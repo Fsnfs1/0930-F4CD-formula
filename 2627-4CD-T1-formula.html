@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2627 數學科測考指南 (4CD-T1) · 核心公式背誦與抽測系統</title>
+    
+    <!-- 引入 MathJax 3 渲染引擎 (嚴格遵循顯影規範) -->
+    <script>
+    window.MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            processEscapes: true
+        },
+        options: {
+            skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        },
+        startup: {
+            pageReady: () => {
+                return MathJax.startup.defaultPageReady();
+            }
+        }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f5ff',
+                            100: '#e0ebff',
+                            200: '#bad2ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+        }
+
+        /* 題目卡片動態進入 */
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.97) translateY(8px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .animate-card {
+            animation: fadeInScale 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* 背誦項目彈出動畫 */
+        @keyframes popItem {
+            0% { opacity: 0; transform: translateY(12px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .prompt-item-anim {
+            animation: popItem 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* 公式容器漸變展示 */
+        .formula-reveal-enter {
+            animation: fadeInScale 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* 自定義高亮與數學排版區塊 */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(239, 246, 255, 0.9) 0%, rgba(240, 249, 255, 0.95) 100%);
+            border: 1.5px solid #bfdbfe;
+            border-radius: 14px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        .dark .highlight-box {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border-color: #334155;
+        }
+
+        .formula-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #1e40af;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .dark .formula-title {
+            color: #93c5fd;
+        }
+
+        .formula-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .sub-card {
+            background: rgba(248, 250, 252, 0.85);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        .dark .sub-card {
+            background: rgba(30, 41, 59, 0.75);
+            border-color: #334155;
+        }
+        .sub-card h4 {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            color: #334155;
+        }
+        .dark .sub-card h4 {
+            color: #cbd5e1;
+        }
+
+        .math-display {
+            font-size: 1.12rem;
+            margin: 0.5rem 0;
+            text-align: center;
+            overflow-x: auto;
+            padding: 0.35rem 0;
+        }
+
+        .math-row-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .math-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 0.6rem 0.85rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .dark .math-row {
+            background: rgba(15, 23, 42, 0.6);
+            border-color: #334155;
+        }
+        .math-row > span {
+            font-weight: 600;
+            color: #1e3a8a;
+            font-size: 0.9rem;
+        }
+        .dark .math-row > span {
+            color: #93c5fd;
+        }
+
+        .tip-banner {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-left: 4px solid #f59e0b;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+            color: #92400e;
+        }
+        .dark .tip-banner {
+            background: #451a03;
+            border-color: #78350f;
+            border-left-color: #f59e0b;
+            color: #fde68a;
+        }
+
+        .symbol-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.4rem;
+            font-size: 0.95rem;
+        }
+        .symbol-list li {
+            background: white;
+            padding: 0.35rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dark .symbol-list li {
+            background: #0f172a;
+            border-color: #334155;
+        }
+
+        /* 打印優化 */
+        @media print {
+            body { background: white !important; color: black !important; }
+            .no-print { display: none !important; }
+            .print-full { display: block !important; }
+            .card-print-break { page-break-inside: avoid; margin-bottom: 2rem; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-200">
+
+    <!-- 頂部導航列 -->
+    <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-800/90 backdrop-blur border-b border-slate-200 dark:border-slate-700 shadow-sm no-print">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-xl shadow-md">
+                    26
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold leading-tight flex items-center gap-2">
+                        <span>4CD 數學大測（一）必備公式背誦系統</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 font-medium">高一上學期</span>
+                    </h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">人教版必修一：第一章 (1.1-1.5) · 第二章 (2.1-2.2) · 考前衝刺</p>
+                </div>
+            </div>
+
+            <!-- 控制按鈕區 -->
+            <div class="flex items-center gap-2">
+                <!-- 視圖切換：抽測 vs 全覽 -->
+                <button id="viewToggleBtn" onclick="toggleViewMode()" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition flex items-center gap-1.5">
+                    <span id="viewIcon">📜</span>
+                    <span id="viewText">全覽清單模式</span>
+                </button>
+
+                <!-- 目錄抽屜按鈕 -->
+                <button onclick="toggleDrawer()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-50 text-blue-600 dark:bg-slate-700 dark:text-blue-400 hover:bg-blue-100 transition flex items-center gap-1">
+                    <span>📑</span>
+                    <span>題庫目錄 (<span id="totalQuestionsCount">22</span>)</span>
+                </button>
+
+                <!-- 深色模式切換 -->
+                <button onclick="toggleDarkMode()" title="切換深淺外觀" class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition text-slate-600 dark:text-slate-300">
+                    <span id="themeIcon">🌙</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要容器 -->
+    <main class="max-w-4xl mx-auto px-4 py-6">
+
+        <!-- ======================= 抽測卡片視圖 (Quiz Mode) ======================= -->
+        <div id="quizModeContainer" class="space-y-6">
+
+            <!-- 篩選器與進度條 -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-slate-700 no-print">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">章節分類篩選：</span>
+                        <div id="categoryChips" class="flex flex-wrap gap-1.5">
+                            <!-- JS 動態生成章節按鈕 -->
+                        </div>
+                    </div>
+
+                    <!-- 抽題模式 -->
+                    <div class="flex items-center gap-2 text-xs">
+                        <label class="flex items-center gap-1.5 cursor-pointer text-slate-600 dark:text-slate-300">
+                            <input type="checkbox" id="randomModeCheckbox" onchange="toggleRandomMode(this.checked)" class="rounded text-blue-600 focus:ring-blue-500">
+                            <span>隨機抽題模式</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 掌握度進度與題號 -->
+                <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1.5">
+                    <div class="flex items-center gap-2">
+                        <span>當前進度：<strong id="currentProgressText" class="text-blue-600 dark:text-blue-400 font-bold">第 1 / 22 題</strong></span>
+                        <span class="text-slate-300 dark:text-slate-600">|</span>
+                        <span>已掌握：<strong id="masteredCountText" class="text-emerald-600 dark:text-emerald-400 font-bold">0</strong> 題</span>
+                    </div>
+                    <span class="hidden sm:inline text-slate-400">快捷鍵：[空格/Enter] 揭曉或下一題 · [方向鍵←/→] 切換</span>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                    <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-indigo-600 h-full transition-all duration-300" style="width: 4.5%;"></div>
+                </div>
+            </div>
+
+            <!-- 核心抽測卡片 -->
+            <div id="activeCard" class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200/80 dark:border-slate-700 animate-card transition-all">
+                
+                <!-- 卡片頂部元信息 -->
+                <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-4 mb-6">
+                    <div class="flex items-center gap-2.5">
+                        <span id="cardBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300">
+                            必考核心
+                        </span>
+                        <span id="cardChapter" class="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                            單元：集合
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button id="masterToggleBtn" onclick="toggleMasterStatus()" class="px-3 py-1 text-xs rounded-full border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition flex items-center gap-1 text-slate-600 dark:text-slate-300">
+                            <span id="masterIcon">⭐</span>
+                            <span id="masterLabel">標記已掌握</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 題目標題 -->
+                <div class="mb-6">
+                    <div class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1 flex items-center gap-1">
+                        <span>🎯 抽測主題 · 第 <span id="cardId">1</span> 題</span>
+                    </div>
+                    <h2 id="cardTitle" class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-tight">
+                        常用數集符號與包含關係
+                    </h2>
+                </div>
+
+                <!-- 階段 1：按鍵後彈出的 2~3 條需要背誦的項目 -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                            <span>💭 請先大腦回憶以下 2～3 條背誦項目：</span>
+                        </h3>
+                        <span class="text-xs text-amber-600 dark:text-amber-400 font-medium">心裡作答後再點擊下方揭曉</span>
+                    </div>
+
+                    <div id="promptsContainer" class="space-y-3">
+                        <!-- 動態插入 2~3 個背誦項目 -->
+                    </div>
+                </div>
+
+                <!-- 階段 2：再按一下，出現公式（公式揭曉區域） -->
+                <div id="formulaSection" class="relative mt-8 pt-6 border-t-2 border-dashed border-slate-200 dark:border-slate-700">
+                    
+                    <!-- 遮罩/待揭曉按鈕（未點擊時顯示） -->
+                    <div id="formulaCover" class="text-center py-8 px-4 bg-gradient-to-b from-slate-50 to-blue-50/50 dark:from-slate-800/80 dark:to-slate-900/80 rounded-2xl border-2 border-dashed border-blue-200 dark:border-blue-900/60">
+                        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-900/60 dark:text-blue-300 text-2xl mb-3 shadow-inner">
+                            💡
+                        </div>
+                        <h4 class="text-base font-bold text-slate-800 dark:text-slate-200 mb-1">
+                            回憶完成了嗎？點擊下方按鈕核對公式
+                        </h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">
+                            系統將呈現標準 LaTeX 公式、答題步驟規範與易錯提醒
+                        </p>
+                        <button onclick="revealFormula()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transform hover:-translate-y-0.5 active:translate-y-0 transition flex items-center gap-2 mx-auto">
+                            <span>✨ 揭曉公式與完整推導</span>
+                            <span class="text-xs opacity-75 font-normal">(或按空格鍵)</span>
+                        </button>
+                    </div>
+
+                    <!-- 揭曉後的公式本體（點擊後顯示） -->
+                    <div id="formulaContent" class="hidden formula-reveal-enter">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm">
+                                <span>✅ 官方標準公式與規範解答</span>
+                            </div>
+                            <button onclick="hideFormula()" class="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                                重新遮蓋 🙈
+                            </button>
+                        </div>
+
+                        <!-- 公式動態注入點 -->
+                        <div id="formulaContainer" class="text-slate-800 dark:text-slate-200">
+                            <!-- 插入 LaTeX 公式內容 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 底部導航操作列 -->
+                <div class="flex flex-wrap items-center justify-between gap-3 mt-8 pt-6 border-t border-slate-100 dark:border-slate-700/60 no-print">
+                    <button onclick="prevQuestion()" class="px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition flex items-center gap-1.5">
+                        <span>⬅️ 上一題</span>
+                    </button>
+
+                    <div class="flex items-center gap-2">
+                        <button onclick="pickRandomQuestion()" class="px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 transition flex items-center gap-1">
+                            <span>🎲 隨機抽一題</span>
+                        </button>
+
+                        <button id="nextBtn" onclick="nextQuestion()" class="px-5 py-2 text-xs sm:text-sm font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 transition flex items-center gap-1.5">
+                            <span>下一題 ➡️</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ======================= 全覽背誦清單模式 (Overview Mode) ======================= -->
+        <div id="overviewModeContainer" class="hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-lg font-bold">📜 全單元公式背誦速查手冊 (全 22 題)</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">適合考前整體梳理回顧，亦可點擊右側按鈕直接列印為紙質手冊</p>
+                </div>
+                <div class="flex items-center gap-2 no-print">
+                    <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow transition flex items-center gap-1.5">
+                        <span>🖨️ 列印 / 另存為 PDF</span>
+                    </button>
+                    <button onclick="toggleViewMode()" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold transition">
+                        返回抽測卡片
+                    </button>
+                </div>
+            </div>
+
+            <div id="overviewList" class="space-y-6">
+                <!-- 動態注入全部 22 題清單 -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 側邊題項目錄抽屜 (Drawer) -->
+    <div id="drawerBackdrop" onclick="toggleDrawer()" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden transition-opacity"></div>
+    <div id="drawer" class="fixed right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-white dark:bg-slate-800 z-50 shadow-2xl p-5 transform translate-x-full transition-transform duration-300 overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-3 mb-4">
+            <div class="flex items-center gap-2">
+                <span class="text-lg">📑</span>
+                <h3 class="font-bold text-slate-800 dark:text-slate-100">題庫目錄導航</h3>
+            </div>
+            <button onclick="toggleDrawer()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                ✕
+            </button>
+        </div>
+        <p class="text-xs text-slate-400 mb-3">點擊任意題目立即切換抽測：</p>
+        <div id="drawerList" class="space-y-2">
+            <!-- 動態生成題目跳轉按鈕 -->
+        </div>
+    </div>
+
+    <!-- 頁尾版權與備註 -->
+    <footer class="text-center py-8 text-xs text-slate-400 dark:text-slate-500 border-t border-slate-200 dark:border-slate-800 mt-12 no-print">
+        <p>新華學校（中學部）2026-2027學年上學期 高一數學科大測（一）必備公式指南</p>
+        <p class="mt-1">技術支持：Antigravity Interactive Educational Engine · MathJax 3 Enabled</p>
+    </footer>
+
+    <!-- 核心互動邏輯 JavaScript -->
+    <script>
+        // 題目數據集
+        const questions = [{"id": 1, "chapter": "集合", "badge": "必考核心", "title": "常用數集符號與包含關係", "prompts": ["自然數集 $\\mathbb{N}$、正整數集 $\\mathbb{N}^*$ ($\\mathbb{N}^+$)、整數集 $\\mathbb{Z}$、有理數集 $\\mathbb{Q}$、實數集 $\\mathbb{R}$ 的具體含義及 $0$ 的歸屬是什麼？", "五大常用數系之間的連續真子集包含鏈是怎樣的？", "元素與集合（$\\in, \\notin$）及集合與集合（$\\subseteq, \\subsetneq$）符號的本質區別是什麼？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 核心數系真子集包含鏈</div>\n            <div class=\"math-display\">$$\\mathbb{N}^* \\subsetneq \\mathbb{N} \\subsetneq \\mathbb{Z} \\subsetneq \\mathbb{Q} \\subsetneq \\mathbb{R}$$</div>\n        </div>\n        <div class=\"formula-grid\">\n            <div class=\"sub-card\">\n                <h4>📌 0 的特殊歸屬（易錯常考）</h4>\n                <p class=\"math-display\">$$0 \\in \\mathbb{N}, \\quad 0 \\notin \\mathbb{N}^*$$</p>\n                <p class=\"text-xs text-slate-500 dark:text-slate-400\">$\\mathbb{N}$ 包含 $0$ 與全體正整數；$\\mathbb{N}^*$ 或 $\\mathbb{N}^+$ 僅包含正整數。</p>\n            </div>\n            <div class=\"sub-card\">\n                <h4>📌 從屬 vs 包含 符號規範</h4>\n                <p class=\"math-display\">$$a \\in A \\text{ 或 } a \\notin A \\quad (\\text{元素與集合從屬})$$</p>\n                <p class=\"math-display\">$$A \\subseteq B \\text{ 或 } A \\subsetneq B \\quad (\\text{集合與集合包含})$$</p>\n            </div>\n        </div>\n        <div class=\"tip-banner\">\n            ⚠️ <strong>避坑提醒：</strong>嚴禁在元素與集合之間使用包含符號（如寫 $0 \\subseteq \\mathbb{N}$ 屬嚴重語法錯誤）！\n        </div>\n        "}, {"id": 2, "chapter": "集合", "badge": "高頻考點", "title": "子集、真子集與空集性質", "prompts": ["子集（$A \\subseteq B$）與真子集（$A \\subsetneq B$）的嚴格邏輯定義是什麼？", "空集 $\\varnothing$ 的兩大核心包含性質是什麼？", "在集合含參子集包含問題中，討論空集 $\\varnothing$ 的致命易錯點是什麼？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 子集與真子集嚴格定義</div>\n            <div class=\"math-display\">$$\\forall x \\in A \\implies x \\in B \\iff A \\subseteq B$$</div>\n            <div class=\"math-display\">$$A \\subseteq B \\text{ 且 } \\exists x \\in B \\ (x \\notin A) \\iff A \\subsetneq B$$</div>\n        </div>\n        <div class=\"formula-grid\">\n            <div class=\"sub-card\">\n                <h4>📌 空集 $\\varnothing$ 核心包含定理</h4>\n                <p class=\"math-display\">$$\\varnothing \\subseteq A \\quad (\\varnothing \\text{ 是任何集合的子集})$$</p>\n                <p class=\"math-display\">$$\\text{若 } A \\neq \\varnothing \\implies \\varnothing \\subsetneq A \\quad (\\text{非空集合的真子集})$$</p>\n            </div>\n            <div class=\"sub-card\">\n                <h4>⚠️ 含參討論致命陷阱</h4>\n                <p class=\"text-xs text-slate-600 dark:text-slate-300\">若已知 $B \\subseteq A$，且 $B$ 含有未知參數（如 $B = \\{x \\mid ax - 1 = 0\\}$）：</p>\n                <p class=\"text-red-500 dark:text-red-400 font-bold text-xs mt-1\">必須第一時間分類討論 $B = \\varnothing$ 的情況！漏掉 $B = \\varnothing$ 全題不得分！</p>\n            </div>\n        </div>\n        "}, {"id": 3, "chapter": "集合", "badge": "必背公式", "title": "有限集合子集個數定理", "prompts": ["若有限集合 $A$ 含有 $n$ 個元素，其子集個數公式是什麼？", "其真子集個數公式是什麼？", "其非空子集個數與非空真子集個數公式分別是什麼？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 子集個數計算四大公式（設集合含 $n$ 個元素）</div>\n            <div class=\"math-row-list\">\n                <div class=\"math-row\"><span>① 子集個數：</span>$$\\text{子集個數} = 2^n$$</div>\n                <div class=\"math-row\"><span>② 真子集個數：</span>$$\\text{真子集個數} = 2^n - 1$$</div>\n                <div class=\"math-row\"><span>③ 非空子集個數：</span>$$\\text{非空子集個數} = 2^n - 1$$</div>\n                <div class=\"math-row\"><span>④ 非空真子集個數：</span>$$\\text{非空真子集個數} = 2^n - 2$$</div>\n            </div>\n        </div>\n        <div class=\"sub-card mt-3\">\n            <h4>💡 典型速算範例</h4>\n            <p class=\"text-xs text-slate-600 dark:text-slate-300\">集合 $A = \\{a, b, c\\}$（$n=3$）：子集共 $2^3 = 8$ 個；真子集有 $8-1=7$ 個；非空真子集有 $8-2=6$ 個。</p>\n        </div>\n        "}, {"id": 4, "chapter": "集合", "badge": "基礎必備", "title": "集合交集、並集與補集運算", "prompts": ["交集 $A \\cap B$ 的描述法定義與核心特徵（公共元素）是什麼？", "並集 $A \\cup B$ 的描述法定義與重複元素規則是什麼？", "全集 $U$ 下子集 $A$ 的補集 $\\complement_U A$ 的描述法定義是什麼？"], "formulaHtml": "\n        <div class=\"formula-grid\">\n            <div class=\"sub-card\">\n                <h4>🔹 交集運算（公共元素）</h4>\n                <div class=\"math-display\">$$A \\cap B = \\{x \\mid x \\in A \\text{ 且 } x \\in B\\}$$</div>\n            </div>\n            <div class=\"sub-card\">\n                <h4>🔸 並集運算（全部合併去重）</h4>\n                <div class=\"math-display\">$$A \\cup B = \\{x \\mid x \\in A \\text{ 或 } x \\in B\\}$$</div>\n            </div>\n        </div>\n        <div class=\"formula-block highlight-box mt-3\">\n            <div class=\"formula-title\">🌟 全集與補集運算</div>\n            <div class=\"math-display\">$$\\complement_U A = \\{x \\mid x \\in U \\text{ 且 } x \\notin A\\}$$</div>\n            <p class=\"text-xs text-slate-500 dark:text-slate-400\">含義：從全集 $U$ 中徹底剔除屬於 $A$ 的所有元素。</p>\n        </div>\n        <div class=\"tip-banner\">\n            📐 <strong>數軸作圖法：</strong>連續數集/區間運算時，務必在數軸上畫圖標記，空心點表示不包含，實心點表示包含！\n        </div>\n        "}, {"id": 5, "chapter": "集合", "badge": "解題神技", "title": "常用集合恆等式與包含等價轉化", "prompts": ["集合自身及與空集的交、並運算結果是什麼？", "集合與其自身補集的交、並運算結果分別是什麼？", "子集關係 $A \\subseteq B$ 的四個完全等價命題轉化是什麼？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 四大完全等價轉化定理（大題逆求參數必備）</div>\n            <div class=\"math-display\">$$A \\subseteq B \\iff A \\cap B = A \\iff A \\cup B = B \\iff \\complement_U B \\subseteq \\complement_U A$$</div>\n        </div>\n        <div class=\"formula-grid mt-3\">\n            <div class=\"sub-card\">\n                <h4>📌 集合自身與空集運算</h4>\n                <p class=\"math-display\">$$A \\cap A = A, \\quad A \\cup A = A$$</p>\n                <p class=\"math-display\">$$A \\cap \\varnothing = \\varnothing, \\quad A \\cup \\varnothing = A$$</p>\n            </div>\n            <div class=\"sub-card\">\n                <h4>📌 集合與補集運算</h4>\n                <p class=\"math-display\">$$A \\cap (\\complement_U A) = \\varnothing$$</p>\n                <p class=\"math-display\">$$A \\cup (\\complement_U A) = U$$</p>\n            </div>\n        </div>\n        "}, {"id": 6, "chapter": "拓展公式", "badge": "聯考拓展", "title": "集合分配律與包含簡化律", "prompts": ["交集對並集的分配律公式是什麼？", "並集對交集的分配律公式是什麼？", "當已知 $A \\subseteq B \\cup C$ 時，式子 $A \\cap (B \\cup C)$ 可直接簡化為什麼？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 集合分配律公式</div>\n            <div class=\"math-display\">$$A \\cap (B \\cup C) = (A \\cap B) \\cup (A \\cap C)$$</div>\n            <div class=\"math-display\">$$A \\cup (B \\cap C) = (A \\cup B) \\cap (A \\cup C)$$</div>\n        </div>\n        <div class=\"sub-card mt-3\">\n            <h4>💡 包含簡化律</h4>\n            <p class=\"text-xs text-slate-600 dark:text-slate-300\">特別地，若已知 $A \\subseteq B \\cup C$，則直接有：</p>\n            <div class=\"math-display\">$$A \\cap (B \\cup C) = A$$</div>\n            <p class=\"text-xs text-slate-500 dark:text-slate-400\">此性質在四校聯考集合化簡大題中常作為秒殺技巧使用。</p>\n        </div>\n        "}, {"id": 7, "chapter": "常用邏輯", "badge": "核心概念", "title": "充分條件、必要條件與充要條件", "prompts": ["若命題 $p \\implies q$，則 $p$ 是 $q$ 的什麼條件？$q$ 是 $p$ 的什麼條件？", "若命題 $q \\implies p$（即 $p \\impliedby q$），則 $p$ 是 $q$ 的什麼條件？", "充要條件的定義與雙向推導符號「$\\iff$」是什麼？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 命題推導方向與條件對照</div>\n            <div class=\"math-row-list\">\n                <div class=\"math-row\"><span>① 充分條件：</span>$$\\text{若 } p \\implies q, \\text{ 則 } p \\text{ 是 } q \\text{ 的充分條件，} q \\text{ 是 } p \\text{ 的必要條件}$$</div>\n                <div class=\"math-row\"><span>② 必要條件：</span>$$\\text{若 } q \\implies p \\ (p \\impliedby q), \\text{ 則 } p \\text{ 是 } q \\text{ 的必要條件}$$</div>\n                <div class=\"math-row\"><span>③ 充要條件：</span>$$\\text{若 } p \\implies q \\text{ 且 } q \\implies p \\ (p \\iff q), \\text{ 則 } p \\text{ 是 } q \\text{ 的充要條件}$$</div>\n            </div>\n        </div>\n        <div class=\"tip-banner mt-3\">\n            🎯 <strong>口訣速記：</strong>箭頭指向誰，誰就是必要條件；箭頭源自誰，誰就是充分條件。「前推後，前充分後必要；雙向推，互為充要。」\n        </div>\n        "}, {"id": 8, "chapter": "常用邏輯", "badge": "解題金匙", "title": "條件與集合解集的包含對照", "prompts": ["設 $p, q$ 對應的解集分別為 $A, B$，當 $A \\subseteq B$ 時，$p$ 與 $q$ 的條件關係是什麼？", "當 $B \\subseteq A$ 時，$p$ 與 $q$ 的條件關係是什麼？", "「小範圍推大範圍」原則如何應用？當 $A = B$ 時結論如何？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 解集包含關係 $\\iff$ 邏輯條件對照</div>\n            <div class=\"math-row-list\">\n                <div class=\"math-row\"><span>① 充分條件：</span>$$A \\subseteq B \\implies p \\text{ 是 } q \\text{ 的充分條件 (小推大)}$$</div>\n                <div class=\"math-row\"><span>② 必要條件：</span>$$B \\subseteq A \\implies p \\text{ 是 } q \\text{ 的必要條件}$$</div>\n                <div class=\"math-row\"><span>③ 充要條件：</span>$$A = B \\iff p \\text{ 是 } q \\text{ 的充要條件}$$</div>\n                <div class=\"math-row\"><span>④ 充分不必要：</span>$$A \\subsetneq B \\implies p \\text{ 是 } q \\text{ 的充分不必要條件}$$</div>\n            </div>\n        </div>\n        <div class=\"tip-banner mt-3\">\n            💡 <strong>黃金法則：</strong>「小範圍能推出大範圍，大範圍不能推出小範圍」。解集範圍越小，條件越充分；解集範圍越大，條件越必要！\n        </div>\n        "}, {"id": 9, "chapter": "常用邏輯", "badge": "必考送分", "title": "全稱命題與特稱命題的否定規則", "prompts": ["全稱命題 $\\forall x \\in M, p(x)$ 的否定公式是什麼？", "特稱命題 $\\exists x \\in M, q(x)$ 的否定公式是什麼？", "命題否定時限定範圍 $M$ 與常見結論符號（如 $>$, $\\leqslant$, 等）的轉變守則？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 量詞命題否定兩大標準公式</div>\n            <div class=\"math-display\">$$\\neg \\Big( \\forall x \\in M, p(x) \\Big) \\iff \\exists x \\in M, \\neg p(x)$$</div>\n            <div class=\"math-display\">$$\\neg \\Big( \\exists x \\in M, q(x) \\Big) \\iff \\forall x \\in M, \\neg q(x)$$</div>\n        </div>\n        <div class=\"formula-grid mt-3\">\n            <div class=\"sub-card\">\n                <h4>📌 否定符號精準對照表</h4>\n                <ul class=\"symbol-list\">\n                    <li>$>$ 否定為 $\\leqslant$</li>\n                    <li>$<$ 否定為 $\\geqslant$</li>\n                    <li>$\\geqslant$ 否定為 $<$</li>\n                    <li>$\\leqslant$ 否定為 $>$</li>\n                    <li>$=$ 否定為 $\\neq$</li>\n                </ul>\n            </div>\n            <div class=\"sub-card\">\n                <h4>⚠️ 核心答題三大鐵律</h4>\n                <p>1. <strong>全稱改存在，存在改全稱</strong></p>\n                <p>2. <strong>結論取反向</strong>（嚴密對照左表）</p>\n                <p class=\"text-red-500 dark:text-red-400 font-bold\">3. 限定範圍 $M$ 絕對保持不變！（嚴禁寫 $x \\notin M$）</p>\n            </div>\n        </div>\n        "}, {"id": 10, "chapter": "等式與不等式", "badge": "核心定理", "title": "實數作差比較法與不等式加法保序", "prompts": ["實數作差比較法的基本事實（大於 0、等於 0、小於 0）是什麼？", "不等式同加、同減任意實數的保序性定理是什麼？", "同向不等式相加法則是什麼？為什麼「同向不等式絕對不能直接相減」？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 實數大小作差比較法基本事實</div>\n            <div class=\"math-display\">$$a - b > 0 \\iff a > b$$</div>\n            <div class=\"math-display\">$$a - b = 0 \\iff a = b$$</div>\n            <div class=\"math-display\">$$a - b < 0 \\iff a < b$$</div>\n        </div>\n        <div class=\"formula-grid mt-3\">\n            <div class=\"sub-card\">\n                <h4>📌 加法保序性定理</h4>\n                <p class=\"math-display\">$$a > b \\iff a + c > b + c$$</p>\n                <p class=\"math-display\">$$a > b \\iff a - c > b - c$$</p>\n                <p class=\"text-xs text-slate-500 dark:text-slate-400\">兩邊同加或同減任意實數，不等號方向絕對不變！</p>\n            </div>\n            <div class=\"sub-card\">\n                <h4>📌 同向不等式相加法則</h4>\n                <p class=\"math-display\">$$\\text{若 } a > b \\text{ 且 } c > d \\implies a + c > b + d$$</p>\n                <div class=\"tip-banner mt-2\">\n                    🚫 <strong>絕對禁忌：</strong>同向不等式絕不能直接相減！例如 $5 > 2, 4 > 1$，若相減得 $1 > 1$ 是完全錯誤的。\n                </div>\n            </div>\n        </div>\n        "}, {"id": 11, "chapter": "等式與不等式", "badge": "易錯考點", "title": "不等式乘法性質與正數乘方開方", "prompts": ["不等式兩邊同乘以正數與同乘以負數時，不等號的方向有何變化？", "正數乘方保序性定理（$n \\in \\mathbb{N}^*, n \\geqslant 2$）是什麼？", "正數開方保序性定理（$n \\in \\mathbb{N}^*, n \\geqslant 2$）是什麼？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 不等式乘法法則（符號翻轉核心）</div>\n            <div class=\"math-display\">$$\\text{若 } a > b \\text{ 且 } c > 0 \\implies ac > bc$$</div>\n            <div class=\"math-display\">$$\\text{若 } a > b \\text{ 且 } c < 0 \\implies ac < bc \\quad (\\text{同乘負數必須翻轉不等號！})$$</div>\n        </div>\n        <div class=\"formula-grid mt-3\">\n            <div class=\"sub-card\">\n                <h4>📌 正數乘方保序性</h4>\n                <p class=\"math-display\">$$\\text{若 } a > b > 0 \\implies a^n > b^n \\quad (n \\in \\mathbb{N}^*, n \\geqslant 2)$$</p>\n            </div>\n            <div class=\"sub-card\">\n                <h4>📌 正數開方保序性</h4>\n                <p class=\"math-display\">$$\\text{若 } a > b > 0 \\implies \\sqrt[n]{a} > \\sqrt[n]{b} \\quad (n \\in \\mathbb{N}^*, n \\geqslant 2)$$</p>\n            </div>\n        </div>\n        <div class=\"tip-banner mt-3\">\n            ⚠️ <strong>分類討論提醒：</strong>在不等式兩邊同乘含有未知字母的代數式（如 $x$）時，必須按 $x>0, x=0, x<0$ 嚴密分類討論！\n        </div>\n        "}, {"id": 12, "chapter": "基本不等式", "badge": "重中之重", "title": "基本不等式公式與取等三要素", "prompts": ["基本不等式的標準公式形式及等號成立的充要條件是什麼？", "算術平均數與幾何平均數的名稱定義是什麼？", "基本不等式應用的「取等三要素」口訣是什麼？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 基本不等式標準形式（均值不等式）</div>\n            <div class=\"math-display\">$$\\text{對任意正實數 } a > 0, b > 0: \\quad \\sqrt{ab} \\leqslant \\frac{a+b}{2} \\quad (\\text{或 } a + b \\geqslant 2\\sqrt{ab})$$</div>\n            <div class=\"math-display\">$$\\text{當且僅當 } a = b \\text{ 時等號成立}$$</div>\n        </div>\n        <div class=\"formula-grid mt-3\">\n            <div class=\"sub-card\">\n                <h4>📌 兩大平均數名稱定義</h4>\n                <p class=\"math-display\">$$\\frac{a+b}{2} \\text{ 稱為 } a, b \\text{ 的算術平均數}$$</p>\n                <p class=\"math-display\">$$\\sqrt{ab} \\text{ 稱為 } a, b \\text{ 的幾何平均數}$$</p>\n            </div>\n            <div class=\"sub-card\">\n                <h4>🏆 取等三要素黃金口訣</h4>\n                <p class=\"text-xs text-slate-600 dark:text-slate-300\"><strong>一正：</strong>指明 $a > 0, b > 0$（正數前提）</p>\n                <p class=\"text-xs text-slate-600 dark:text-slate-300\"><strong>二定：</strong>和為定值或積為定值（構造常數）</p>\n                <p class=\"text-xs text-slate-600 dark:text-slate-300\"><strong>三相等：</strong>嚴格檢驗等號成立條件 $a = b$</p>\n            </div>\n        </div>\n        "}, {"id": 13, "chapter": "基本不等式", "badge": "最值定理", "title": "積定和小與和定積大最值定理", "prompts": ["積定和小定理：在什麼條件下、取何值時，兩數之和 $a+b$ 取得最小值？", "和定積大定理：在什麼條件下、取何值時，乘積 $ab$ 取得最大值？", "最值解答題中，漏寫取等條件會有何後果？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 兩大最值定理（求極值必備）</div>\n            <div class=\"math-display\">$$\\text{積定和小：若 } a,b>0 \\text{ 且 } ab=P \\text{ (常數)}, \\text{ 當 } a=b=\\sqrt{P} \\text{ 時}, \\ \\min(a+b) = 2\\sqrt{P}$$</div>\n            <div class=\"math-display\">$$\\text{和定積大：若 } a,b>0 \\text{ 且 } a+b=S \\text{ (常數)}, \\text{ 當 } a=b=\\frac{S}{2} \\text{ 時}, \\ \\max(ab) = \\frac{S^2}{4}$$</div>\n        </div>\n        <div class=\"tip-banner mt-3\">\n            📝 <strong>解答題規範：</strong>步驟中必須完整寫明「當且僅當 $a = b = \\dots$ 時等號成立，故原式取得最值 $\\dots$」。若漏寫取等條件，扣大題步驟分！\n        </div>\n        "}, {"id": 14, "chapter": "基本不等式", "badge": "速算模型", "title": "常見倒數和模型與速算公式", "prompts": ["倒數和模型 $x + \\frac{k}{x}$（$x > 0, k > 0$）的最小值公式與取等條件是什麼？", "特例一：$x + \\frac{1}{x}$（$x > 0$）的最小值及取等點是什麼？", "特例二：$x + \\frac{4}{x}$（$x > 0$）的最小值及取等點是什麼？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 倒數和模型一般公式（$x > 0, k > 0$）</div>\n            <div class=\"math-display\">$$x + \\frac{k}{x} \\geqslant 2\\sqrt{x \\cdot \\frac{k}{x}} = 2\\sqrt{k}$$</div>\n            <div class=\"math-display\">$$\\text{當且僅當 } x = \\frac{k}{x} \\iff x = \\sqrt{k} \\text{ 時取等號}$$</div>\n        </div>\n        <div class=\"formula-grid mt-3\">\n            <div class=\"sub-card\">\n                <h4>⚡ 特例一（$k=1$）</h4>\n                <p class=\"math-display\">$$x + \\frac{1}{x} \\geqslant 2$$</p>\n                <p class=\"text-xs text-slate-500 dark:text-slate-400\">當且僅當 $x = 1$ 時取等號，最小值為 $2$。</p>\n            </div>\n            <div class=\"sub-card\">\n                <h4>⚡ 特例二（$k=4$）</h4>\n                <p class=\"math-display\">$$x + \\frac{4}{x} \\geqslant 4$$</p>\n                <p class=\"text-xs text-slate-500 dark:text-slate-400\">當且僅當 $x = 2$ 時取等號，最小值為 $4$。</p>\n            </div>\n        </div>\n        <div class=\"tip-banner mt-3\">\n            🧩 <strong>配湊技巧：</strong>遇到分母含變量如 $x + \\frac{1}{x-1} \\ (x>1)$，拆為 $(x-1) + \\frac{1}{x-1} + 1 \\geqslant 2 + 1 = 3$。\n        </div>\n        "}, {"id": 15, "chapter": "基本不等式", "badge": "幾何建模", "title": "幾何最值建模（矩形周長與面積）", "prompts": ["面積為定值 $S = xy$ 時，矩形周長 $L = 2(x+y)$ 的最值模型及幾何形狀是什麼？", "周長為定值 $L = 2(x+y)$ 時，矩形面積 $S = xy$ 的最值模型及幾何形狀是什麼？", "幾何應用題建模設元的規範要求是什麼？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 矩形幾何最值雙模型（設長為 $x$，寬為 $y$，且 $x, y > 0$）</div>\n            <div class=\"math-display\">$$\\text{① 面積定值 } S = xy \\implies \\text{周長 } L = 2(x+y) \\geqslant 4\\sqrt{xy} = 4\\sqrt{S}$$</div>\n            <div class=\"math-display\">$$\\text{當 } x = y = \\sqrt{S} \\text{ (正方形) 時，周長最短，最短周長為 } 4\\sqrt{S}$$</div>\n            <hr class=\"my-2 border-slate-200 dark:border-slate-700\">\n            <div class=\"math-display\">$$\\text{② 周長定值 } L = 2(x+y) \\implies \\text{面積 } S = xy \\leqslant \\left(\\frac{x+y}{2}\\right)^2 = \\left(\\frac{L}{4}\\right)^2$$</div>\n            <div class=\"math-display\">$$\\text{當 } x = y = \\frac{L}{4} \\text{ (正方形) 時，面積最大，最大面積為 } \\left(\\frac{L}{4}\\right)^2$$</div>\n        </div>\n        <div class=\"tip-banner mt-3\">\n            📝 <strong>解答題規範：</strong>① 設長為 $x\\text{ m}$，寬為 $y\\text{ m}$，註明單位與正數條件（$x>0, y>0$）；② 寫出目標函數；③ 套公式求最值；④ 完整寫出正方形尺寸答語。\n        </div>\n        "}, {"id": 16, "chapter": "拓展公式", "badge": "解題必備", "title": "一元二次不等式的解集規律", "prompts": ["二次方程兩根為 $x_1, x_2$（設 $x_1 < x_2$），小於等於零不等式 $(x-x_1)(x-x_2) \\leqslant 0$ 的解集是什麼？", "大於等於零不等式 $(x-x_1)(x-x_2) \\geqslant 0$ 的解集是什麼？", "口訣「小於取中間，大於取兩邊」的適用前提是什麼？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 一元二次不等式解集規律（設方程兩根為 $x_1 < x_2$）</div>\n            <div class=\"math-display\">$$(x - x_1)(x - x_2) \\leqslant 0 \\iff x_1 \\leqslant x \\leqslant x_2 \\quad (\\text{小於取中間})$$</div>\n            <div class=\"math-display\">$$(x - x_1)(x - x_2) \\geqslant 0 \\iff x \\leqslant x_1 \\text{ 或 } x \\geqslant x_2 \\quad (\\text{大於取兩邊})$$</div>\n        </div>\n        <div class=\"formula-grid mt-3\">\n            <div class=\"sub-card\">\n                <h4>🎯 核心口訣</h4>\n                <p class=\"text-blue-600 dark:text-blue-400 font-bold text-base\">「小於取中間，大於取兩邊」</p>\n                <p class=\"text-xs text-slate-500 dark:text-slate-400\">以兩根為邊界，開口向上時小於 0 落在根之間，大於 0 落在根兩側。</p>\n            </div>\n            <div class=\"sub-card\">\n                <h4>⚠️ 關鍵前提（不可忽略）</h4>\n                <p class=\"text-red-500 dark:text-red-400 font-bold text-xs\">二次項係數必須為正（$a > 0$）！</p>\n                <p class=\"text-xs text-slate-600 dark:text-slate-300\">若 $a < 0$（例如 $-x^2+3x+4>0$），必須先兩邊同乘 $-1$ 翻轉不等號為 $x^2-3x-4<0$，再套用口訣！</p>\n            </div>\n        </div>\n        "}, {"id": 17, "chapter": "答題規範", "badge": "大測模板", "title": "作差法證明規範步驟模板", "prompts": ["作差法證明解答題的步驟一（展開）與步驟二（作差因式分解）是什麼？", "步驟三：判定差值正負的關鍵依據是什麼？", "步驟四：如何規範得出大小結論？二次多項式作差相消有何技巧？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 作差法解答題規範答題四步模板</div>\n            <div class=\"math-row-list\">\n                <div class=\"math-row\"><span>① 【展開代數式】：</span>分別展開或通分要比較的兩代數式 $A$ 與 $B$。</div>\n                <div class=\"math-row\"><span>② 【作差與分解】：</span>計算 $A - B$，相消同類項後，因式分解為乘積或配方為完全平方式。</div>\n                <div class=\"math-row\"><span>③ 【判定符號】：</span>明確寫出正負判定依據（如「因為 $x>0 \\implies x+1>0$ 且 $(x-1)^2 \\geqslant 0$」）。</div>\n                <div class=\"math-row\"><span>④ 【得出結論】：</span>明確寫出「故 $A - B > 0 \\implies A > B$」。</div>\n            </div>\n        </div>\n        <div class=\"sub-card mt-3\">\n            <h4>💡 二次多項式作差相消秒殺技巧</h4>\n            <div class=\"math-display\">$$[(x+a)(x+b)] - [(x+c)(x+d)] = [x^2+(a+b)x+ab] - [x^2+(c+d)x+cd]$$</div>\n            <p class=\"text-xs text-slate-600 dark:text-slate-300\"><strong>二次項 $x^2$ 直接抵消</strong>，只剩下一次項和常數項，計算極速且絕不會算錯！</p>\n        </div>\n        "}, {"id": 18, "chapter": "答題規範", "badge": "大測模板", "title": "充要條件證明規範步驟模板", "prompts": ["【充分性驗證】的證明起點、推導過程與目標是什麼？", "【必要性驗證】的證明起點、推導過程與目標是什麼？", "充要條件大題的規範終結語如何書寫？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 充要條件大題規範作答結構模板</div>\n            <div class=\"math-row-list\">\n                <div class=\"math-row\"><span>① 【充分性驗證】：</span>由已知條件 $p$ 出發，嚴格推導出條件 $q$（即證明 $p \\implies q$）。</div>\n                <div class=\"math-row\"><span>② 【必要性驗證】：</span>由條件 $q$ 出發，嚴格反推導出條件 $p$（即證明 $q \\implies p$）。</div>\n                <div class=\"math-row\"><span>③ 【最終結論】：</span>規範結語寫出「綜上所述，$p$ 是 $q$ 的充要條件」。</div>\n            </div>\n        </div>\n        <div class=\"tip-banner mt-3\">\n            ⚠️ <strong>評分踩分點：</strong>充要條件題必須嚴格分開書寫「充分性」與「必要性」兩個獨立論證模塊，缺一不可！\n        </div>\n        "}, {"id": 19, "chapter": "答題規範", "badge": "大測模板", "title": "基本不等式求最值規範步驟模板", "prompts": ["步驟一（正數檢驗）與步驟二（構造常數定值）如何規範書寫？", "步驟三：套用基本不等式寫出不等關係的格式是什麼？", "步驟四：檢驗等號成立條件並求解具體自變量數值的規範是什麼？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 基本不等式解答題規範四步模板</div>\n            <div class=\"math-row-list\">\n                <div class=\"math-row\"><span>① 【檢驗正數】：</span>第一行必須指明「因為 $x > 0$（或 $a > 0, b > 0$）」。</div>\n                <div class=\"math-row\"><span>② 【構造定值】：</span>透過拆項、配湊或換元，構造出乘積或和為常數。</div>\n                <div class=\"math-row\"><span>③ 【套用公式】：</span>完整列出不等式：$x + \\frac{k}{x} \\geqslant 2\\sqrt{x \\cdot \\frac{k}{x}} = 2\\sqrt{k}$。</div>\n                <div class=\"math-row\"><span>④ 【檢驗取等】：</span>寫明「當且僅當 $x = \\frac{k}{x}$ 即 $x = \\sqrt{k}$ 時等號成立，故最小值為 $2\\sqrt{k}$」。</div>\n            </div>\n        </div>\n        <div class=\"tip-banner mt-3\">\n            🚫 <strong>扣分重災區：</strong>漏寫取等條件扣步驟分；如果求出取等時的自變量不在定義域內，則不能取到等號！\n        </div>\n        "}, {"id": 20, "chapter": "舊知銜接", "badge": "必備基石", "title": "乘法公式、十字相乘與求根公式", "prompts": ["平方差公式與完全平方公式分別是什麼？", "十字相乘因式分解模型是什麼？舉例說明。", "一元二次方程求根公式與判別式 $\\Delta$ 是什麼？"], "formulaHtml": "\n        <div class=\"formula-grid\">\n            <div class=\"sub-card\">\n                <h4>📌 平方差公式</h4>\n                <div class=\"math-display\">$$a^2 - b^2 = (a - b)(a + b)$$</div>\n            </div>\n            <div class=\"sub-card\">\n                <h4>📌 完全平方公式</h4>\n                <div class=\"math-display\">$$(a \\pm b)^2 = a^2 \\pm 2ab + b^2$$</div>\n            </div>\n        </div>\n        <div class=\"formula-block highlight-box mt-3\">\n            <div class=\"formula-title\">🌟 十字相乘因式分解與求根公式</div>\n            <div class=\"math-display\">$$x^2 + (p+q)x + pq = (x+p)(x+q)$$</div>\n            <p class=\"text-xs text-slate-500 dark:text-slate-400\">例如：$x^2 - 3x - 4 = (x-4)(x+1)$；$x^2 + 3x - 4 = (x+4)(x-1)$</p>\n            <hr class=\"my-2 border-slate-200 dark:border-slate-700\">\n            <div class=\"math-display\">$$ax^2 + bx + c = 0 \\ (a \\ne 0): \\quad \\Delta = b^2 - 4ac$$</div>\n            <div class=\"math-display\">$$\\text{當 } \\Delta \\geqslant 0 \\text{ 時}, \\quad x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$</div>\n        </div>\n        "}, {"id": 21, "chapter": "舊知銜接", "badge": "幾何銜接", "title": "韋達定理與幾何平均數的幾何解釋", "prompts": ["韋達定理（兩根之和 $x_1+x_2$ 與兩根之積 $x_1 x_2$）公式是什麼？", "直角三角形射影定理中，幾何平均數與算術平均數的幾何解釋是什麼？", "常見幾何圖形判定（正方形與矩形、菱形與平行四邊形、等腰三角形）的充分必要關係是什麼？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🌟 韋達定理（根與係數關係）</div>\n            <div class=\"math-display\">$$x_1 + x_2 = -\\frac{b}{a}, \\quad x_1 x_2 = \\frac{c}{a}$$</div>\n        </div>\n        <div class=\"formula-grid mt-3\">\n            <div class=\"sub-card\">\n                <h4>📐 均值不等式幾何解釋</h4>\n                <p class=\"text-xs text-slate-600 dark:text-slate-300\">直角三角形中，斜邊被高分成 $a, b$ 兩段：</p>\n                <p class=\"text-xs text-slate-600 dark:text-slate-300\">斜邊上的高 $h = \\sqrt{ab}$，外接圓半徑 $R = \\frac{a+b}{2}$。</p>\n                <p class=\"text-xs text-slate-600 dark:text-slate-300\">因半圓中高最大為半徑，恆有：</p>\n                <div class=\"math-display\">$$\\frac{a+b}{2} \\geqslant \\sqrt{ab}$$</div>\n            </div>\n            <div class=\"sub-card\">\n                <h4>📐 常見圖形充要關係</h4>\n                <p class=\"text-xs text-slate-600 dark:text-slate-300\">① 正方形 $\\implies$ 矩形（充分條件）</p>\n                <p class=\"text-xs text-slate-600 dark:text-slate-300\">② 菱形 $\\implies$ 平行四邊形（充分條件）</p>\n                <p class=\"text-xs text-slate-600 dark:text-slate-300\">③ 等腰三角形 $\\iff$ 兩底角相等（充要條件）</p>\n            </div>\n        </div>\n        "}, {"id": 22, "chapter": "易錯速查", "badge": "避坑指南", "title": "大測五大易錯速查備忘錄", "prompts": ["自然數集符號 $\\mathbb{N}$ 中最容易遺漏的元素是誰？遺漏會導致什麼後果？", "集合子集包含含參討論時，必須第一時間檢驗的特殊集合是什麼？", "不等式兩邊同乘未知符號代數式以及同乘負數時的致命易錯點是什麼？"], "formulaHtml": "\n        <div class=\"formula-block highlight-box\">\n            <div class=\"formula-title\">🚨 大測五大易錯速查備忘錄</div>\n            <div class=\"math-row-list\">\n                <div class=\"math-row\">\n                    <span>1. 自然數集必含零：</span>\n                    <div class=\"text-xs text-slate-600 dark:text-slate-300\">切記 $0 \\in \\mathbb{N}$！在離散全集列舉（如 $U=\\{x \\in \\mathbb{N} \\mid x \\leqslant 8\\}$）中，遺漏元素 $0$ 將導致後續補集與交集連帶全錯！</div>\n                </div>\n                <div class=\"math-row\">\n                    <span>2. 子集包含必檢驗空集：</span>\n                    <div class=\"text-xs text-slate-600 dark:text-slate-300\">空集 $\\varnothing$ 是任何集合的子集！含參子集討論時，若未說明子集非空，必須嚴格檢驗子集為空集 $\\varnothing$ 的情況。</div>\n                </div>\n                <div class=\"math-row\">\n                    <span>3. 同乘負數方向翻轉：</span>\n                    <div class=\"text-xs text-slate-600 dark:text-slate-300\">不等式兩邊同乘未知代數式時必須分類討論；同乘負數時不等號方向必須及時翻轉！</div>\n                </div>\n                <div class=\"math-row\">\n                    <span>4. 量詞命題否定限定範圍不變：</span>\n                    <div class=\"text-xs text-slate-600 dark:text-slate-300\">「全稱改存在、存在改全稱、結論取反向」，但變量限定集合範圍 $\\mathbb{R}$ 絕對保持不變（嚴禁改為 $\\notin \\mathbb{R}$）。</div>\n                </div>\n                <div class=\"math-row\">\n                    <span>5. 基本不等式必檢驗取等：</span>\n                    <div class=\"text-xs text-slate-600 dark:text-slate-300\">利用基本不等式求最值時，必須寫明「當且僅當 $a=b$ 時等號成立」並求出具體數值，漏寫扣大題步驟分！</div>\n                </div>\n            </div>\n        </div>\n        "}];
+
+        // 應用狀態
+        let currentIndex = 0;
+        let isFormulaRevealed = false;
+        let isRandomMode = false;
+        let selectedCategory = 'ALL';
+        let isOverviewMode = false;
+        let masteredIds = new Set(JSON.parse(localStorage.getItem('2627_mastered_ids') || '[]'));
+
+        // 章節清單
+        const categories = [
+            { id: 'ALL', name: '全部 (22)' },
+            { id: '集合', name: '集合 (6)' },
+            { id: '常用邏輯', name: '常用邏輯 (3)' },
+            { id: '等式與不等式', name: '等式與不等式 (2)' },
+            { id: '基本不等式', name: '基本不等式 (4)' },
+            { id: '答題規範', name: '答題規範 (3)' },
+            { id: '拓展公式', name: '拓展公式 (2)' },
+            { id: '舊知銜接', name: '舊知銜接 (2)' },
+            { id: '易錯速查', name: '易錯速查 (1)' }
+        ];
+
+        // 獲取當前篩選下的題目子集
+        function getFilteredQuestions() {
+            if (selectedCategory === 'ALL') return questions;
+            return questions.filter(q => q.chapter === selectedCategory);
+        }
+
+        // 初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            initCategoryChips();
+            initDrawer();
+            renderActiveQuestion();
+            updateMasteredCountUI();
+            
+            // 監聽鍵盤快捷鍵
+            window.addEventListener('keydown', handleKeyDown);
+        });
+
+        // 觸發 MathJax 重新渲染
+        function renderMath() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise().catch((err) => console.warn('MathJax Error:', err));
+            }
+        }
+
+        // 初始化分類標籤按鈕
+        function initCategoryChips() {
+            const container = document.getElementById('categoryChips');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="setCategory('${cat.id}')" 
+                        id="chip-${cat.id}"
+                        class="px-2.5 py-1 text-xs rounded-lg font-medium transition ${
+                            selectedCategory === cat.id 
+                            ? 'bg-blue-600 text-white font-bold shadow-sm' 
+                            : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                        }">
+                    ${cat.name}
+                </button>
+            `).join('');
+        }
+
+        // 切換分類
+        function setCategory(catId) {
+            selectedCategory = catId;
+            initCategoryChips();
+            currentIndex = 0;
+            renderActiveQuestion();
+        }
+
+        // 渲染當前題目
+        function renderActiveQuestion() {
+            const filtered = getFilteredQuestions();
+            if (filtered.length === 0) return;
+
+            if (currentIndex >= filtered.length) currentIndex = 0;
+            if (currentIndex < 0) currentIndex = filtered.length - 1;
+
+            const q = filtered[currentIndex];
+            isFormulaRevealed = false;
+
+            // 更新元信息
+            document.getElementById('cardId').innerText = q.id;
+            document.getElementById('cardTitle').innerText = q.title;
+            document.getElementById('cardBadge').innerText = q.badge;
+            document.getElementById('cardChapter').innerText = `單元：${q.chapter}`;
+
+            // 更新掌握狀態按鈕
+            updateMasterButtonUI(q.id);
+
+            // 更新進度
+            const total = filtered.length;
+            document.getElementById('currentProgressText').innerText = `第 ${currentIndex + 1} / ${total} 題 (總號 #${q.id})`;
+            document.getElementById('progressBar').style.width = `${((currentIndex + 1) / total) * 100}%`;
+
+            // 渲染 2~3 個背誦項目 (階段一：彈出)
+            const promptsBox = document.getElementById('promptsContainer');
+            promptsBox.innerHTML = q.prompts.map((p, i) => `
+                <div class="prompt-item-anim p-3.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 flex items-start gap-3 shadow-xs" style="animation-delay: ${i * 0.08}s">
+                    <div class="flex-shrink-0 w-6 h-6 rounded-lg bg-amber-500 text-white text-xs font-bold flex items-center justify-center mt-0.5">
+                        ${i + 1}
+                    </div>
+                    <div class="text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-100 leading-relaxed">
+                        ${p}
+                    </div>
+                </div>
+            `).join('');
+
+            // 重置公式顯示區 (階段二：遮蓋狀態)
+            document.getElementById('formulaCover').classList.remove('hidden');
+            document.getElementById('formulaContent').classList.add('hidden');
+            document.getElementById('formulaContainer').innerHTML = q.formulaHtml;
+
+            // 觸發 MathJax 排版背誦項目中的公式
+            renderMath();
+        }
+
+        // 揭曉公式 (再按一下出現公式)
+        function revealFormula() {
+            isFormulaRevealed = true;
+            document.getElementById('formulaCover').classList.add('hidden');
+            document.getElementById('formulaContent').classList.remove('hidden');
+            renderMath();
+        }
+
+        // 重新遮蓋公式
+        function hideFormula() {
+            isFormulaRevealed = false;
+            document.getElementById('formulaCover').classList.remove('hidden');
+            document.getElementById('formulaContent').classList.add('hidden');
+        }
+
+        // 下一題
+        function nextQuestion() {
+            const filtered = getFilteredQuestions();
+            if (isRandomMode) {
+                let nextIdx;
+                do {
+                    nextIdx = Math.floor(Math.random() * filtered.length);
+                } while (filtered.length > 1 && nextIdx === currentIndex);
+                currentIndex = nextIdx;
+            } else {
+                currentIndex = (currentIndex + 1) % filtered.length;
+            }
+            renderActiveQuestion();
+        }
+
+        // 上一題
+        function prevQuestion() {
+            const filtered = getFilteredQuestions();
+            currentIndex = (currentIndex - 1 + filtered.length) % filtered.length;
+            renderActiveQuestion();
+        }
+
+        // 隨機抽題
+        function pickRandomQuestion() {
+            const filtered = getFilteredQuestions();
+            let nextIdx;
+            do {
+                nextIdx = Math.floor(Math.random() * filtered.length);
+            } while (filtered.length > 1 && nextIdx === currentIndex);
+            currentIndex = nextIdx;
+            renderActiveQuestion();
+        }
+
+        // 隨機模式勾選
+        function toggleRandomMode(val) {
+            isRandomMode = val;
+        }
+
+        // 掌握狀態切換
+        function toggleMasterStatus() {
+            const filtered = getFilteredQuestions();
+            const q = filtered[currentIndex];
+            if (masteredIds.has(q.id)) {
+                masteredIds.delete(q.id);
+            } else {
+                masteredIds.add(q.id);
+            }
+            localStorage.setItem('2627_mastered_ids', JSON.stringify(Array.from(masteredIds)));
+            updateMasterButtonUI(q.id);
+            updateMasteredCountUI();
+            initDrawer();
+        }
+
+        function updateMasterButtonUI(qid) {
+            const btn = document.getElementById('masterToggleBtn');
+            const icon = document.getElementById('masterIcon');
+            const label = document.getElementById('masterLabel');
+
+            if (masteredIds.has(qid)) {
+                btn.className = "px-3 py-1 text-xs rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 font-bold transition flex items-center gap-1";
+                icon.innerText = "⭐";
+                label.innerText = "已熟記掌握";
+            } else {
+                btn.className = "px-3 py-1 text-xs rounded-full border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition flex items-center gap-1 text-slate-600 dark:text-slate-300";
+                icon.innerText = "☆";
+                label.innerText = "標記已掌握";
+            }
+        }
+
+        function updateMasteredCountUI() {
+            document.getElementById('masteredCountText').innerText = masteredIds.size;
+        }
+
+        // 目錄抽屜
+        function toggleDrawer() {
+            const drawer = document.getElementById('drawer');
+            const backdrop = document.getElementById('drawerBackdrop');
+            if (drawer.classList.contains('translate-x-full')) {
+                drawer.classList.remove('translate-x-full');
+                backdrop.classList.remove('hidden');
+            } else {
+                drawer.classList.add('translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
+        function initDrawer() {
+            const list = document.getElementById('drawerList');
+            list.innerHTML = questions.map((q, idx) => {
+                const isMastered = masteredIds.has(q.id);
+                return `
+                    <button onclick="jumpToQuestion(${q.id})" class="w-full text-left p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-slate-700/60 transition flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-2 truncate">
+                            <span class="font-bold text-blue-600 dark:text-blue-400">#${q.id}</span>
+                            <span class="truncate font-medium text-slate-800 dark:text-slate-200">${q.title}</span>
+                        </div>
+                        <span class="${isMastered ? 'text-emerald-500 font-bold' : 'text-slate-300'}">
+                            ${isMastered ? '★' : '☆'}
+                        </span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function jumpToQuestion(qid) {
+            selectedCategory = 'ALL';
+            initCategoryChips();
+            currentIndex = questions.findIndex(q => q.id === qid);
+            toggleDrawer();
+            renderActiveQuestion();
+        }
+
+        // 切換抽測模式與全覽模式
+        function toggleViewMode() {
+            isOverviewMode = !isOverviewMode;
+            const quizContainer = document.getElementById('quizModeContainer');
+            const overviewContainer = document.getElementById('overviewModeContainer');
+            const icon = document.getElementById('viewIcon');
+            const text = document.getElementById('viewText');
+
+            if (isOverviewMode) {
+                quizContainer.classList.add('hidden');
+                overviewContainer.classList.remove('hidden');
+                icon.innerText = "🎴";
+                text.innerText = "返回卡片抽測";
+                renderOverviewList();
+            } else {
+                quizContainer.classList.remove('hidden');
+                overviewContainer.classList.add('hidden');
+                icon.innerText = "📜";
+                text.innerText = "全覽清單模式";
+                renderActiveQuestion();
+            }
+        }
+
+        function renderOverviewList() {
+            const container = document.getElementById('overviewList');
+            container.innerHTML = questions.map(q => `
+                <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-md border border-slate-200 dark:border-slate-700 card-print-break">
+                    <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3 mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">#${q.id} ${q.chapter}</span>
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white">${q.title}</h3>
+                        </div>
+                        <span class="text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">${q.badge}</span>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="text-xs font-bold text-amber-600 dark:text-amber-400 mb-2">📌 必背要點：</div>
+                        <div class="space-y-1.5 pl-2">
+                            ${q.prompts.map((p, i) => `<div class="text-sm text-slate-700 dark:text-slate-300"><strong>${i+1}.</strong> ${p}</div>`).join('')}
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="text-xs font-bold text-blue-600 dark:text-blue-400 mb-2">🌟 核心公式與結論：</div>
+                        ${q.formulaHtml}
+                    </div>
+                </div>
+            `).join('');
+
+            renderMath();
+        }
+
+        // 鍵盤監聽
+        function handleKeyDown(e) {
+            if (isOverviewMode) return;
+
+            // Space: 揭曉公式 或 下一題
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (!isFormulaRevealed) {
+                    revealFormula();
+                } else {
+                    nextQuestion();
+                }
+            } else if (e.code === 'ArrowRight' || e.code === 'Enter') {
+                e.preventDefault();
+                nextQuestion();
+            } else if (e.code === 'ArrowLeft') {
+                e.preventDefault();
+                prevQuestion();
+            } else if (e.key === 'r' || e.key === 'R') {
+                pickRandomQuestion();
+            }
+        }
+
+        // 深淺色主題
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('2627_theme', 'light');
+                icon.innerText = "🌙";
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('2627_theme', 'dark');
+                icon.innerText = "☀️";
+            }
+        }
+
+        // 載入偏好主題
+        if (localStorage.getItem('2627_theme') === 'dark' || (!('2627_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.getElementById('themeIcon').innerText = "☀️";
+        }
+    </script>
+</body>
+</html>
