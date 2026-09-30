@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-09-30T06:22:04Z",
+  "status": "PASS",
+  "total_tests": 250,
+  "total_passed": 250,
+  "total_failed": 0,
+  "pass_rate_percent": 100.0,
+  "unit_summary": {
+    "total": 240,
+    "passed": 240,
+    "failed": 0,
+    "errors": 0,
+    "duration_seconds": 35.83,
+    "failures_details": [],
+    "errors_details": []
+  },
+  "browser_summary": {
+    "passed": 10,
+    "failed": 0,
+    "steps": [
+      "✓ Step 1: Page title & MathJax script presence in <head> verified.",
+      "✓ Step 2: Screen 1 (Roster Selection) active state verified.",
+      "✓ Step 3: 4C roster loaded (29 students, student #13 strictly omitted).",
+      "✓ Step 4: 4D (31 students) and 5B (28 students) counts verified.",
+      "✓ Step 5: Student 4D 23 (劉付穎) selection & Grade 10 auto-routing badge verified.",
+      "✓ Step 6: Transitioned to Screen 2 (Face Registration).",
+      "✓ Step 7: Face capture & preview verification passed.",
+      "✓ Step 8: Identity locked, dual persistence triggered, Dashboard active.",
+      "✓ Step 9: Profile recognized, transitioned to Screen 3 (Secondary Re-auth).",
+      "✓ Step 10: Secondary face authentication (>= 85%) verified and dashboard unlocked."
+    ]
+  }
+}

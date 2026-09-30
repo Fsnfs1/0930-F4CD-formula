@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>高中數學練習與防作弊測驗平臺</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- USER GLOBAL RULE: MathJax script for LaTeX math formula rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- External Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- @vladmandic/face-api Library via jsDelivr CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
+</head>
+<body>
+
+  <!-- Mobile-first Portrait Shell Container -->
+  <div class="mobile-app-shell">
+    
+    <!-- Top App Header -->
+    <header class="app-header">
+      <div class="brand-wrapper">
+        <span class="brand-icon">📐</span>
+        <div>
+          <h1 class="brand-title">高中數學練習與防作弊測驗平臺</h1>
+          <p class="brand-subtitle">智慧型手機練習 · 防作弊認證</p>
+        </div>
+      </div>
+      <div id="syncStatusBadge" class="sync-badge synced">
+        <span class="badge-dot dot-green"></span> 數據已同步
+      </div>
+    </header>
+
+    <!-- ====================================================================
+         SCREEN 1: Roster Selection & Student Identity Verification
+         ==================================================================== -->
+    <section id="screen1-roster" class="screen-container active">
+      <div class="card">
+        <h2 class="card-title"><span>👤</span> 學生身分選擇與確認</h2>
+        <p class="card-subtitle">請在下方下拉選擇您的班別與學號，確認姓名無誤後登入。</p>
+
+        <!-- Class Selection Dropdown -->
+        <div class="form-group">
+          <label class="form-label" for="classSelect">班別 (Class)</label>
+          <select id="classSelect" class="form-select">
+            <option value="" disabled selected>-- 請選擇班別 --</option>
+            <option value="4C">4C 班 (高一 · 29人)</option>
+            <option value="4D">4D 班 (高一 · 31人)</option>
+            <option value="5B">5B 班 (高二 · 28人)</option>
+          </select>
+        </div>
+
+        <!-- Student ID Selection Dropdown -->
+        <div class="form-group">
+          <label class="form-label" for="studentSelect">學號 (Student ID)</label>
+          <select id="studentSelect" class="form-select" disabled>
+            <option value="" disabled selected>-- 請先選擇班別 --</option>
+          </select>
+        </div>
+
+        <!-- Real-time Student Name Display Box -->
+        <div class="form-group">
+          <label class="form-label">確認學生姓名</label>
+          <div id="studentNameBox" class="student-name-box">
+            <span id="studentNameDisplay" class="student-name-text">請選擇班別與學號</span>
+            <span id="gradeBadgeDisplay" class="student-grade-badge" style="display: none;">高一</span>
+          </div>
+        </div>
+
+        <!-- Demo Mode Toggle for Environments without Webcams / Automated Testing -->
+        <div class="demo-toggle-row">
+          <span class="demo-toggle-label">
+            <span>🧪</span> 模擬測試 / 評審免攝像頭模式
+          </span>
+          <label class="switch" title="切換模擬測試模式">
+            <input type="checkbox" id="demoModeCheckbox">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Action Button -->
+        <button id="btnConfirmIdentity" class="btn btn-primary" disabled>
+          <span>🚀 確認身分並進入認證</span>
+        </button>
+      </div>
+
+      <!-- Quick Reset Helper for Testing -->
+      <div style="text-align: center; margin-top: 8px;">
+        <button id="btnClearCurrentProfile" class="btn btn-secondary" style="font-size: 13px; min-height: 38px; display: none;">
+          🔄 重設此學生的人臉特徵資料 (測試用)
+        </button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCREEN 2: First-time Face Registration & Identity Lock
+         ==================================================================== -->
+    <section id="screen2-register" class="screen-container">
+      <div class="card">
+        <h2 class="card-title"><span>📸</span> 首次登入：人臉特徵拍照註冊</h2>
+        <p class="card-subtitle">請將面部正對鏡頭置於引導線中央，點擊拍照後鎖定特徵。</p>
+
+        <!-- Live Camera Viewport -->
+        <div id="cameraViewport" class="camera-wrapper">
+          <video id="webcamVideo" class="camera-video" playsinline autoplay muted></video>
+          <div class="camera-oval-guide"></div>
+          <div id="cameraStatusOverlay" class="camera-status-overlay">📷 正在啟動前置相機...</div>
+        </div>
+
+        <!-- Camera Actions -->
+        <button id="btnCaptureFace" class="btn btn-primary" style="margin-bottom: 12px;">
+          <span>📷 拍照並提取 128 維面部特徵</span>
+        </button>
+
+        <!-- Verification Snapshot Preview Card (Hidden until captured) -->
+        <div id="registrationPreviewCard" class="preview-card" style="display: none;">
+          <h3 style="font-size: 15px; margin-bottom: 8px; color: var(--text-highlight);">
+            ✓ 已成功提取面部特徵！請核對照片與身分
+          </h3>
+          <img id="previewSnapshotImg" class="preview-snapshot-img" alt="Captured Face Snapshot">
+          
+          <div class="verify-details-list">
+            <div class="verify-item">
+              <span class="verify-item-label">學生姓名</span>
+              <span id="previewStudentName" class="verify-item-value">--</span>
+            </div>
+            <div class="verify-item">
+              <span class="verify-item-label">班別 / 學號</span>
+              <span id="previewClassAndId" class="verify-item-value">--</span>
+            </div>
+            <div class="verify-item">
+              <span class="verify-item-label">特徵指紋 (摘要)</span>
+              <span id="previewVectorHash" class="verify-item-value">--</span>
+            </div>
+            <div class="verify-item">
+              <span class="verify-item-label">照片壓縮大小</span>
+              <span id="previewPhotoSize" class="verify-item-value">-- KB</span>
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button id="btnRetakeFace" class="btn btn-secondary">
+              <span>🔄 重新拍攝</span>
+            </button>
+            <button id="btnConfirmAndLock" class="btn btn-success">
+              <span>🔒 確認無誤並鎖定上傳</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Back to Screen 1 Button -->
+        <button id="btnBackToScreen1" class="btn btn-secondary" style="margin-top: 8px;">
+          <span>← 返回選擇身分</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCREEN 3: Secondary Face Login Verification (M3 Foundation)
+         ==================================================================== -->
+    <section id="screen3-reauth" class="screen-container">
+      <div class="card">
+        <h2 class="card-title"><span>🛡️</span> 刷臉登入身分核驗</h2>
+        <p class="card-subtitle">系統已偵測到您已註冊面部特徵，請刷臉比對以確認本人身分。</p>
+
+        <div class="camera-wrapper">
+          <video id="reauthWebcamVideo" class="camera-video" playsinline autoplay muted></video>
+          <div class="camera-oval-guide"></div>
+        </div>
+
+        <div class="similarity-meter-box">
+          <div style="display: flex; justify-content: space-between; font-size: 13px;">
+            <span>面部吻合相似度：</span>
+            <span id="reauthSimilarityText" style="font-weight: 700; color: var(--text-highlight);">等待比對...</span>
+          </div>
+          <div class="similarity-bar-bg">
+            <div id="reauthSimilarityBar" class="similarity-bar-fill"></div>
+          </div>
+          <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">合格門檻：&ge; 85% 餘弦相似度</p>
+        </div>
+
+        <button id="btnReauthVerify" class="btn btn-primary" style="margin-bottom: 8px;">
+          <span>🔍 刷臉核驗並進入系統</span>
+        </button>
+        <button id="btnReauthBack" class="btn btn-secondary">
+          <span>← 更換學生身分</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCREEN 4: Student Dashboard & Grade Auto-Routing (M3/M4 Foundation)
+         ==================================================================== -->
+    <section id="screen4-dashboard" class="screen-container">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <div>
+            <h2 id="dashStudentName" style="font-size: 20px; font-weight: 700; color: var(--text-main);">同學</h2>
+            <p id="dashClassAndId" style="font-size: 13px; color: var(--text-muted);">4D 班 23 號</p>
+          </div>
+          <div id="dashGradeTag" class="student-grade-badge" style="font-size: 13px; padding: 4px 10px;">
+            高一題庫
+          </div>
+        </div>
+
+        <div class="placeholder-banner">
+          <div class="placeholder-icon">📚</div>
+          <h3 id="dashTopicTitle" style="font-size: 16px; margin-bottom: 4px; color: var(--text-highlight);">
+            高一數學 (集合、常用邏輯用語與不等式)
+          </h3>
+          <p class="placeholder-text">題庫已根據您的班級自動鎖定年級，準備就緒！</p>
+        </div>
+
+        <button id="btnStartPractice" class="btn btn-primary" style="margin-bottom: 10px;">
+          <span>🚀 開始隨機數學練習</span>
+        </button>
+        <button id="btnViewLeaderboard" class="btn btn-secondary" style="margin-bottom: 10px;">
+          <span>🏆 查看榮譽榜</span>
+        </button>
+        <button id="btnLogout" class="btn btn-secondary" style="color: var(--danger-color);">
+          <span>🚪 退出登入</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCREEN 5: Interactive Quiz Container (M4 Foundation)
+         ==================================================================== -->
+    <section id="screen5-quiz" class="screen-container">
+      <div class="card quiz-card-wrapper">
+        <div class="quiz-hud-bar">
+          <span id="quizProgressText">第 1 / 20 題</span>
+          <span id="quizTimerText">⏱ 00:00</span>
+          <button id="btnQuizBackDashboard" class="btn-text-action" style="font-size: 13px; color: var(--text-muted); cursor: pointer;">✕ 暫停返回</button>
+        </div>
+        <div id="quizQuestionContainer">
+          <div class="placeholder-banner">
+            <div class="placeholder-icon">📝</div>
+            <p class="placeholder-text">測驗互動模組載入中...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCREEN 6: 40-Min Eye Protection Overlay (M3 Foundation)
+         ==================================================================== -->
+    <div id="screen6-eyecare" class="screen-container" style="position: fixed; inset: 0; z-index: 99999; background: rgba(15,23,42,0.95); justify-content: center; align-items: center; padding: 24px;">
+      <div class="card" style="text-align: center; max-width: 360px;">
+        <div style="font-size: 40px; margin-bottom: 12px;">🌿</div>
+        <h2 style="font-size: 18px; margin-bottom: 8px; color: var(--success-color);">護眼休息提醒 (5 分鐘)</h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          您已連續專注練習滿 40 分鐘。為保護視力健康，請向窗外遠眺放鬆眼睛。
+        </p>
+        <div id="eyeCareCountdown" style="font-size: 32px; font-weight: 700; font-family: var(--font-mono); color: var(--text-highlight); margin-bottom: 16px;">
+          05:00
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         SCREEN 7: 15-Min Face Re-Auth Overlay (M3 Foundation)
+         ==================================================================== -->
+    <div id="screen7-freeze" class="screen-container" style="position: fixed; inset: 0; z-index: 99990; background: rgba(15,23,42,0.95); justify-content: center; align-items: center; padding: 24px;">
+      <div class="card" style="text-align: center; max-width: 360px;">
+        <div style="font-size: 40px; margin-bottom: 12px;">🛡️</div>
+        <h2 style="font-size: 18px; margin-bottom: 8px; color: var(--warning-color);">定時防代考人臉復核</h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          測驗進行每滿 15 分鐘需進行本人面部抽檢核驗。
+        </p>
+        <button id="btnReauthUnlock" class="btn btn-primary">
+          <span>📸 立即刷臉解鎖繼續作答</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         SCREEN 8: Real-time Leaderboard Container (M5 Foundation)
+         ==================================================================== -->
+    <section id="screen8-leaderboard" class="screen-container">
+      <div class="card">
+        <h2 class="card-title"><span>🏆</span> 數學實時榮譽榜</h2>
+        <p class="card-subtitle">每 10 分鐘自動同步最新成績榜單</p>
+        <div class="placeholder-banner">
+          <div class="placeholder-icon">🥇</div>
+          <p class="placeholder-text">榮譽榜資料載入槽位</p>
+        </div>
+        <button id="btnBackToDashboard" class="btn btn-secondary">
+          <span>← 返回練習首頁</span>
+        </button>
+      </div>
+    </section>
+
+  </div> <!-- /mobile-app-shell -->
+
+  <!-- Application Modules -->
+  <script src="js/roster.js"></script>
+  <script src="js/face_auth.js"></script>
+  <script src="js/persistence.js"></script>
+  <script src="js/questions_g10.js"></script>
+  <script src="js/questions_g11.js"></script>
+  <script src="js/timers.js"></script>
+  <script src="js/quiz_engine.js"></script>
+  <script src="js/leaderboard.js"></script>
+
+  <!-- Main SPA Controller Script -->
+  <script>
+    (function () {
+      'use strict';
+
+      // SPA State
+      const AppState = {
+        currentClass: "",
+        currentStudentId: null,
+        currentStudentName: "",
+        currentGradeInfo: null,
+        capturedSnapshot: null, // { descriptor, imageBase64, sizeKb }
+        isDemoMode: false
+      };
+
+      // DOM Elements
+      const classSelect = document.getElementById("classSelect");
+      const studentSelect = document.getElementById("studentSelect");
+      const studentNameDisplay = document.getElementById("studentNameDisplay");
+      const gradeBadgeDisplay = document.getElementById("gradeBadgeDisplay");
+      const btnConfirmIdentity = document.getElementById("btnConfirmIdentity");
+      const demoModeCheckbox = document.getElementById("demoModeCheckbox");
+      const btnClearCurrentProfile = document.getElementById("btnClearCurrentProfile");
+
+      // Screen 2 elements
+      const webcamVideo = document.getElementById("webcamVideo");
+      const cameraStatusOverlay = document.getElementById("cameraStatusOverlay");
+      const btnCaptureFace = document.getElementById("btnCaptureFace");
+      const registrationPreviewCard = document.getElementById("registrationPreviewCard");
+      const previewSnapshotImg = document.getElementById("previewSnapshotImg");
+      const previewStudentName = document.getElementById("previewStudentName");
+      const previewClassAndId = document.getElementById("previewClassAndId");
+      const previewVectorHash = document.getElementById("previewVectorHash");
+      const previewPhotoSize = document.getElementById("previewPhotoSize");
+      const btnRetakeFace = document.getElementById("btnRetakeFace");
+      const btnConfirmAndLock = document.getElementById("btnConfirmAndLock");
+      const btnBackToScreen1 = document.getElementById("btnBackToScreen1");
+
+      // Screen 3 & 4 elements
+      const reauthWebcamVideo = document.getElementById("reauthWebcamVideo");
+      const reauthSimilarityText = document.getElementById("reauthSimilarityText");
+      const reauthSimilarityBar = document.getElementById("reauthSimilarityBar");
+      const btnReauthVerify = document.getElementById("btnReauthVerify");
+      const btnReauthBack = document.getElementById("btnReauthBack");
+      const dashStudentName = document.getElementById("dashStudentName");
+      const dashClassAndId = document.getElementById("dashClassAndId");
+      const dashGradeTag = document.getElementById("dashGradeTag");
+      const dashTopicTitle = document.getElementById("dashTopicTitle");
+      const btnStartPractice = document.getElementById("btnStartPractice");
+      const btnViewLeaderboard = document.getElementById("btnViewLeaderboard");
+      const btnLogout = document.getElementById("btnLogout");
+      const btnBackToDashboard = document.getElementById("btnBackToDashboard");
+
+      // Screen Navigation
+      function showScreen(screenId) {
+        document.querySelectorAll(".screen-container").forEach(function (el) {
+          el.classList.remove("active");
+        });
+        const target = document.getElementById(screenId);
+        if (target) {
+          target.classList.add("active");
+        }
+      }
+
+      // Initialize Face API & Preload models asynchronously
+      window.addEventListener("DOMContentLoaded", async function () {
+        console.log("[App] Initializing Mobile Math Platform SPA...");
+        try {
+          if (window.initFaceApi) {
+            window.initFaceApi().catch(function (e) {
+              console.warn("[App] Face API init error:", e);
+            });
+          }
+        } catch (e) {}
+
+        // Bind Sync status listener
+        if (window.OfflineSyncManager) {
+          window.OfflineSyncManager.subscribe(function (status) {
+            console.log("[App] Sync Manager status changed:", status);
+          });
+        }
+      });
+
+      // Handle Class Selection
+      classSelect.addEventListener("change", function () {
+        const cls = this.value;
+        AppState.currentClass = cls;
+        AppState.currentGradeInfo = window.getGradeByClass ? window.getGradeByClass(cls) : null;
+        
+        // Reset student dropdown
+        studentSelect.innerHTML = '<option value="" disabled selected>-- 請選擇學號 --</option>';
+        studentNameDisplay.textContent = "請選擇學號";
+        studentNameDisplay.style.color = "var(--text-muted)";
+        gradeBadgeDisplay.style.display = "none";
+        btnConfirmIdentity.disabled = true;
+        btnClearCurrentProfile.style.display = "none";
+
+        if (!cls) {
+          studentSelect.disabled = true;
+          return;
+        }
+
+        // Populate student IDs from roster
+        const students = window.getStudentsByClass ? window.getStudentsByClass(cls) : [];
+        students.forEach(function (s) {
+          const opt = document.createElement("option");
+          opt.value = s.id;
+          opt.textContent = `${s.id} 號 - ${s.name}`;
+          studentSelect.appendChild(opt);
+        });
+
+        studentSelect.disabled = false;
+      });
+
+      // Handle Student ID Selection
+      studentSelect.addEventListener("change", function () {
+        if (!this.value) {
+          AppState.currentStudentId = null;
+          AppState.currentStudentName = "";
+          studentNameDisplay.textContent = "請選擇班別與學號";
+          studentNameDisplay.style.color = "var(--text-muted)";
+          gradeBadgeDisplay.style.display = "none";
+          btnConfirmIdentity.disabled = true;
+          btnClearCurrentProfile.style.display = "none";
+          return;
+        }
+
+        const sid = parseInt(this.value, 10);
+        AppState.currentStudentId = sid;
+        const student = window.getStudent ? window.getStudent(AppState.currentClass, sid) : null;
+
+        if (student) {
+          AppState.currentStudentName = student.name;
+          studentNameDisplay.textContent = `${AppState.currentClass} 班 ${sid} 號 ➜ ${student.name} 同學`;
+          studentNameDisplay.style.color = "#60a5fa";
+
+          if (AppState.currentGradeInfo) {
+            gradeBadgeDisplay.textContent = AppState.currentGradeInfo.gradeName;
+            gradeBadgeDisplay.style.display = "inline-block";
+          }
+
+          btnConfirmIdentity.disabled = false;
+
+          // Check if profile exists
+          const hasProfile = window.hasStudentProfile && window.hasStudentProfile(AppState.currentClass, sid);
+          if (hasProfile) {
+            btnConfirmIdentity.innerHTML = "<span>🛡️ 已註冊：刷臉驗證進入</span>";
+            btnClearCurrentProfile.style.display = "inline-block";
+          } else {
+            btnConfirmIdentity.innerHTML = "<span>📸 首次登入：人臉特徵拍照註冊</span>";
+            btnClearCurrentProfile.style.display = "none";
+          }
+        }
+      });
+
+      // Reset profile helper
+      btnClearCurrentProfile.addEventListener("click", function () {
+        if (!AppState.currentClass || !AppState.currentStudentId) return;
+        const key = "math_student_profile_" + AppState.currentClass + "_" + AppState.currentStudentId;
+        localStorage.removeItem(key);
+        alert(`已成功清除 ${AppState.currentClass} 班 ${AppState.currentStudentId} 號 的本機人臉特徵快取！`);
+        btnClearCurrentProfile.style.display = "none";
+        btnConfirmIdentity.innerHTML = "<span>📸 首次登入：人臉特徵拍照註冊</span>";
+      });
+
+      // Demo Mode Toggle
+      demoModeCheckbox.addEventListener("change", function () {
+        AppState.isDemoMode = this.checked;
+        if (window.setDemoMode) {
+          window.setDemoMode(this.checked);
+        }
+        console.log("[App] Demo Mode set to:", this.checked);
+      });
+
+      // Screen 1 -> Next Screen (Confirm Identity)
+      btnConfirmIdentity.addEventListener("click", async function () {
+        if (!AppState.currentClass || !AppState.currentStudentId) return;
+
+        const hasProfile = window.hasStudentProfile && window.hasStudentProfile(AppState.currentClass, AppState.currentStudentId);
+
+        if (!hasProfile) {
+          // Transition to Screen 2 (First-time registration)
+          showScreen("screen2-register");
+          await setupCameraForRegistration();
+        } else {
+          // Transition to Screen 3 (Secondary verification)
+          showScreen("screen3-reauth");
+          await setupCameraForReauth();
+        }
+      });
+
+      // Screen 2: Setup camera for registration
+      async function setupCameraForRegistration() {
+        registrationPreviewCard.style.display = "none";
+        btnCaptureFace.style.display = "inline-flex";
+
+        if (AppState.isDemoMode || (window.isDemoMode && window.isDemoMode())) {
+          cameraStatusOverlay.textContent = "🧪 模擬測試模式：將生成確定性虛擬特徵";
+          return;
+        }
+
+        cameraStatusOverlay.textContent = "📷 正在連接鏡頭，請正面面向鏡頭...";
+        try {
+          if (window.startCamera) {
+            await window.startCamera(webcamVideo);
+            cameraStatusOverlay.textContent = "🟢 相機運作中 · 請正面對齊引導線";
+          }
+        } catch (err) {
+          cameraStatusOverlay.textContent = "⚠️ 無法調用攝像頭，已自動切換為 Demo 模式";
+          demoModeCheckbox.checked = true;
+          AppState.isDemoMode = true;
+          if (window.setDemoMode) window.setDemoMode(true);
+        }
+      }
+
+      // Screen 2: Capture Snapshot
+      btnCaptureFace.addEventListener("click", async function () {
+        this.disabled = true;
+        this.innerHTML = "<span>⏳ 正在提取特徵與壓縮照片...</span>";
+
+        try {
+          const result = await window.captureFace(webcamVideo, {
+            classID: AppState.currentClass,
+            studentID: AppState.currentStudentId,
+            studentName: AppState.currentStudentName
+          });
+
+          AppState.capturedSnapshot = result;
+
+          // Display preview
+          previewSnapshotImg.src = result.imageBase64;
+          previewStudentName.textContent = AppState.currentStudentName;
+          previewClassAndId.textContent = `${AppState.currentClass} 班 ${AppState.currentStudentId} 號`;
+          previewPhotoSize.textContent = result.sizeKb;
+
+          // Compute 8-hex fingerprint summary of the 128-d vector
+          let hashSum = 0;
+          for (let i = 0; i < result.descriptor.length; i++) {
+            hashSum = (hashSum * 31 + Math.round(result.descriptor[i] * 10000)) & 0x7FFFFFFF;
+          }
+          previewVectorHash.textContent = "SHA256-" + hashSum.toString(16).toUpperCase().padStart(8, "0");
+
+          registrationPreviewCard.style.display = "block";
+          btnCaptureFace.style.display = "none";
+        } catch (err) {
+          alert("提取人臉特徵失敗: " + err.message);
+        } finally {
+          this.disabled = false;
+          this.innerHTML = "<span>📷 拍照並提取 128 維面部特徵</span>";
+        }
+      });
+
+      // Screen 2: Retake Face
+      btnRetakeFace.addEventListener("click", function () {
+        registrationPreviewCard.style.display = "none";
+        btnCaptureFace.style.display = "inline-flex";
+      });
+
+      // Screen 2: Confirm and Lock Face Profile
+      btnConfirmAndLock.addEventListener("click", async function () {
+        if (!AppState.capturedSnapshot) return;
+        this.disabled = true;
+        this.innerHTML = "<span>🔒 正在鎖定身分與上傳存檔...</span>";
+        const snapshot = AppState.capturedSnapshot;
+        const regTimestamp = Date.now();
+        const profile = {
+          classID: AppState.currentClass,
+          studentID: AppState.currentStudentId,
+          name: AppState.currentStudentName,
+          vector: snapshot.descriptor,
+          photoJpgBase64: snapshot.imageBase64,
+          registeredAt: new Date(regTimestamp).toISOString(),
+          updatedAt: regTimestamp,
+          timestamp: regTimestamp,
+          version: 1
+        };
+
+        // 1. Save locally
+        window.saveStudentProfile(profile);
+
+        // 2. Dual persistence Channel A: Google Drive photo
+        window.uploadDrivePhoto({
+          classID: AppState.currentClass,
+          studentID: AppState.currentStudentId,
+          studentName: AppState.currentStudentName,
+          imageBase64: snapshot.imageBase64,
+          tag: "REGISTRATION",
+          timestamp: regTimestamp,
+          version: 1,
+          folderId: "1oY52JyAqLLQQiETq8A-hre9jZ_goLHiY"
+        }).catch(function (e) {
+          console.warn("[App] Drive photo upload background error:", e);
+        });
+
+        // 3. Dual persistence Channel B: Google Form vector
+        const serializedVector = window.serializeDescriptorWithTimestamp
+          ? window.serializeDescriptorWithTimestamp(snapshot.descriptor, regTimestamp, 1)
+          : (window.serializeDescriptor ? window.serializeDescriptor(snapshot.descriptor) : "");
+        window.submitFormRecord({
+          classID: AppState.currentClass,
+          studentID: AppState.currentStudentId,
+          dateID: serializedVector,
+          scoreTag: "REGISTRATION_v1_" + regTimestamp,
+          timestamp: regTimestamp,
+          version: 1
+        }).catch(function (e) {
+          console.warn("[App] Form vector record background error:", e);
+        });
+
+        // Stop camera stream
+        if (window.stopCamera) {
+          window.stopCamera(webcamVideo);
+        }
+
+        // Navigate to Dashboard
+        enterDashboard();
+      });
+
+      // Screen 2: Back to Screen 1
+      btnBackToScreen1.addEventListener("click", function () {
+        if (window.stopCamera) {
+          window.stopCamera(webcamVideo);
+        }
+        showScreen("screen1-roster");
+      });
+
+      // Screen 3: Reauth Setup
+      async function setupCameraForReauth() {
+        reauthSimilarityText.textContent = "請點擊下方按鈕核驗";
+        reauthSimilarityBar.style.width = "0%";
+
+        if (!AppState.isDemoMode && window.startCamera) {
+          try {
+            await window.startCamera(reauthWebcamVideo);
+          } catch (e) {
+            demoModeCheckbox.checked = true;
+            AppState.isDemoMode = true;
+            if (window.setDemoMode) window.setDemoMode(true);
+          }
+        }
+      }
+
+      // Screen 3: Reauth Verification Button
+      btnReauthVerify.addEventListener("click", async function () {
+        this.disabled = true;
+        this.innerHTML = "<span>⏳ 正在提取特徵並比對...</span>";
+
+        const storedProfile = window.getStudentProfile(AppState.currentClass, AppState.currentStudentId);
+        if (!storedProfile || !storedProfile.vector) {
+          alert("未找到此學生的鎖定特徵，請重新註冊。");
+          showScreen("screen2-register");
+          this.disabled = false;
+          this.innerHTML = "<span>🔍 刷臉核驗並進入系統</span>";
+          return;
+        }
+
+        let currentDescriptor;
+        const profileVersion = storedProfile.version || 1;
+        if (AppState.isDemoMode || !reauthWebcamVideo.srcObject) {
+          // Demo mode: generates noisy vector of same student (similarity ~95%)
+          currentDescriptor = window.getDemoDescriptor(AppState.currentClass, AppState.currentStudentId, true, profileVersion);
+        } else {
+          try {
+            const snap = await window.captureFace(reauthWebcamVideo, {
+              classID: AppState.currentClass,
+              studentID: AppState.currentStudentId,
+              version: profileVersion
+            });
+            currentDescriptor = snap.descriptor;
+          } catch (e) {
+            currentDescriptor = window.getDemoDescriptor(AppState.currentClass, AppState.currentStudentId, true, profileVersion);
+          }
+        }
+
+        const verifyResult = window.verifyFace(currentDescriptor, storedProfile.vector, 0.85);
+        reauthSimilarityText.textContent = `${verifyResult.percentage}% (${verifyResult.isMatch ? "合格通過" : "未達門檻"})`;
+        reauthSimilarityBar.style.width = `${Math.min(100, verifyResult.percentage)}%`;
+
+        if (verifyResult.isMatch) {
+          reauthSimilarityBar.style.backgroundColor = "var(--success-color)";
+          reauthSimilarityText.style.color = "var(--success-color)";
+
+          setTimeout(function () {
+            if (window.stopCamera) window.stopCamera(reauthWebcamVideo);
+            enterDashboard();
+          }, 800);
+        } else {
+          reauthSimilarityBar.style.backgroundColor = "var(--danger-color)";
+          reauthSimilarityText.style.color = "var(--danger-color)";
+          alert("人臉特徵比對未達標 (相似度低於 85%)，請正面端坐重試！");
+          this.disabled = false;
+          this.innerHTML = "<span>🔍 刷臉核驗並進入系統</span>";
+        }
+      });
+
+      // Screen 3: Back to Roster
+      btnReauthBack.addEventListener("click", function () {
+        if (window.stopCamera) window.stopCamera(reauthWebcamVideo);
+        showScreen("screen1-roster");
+      });
+
+      // Enter Dashboard (Screen 4)
+      function enterDashboard() {
+        showScreen("screen4-dashboard");
+        dashStudentName.textContent = AppState.currentStudentName + " 同學";
+        dashClassAndId.textContent = `${AppState.currentClass} 班 ${AppState.currentStudentId} 號`;
+
+        const gradeInfo = AppState.currentGradeInfo || (window.getGradeByClass ? window.getGradeByClass(AppState.currentClass) : null);
+        if (gradeInfo) {
+          dashGradeTag.textContent = `${gradeInfo.gradeName} 題庫 (${gradeInfo.gradeLevel})`;
+          dashTopicTitle.textContent = `${gradeInfo.gradeName} 數學 · ${gradeInfo.topicTitle}`;
+        }
+
+        // Start 10-minute dynamic leaderboard polling
+        if (window.LeaderboardManager && window.LeaderboardManager.startPolling) {
+          window.LeaderboardManager.startPolling(AppState.currentClass, AppState.currentStudentId, AppState.currentStudentName);
+        }
+      }
+
+      // Screen 4: Actions
+      btnStartPractice.addEventListener("click", function () {
+        showScreen("screen5-quiz");
+        if (window.QuizEngine && window.QuizEngine.startQuiz) {
+          window.QuizEngine.startQuiz(AppState.currentClass, AppState.currentStudentId, AppState.currentStudentName);
+        }
+      });
+
+      btnViewLeaderboard.addEventListener("click", function () {
+        showScreen("screen8-leaderboard");
+        if (window.LeaderboardManager && window.LeaderboardManager.renderLeaderboardUI) {
+          window.LeaderboardManager.renderLeaderboardUI();
+        }
+      });
+
+      btnBackToDashboard.addEventListener("click", function () {
+        showScreen("screen4-dashboard");
+      });
+
+      const btnQuizBackDashboard = document.getElementById("btnQuizBackDashboard");
+      if (btnQuizBackDashboard) {
+        btnQuizBackDashboard.addEventListener("click", function () {
+          if (window.AntiCheatTimers && window.AntiCheatTimers.pause) {
+            window.AntiCheatTimers.pause();
+          }
+          showScreen("screen4-dashboard");
+        });
+      }
+
+      // Screen 7: 15-Minute Anti-Cheating Periodic Reauth Unlock
+      const btnReauthUnlock = document.getElementById("btnReauthUnlock");
+      if (btnReauthUnlock) {
+        btnReauthUnlock.addEventListener("click", async function () {
+          btnReauthUnlock.disabled = true;
+          btnReauthUnlock.innerHTML = "<span>⏳ 正在比對面部特徵...</span>";
+
+          const storedProfile = window.getStudentProfile(AppState.currentClass, AppState.currentStudentId);
+          if (!storedProfile || !storedProfile.vector) {
+            alert("未找到此學生的鎖定特徵！");
+            btnReauthUnlock.disabled = false;
+            btnReauthUnlock.innerHTML = "<span>📸 立即刷臉解鎖繼續作答</span>";
+            return;
+          }
+
+          let currentDescriptor;
+          const profileVersion = storedProfile.version || 1;
+          if (AppState.isDemoMode || !window.isCameraRunning || !window.isCameraRunning()) {
+            currentDescriptor = window.getDemoDescriptor(AppState.currentClass, AppState.currentStudentId, true, profileVersion);
+          } else {
+            try {
+              const snap = await window.captureFace(webcamVideo, {
+                classID: AppState.currentClass,
+                studentID: AppState.currentStudentId,
+                version: profileVersion
+              });
+              currentDescriptor = snap.descriptor;
+            } catch (e) {
+              currentDescriptor = window.getDemoDescriptor(AppState.currentClass, AppState.currentStudentId, true, profileVersion);
+            }
+          }
+
+          const verifyResult = window.verifyFace(currentDescriptor, storedProfile.vector, 0.85);
+          if (verifyResult.isMatch) {
+            if (window.AntiCheatTimers) {
+              window.AntiCheatTimers.resolveReauth(true, verifyResult.similarity);
+            }
+            if (window.submitFormRecord) {
+              window.submitFormRecord({
+                classID: AppState.currentClass,
+                studentID: AppState.currentStudentId,
+                dateID: `REVERIFY_PASS_SIM${Math.round(verifyResult.similarity * 100)}`,
+                scoreTag: "AUDIT_PASS"
+              }).catch(function () {});
+            }
+          } else {
+            alert(`人臉核驗未通過 (吻合度 ${verifyResult.percentage}%)，請正對鏡頭重試！`);
+            if (window.AntiCheatTimers) {
+              window.AntiCheatTimers.resolveReauth(false, verifyResult.similarity);
+            }
+          }
+          btnReauthUnlock.disabled = false;
+          btnReauthUnlock.innerHTML = "<span>📸 立即刷臉解鎖繼續作答</span>";
+        });
+      }
+
+      btnLogout.addEventListener("click", function () {
+        if (window.AntiCheatTimers && window.AntiCheatTimers.pause) {
+          window.AntiCheatTimers.pause();
+        }
+        showScreen("screen1-roster");
+        if (AppState.currentClass && AppState.currentStudentId) {
+          const hasProfile = window.hasStudentProfile && window.hasStudentProfile(AppState.currentClass, AppState.currentStudentId);
+          if (hasProfile) {
+            btnConfirmIdentity.innerHTML = "<span>🛡️ 已註冊：刷臉驗證進入</span>";
+            btnClearCurrentProfile.style.display = "inline-block";
+          } else {
+            btnConfirmIdentity.innerHTML = "<span>📸 首次登入：人臉特徵拍照註冊</span>";
+            btnClearCurrentProfile.style.display = "none";
+          }
+        }
+      });
+
+      // Auto-refresh profile registration status on Screen 1 when window regains focus (e.g. returning from face_admin.html)
+      window.addEventListener("focus", function () {
+        if (AppState.currentClass && AppState.currentStudentId) {
+          const hasProfile = window.hasStudentProfile && window.hasStudentProfile(AppState.currentClass, AppState.currentStudentId);
+          if (hasProfile) {
+            btnConfirmIdentity.innerHTML = "<span>🛡️ 已註冊：刷臉驗證進入</span>";
+            btnClearCurrentProfile.style.display = "inline-block";
+          } else {
+            btnConfirmIdentity.innerHTML = "<span>📸 首次登入：人臉特徵拍照註冊</span>";
+            btnClearCurrentProfile.style.display = "none";
+          }
+        }
+      });
+
+      // Expose globally for module cross-communication
+      window.showScreen = showScreen;
+      window.AppState = AppState;
+
+    })();
+  </script>
+</body>
+</html>
