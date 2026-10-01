@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>學生人臉驗證重設 - 柯鈺鑫 同學 (5B 班 8 號)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- USER GLOBAL RULE: MathJax script for LaTeX math formula rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Bootstrap 5 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Custom Mobile Stylesheet (Relative path from resets/) -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <!-- Bootstrap 5 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- @vladmandic/face-api Library via jsDelivr CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
+
+  <!-- Platform Core Modules (Relative paths from resets/) -->
+  <script src="../js/roster.js"></script>
+  <script src="../js/face_auth.js"></script>
+  <script src="../js/persistence.js"></script>
+</head>
+<body>
+
+  <!-- Mobile-first Portrait Shell Container -->
+  <div class="mobile-app-shell">
+    
+    <!-- Top App Header -->
+    <header class="app-header">
+      <div class="brand-wrapper">
+        <span class="brand-icon"><i class="fa-solid fa-camera"></i></span>
+        <div>
+          <h1 class="brand-title">學生人臉驗證重設</h1>
+          <p class="brand-subtitle">拍照更新最新驗證資料</p>
+        </div>
+      </div>
+      <div id="syncStatusBadge" class="sync-badge synced">
+        <span class="badge-dot dot-green"></span> 數據已同步
+      </div>
+    </header>
+
+    <!-- Pre-Bound Student Identity Card (Immutable, No Dropdown, Tamper-proof) -->
+    <section class="card" id="studentIdentityCard">
+      <h2 class="card-title"><span><i class="fa-solid fa-user-check"></i></span> 學生身分資料</h2>
+      <div class="student-name-box" style="margin-top: 10px;">
+        <span class="student-name-text">5B 班 8 號 ➜ 柯鈺鑫 同學</span>
+        <span class="student-grade-badge" style="display: inline-block;">高二</span>
+      </div>
+    </section>
+
+    <!-- Camera Viewport & Capture Card -->
+    <section class="card" id="cameraCard">
+      <h2 class="card-title"><span><i class="fa-solid fa-camera-retro"></i></span> 拍攝新照片</h2>
+      <p class="card-subtitle">請正對鏡頭並保持光線充足，點擊按鈕拍攝照片以更新臉部資料。</p>
+
+      <!-- Live Camera Viewport -->
+      <div id="cameraViewport" class="camera-wrapper">
+        <video id="webcamVideo" class="camera-video" playsinline autoplay muted></video>
+        <div class="camera-oval-guide"></div>
+        <div id="cameraStatusOverlay" class="camera-status-overlay">📷 準備就緒</div>
+      </div>
+
+      <!-- Capture Action Button -->
+      <button id="btnCaptureFace" class="btn btn-primary" style="margin-bottom: 12px;">
+        <span><i class="fa-solid fa-camera"></i> 拍攝新照片</span>
+      </button>
+
+      <!-- Preview Card (Hidden until photo captured) -->
+      <div id="previewCard" class="preview-card" style="display: none;">
+        <h3 style="font-size: 15px; margin-bottom: 10px; color: var(--text-highlight);">
+          <i class="fa-solid fa-circle-check" style="color: var(--success-color);"></i> 照片已拍攝！請檢視並確認更新
+        </h3>
+        <img id="previewSnapshotImg" class="preview-snapshot-img" alt="Captured Face Snapshot">
+
+        <div class="verify-details-list">
+          <div class="verify-item">
+            <span class="verify-item-label">學生姓名</span>
+            <span class="verify-item-value">柯鈺鑫 同學</span>
+          </div>
+          <div class="verify-item">
+            <span class="verify-item-label">班別 / 學號</span>
+            <span class="verify-item-value">5B 班 8 號</span>
+          </div>
+          <div class="verify-item">
+            <span class="verify-item-label">拍攝時間</span>
+            <span id="previewTimestamp" class="verify-item-value">--</span>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button id="btnRetakeFace" class="btn btn-secondary">
+            <span><i class="fa-solid fa-rotate-left"></i> 重新拍攝</span>
+          </button>
+          <button id="btnConfirmReset" class="btn btn-success">
+            <span><i class="fa-solid fa-lock"></i> 確認送出並更新人臉資料</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Success Confirmation Card -->
+    <section class="card" id="successCard" style="display: none;">
+      <div style="text-align: center; padding: 24px 0;">
+        <div style="font-size: 56px; margin-bottom: 12px; color: var(--success-color);">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <h2 style="font-size: 20px; color: var(--success-color); margin-bottom: 10px;">人臉資料更新成功！</h2>
+        <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">
+          您的最新人臉驗證照片與資料已成功儲存並同步。<br>
+          您現在可以使用新照片進行平臺登入與身分驗證。
+        </p>
+        <a href="../index.html" class="btn btn-primary" style="text-decoration: none; display: inline-flex; justify-content: center; align-items: center; gap: 8px;">
+          <span><i class="fa-solid fa-house"></i> 返回測驗平臺首頁</span>
+        </a>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Face Reset Controller Script -->
+  <script>
+    (function () {
+      'use strict';
+
+      // Pre-bound Immutable Student Identity
+      const STUDENT = {
+        classID: "5B",
+        studentID: 8,
+        name: "柯鈺鑫",
+        grade: "高二"
+      };
+
+      let capturedSnapshot = null;
+      let captureTimestamp = null;
+
+      // DOM Elements
+      const webcamVideo = document.getElementById("webcamVideo");
+      const cameraStatusOverlay = document.getElementById("cameraStatusOverlay");
+      const btnCaptureFace = document.getElementById("btnCaptureFace");
+      const previewCard = document.getElementById("previewCard");
+      const previewSnapshotImg = document.getElementById("previewSnapshotImg");
+      const previewTimestamp = document.getElementById("previewTimestamp");
+      const btnRetakeFace = document.getElementById("btnRetakeFace");
+      const btnConfirmReset = document.getElementById("btnConfirmReset");
+      const cameraCard = document.getElementById("cameraCard");
+      const successCard = document.getElementById("successCard");
+
+      // Auto-init models and camera on load
+      window.addEventListener("DOMContentLoaded", async function () {
+        if (window.initFaceApi) {
+          window.initFaceApi().catch(function (e) {
+            console.warn("[FaceReset] Face API init notice:", e);
+          });
+        }
+        try {
+          if (window.startCamera) {
+            await window.startCamera(webcamVideo);
+            if (cameraStatusOverlay) {
+              cameraStatusOverlay.textContent = "🟢 鏡頭運作中 · 請正面對齊引導線";
+            }
+          }
+        } catch (err) {
+          console.warn("[FaceReset] Camera start notice:", err);
+          if (cameraStatusOverlay) {
+            cameraStatusOverlay.textContent = "📷 鏡頭就緒";
+          }
+        }
+      });
+
+      // Capture Face Snapshot
+      btnCaptureFace.addEventListener("click", async function () {
+        this.disabled = true;
+        this.innerHTML = '<span><i class="fa-solid fa-spinner fa-spin"></i> 正在處理照片...</span>';
+
+        try {
+          const existing = window.getStudentProfile
+            ? window.getStudentProfile(STUDENT.classID, STUDENT.studentID)
+            : null;
+          const nextVersion = (existing && existing.version ? existing.version : 0) + 1;
+
+          const result = await window.captureFace(webcamVideo, {
+            classID: STUDENT.classID,
+            studentID: STUDENT.studentID,
+            studentName: STUDENT.name,
+            version: nextVersion
+          });
+
+          capturedSnapshot = result;
+          captureTimestamp = Date.now();
+          previewSnapshotImg.src = result.imageBase64;
+          const d = new Date(captureTimestamp);
+          previewTimestamp.textContent = d.toLocaleTimeString();
+
+          previewCard.style.display = "block";
+          btnCaptureFace.style.display = "none";
+        } catch (err) {
+          alert("拍照失敗: " + err.message);
+        } finally {
+          this.disabled = false;
+          this.innerHTML = '<span><i class="fa-solid fa-camera"></i> 拍攝新照片</span>';
+        }
+      });
+
+      // Retake Photo
+      btnRetakeFace.addEventListener("click", function () {
+        capturedSnapshot = null;
+        captureTimestamp = null;
+        previewCard.style.display = "none";
+        btnCaptureFace.style.display = "inline-flex";
+      });
+
+      // Confirm & Save
+      btnConfirmReset.addEventListener("click", async function () {
+        if (!capturedSnapshot) return;
+
+        this.disabled = true;
+        this.innerHTML = '<span><i class="fa-solid fa-spinner fa-spin"></i> 正在更新資料...</span>';
+
+        try {
+          const existing = window.getStudentProfile
+            ? window.getStudentProfile(STUDENT.classID, STUDENT.studentID)
+            : null;
+          const existingTs = window.PersistenceModule && window.PersistenceModule.extractTimestamp
+            ? window.PersistenceModule.extractTimestamp(existing)
+            : (existing ? (existing.updatedAt || existing.timestamp || 0) : 0);
+          const timestamp = Math.max(captureTimestamp || Date.now(), (existingTs ? existingTs + 1 : 0));
+          const existingVer = (existing && existing.version) ? existing.version : 0;
+          const version = Math.max(existingVer + 1, 1);
+
+          // Build updated student profile object
+          const newProfile = {
+            classID: STUDENT.classID,
+            studentID: STUDENT.studentID,
+            name: STUDENT.name,
+            vector: capturedSnapshot.descriptor,
+            photoJpgBase64: capturedSnapshot.imageBase64,
+            registeredAt: (existing && existing.registeredAt) ? existing.registeredAt : new Date(timestamp).toISOString(),
+            updatedAt: timestamp,
+            timestamp: timestamp,
+            version: version,
+            forceLatest: true
+          };
+
+          // 1. LocalStorage Update (math_student_profile_${cls}_${id})
+          if (window.saveStudentProfile) {
+            window.saveStudentProfile(newProfile);
+          } else {
+            localStorage.setItem("math_student_profile_" + STUDENT.classID + "_" + STUDENT.studentID, JSON.stringify(newProfile));
+          }
+
+          // 2. Google Drive Photo Upload via GAS
+          if (window.uploadDrivePhoto) {
+            window.uploadDrivePhoto({
+              classID: STUDENT.classID,
+              studentID: STUDENT.studentID,
+              studentName: STUDENT.name,
+              imageBase64: capturedSnapshot.imageBase64,
+              tag: "RE_REGISTER",
+              timestamp: timestamp,
+              version: version,
+              folderId: "1oY52JyAqLLQQiETq8A-hre9jZ_goLHiY"
+            }).catch(function (e) {
+              console.warn("[FaceReset] Drive upload notice:", e);
+            });
+          }
+
+          // 3. Google Form Vector Submission
+          if (window.submitFormRecord) {
+            let serialized = "";
+            if (window.serializeDescriptorWithTimestamp) {
+              serialized = window.serializeDescriptorWithTimestamp(capturedSnapshot.descriptor, timestamp, version);
+            } else if (window.serializeDescriptor) {
+              serialized = window.serializeDescriptor(capturedSnapshot.descriptor);
+            } else {
+              serialized = Array.from(capturedSnapshot.descriptor).map(function (x) {
+                return Number(x).toFixed(4);
+              }).join(",");
+            }
+
+            window.submitFormRecord({
+              classID: STUDENT.classID,
+              studentID: STUDENT.studentID,
+              dateID: serialized,
+              scoreTag: "RE_REGISTER_v" + version + "_" + timestamp,
+              timestamp: timestamp,
+              version: version
+            }).catch(function (e) {
+              console.warn("[FaceReset] Form submit notice:", e);
+            });
+          }
+
+          // Stop camera and show success card
+          if (window.stopCamera) {
+            window.stopCamera(webcamVideo);
+          }
+          cameraCard.style.display = "none";
+          successCard.style.display = "block";
+        } catch (err) {
+          alert("更新資料失敗: " + err.message);
+        } finally {
+          this.disabled = false;
+          this.innerHTML = '<span><i class="fa-solid fa-lock"></i> 確認送出並更新人臉資料</span>';
+        }
+      });
+
+    })();
+  </script>
+</body>
+</html>
