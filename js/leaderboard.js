@@ -65,10 +65,10 @@
 
     state.countdownSeconds = POLL_INTERVAL_SECONDS;
 
-    // Immediately pre-populate with fallback mock so UI is instantly populated
-    if (!state.cachedData || state.cachedData.length === 0) {
-      state.cachedData = generateFallbackMock();
-      state.dataSource = "MOCK_FALLBACK";
+    // Initialize empty cached data until cloud fetch completes
+    if (!state.cachedData) {
+      state.cachedData = [];
+      state.dataSource = "FETCHING";
     }
 
     // Fetch immediately from cloud in background
@@ -117,14 +117,14 @@
         state.cachedData = buildProcessedLeaderboard(rawData);
         state.dataSource = "CLOUD";
       } else {
-        // Fallback mock if data is sparse
-        state.cachedData = generateFallbackMock();
-        state.dataSource = "MOCK_FALLBACK";
+        // Cloud database is empty or has been reset by teacher
+        state.cachedData = [];
+        state.dataSource = "CLOUD_EMPTY";
       }
     } catch (err) {
-      console.warn("[Leaderboard] GAS endpoint unavailable or timed out. Using deterministic fallback mock:", err.message);
-      state.cachedData = generateFallbackMock();
-      state.dataSource = "MOCK_OFFLINE";
+      console.warn("[Leaderboard] GAS endpoint unavailable or timed out:", err.message);
+      if (!state.cachedData) state.cachedData = [];
+      state.dataSource = "OFFLINE_NO_DATA";
     } finally {
       clearTimeout(timeoutId);
       state.isFetching = false;
@@ -251,10 +251,13 @@
       badge.innerHTML = "<span>🔄 正在同步雲端榜單...</span>";
       badge.className = "leaderboard-badge syncing";
     } else if (statusType === "CLOUD") {
-      badge.innerHTML = "<span>🟢 雲端 GAS 實時榜單</span>";
+      badge.innerHTML = "<span>🟢 雲端 GAS 實時榜單 (已同步)</span>";
+      badge.className = "leaderboard-badge synced";
+    } else if (statusType === "CLOUD_EMPTY") {
+      badge.innerHTML = "<span>🟢 雲端已連線 (尚無作答紀錄)</span>";
       badge.className = "leaderboard-badge synced";
     } else {
-      badge.innerHTML = "<span>🟡 實時名冊同步 (離線/動態備援)</span>";
+      badge.innerHTML = "<span>🟡 離線暫存模式</span>";
       badge.className = "leaderboard-badge fallback";
     }
   }
@@ -266,9 +269,8 @@
     const screen = document.getElementById("screen8-leaderboard");
     if (!screen) return;
 
-    if (!state.cachedData || state.cachedData.length === 0) {
-      state.cachedData = generateFallbackMock();
-      state.dataSource = "MOCK_FALLBACK";
+    if (!Array.isArray(state.cachedData)) {
+      state.cachedData = [];
     }
 
     // Filter by tab
@@ -289,44 +291,69 @@
     // Current student entry
     const myEntry = displayList.find(s => s.isCurrentUser) || state.cachedData.find(s => s.isCurrentUser);
 
-    let podiumHtml = "";
-    const podiumOrder = [1, 0, 2]; // Silver (Rank 2), Gold (Rank 1), Bronze (Rank 3)
-    const medalIcons = ["🥇 冠軍", "🥈 亞軍", "🥉 季軍"];
-    const podiumClasses = ["podium-gold", "podium-silver", "podium-bronze"];
+    let mainContentHtml = "";
 
-    podiumOrder.forEach(function (orderIdx) {
-      const student = top3[orderIdx];
-      if (student) {
-        const medal = medalIcons[orderIdx];
-        const pClass = podiumClasses[orderIdx];
-        podiumHtml += `
-          <div class="podium-card ${pClass} ${student.isCurrentUser ? 'is-me' : ''}">
-            <div class="podium-crown">${medal}</div>
-            <div class="podium-name">${student.name}</div>
-            <div class="podium-class">${student.classID} 班 ${student.studentID} 號</div>
-            <div class="podium-metric">作答 <strong>${student.questionCount}</strong> 題</div>
-            <div class="podium-metric">正確率 <strong>${student.accuracy}%</strong></div>
-          </div>
-        `;
-      }
-    });
-
-    let othersHtml = "";
-    others.forEach(function (s) {
-      othersHtml += `
-        <div class="rank-list-item ${s.isCurrentUser ? 'is-me' : ''}">
-          <div class="rank-number">${s.tabRank}</div>
-          <div class="rank-info">
-            <div class="rank-name">${s.name} ${s.isCurrentUser ? '<span class="me-tag">我</span>' : ''}</div>
-            <div class="rank-sub">${s.classID} 班 ${s.studentID} 號</div>
-          </div>
-          <div class="rank-stats">
-            <div>${s.questionCount} 題</div>
-            <div class="rank-acc">${s.accuracy}%</div>
-          </div>
+    if (displayList.length === 0) {
+      // Clean Empty State when cloud database is reset or empty
+      mainContentHtml = `
+        <div class="empty-leaderboard-box" style="text-align: center; padding: 40px 16px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.18); border-radius: 12px; margin: 18px 0;">
+          <div style="font-size: 44px; margin-bottom: 10px;">🏆</div>
+          <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 6px; color: var(--text-highlight, #f8fafc);">目前尚無測驗作答排行</h3>
+          <p style="font-size: 13px; color: var(--text-muted, #94a3b8); margin-bottom: 0;">雲端數據庫已清空重置。完成測驗交卷後，成績將即時同步登上實時榮譽榜！</p>
         </div>
       `;
-    });
+    } else {
+      let podiumHtml = "";
+      const podiumOrder = [1, 0, 2]; // Silver (Rank 2), Gold (Rank 1), Bronze (Rank 3)
+      const medalIcons = ["🥇 冠軍", "🥈 亞軍", "🥉 季軍"];
+      const podiumClasses = ["podium-gold", "podium-silver", "podium-bronze"];
+
+      podiumOrder.forEach(function (orderIdx) {
+        const student = top3[orderIdx];
+        if (student) {
+          const medal = medalIcons[orderIdx];
+          const pClass = podiumClasses[orderIdx];
+          podiumHtml += `
+            <div class="podium-card ${pClass} ${student.isCurrentUser ? 'is-me' : ''}">
+              <div class="podium-crown">${medal}</div>
+              <div class="podium-name">${student.name}</div>
+              <div class="podium-class">${student.classID} 班 ${student.studentID} 號</div>
+              <div class="podium-metric">作答 <strong>${student.questionCount}</strong> 題</div>
+              <div class="podium-metric">正確率 <strong>${student.accuracy}%</strong></div>
+            </div>
+          `;
+        }
+      });
+
+      let othersHtml = "";
+      others.forEach(function (s) {
+        othersHtml += `
+          <div class="rank-list-item ${s.isCurrentUser ? 'is-me' : ''}">
+            <div class="rank-number">${s.tabRank}</div>
+            <div class="rank-info">
+              <div class="rank-name">${s.name} ${s.isCurrentUser ? '<span class="me-tag">我</span>' : ''}</div>
+              <div class="rank-sub">${s.classID} 班 ${s.studentID} 號</div>
+            </div>
+            <div class="rank-stats">
+              <div>${s.questionCount} 題</div>
+              <div class="rank-acc">${s.accuracy}%</div>
+            </div>
+          </div>
+        `;
+      });
+
+      mainContentHtml = `
+        <!-- Top 3 Podium View -->
+        <div class="podium-container">
+          ${podiumHtml}
+        </div>
+
+        <!-- Rank 4+ List View -->
+        <div class="rank-list-container">
+          ${othersHtml}
+        </div>
+      `;
+    }
 
     // Sticky My Rank HTML
     let myRankHtml = "";
@@ -367,15 +394,7 @@
           <button class="tab-btn ${state.activeFilterTab === 'G11' ? 'active' : ''}" data-tab="G11">高二榜 (5B)</button>
         </div>
 
-        <!-- Top 3 Podium View -->
-        <div class="podium-container">
-          ${podiumHtml}
-        </div>
-
-        <!-- Rank 4+ List View -->
-        <div class="rank-list-container">
-          ${othersHtml}
-        </div>
+        ${mainContentHtml}
 
         ${myRankHtml}
 
