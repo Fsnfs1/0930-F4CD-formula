@@ -1593,6 +1593,7 @@
         gradeLevel: state.gradeLevel,
         bankId: state.bankId,
         questions: state.questions,
+        currentQuestion: state.currentQuestion || (state.questions && state.questions[state.currentIndex]) || null,
         currentIndex: state.currentIndex,
         totalAnswered: state.totalAnswered,
         totalCorrect: state.totalCorrect,

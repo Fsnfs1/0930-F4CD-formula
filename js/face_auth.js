@@ -642,6 +642,7 @@
       secondMatch: scoredList.length > 1 ? scoredList[1].profile : null,
       secondSimilarity: sim2,
       delta: delta,
+      marginDelta: delta,
       status: status,
       needsManualConfirm: needsManualConfirm
     };
