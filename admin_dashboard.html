@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>教師後台即時監控儀表板 - 高中數學練習平臺</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f172a">
+
+  <!-- USER GLOBAL RULE: MathJax script for LaTeX math formula rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- External Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --gold: #fbbf24;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "PingFang TC", "Microsoft JhengHei", sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 24px 20px;
+    }
+
+    .dashboard-container {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 24px;
+    }
+
+    .brand-title {
+      font-size: 24px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 9px 16px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-outline { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text-main); }
+    .btn-outline:hover { background: rgba(255, 255, 255, 0.1); }
+
+    .countdown-indicator {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--primary);
+    }
+    .kpi-card.success::before { background: var(--success); }
+    .kpi-card.warning::before { background: var(--warning); }
+    .kpi-card.gold::before { background: var(--gold); }
+
+    .kpi-title {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 10px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .filters-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 18px;
+      background: var(--card-bg);
+      padding: 14px 18px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .select-input, .search-input {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .search-input { min-width: 220px; }
+
+    .table-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    th {
+      background: rgba(15, 23, 42, 0.7);
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+      color: var(--text-main);
+    }
+
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-secondary {
+      background: rgba(148, 163, 184, 0.1);
+      color: #94a3b8;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .podium-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .podium-container { grid-template-columns: 1fr; }
+    }
+
+    .podium-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid var(--card-border);
+      position: relative;
+    }
+
+    .podium-card.rank-1 {
+      border-color: rgba(251, 191, 36, 0.5);
+      background: linear-gradient(180deg, rgba(251, 191, 36, 0.08) 0%, var(--card-bg) 100%);
+    }
+
+    .podium-medal { font-size: 32px; margin-bottom: 6px; }
+    .podium-name { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+    .podium-class { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+
+    .podium-stats {
+      display: flex;
+      justify-content: space-around;
+      background: rgba(15, 23, 42, 0.5);
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .podium-stat-val { font-weight: 700; color: var(--primary); }
+    .podium-stat-lbl { font-size: 11px; color: var(--text-muted); }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 800px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title { font-size: 18px; font-weight: 700; }
+    .modal-close { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; }
+    .modal-body { padding: 20px 24px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-container">
+    <header>
+      <div>
+        <div class="brand-title">
+          <span>📊</span> 高中數學平臺 · 教師實時監控儀表板
+        </div>
+        <div class="brand-subtitle">
+          全校 88 位學生 · 實時雲端特徵同步 · 作答成績與時長監控
+        </div>
+      </div>
+      <div class="header-actions">
+        <div id="cloudSyncStatusBadge" class="badge" style="font-size: 12px; padding: 6px 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3);">
+          <i class="fa-solid fa-spinner fa-spin"></i> <span id="cloudSyncStatusText">載入中...</span>
+        </div>
+        <div class="countdown-indicator">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span id="countdownText">60s 後自動更新</span>
+        </div>
+        <button id="btnManualRefresh" class="btn btn-primary">
+          <i class="fa-solid fa-rotate"></i> 立即刷新
+        </button>
+        <button id="btnExportCSV" class="btn btn-outline">
+          <i class="fa-solid fa-file-csv"></i> 匯出本頁 CSV
+        </button>
+      </div>
+    </header>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-title">全校學生總數 <i class="fa-solid fa-users"></i></div>
+        <div class="kpi-value" id="kpiTotalStudents">88</div>
+        <div class="kpi-sub">4C(29人), 4D(31人), 5B(28人)</div>
+      </div>
+      <div class="kpi-card success">
+        <div class="kpi-title">雲端已註冊臉孔 <i class="fa-solid fa-id-card"></i></div>
+        <div class="kpi-value" id="kpiRegisteredFaces">--</div>
+        <div class="kpi-sub" id="kpiRegisteredPct">登記進度加載中...</div>
+      </div>
+      <div class="kpi-card warning">
+        <div class="kpi-title">已參與答題學生 <i class="fa-solid fa-graduation-cap"></i></div>
+        <div class="kpi-value" id="kpiParticipants">--</div>
+        <div class="kpi-sub" id="kpiParticipantPct">作答進度加載中...</div>
+      </div>
+      <div class="kpi-card gold">
+        <div class="kpi-title">累計作答題數 <i class="fa-solid fa-fire"></i></div>
+        <div class="kpi-value" id="kpiTotalAttempts">--</div>
+        <div class="kpi-sub" id="kpiAvgAccuracy">整體正確率加載中...</div>
+      </div>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="tab-btn active" data-tab="tab-roster">
+        <i class="fa-solid fa-id-badge"></i> 👤 雲端人臉登記在庫清單 (<span id="tabCountRoster">88</span>)
+      </button>
+      <button class="tab-btn" data-tab="tab-leaderboard">
+        <i class="fa-solid fa-trophy"></i> 🏆 全體實時作答排行榜 (<span id="tabCountLeaderboard">0</span>)
+      </button>
+    </div>
+
+    <div id="tab-roster" class="tab-content active">
+      <div class="filters-bar">
+        <div class="filter-group">
+          <span class="filter-label">班級：</span>
+          <select id="selectRosterClass" class="select-input">
+            <option value="ALL">全部班級</option>
+            <option value="4C">4C 班 (高一)</option>
+            <option value="4D">4D 班 (高一)</option>
+            <option value="5B">5B 班 (高二)</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">登記狀態：</span>
+          <select id="selectRosterStatus" class="select-input">
+            <option value="ALL">全部狀態</option>
+            <option value="REGISTERED">僅看已登記</option>
+            <option value="UNREGISTERED">僅看未登記</option>
+          </select>
+        </div>
+        <div class="filter-group" style="margin-left: auto;">
+          <input type="text" id="inputRosterSearch" class="search-input" placeholder="🔍 搜尋學生姓名或學號...">
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>班級</th>
+              <th>學號</th>
+              <th>姓名</th>
+              <th>登記狀態</th>
+              <th>登記時間 (雲端試算表)</th>
+              <th>版本</th>
+              <th>特徵特質</th>
+              <th>作答狀況</th>
+            </tr>
+          </thead>
+          <tbody id="rosterTableBody">
+            <tr>
+              <td colspan="8" style="text-align: center; padding: 30px; color: var(--text-muted);">
+                <i class="fa-solid fa-spinner fa-spin"></i> 正在自 Google 試算表拉取人臉特徵...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="tab-leaderboard" class="tab-content">
+      <div class="filters-bar">
+        <div class="filter-group">
+          <span class="filter-label">組別：</span>
+          <select id="selectLeaderboardGrade" class="select-input">
+            <option value="ALL">全校綜合排名 (4C, 4D, 5B)</option>
+            <option value="G10">高一組 (4C, 4D)</option>
+            <option value="G11">高二組 (5B)</option>
+          </select>
+        </div>
+        <div class="filter-group" style="margin-left: auto;">
+          <input type="text" id="inputLeaderboardSearch" class="search-input" placeholder="🔍 搜尋榜單學生...">
+        </div>
+      </div>
+
+      <div class="podium-container" id="podiumContainer"></div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>名次</th>
+              <th>班級</th>
+              <th>學號</th>
+              <th>姓名</th>
+              <th>作答總數</th>
+              <th>答對題數</th>
+              <th>正確率</th>
+              <th>平均每題時長</th>
+              <th>綜合評分</th>
+              <th>最後作答時間</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardTableBody">
+            <tr>
+              <td colspan="11" style="text-align: center; padding: 30px; color: var(--text-muted);">
+                <i class="fa-solid fa-spinner fa-spin"></i> 正在自 Google 試算表讀取排行榜...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="studentModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="modalStudentTitle">學生個人作答紀錄</div>
+        <button id="modalCloseBtn" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="modalStudentBody"></div>
+    </div>
+  </div>
+
+  <script src="js/roster.js"></script>
+  <script src="js/admin_snapshot.js"></script>
+
+  <script>
+    (function () {
+      const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwNAQNxmNsNa8rWGp48qnYRrjA2WFLGIzKqSel2r8MilRp59s3ZfBJjeKXIrUfoS-Zp-g/exec";
+      let countdownSec = 60;
+      let countdownTimer = null;
+
+      let rawData = [];
+      let parsedFaces = {};
+      let studentAttempts = {};
+      let allAttempts = [];
+
+      const btnManualRefresh = document.getElementById("btnManualRefresh");
+      const btnExportCSV = document.getElementById("btnExportCSV");
+      const countdownText = document.getElementById("countdownText");
+      const kpiRegisteredFaces = document.getElementById("kpiRegisteredFaces");
+      const kpiRegisteredPct = document.getElementById("kpiRegisteredPct");
+      const kpiParticipants = document.getElementById("kpiParticipants");
+      const kpiParticipantPct = document.getElementById("kpiParticipantPct");
+      const kpiTotalAttempts = document.getElementById("kpiTotalAttempts");
+      const kpiAvgAccuracy = document.getElementById("kpiAvgAccuracy");
+
+      const selectRosterClass = document.getElementById("selectRosterClass");
+      const selectRosterStatus = document.getElementById("selectRosterStatus");
+      const inputRosterSearch = document.getElementById("inputRosterSearch");
+      const rosterTableBody = document.getElementById("rosterTableBody");
+      const tabCountRoster = document.getElementById("tabCountRoster");
+
+      const selectLeaderboardGrade = document.getElementById("selectLeaderboardGrade");
+      const inputLeaderboardSearch = document.getElementById("inputLeaderboardSearch");
+      const podiumContainer = document.getElementById("podiumContainer");
+      const leaderboardTableBody = document.getElementById("leaderboardTableBody");
+      const tabCountLeaderboard = document.getElementById("tabCountLeaderboard");
+
+      const studentModal = document.getElementById("studentModal");
+      const modalCloseBtn = document.getElementById("modalCloseBtn");
+      const modalStudentTitle = document.getElementById("modalStudentTitle");
+      const modalStudentBody = document.getElementById("modalStudentBody");
+
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", function () {
+          document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+          document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+          this.classList.add("active");
+          const target = document.getElementById(this.dataset.tab);
+          if (target) target.classList.add("active");
+        });
+      });
+
+      function updateSyncStatus(type, message) {
+        const badge = document.getElementById("cloudSyncStatusBadge");
+        const text = document.getElementById("cloudSyncStatusText");
+        if (!badge || !text) return;
+
+        text.textContent = message;
+
+        if (type === "SYNCING") {
+          badge.style.background = "rgba(59, 130, 246, 0.15)";
+          badge.style.color = "#60a5fa";
+          badge.style.border = "1px solid rgba(59, 130, 246, 0.3)";
+          badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span id="cloudSyncStatusText">${message}</span>`;
+        } else if (type === "ONLINE") {
+          badge.style.background = "rgba(16, 185, 129, 0.15)";
+          badge.style.color = "#34d399";
+          badge.style.border = "1px solid rgba(16, 185, 129, 0.3)";
+          badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span id="cloudSyncStatusText">${message}</span>`;
+        } else {
+          // FALLBACK / CACHE / SNAPSHOT
+          badge.style.background = "rgba(245, 158, 11, 0.15)";
+          badge.style.color = "#fbbf24";
+          badge.style.border = "1px solid rgba(245, 158, 11, 0.3)";
+          badge.innerHTML = `<i class="fa-solid fa-cloud-arrow-down"></i> <span id="cloudSyncStatusText">${message}</span>`;
+        }
+      }
+
+      function loadInitialData() {
+        try {
+          const cached = localStorage.getItem("ADMIN_DASHBOARD_CACHE");
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              rawData = parsed;
+              processData();
+              updateSyncStatus("CACHE", "已載入本機快取數據");
+              return;
+            }
+          }
+        } catch (e) {}
+
+        if (window.ADMIN_SNAPSHOT_DATA && Array.isArray(window.ADMIN_SNAPSHOT_DATA)) {
+          rawData = window.ADMIN_SNAPSHOT_DATA;
+          processData();
+          updateSyncStatus("SNAPSHOT", "已載入最新官方備份數據");
+        }
+      }
+
+      async function loadData() {
+        btnManualRefresh.disabled = true;
+        btnManualRefresh.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 同步中...';
+        updateSyncStatus("SYNCING", "正在同步雲端最新數據...");
+
+        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        let timeoutId = null;
+        if (controller) {
+          timeoutId = setTimeout(() => controller.abort(), 45000);
+        }
+
+        try {
+          const fetchOpts = {
+            method: "GET",
+            mode: "cors",
+            redirect: "follow",
+            cache: "no-store"
+          };
+          if (controller) {
+            fetchOpts.signal = controller.signal;
+          }
+
+          const resp = await fetch(GAS_ENDPOINT, fetchOpts);
+          if (timeoutId) clearTimeout(timeoutId);
+
+          if (!resp.ok) throw new Error("HTTP " + resp.status);
+          const freshData = await resp.json();
+
+          if (Array.isArray(freshData) && freshData.length > 0) {
+            rawData = freshData;
+            try {
+              localStorage.setItem("ADMIN_DASHBOARD_CACHE", JSON.stringify(freshData));
+            } catch (e) {}
+            processData();
+            updateSyncStatus("ONLINE", "雲端試算表實時數據 (已同步)");
+          }
+        } catch (err) {
+          if (timeoutId) clearTimeout(timeoutId);
+          console.warn("[Dashboard] GAS sync error:", err.message);
+
+          if (rawData && rawData.length > 0) {
+            updateSyncStatus("FALLBACK", "雲端連線較慢，目前顯示快取數據");
+          } else {
+            loadInitialData();
+            updateSyncStatus("FALLBACK", "雲端連線異常，已載入本機備份數據");
+          }
+        } finally {
+          btnManualRefresh.disabled = false;
+          btnManualRefresh.innerHTML = '<i class="fa-solid fa-rotate"></i> 立即刷新';
+          countdownSec = 60;
+        }
+      }
+
+      function processData() {
+        parsedFaces = {};
+        studentAttempts = {};
+        allAttempts = [];
+
+        rawData.forEach(row => {
+          const cid = String(row.classID || "").trim().toUpperCase();
+          const sid = parseInt(row.studentID, 10);
+          if (!cid || isNaN(sid) || sid <= 0) return;
+
+          const did = String(row.dateID || "").trim();
+          const ts = String(row.Timestamp || "").trim();
+
+          if (did.includes("|TS:")) {
+            let tsVal = 0;
+            let ver = 1;
+            try {
+              tsVal = parseInt(did.split("|TS:")[1].split("|")[0], 10) || 0;
+              if (did.includes("|V:")) {
+                ver = parseInt(did.split("|V:")[1].split("|")[0], 10) || 1;
+              }
+            } catch (e) {}
+
+            const k = `${cid}_${sid}`;
+            if (!parsedFaces[k] || tsVal > parsedFaces[k].tsVal) {
+              parsedFaces[k] = {
+                tsVal: tsVal,
+                version: ver,
+                timestamp: ts,
+                dateID: did
+              };
+            }
+            return;
+          }
+
+          if (did.startsWith("KICKOUT") || did.startsWith("TAB_SWITCH") || did.startsWith("SCREENSHOT")) {
+            return;
+          }
+
+          const score = Number(row.score) || 0;
+          let dur = 0;
+          const durMatch = did.match(/_T(\d+)s_/);
+          if (durMatch) dur = parseInt(durMatch[1], 10);
+
+          let acc = 0;
+          const accMatch = did.match(/_ACC(\d+)/);
+          if (accMatch) acc = parseInt(accMatch[1], 10);
+
+          const attempt = {
+            classID: cid,
+            studentID: sid,
+            timestamp: ts,
+            dateID: did,
+            score: score,
+            isCorrect: score >= 100,
+            duration: dur,
+            accuracy: acc
+          };
+
+          allAttempts.push(attempt);
+          const k = `${cid}_${sid}`;
+          if (!studentAttempts[k]) studentAttempts[k] = [];
+          studentAttempts[k].push(attempt);
+        });
+
+        updateKPIs();
+        renderRoster();
+        renderLeaderboard();
+      }
+
+      function updateKPIs() {
+        const totalRegistered = Object.keys(parsedFaces).length;
+        const totalParticipants = Object.keys(studentAttempts).length;
+        const totalAttemptsCount = allAttempts.length;
+
+        const totalCorrect = allAttempts.filter(a => a.isCorrect).length;
+        const overallAcc = totalAttemptsCount > 0 ? ((totalCorrect / totalAttemptsCount) * 100).toFixed(1) : 0;
+
+        kpiRegisteredFaces.textContent = totalRegistered;
+        kpiRegisteredPct.textContent = `全校登記率 ${(totalRegistered / 88 * 100).toFixed(1)}%`;
+
+        kpiParticipants.textContent = totalParticipants;
+        kpiParticipantPct.textContent = `全校參與率 ${(totalParticipants / 88 * 100).toFixed(1)}%`;
+
+        kpiTotalAttempts.textContent = totalAttemptsCount;
+        kpiAvgAccuracy.textContent = `作答正確率 ${overallAcc}%`;
+      }
+
+      function renderRoster() {
+        const roster = window.ROSTER_DATA || {};
+        const selectedClass = selectRosterClass.value;
+        const selectedStatus = selectRosterStatus.value;
+        const searchKeyword = inputRosterSearch.value.trim().toLowerCase();
+
+        let list = [];
+        for (const cid in roster) {
+          if (selectedClass !== "ALL" && selectedClass !== cid) continue;
+          roster[cid].forEach(s => {
+            const k = `${cid}_${s.id}`;
+            const face = parsedFaces[k];
+            const isReg = !!face;
+            if (selectedStatus === "REGISTERED" && !isReg) return;
+            if (selectedStatus === "UNREGISTERED" && isReg) return;
+
+            if (searchKeyword) {
+              const matchName = s.name.toLowerCase().includes(searchKeyword);
+              const matchId = String(s.id).includes(searchKeyword);
+              if (!matchName && !matchId) return;
+            }
+
+            list.push({
+              classID: cid,
+              studentID: s.id,
+              name: s.name,
+              isRegistered: isReg,
+              face: face,
+              attempts: studentAttempts[k] || []
+            });
+          });
+        }
+
+        tabCountRoster.textContent = list.length;
+        rosterTableBody.innerHTML = "";
+
+        if (list.length === 0) {
+          rosterTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 25px; color: var(--text-muted);">無符合條件之學生</td></tr>';
+          return;
+        }
+
+        list.forEach(s => {
+          const tr = document.createElement("tr");
+          const attCount = s.attempts.length;
+          const statusBadge = s.isRegistered
+            ? '<span class="badge badge-success"><i class="fa-solid fa-check"></i> 已登記</span>'
+            : '<span class="badge badge-secondary"><i class="fa-solid fa-minus"></i> 未登記</span>';
+          
+          const timeStr = s.face && s.face.timestamp ? s.face.timestamp.replace('T', ' ').replace('.000Z', '') : '-';
+          const verStr = s.face ? `v${s.face.version}` : '-';
+          const vecStr = s.isRegistered ? '<span style="color:#10b981;">128維特徵正常</span>' : '<span style="color:#64748b;">無特徵</span>';
+          const attemptStr = attCount > 0 ? `<strong style="color:var(--primary);">${attCount} 題</strong>` : '<span style="color:#64748b;">未作答</span>';
+
+          tr.innerHTML = `
+            <td><strong>${s.classID}</strong></td>
+            <td>${s.studentID} 號</td>
+            <td><strong>${s.name}</strong></td>
+            <td>${statusBadge}</td>
+            <td style="font-size:12px; color:var(--text-muted);">${timeStr}</td>
+            <td>${verStr}</td>
+            <td style="font-size:12px;">${vecStr}</td>
+            <td>${attemptStr}</td>
+          `;
+          rosterTableBody.appendChild(tr);
+        });
+      }
+
+      function renderLeaderboard() {
+        const gradeFilter = selectLeaderboardGrade.value;
+        const searchKeyword = inputLeaderboardSearch.value.trim().toLowerCase();
+
+        let list = [];
+        for (const k in studentAttempts) {
+          const atts = studentAttempts[k];
+          if (!atts || atts.length === 0) continue;
+          const cid = atts[0].classID;
+          const sid = atts[0].studentID;
+          const sName = window.getStudentName ? window.getStudentName(cid, sid) : `學生 ${sid}`;
+
+          if (gradeFilter === "G10" && (cid !== "4C" && cid !== "4D")) continue;
+          if (gradeFilter === "G11" && cid !== "5B") continue;
+
+          if (searchKeyword) {
+            const matchName = sName.toLowerCase().includes(searchKeyword);
+            const matchId = String(sid).includes(searchKeyword);
+            if (!matchName && !matchId) return;
+          }
+
+          const total = atts.length;
+          const correct = atts.filter(a => a.isCorrect).length;
+          const acc = total > 0 ? Math.round((correct / total) * 100) : 0;
+          const composite = (total * 10) + Math.round(acc * 2.5);
+
+          const durs = atts.map(a => a.duration).filter(d => d > 0);
+          const avgDur = durs.length > 0 ? (durs.reduce((a, b) => a + b, 0) / durs.length).toFixed(1) : 0;
+
+          list.push({
+            classID: cid,
+            studentID: sid,
+            name: sName,
+            total: total,
+            correct: correct,
+            accuracy: acc,
+            avgDuration: avgDur,
+            composite: composite,
+            lastTimestamp: atts[atts.length - 1].timestamp,
+            attempts: atts
+          });
+        }
+
+        list.sort((a, b) => b.composite - a.composite);
+        tabCountLeaderboard.textContent = list.length;
+
+        podiumContainer.innerHTML = "";
+        const top3 = list.slice(0, 3);
+        const medals = ["🥇 冠軍", "🥈 亞軍", "🥉 季軍"];
+        const ranks = ["rank-1", "rank-2", "rank-3"];
+
+        top3.forEach((s, idx) => {
+          const card = document.createElement("div");
+          card.className = `podium-card ${ranks[idx]}`;
+          card.innerHTML = `
+            <div class="podium-medal">${medals[idx]}</div>
+            <div class="podium-name">${s.name}</div>
+            <div class="podium-class">${s.classID} 班 ${s.studentID} 號</div>
+            <div class="podium-stats">
+              <div>
+                <div class="podium-stat-val">${s.total}</div>
+                <div class="podium-stat-lbl">作答題數</div>
+              </div>
+              <div>
+                <div class="podium-stat-val">${s.accuracy}%</div>
+                <div class="podium-stat-lbl">正確率</div>
+              </div>
+              <div>
+                <div class="podium-stat-val">${s.composite}</div>
+                <div class="podium-stat-lbl">綜合評分</div>
+              </div>
+            </div>
+          `;
+          podiumContainer.appendChild(card);
+        });
+
+        leaderboardTableBody.innerHTML = "";
+        if (list.length === 0) {
+          leaderboardTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 25px; color: var(--text-muted);">無作答數據</td></tr>';
+          return;
+        }
+
+        list.forEach((s, idx) => {
+          const tr = document.createElement("tr");
+          const lastTs = s.lastTimestamp ? s.lastTimestamp.replace('T', ' ').replace('.000Z', '') : '-';
+
+          tr.innerHTML = `
+            <td><strong>#${idx + 1}</strong></td>
+            <td>${s.classID}</td>
+            <td>${s.studentID} 號</td>
+            <td><strong>${s.name}</strong></td>
+            <td><strong style="color:var(--primary);">${s.total}</strong></td>
+            <td>${s.correct}</td>
+            <td><span style="color:#10b981; font-weight:600;">${s.accuracy}%</span></td>
+            <td>${s.avgDuration}s</td>
+            <td><strong style="color:var(--gold);">${s.composite}</strong></td>
+            <td style="font-size:12px; color:var(--text-muted);">${lastTs}</td>
+            <td>
+              <button class="btn btn-outline" style="padding:4px 8px; font-size:11px;" onclick="window.viewStudentAttempts('${s.classID}', ${s.studentID})">
+                <i class="fa-solid fa-list-check"></i> 明細
+              </button>
+            </td>
+          `;
+          leaderboardTableBody.appendChild(tr);
+        });
+      }
+
+      window.viewStudentAttempts = function (cid, sid) {
+        const k = `${cid}_${sid}`;
+        const atts = studentAttempts[k] || [];
+        const sName = window.getStudentName ? window.getStudentName(cid, sid) : `學生 ${sid}`;
+
+        modalStudentTitle.textContent = `${cid} 班 ${sid} 號 ${sName} - 作答詳細紀錄 (共 ${atts.length} 題)`;
+        
+        let html = `
+          <table style="width:100%; border-collapse:collapse; font-size:13px;">
+            <thead>
+              <tr style="background:#0f172a;">
+                <th style="padding:8px;">序號</th>
+                <th style="padding:8px;">題目</th>
+                <th style="padding:8px;">得分</th>
+                <th style="padding:8px;">耗時</th>
+                <th style="padding:8px;">當時正確率</th>
+                <th style="padding:8px;">提交時間</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        atts.forEach((a, idx) => {
+          const isCor = a.score >= 100;
+          const scoreBadge = isCor
+            ? '<span style="color:#10b981; font-weight:bold;">100 (正確)</span>'
+            : '<span style="color:#ef4444; font-weight:bold;">0 (錯誤)</span>';
+          const t = a.timestamp.replace('T', ' ').replace('.000Z', '');
+          html += `
+            <tr style="border-bottom:1px solid #334155;">
+              <td style="padding:8px;">${idx + 1}</td>
+              <td style="padding:8px; font-family:monospace; color:var(--primary);">${a.dateID.split('_T')[0]}</td>
+              <td style="padding:8px;">${scoreBadge}</td>
+              <td style="padding:8px;">${a.duration} 秒</td>
+              <td style="padding:8px;">${a.accuracy}%</td>
+              <td style="padding:8px; color:#94a3b8; font-size:12px;">${t}</td>
+            </tr>
+          `;
+        });
+
+        html += '</tbody></table>';
+        modalStudentBody.innerHTML = html;
+        studentModal.classList.add("active");
+      };
+
+      modalCloseBtn.addEventListener("click", () => studentModal.classList.remove("active"));
+      studentModal.addEventListener("click", (e) => {
+        if (e.target === studentModal) studentModal.classList.remove("active");
+      });
+
+      btnExportCSV.addEventListener("click", function () {
+        const rows = [["班級", "學號", "姓名", "作答提交時間", "題目識別碼", "得分", "花費時長(秒)", "當時正確率(%)"]];
+        allAttempts.forEach(a => {
+          const sName = window.getStudentName ? window.getStudentName(a.classID, a.studentID) : `學生 ${a.studentID}`;
+          rows.push([
+            a.classID,
+            a.studentID,
+            sName,
+            a.timestamp,
+            a.dateID.split('_T')[0],
+            a.score,
+            a.duration,
+            a.accuracy
+          ]);
+        });
+
+        let csvContent = "\uFEFF" + rows.map(e => e.join(",")).join("\n");
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `全體作答明細_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      });
+
+      selectRosterClass.addEventListener("change", renderRoster);
+      selectRosterStatus.addEventListener("change", renderRoster);
+      inputRosterSearch.addEventListener("input", renderRoster);
+
+      selectLeaderboardGrade.addEventListener("change", renderLeaderboard);
+      inputLeaderboardSearch.addEventListener("input", renderLeaderboard);
+
+      btnManualRefresh.addEventListener("click", loadData);
+
+      countdownTimer = setInterval(() => {
+        countdownSec--;
+        countdownText.textContent = `${countdownSec}s 後自動更新`;
+        if (countdownSec <= 0) {
+          loadData();
+        }
+      }, 1000);
+
+      // 1. Instant First-Paint from snapshot or localStorage
+      loadInitialData();
+
+      // 2. Background Cloud Sync
+      loadData();
+    })();
+  </script>
+</body>
+</html>
