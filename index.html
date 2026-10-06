@@ -174,9 +174,14 @@
           <span>🚀 確認身分，直接進入答題</span>
         </button>
 
+        <!-- Manual self-selection button if misidentified (Crucial for first-time or misrecognized students) -->
+        <button id="btnManualSelectSelf" class="btn btn-outline" style="width: 100%; padding: 12px; font-size: 15px; margin-bottom: 10px; border: 1.5px solid var(--primary); color: var(--primary); background: #f0f7ff; font-weight: 600; cursor: pointer;">
+          <span id="btnNotMe">👤 不是本人 / 非本人？手動選擇我的真實姓名（更正身分 / 密碼登錄）</span>
+        </button>
+
         <!-- Not me / return button -->
         <button id="btnConfirmNotMe" class="btn btn-secondary" style="width: 100%;">
-          <span>← 非本人？重新識別</span>
+          <span>← 重新對準鏡頭拍照識別</span>
         </button>
       </div>
 
@@ -603,12 +608,40 @@
     <div id="modalPasswordAuth" class="auth-modal-overlay" style="display: none;">
       <div class="auth-modal-card">
         <div style="font-size: 40px; text-align: center; margin-bottom: 8px;">🔐</div>
-        <h3 style="text-align: center; margin-bottom: 6px; font-size: 18px; font-weight: 700; color: #f8fafc;">
-          密碼輔助身分鑑別
+        <h3 id="authModalTitle" style="text-align: center; margin-bottom: 6px; font-size: 18px; font-weight: 700; color: #f8fafc;">
+          密碼二次身分驗證
         </h3>
-        <p style="text-align: center; font-size: 13px; color: #94a3b8; margin-bottom: 14px;">
+        <p id="authModalSubtitle" style="text-align: center; font-size: 13px; color: #94a3b8; margin-bottom: 14px;">
           人臉未能唯一確認。請輸入您的個人密碼進行鑑別，系統將融合更新特徵以消除後續衝突。
         </p>
+
+        <!-- Candidate list container for ambiguous / multi-face recognition (Requirement 2) -->
+        <div id="authCandidateSection" style="margin-bottom: 14px; text-align: left; display: none;">
+          <label class="form-label" style="font-size: 13px; color: #cbd5e1; margin-bottom: 6px; display: block; font-weight: 600;">
+            偵測到多位相似特徵，請選擇最可能的本人身分：
+          </label>
+          <div id="authCandidateList" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
+            <!-- Rendered dynamically -->
+          </div>
+          <div style="text-align: right; margin-bottom: 6px;">
+            <a href="javascript:void(0)" id="linkAuthManualSelect" style="font-size: 12px; color: #60a5fa; text-decoration: underline;">
+              非以上候選人？手動選擇其他學生 ▾
+            </a>
+          </div>
+          <div id="authManualSelectFields" style="display: none; padding: 10px; background: rgba(15, 23, 42, 0.6); border-radius: 8px; border: 1px solid #334155;">
+            <div style="display: flex; gap: 8px;">
+              <select id="authClassSelect" class="form-select" style="flex: 1; padding: 8px; font-size: 13px; background: #0f172a; color: #f8fafc; border: 1px solid #334155; border-radius: 6px;">
+                <option value="" disabled selected>-- 選擇班別 --</option>
+                <option value="4C">4C 班</option>
+                <option value="4D">4D 班</option>
+                <option value="5B">5B 班</option>
+              </select>
+              <select id="authStudentSelect" class="form-select" disabled style="flex: 1.5; padding: 8px; font-size: 13px; background: #0f172a; color: #f8fafc; border: 1px solid #334155; border-radius: 6px;">
+                <option value="" disabled selected>-- 選擇學號 --</option>
+              </select>
+            </div>
+          </div>
+        </div>
 
         <div id="authStudentInfo" style="background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.3); padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; font-size: 14px; text-align: center; font-weight: 600; color: #a5b4fc;">
           <!-- e.g. 4D 班 7 號 李語鵑 同學 -->
@@ -681,11 +714,13 @@
         currentStudentName: "",
         currentGradeInfo: null,
         capturedSnapshot: null, // { descriptor, imageBase64, sizeKb }
+        lastCapturedSnapshot: null,
         pendingRegistrationDescriptor: null,
         pendingRegistrationSnapshot: null,
         isAmbiguousScan: false,
         isUnrecognizedScan: false,
         isPasswordAuthMode: false,
+        isPasswordAuthenticated: false,
         pendingActionAfterPasswordChange: null,
         pendingActionAfterPasswordAuth: null
       };
@@ -714,6 +749,7 @@
       const confirmStudentName = document.getElementById("confirmStudentName");
       const confirmGradeBadge = document.getElementById("confirmGradeBadge");
       const btnEnterQuiz = document.getElementById("btnEnterQuiz");
+      const btnManualSelectSelf = document.getElementById("btnManualSelectSelf");
       const btnConfirmNotMe = document.getElementById("btnConfirmNotMe");
 
       const classSelect = document.getElementById("classSelect");
@@ -1019,26 +1055,48 @@
           const profiles = window.getAllStudentProfiles ? window.getAllStudentProfiles() : [];
           const matchResult = window.identifyFace1toN(snap.descriptor, profiles, 0.82);
 
-          if (matchResult.status === "AMBIGUOUS_MARGIN") {
-            // R3: Ambiguous security margin fallback to manual confirmation & password-assisted upgrade
+          const isAmbiguous = (matchResult.status === "AMBIGUOUS_MARGIN") ||
+            (matchResult.delta < 0.08 && matchResult.topCandidate && matchResult.secondMatch &&
+             (matchResult.centeredSimilarity >= 0.75 || matchResult.euclideanDistance < 0.48));
+
+          if (isAmbiguous) {
+            // R2: Ambiguous security margin (Delta < 0.08): strictly prohibit auto-jumping to top student!
             AppState.isAmbiguousScan = true;
             AppState.isPasswordAuthMode = true;
             AppState.pendingRegistrationDescriptor = snap.descriptor;
             AppState.pendingRegistrationSnapshot = snap;
             AppState.capturedSnapshot = snap;
 
+            if (window.stopCamera && faceFirstVideo) {
+              window.stopCamera(faceFirstVideo);
+            }
+            if (faceFirstBlinkTracker) {
+              faceFirstBlinkTracker.stop();
+              faceFirstBlinkTracker = null;
+            }
+
             if (faceFirstAlert) {
               faceFirstAlert.style.display = "block";
               faceFirstAlert.className = "alert-box alert-warning";
-              faceFirstAlert.innerHTML = `⚠️ <strong>無法唯一確認本人 (邊距不足安全邊際)</strong><br><small>最高匹配與次高匹配差距小於安全邊際 (Δ < 0.08)，為防止冒認已暫停自動登入，請點擊下方手動核對身分或重新對準鏡頭！</small>`;
+              faceFirstAlert.innerHTML = `⚠️ <strong>偵測到多位相似特徵 (無法唯一確認本人)</strong><br><small>最高匹配與次高匹配差距小於安全邊際 (Δ < 0.08)，為維護帳號安全，請在彈出視窗選擇您的姓名並輸入個人密碼完成二次驗證！</small>`;
             }
-            if (faceFirstOverlay) faceFirstOverlay.textContent = "⚠️ 邊距不足 · 請手動核對身分";
+            if (faceFirstOverlay) faceFirstOverlay.textContent = "⚠️ 偵測到多位相似特徵 · 請輸入密碼二次驗證";
 
             isFaceFirstScanning = false;
             if (btnFaceFirstCapture) {
               btnFaceFirstCapture.disabled = false;
               btnFaceFirstCapture.innerHTML = "<span>🔍 拍照識別身分</span>";
             }
+
+            const candidates = (matchResult.candidates && matchResult.candidates.length > 0)
+              ? matchResult.candidates
+              : [
+                  { profile: matchResult.topCandidate, centeredSim: matchResult.centeredSimilarity, percentage: matchResult.percentage },
+                  { profile: matchResult.secondMatch, centeredSim: matchResult.secondSimilarity, percentage: Math.round(Math.max(0, matchResult.secondSimilarity) * 1000) / 10 }
+                ].filter(function (c) { return !!c.profile; });
+
+            AppState.ambiguousCandidates = candidates;
+            showPasswordAuthModal(null, candidates);
             return;
           }
 
@@ -1089,8 +1147,10 @@
 
             if (window.stopCamera) window.stopCamera(faceFirstVideo);
 
-            showScreen2FirstTimeSelect(snap);
-            isFaceFirstScanning = false;
+            setTimeout(function () {
+              showScreen2FirstTimeSelect(snap);
+              isFaceFirstScanning = false;
+            }, 450);
             if (btnFaceFirstCapture) {
               btnFaceFirstCapture.disabled = false;
               btnFaceFirstCapture.innerHTML = "<span>🔍 拍照識別身分</span>";
@@ -1126,7 +1186,8 @@
       if (linkGoToManualPage) {
         linkGoToManualPage.addEventListener("click", function (e) {
           e.preventDefault();
-          showScreen2FirstTimeSelect(AppState.capturedSnapshot || AppState.pendingRegistrationSnapshot);
+          const snap = AppState.capturedSnapshot || AppState.pendingRegistrationSnapshot || AppState.lastCapturedSnapshot;
+          showScreen2FirstTimeSelect(snap);
         });
       }
 
@@ -1205,12 +1266,14 @@
         if (cardReturningConfirm) cardReturningConfirm.style.display = "none";
         if (cardFirstTimeSelect) cardFirstTimeSelect.style.display = "block";
 
+        const snap = snapshot || AppState.capturedSnapshot || AppState.pendingRegistrationSnapshot || AppState.lastCapturedSnapshot;
+
         // 第一頁已拍照，顯示縮圖預覽
-        if (snapshot && snapshot.imageBase64) {
-          AppState.pendingRegistrationSnapshot = snapshot;
-          AppState.capturedSnapshot = snapshot;
+        if (snap && snap.imageBase64) {
+          AppState.pendingRegistrationSnapshot = snap;
+          AppState.capturedSnapshot = snap;
           if (firstTimePhotoPreviewBox) firstTimePhotoPreviewBox.style.display = "block";
-          if (firstTimePhotoPreviewImg) firstTimePhotoPreviewImg.src = snapshot.imageBase64;
+          if (firstTimePhotoPreviewImg) firstTimePhotoPreviewImg.src = snap.imageBase64;
         } else {
           if (firstTimePhotoPreviewBox) firstTimePhotoPreviewBox.style.display = "none";
         }
@@ -1264,18 +1327,57 @@
         });
       }
 
-      // 老生確認頁面：非本人？重新識別按鈕
-      if (btnConfirmNotMe) {
-        btnConfirmNotMe.addEventListener("click", function () {
+      // 老生確認頁面：非本人？手動選擇我的真實姓名（首次登記 / 更正身分）
+      if (btnManualSelectSelf) {
+        btnManualSelectSelf.addEventListener("click", function () {
+          const snap = AppState.capturedSnapshot || AppState.pendingRegistrationSnapshot || AppState.lastCapturedSnapshot;
+          if (snap) {
+            AppState.capturedSnapshot = snap;
+            AppState.pendingRegistrationSnapshot = snap;
+            AppState.lastCapturedSnapshot = snap;
+            if (snap.descriptor) {
+              AppState.pendingRegistrationDescriptor = snap.descriptor;
+            }
+          }
           AppState.currentClass = "";
           AppState.currentStudentId = null;
           AppState.currentStudentName = "";
           AppState.currentGradeInfo = null;
-          AppState.capturedSnapshot = null;
-          AppState.pendingRegistrationSnapshot = null;
-          AppState.pendingRegistrationDescriptor = null;
           AppState.isAmbiguousScan = false;
           AppState.isPasswordAuthMode = false;
+          AppState.isMisrecognizedCorrection = true;
+          AppState.isPasswordAuthenticated = false;
+
+          if (classSelect) classSelect.value = "";
+          if (studentSelect) {
+            studentSelect.innerHTML = '<option value="" disabled selected>-- 請先選擇班別 --</option>';
+            studentSelect.disabled = true;
+          }
+          if (studentNameDisplay) {
+            studentNameDisplay.textContent = "請選擇班別與學號";
+            studentNameDisplay.style.color = "var(--text-muted)";
+          }
+          if (gradeBadgeDisplay) gradeBadgeDisplay.style.display = "none";
+          if (btnConfirmIdentity) btnConfirmIdentity.disabled = true;
+
+          showScreen2FirstTimeSelect(snap);
+        });
+      }
+
+      // 老生確認頁面：非本人？重新對準鏡頭拍照識別按鈕
+      if (btnConfirmNotMe) {
+        btnConfirmNotMe.addEventListener("click", function () {
+          if (AppState.capturedSnapshot) {
+            AppState.lastCapturedSnapshot = AppState.capturedSnapshot;
+          }
+          AppState.currentClass = "";
+          AppState.currentStudentId = null;
+          AppState.currentStudentName = "";
+          AppState.currentGradeInfo = null;
+          AppState.isAmbiguousScan = false;
+          AppState.isPasswordAuthMode = false;
+          AppState.isMisrecognizedCorrection = false;
+          AppState.isPasswordAuthenticated = false;
 
           if (classSelect) classSelect.value = "";
           if (studentSelect) {
@@ -1313,6 +1415,9 @@
       // 返回第一頁拍照按鈕
       if (btnBackToFaceFirst) {
         btnBackToFaceFirst.addEventListener("click", function () {
+          if (AppState.capturedSnapshot) {
+            AppState.lastCapturedSnapshot = AppState.capturedSnapshot;
+          }
           showScreen("screen1-roster");
           isFaceFirstScanning = false;
           if (btnFaceFirstStart) {
@@ -1363,7 +1468,7 @@
           return;
         }
 
-        const isAmbiguousOrReauth = AppState.isAmbiguousScan || AppState.isPasswordAuthMode;
+        const isAmbiguousOrReauth = AppState.isAmbiguousScan || AppState.isPasswordAuthMode || AppState.isMisrecognizedCorrection;
 
         // 從名單模組獲取此班全體學生名單（來源於 StudentID.txt）
         const allStudents = window.getStudentsByClass ? window.getStudentsByClass(cls) : [];
@@ -1379,9 +1484,10 @@
         });
 
         if (!isAmbiguousOrReauth && unregStudents.length === 0 && cls !== "5B") {
-          studentSelect.innerHTML = '<option value="" disabled selected>⚠️ 全班學生均已完成人臉登記</option>';
+          studentSelect.innerHTML = '<option value="" disabled selected>⚠️ 本班全部同學均已完成人臉登記</option>';
           studentSelect.disabled = true;
-          btnConfirmIdentity.disabled = true;
+          studentNameDisplay.textContent = "本班所有學生均已建立人臉特徵";
+          studentNameDisplay.style.color = "var(--success)";
           return;
         }
 
@@ -1465,10 +1571,13 @@
           btnConfirmIdentity.disabled = false;
 
           const hasProfile = window.hasStudentProfile && window.hasStudentProfile(AppState.currentClass, sid);
+          const snap = AppState.pendingRegistrationSnapshot || AppState.capturedSnapshot || AppState.lastCapturedSnapshot;
           if (AppState.isAmbiguousScan || AppState.isPasswordAuthMode || hasProfile) {
             btnConfirmIdentity.innerHTML = "<span>🔒 密碼驗證登入</span>";
+          } else if (snap && snap.descriptor) {
+            btnConfirmIdentity.innerHTML = "<span>🔒 密碼核驗並綁定人臉</span>";
           } else {
-            btnConfirmIdentity.innerHTML = "<span>使用剛拍攝的人臉配對並登記</span>";
+            btnConfirmIdentity.innerHTML = "<span>📸 前往拍照登記人臉</span>";
           }
 
           // 背景探測：若本機無此學生特徵，向雲端嘗試同步
@@ -1491,7 +1600,7 @@
         }
       });
 
-      // 身分確認按鈕：老生跳轉至刷臉驗證，新生跳轉至確認拍照鎖定頁面
+      // 身分確認按鈕：老生跳轉至密碼驗證，新生跳轉至確認拍照鎖定頁面
       btnConfirmIdentity.addEventListener("click", async function () {
         if (!AppState.currentClass || !AppState.currentStudentId) return;
 
@@ -1507,19 +1616,16 @@
         const isDemo = (demoModeCheckbox && demoModeCheckbox.checked) ||
           (window.FaceAuthModule && typeof window.FaceAuthModule.isDemoMode === 'function' && window.FaceAuthModule.isDemoMode());
 
-        const snapshot = AppState.pendingRegistrationSnapshot || AppState.capturedSnapshot;
-        if (!isDemo && (!snapshot || !snapshot.descriptor || snapshot.isDemo)) {
-          alert("⚠️ 尚未採集面部照片，請先點擊下方「← 返回第一頁拍照」完成刷臉！");
-          return;
-        }
+        const snapshot = AppState.pendingRegistrationSnapshot || AppState.capturedSnapshot || AppState.lastCapturedSnapshot;
 
+        // 新生首次登記：導向 screen2-register 進行預覽或補拍，嚴禁死循環阻斷彈窗！
         AppState.capturedSnapshot = snapshot;
         showScreen("screen2-register");
         if (previewStudentName) previewStudentName.textContent = AppState.currentStudentName;
         if (previewClassAndId) previewClassAndId.textContent = `${AppState.currentClass} 班 ${AppState.currentStudentId} 號`;
 
-        if (snapshot && !snapshot.isDemo) {
-          if (previewPhotoSize) previewPhotoSize.textContent = `${snapshot.sizeKb || 25} KB`;
+        if (snapshot && !snapshot.isDemo && snapshot.descriptor) {
+          if (previewPhotoSize) previewPhotoSize.textContent = `${snapshot.sizeKb || 28} KB`;
           if (previewSnapshotImg) previewSnapshotImg.src = snapshot.imageBase64 || "";
           if (registrationPreviewCard) registrationPreviewCard.style.display = "block";
           if (webcamVideo) webcamVideo.style.display = "none";
@@ -1643,10 +1749,17 @@
             0.92
           );
           if (dupCheck.isDuplicate && dupCheck.duplicateStudent) {
-            alert(`⚠️ 安全警告：該面孔特徵已登記為其他學號，請勿重複綁定或代刷！(與 [${dupCheck.duplicateStudent.classID} 班 ${dupCheck.duplicateStudent.studentID} 號 ${dupCheck.duplicateStudent.name}] 相似度高達 ${dupCheck.percentage}%)`);
-            this.disabled = false;
-            this.innerHTML = "<span>🔒 確認無誤並完成登記</span>";
-            return;
+            if (!AppState.isPasswordAuthenticated) {
+              alert(`⚠️ 該面孔特徵已登記為其他學號，請勿重複綁定或代刷！特徵與 [${dupCheck.duplicateStudent.classID} 班 ${dupCheck.duplicateStudent.studentID} 號 ${dupCheck.duplicateStudent.name}] 相似度較高 (${dupCheck.percentage}%)。請在接下來的視窗輸入您的個人密碼（初始值 1234）以確認身分！`);
+              showPasswordAuthModal(function () {
+                btnConfirmAndLock.click();
+              });
+              this.disabled = false;
+              this.innerHTML = "<span>🔒 確認無誤並完成登記</span>";
+              return;
+            } else {
+              console.log("[Registration] Duplicate face warning bypassed: student confirmed via account password (similarity: " + dupCheck.percentage + "%).");
+            }
           }
         }
 
@@ -1729,7 +1842,10 @@
             return;
           }
 
-          enterDashboard();
+          showScreen("screen5-quiz");
+          if (window.QuizEngine && window.QuizEngine.startQuiz) {
+            window.QuizEngine.startQuiz(AppState.currentClass, AppState.currentStudentId, AppState.currentStudentName);
+          }
         } catch (err) {
           console.error("[Registration] Error confirming identity:", err);
           alert("登記過程發生錯誤，請重試: " + err.message);
@@ -2366,13 +2482,120 @@
       }
 
       // ====================================================================
-      // R3: 密碼輔助身分鑑別與特徵重採樣升級彈窗 (Password Auth & Resampling Modal)
+      // R2 & R3: 密碼二次身分驗證與特徵重採樣升級彈窗 (Password Auth & Resampling Modal)
       // ====================================================================
-      function showPasswordAuthModal(onSuccessCallback) {
+      function selectAuthCandidate(cls, sid, name) {
+        AppState.currentClass = cls;
+        AppState.currentStudentId = parseInt(sid, 10);
+        AppState.currentStudentName = name;
+        AppState.currentGradeInfo = window.getGradeByClass ? window.getGradeByClass(cls) : null;
+
+        if (authStudentInfo) {
+          authStudentInfo.textContent = `${cls} 班 ${sid} 號 ${name} 同學`;
+        }
+
+        // Highlight selected candidate button
+        document.querySelectorAll(".auth-candidate-btn").forEach(function (btn) {
+          const bCls = btn.getAttribute("data-class");
+          const bSid = parseInt(btn.getAttribute("data-id"), 10);
+          if (bCls === cls && bSid === parseInt(sid, 10)) {
+            btn.style.border = "1.5px solid #6366f1";
+            btn.style.background = "rgba(99, 102, 241, 0.25)";
+            btn.style.color = "#a5b4fc";
+          } else {
+            btn.style.border = "1.5px solid #334155";
+            btn.style.background = "#0f172a";
+            btn.style.color = "#f8fafc";
+          }
+        });
+
+        if (alertPasswordAuthError) {
+          alertPasswordAuthError.style.display = "none";
+        }
+      }
+
+      function showPasswordAuthModal(onSuccessCallback, candidates) {
         AppState.pendingActionAfterPasswordAuth = onSuccessCallback || null;
         if (modalPasswordAuth) {
           modalPasswordAuth.style.display = "flex";
         }
+
+        const candidateSection = document.getElementById("authCandidateSection");
+        const candidateList = document.getElementById("authCandidateList");
+        const modalSubtitle = document.getElementById("authModalSubtitle");
+        const manualFields = document.getElementById("authManualSelectFields");
+        const linkManual = document.getElementById("linkAuthManualSelect");
+
+        if (manualFields) manualFields.style.display = "none";
+        if (linkManual) linkManual.textContent = "非以上候選人？手動選擇其他學生 ▾";
+
+        // Check if candidates are provided
+        const candList = (Array.isArray(candidates) && candidates.length > 0)
+          ? candidates
+          : (AppState.ambiguousCandidates || null);
+
+        if (candList && candList.length > 0) {
+          if (modalSubtitle) {
+            modalSubtitle.innerHTML = "⚠️ <strong>偵測到多位相似特徵（無法唯一確認本人）</strong>，為維護帳號安全，請選擇您的姓名並輸入個人密碼完成二次驗證！";
+            modalSubtitle.style.color = "#fcd34d";
+          }
+          if (candidateSection) {
+            candidateSection.style.display = "block";
+          }
+          if (candidateList) {
+            candidateList.innerHTML = "";
+            candList.forEach(function (cItem, idx) {
+              const prof = cItem.profile || cItem;
+              if (!prof || !prof.classID || !prof.studentID) return;
+              const cls = prof.classID;
+              const sid = prof.studentID;
+              const name = prof.name || (window.getStudentName ? window.getStudentName(cls, sid) : "");
+              const pct = cItem.percentage || (cItem.centeredSim ? Math.round(cItem.centeredSim * 1000) / 10 : null);
+
+              const btn = document.createElement("button");
+              btn.type = "button";
+              btn.className = "auth-candidate-btn";
+              btn.id = `btnCandidate_${cls}_${sid}`;
+              btn.setAttribute("data-class", cls);
+              btn.setAttribute("data-id", sid);
+              btn.setAttribute("data-name", name);
+              btn.style.cssText = "width: 100%; text-align: left; padding: 10px 14px; border-radius: 8px; border: 1.5px solid #334155; background: #0f172a; color: #f8fafc; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s;";
+
+              const labelSpan = document.createElement("span");
+              labelSpan.style.cssText = "font-weight: 600; font-size: 14px;";
+              labelSpan.textContent = `Top ${idx + 1}: ${cls} 班 ${sid} 號 ${name}`;
+
+              const pctSpan = document.createElement("span");
+              pctSpan.style.cssText = "font-size: 12px; color: #94a3b8;";
+              pctSpan.textContent = pct ? `相似度: ${pct}%` : "";
+
+              btn.appendChild(labelSpan);
+              btn.appendChild(pctSpan);
+
+              btn.addEventListener("click", function () {
+                selectAuthCandidate(cls, sid, name);
+              });
+
+              candidateList.appendChild(btn);
+            });
+          }
+
+          // Default select Top 1 candidate
+          const firstCand = candList[0].profile || candList[0];
+          if (firstCand) {
+            selectAuthCandidate(firstCand.classID, firstCand.studentID, firstCand.name || (window.getStudentName ? window.getStudentName(firstCand.classID, firstCand.studentID) : ""));
+          }
+        } else {
+          // Normal single student mode (e.g. called from Screen 2 or existing tests)
+          if (modalSubtitle) {
+            modalSubtitle.textContent = "人臉未能唯一確認。請輸入您的個人密碼進行鑑別，系統將融合更新特徵以消除後續衝突。";
+            modalSubtitle.style.color = "#94a3b8";
+          }
+          if (candidateSection) {
+            candidateSection.style.display = "none";
+          }
+        }
+
         if (authStudentInfo) {
           authStudentInfo.textContent = `${AppState.currentClass} 班 ${AppState.currentStudentId} 號 ${AppState.currentStudentName} 同學`;
         }
@@ -2380,7 +2603,10 @@
           alertPasswordAuthError.style.display = "none";
           alertPasswordAuthError.textContent = "";
         }
-        if (inputAuthPassword) inputAuthPassword.value = "";
+        if (inputAuthPassword) {
+          inputAuthPassword.value = "";
+          setTimeout(function () { inputAuthPassword.focus(); }, 100);
+        }
         if (chkAuthChangePassword) chkAuthChangePassword.checked = false;
         if (authChangePasswordFields) authChangePasswordFields.style.display = "none";
         if (inputAuthNewPassword) inputAuthNewPassword.value = "";
@@ -2413,6 +2639,79 @@
       if (btnCancelPasswordAuth) {
         btnCancelPasswordAuth.addEventListener("click", function () {
           hidePasswordAuthModal();
+          AppState.isAmbiguousScan = false;
+          AppState.isPasswordAuthMode = false;
+          if (btnFaceFirstStart) {
+            btnFaceFirstStart.disabled = false;
+            btnFaceFirstStart.style.display = "inline-flex";
+            btnFaceFirstStart.innerHTML = "<span>📷 啟動相機識別</span>";
+          }
+          if (btnFaceFirstCapture) {
+            btnFaceFirstCapture.style.display = "none";
+          }
+          if (faceFirstOverlay) {
+            faceFirstOverlay.textContent = "📷 點擊下方按鈕啟動刷臉辨識";
+          }
+          if (faceFirstAlert) {
+            faceFirstAlert.style.display = "none";
+          }
+        });
+      }
+
+      const linkAuthManualSelect = document.getElementById("linkAuthManualSelect");
+      const authManualSelectFields = document.getElementById("authManualSelectFields");
+      const authClassSelect = document.getElementById("authClassSelect");
+      const authStudentSelect = document.getElementById("authStudentSelect");
+
+      if (linkAuthManualSelect) {
+        linkAuthManualSelect.addEventListener("click", function () {
+          if (authManualSelectFields) {
+            const isHidden = authManualSelectFields.style.display === "none";
+            authManualSelectFields.style.display = isHidden ? "block" : "none";
+            linkAuthManualSelect.textContent = isHidden ? "收起手動選擇 ▴" : "非以上候選人？手動選擇其他學生 ▾";
+          }
+        });
+      }
+
+      if (authClassSelect) {
+        authClassSelect.addEventListener("change", function () {
+          const cls = this.value;
+          if (!authStudentSelect) return;
+          authStudentSelect.innerHTML = '<option value="" disabled selected>-- 選擇學號 --</option>';
+          if (!cls) {
+            authStudentSelect.disabled = true;
+            return;
+          }
+          const allStudents = window.getStudentsByClass ? window.getStudentsByClass(cls) : [];
+          allStudents.forEach(function (s) {
+            const opt = document.createElement("option");
+            opt.value = s.id;
+            opt.textContent = `${s.id} 號 - ${s.name}`;
+            authStudentSelect.appendChild(opt);
+          });
+          if (cls === "5B") {
+            const teacherOpt = document.createElement("option");
+            teacherOpt.value = "99";
+            teacherOpt.textContent = "...";
+            authStudentSelect.appendChild(teacherOpt);
+          }
+          authStudentSelect.disabled = false;
+        });
+      }
+
+      if (authStudentSelect) {
+        authStudentSelect.addEventListener("change", function () {
+          const cls = authClassSelect ? authClassSelect.value : "";
+          const sid = parseInt(this.value, 10);
+          if (!cls || isNaN(sid)) return;
+          let name = "";
+          if (cls === "5B" && sid === 99) {
+            name = "教師測試員";
+          } else {
+            const sObj = window.getStudent ? window.getStudent(cls, sid) : null;
+            name = sObj ? sObj.name : "";
+          }
+          selectAuthCandidate(cls, sid, name);
         });
       }
 
@@ -2477,9 +2776,42 @@
             console.log("[App] Face vector resampled & enhanced for", cls, sid);
           }
 
+          const snap = AppState.capturedSnapshot || AppState.pendingRegistrationSnapshot || AppState.lastCapturedSnapshot;
+          if (snap && snap.imageBase64) {
+            const prof = window.getStudentProfile ? window.getStudentProfile(cls, sid) : null;
+            if (prof && !prof.photoJpgBase64) {
+              prof.photoJpgBase64 = snap.imageBase64;
+              if (window.saveStudentProfile) window.saveStudentProfile(prof, { forceLatest: true });
+            }
+            if (window.uploadDrivePhoto) {
+              window.uploadDrivePhoto({
+                timestamp: Date.now(),
+                version: 1,
+                folderId: "1oY52JyAqLLQQiETq8A-hre9jZ_goLHiY",
+                classID: cls,
+                studentID: sid,
+                studentName: AppState.currentStudentName,
+                imageBase64: snap.imageBase64,
+                tag: "AUTH_REGISTRATION"
+              }).catch(function () {});
+            }
+          }
+
           hidePasswordAuthModal();
           AppState.isAmbiguousScan = false;
           AppState.isPasswordAuthMode = false;
+          AppState.isPasswordAuthenticated = true;
+
+          const gradeInfo = window.getGradeByClass ? window.getGradeByClass(cls) : AppState.currentGradeInfo;
+          AppState.currentGradeInfo = gradeInfo;
+          if (dashStudentName) dashStudentName.textContent = AppState.currentStudentName + " 同學";
+          if (dashClassAndId) dashClassAndId.textContent = `${cls} 班 ${sid} 號`;
+          if (dashGradeTag && gradeInfo) {
+            dashGradeTag.textContent = `${gradeInfo.gradeName} 題庫 (${gradeInfo.gradeLevel})`;
+          }
+          if (dashTopicTitle && gradeInfo) {
+            dashTopicTitle.textContent = `${gradeInfo.gradeName} 數學 · ${gradeInfo.topicTitle}`;
+          }
 
           // Check if password must be forced changed (R2)
           const pwdRec = window.getStudentPasswordRecord ? window.getStudentPasswordRecord(cls, sid) : null;
@@ -2529,6 +2861,7 @@
       window.hideForceChangePasswordModal = hideForceChangePasswordModal;
       window.showPasswordAuthModal = showPasswordAuthModal;
       window.hidePasswordAuthModal = hidePasswordAuthModal;
+      window.selectAuthCandidate = selectAuthCandidate;
 
       // Auto-start front camera for face-first flow
       try {

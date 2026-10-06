@@ -630,10 +630,23 @@
     const returnSim = sim1 > 0 ? sim1 : rawSim1;
     const percentage = Math.round(Math.max(0, returnSim) * 1000) / 10;
 
+    const candidates = scoredList.slice(0, 5).map(function (item) {
+      return {
+        profile: item.profile,
+        centeredSim: item.centeredSim,
+        rawSim: item.rawSim,
+        eucDist: item.eucDist,
+        percentage: Math.round(Math.max(0, item.centeredSim) * 1000) / 10
+      };
+    });
+
     return {
       isMatch: isMatch,
       bestMatch: isMatch ? top1.profile : null,
       topCandidate: top1.profile,
+      secondCandidate: scoredList.length > 1 ? scoredList[1].profile : null,
+      candidates: candidates,
+      candidateList: candidates,
       similarity: returnSim,
       percentage: percentage,
       centeredSimilarity: sim1,
@@ -656,9 +669,19 @@
    * @param {number|string} [targetStudentID]
    * @param {Array<Object>} [profileList]
    * @param {number} [threshold=0.92]
+   * @param {Object} [options]
    * @returns {{isDuplicate: boolean, duplicateStudent: Object|null, similarity: number, percentage: number}}
    */
-  function checkDuplicateFace(candidateDescriptor, targetClassID, targetStudentID, profileList, threshold) {
+  function checkDuplicateFace(candidateDescriptor, targetClassID, targetStudentID, profileList, threshold, options) {
+    if (options && (options.isPasswordAuthenticated || options.exempt)) {
+      return { isDuplicate: false, duplicateStudent: null, similarity: 0, percentage: 0, isExempt: true };
+    }
+    if (typeof globalThis !== 'undefined' && globalThis.AppState && globalThis.AppState.isPasswordAuthenticated && (!options || options.forceCheck !== true)) {
+      return { isDuplicate: false, duplicateStudent: null, similarity: 0, percentage: 0, isExempt: true };
+    }
+    if (typeof window !== 'undefined' && window.AppState && window.AppState.isPasswordAuthenticated && (!options || options.forceCheck !== true)) {
+      return { isDuplicate: false, duplicateStudent: null, similarity: 0, percentage: 0, isExempt: true };
+    }
     const t = typeof threshold === 'number' ? threshold : 0.92;
     if (!candidateDescriptor || !Array.isArray(profileList) || profileList.length === 0) {
       return { isDuplicate: false, duplicateStudent: null, similarity: 0, percentage: 0 };
