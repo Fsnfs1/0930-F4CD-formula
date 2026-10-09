@@ -41,18 +41,27 @@
 </head>
 <body>
   <div id="startScreen" class="container" style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 80vh; text-align: center;">
-    <div class="card" style="max-width: 500px; padding: 40px 20px;">
-      <h1 style="color: var(--dang); font-size: 1.8rem; margin-bottom: 20px;">⚠️ 測驗注意事項</h1>
-      <p style="font-size: 1.1rem; margin-bottom: 15px; color: #334155;">本次測驗為<strong>閉卷考試</strong>。</p>
-      <p style="font-size: 1.1rem; margin-bottom: 15px; color: #334155;">測驗時間為完整的 <strong>40 分鐘</strong>，時間一到系統將自動強制交卷。</p>
-      <p style="font-size: 1.1rem; margin-bottom: 30px; color: #334155;">作答機會<strong>僅有一次</strong>，中途若重新載入頁面將可能導致測驗失效。</p>
-      <button type="button" class="btn-primary" style="font-size: 1.2rem; padding: 12px 24px;" onclick="startExam()">✅ 我已了解，確認開始測驗</button>
+    <div class="card" style="max-width: 560px; padding: 36px 24px; text-align: left;">
+      <h1 style="color: var(--dang); font-size: 1.6rem; margin-bottom: 16px; text-align: center;">⚠️ 測驗注意事項與規則</h1>
+      <ul style="font-size: 1.02rem; line-height: 1.7; margin-bottom: 24px; color: #334155; padding-left: 20px;">
+        <li><strong>閉卷考試</strong>：嚴禁查閱任何書籍、筆記或網路資源。</li>
+        <li><strong>作答時間結構 (40 + 10 分鐘)</strong>：
+          <ul style="margin-top: 6px; margin-bottom: 6px;">
+            <li><span style="color: #2563eb; font-weight: 600;">前 40 分鐘</span>：正式作答時間（全卷開放）。</li>
+            <li><span style="color: #dc2626; font-weight: 600;">滿 40 分鐘瞬間</span>：<strong>選擇題與是非題將立即鎖定，無法修改！</strong></li>
+            <li><span style="color: #16a34a; font-weight: 600;">額外 10 分鐘緩衝</span>：專供修訂填空題文字輸入，以及拍照壓縮上傳主觀大題手寫過程。</li>
+          </ul>
+        </li>
+        <li><strong>總限時 50 分鐘</strong>：緩衝時間倒數結束後，系統將<strong>自動強制交卷</strong>。</li>
+        <li><strong>僅有一次機會</strong>：每位同學作答機會僅有一次，中途請勿重新整理頁面。</li>
+      </ul>
+      <button type="button" class="btn-primary" style="font-size: 1.15rem; padding: 12px 24px; width: 100%; cursor: pointer;" onclick="startExam()">✅ 我已清楚理解規則，開始測驗</button>
     </div>
   </div>
   <div id="examContainer" style="display: none;">
 
 
-<div id="stickyTimer" class="sticky-timer">剩餘作答時間：<span id="timerText">40:00</span></div>
+<div id="stickyTimer" class="sticky-timer"><span id="timerPhaseLabel">【客觀題作答】剩餘：</span><span id="timerText">40:00</span></div>
 
 <div class="container">
   <div class="card">
@@ -65,7 +74,10 @@
   </div>
 
   <form id="examForm">
-    <div class="card">
+    <div class="card" id="cardObjective">
+      <div id="objectiveLockBanner" class="lock-banner" style="display: none; background: #fee2e2; border: 1.5px solid #ef4444; color: #b91c1c; padding: 10px 14px; border-radius: 6px; font-weight: 700; margin-bottom: 14px; text-align: center;">
+        🔒 40 分鐘作答時間已結束！選擇題與是非題已全面鎖定無法更改。請把握剩餘 10 分鐘完成填空題與大題拍照上傳。
+      </div>
       <h2>第一部分：客觀科學素養題 (共 60 分)</h2>
       <div class="question" id="sec-q1">
         <div class="q-title">1. 【物理】質點初速 $v_0 = 0\,\text{m/s}$，加速度 $a = 2\,\text{m/s}^2$，位移 $\Delta x = 16\,\text{m}$。依公式 $v^2 = v_0^2 + 2a\Delta x$，末速度 $v$ 為何？(10分)</div>
@@ -119,8 +131,14 @@
       </div>
     </div>
 
-    <div class="card">
-      <h2>第二部分：主觀解答計算題 (40 分)</h2>
+    <div class="card" id="cardFillIn">
+      <h2>第二部分：填空與文字論述題</h2>
+      <p style="margin-bottom: 8px; color: #64748b;">請使用自然語言清楚描述您的填空答案或推導結論（40分鐘後仍有額外10分鐘緩衝時間可修訂）：</p>
+      <textarea id="fillInAnswer" style="width: 100%; height: 95px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 14px; resize: vertical;" placeholder="1. 填空題答案...&#10;2. 推導重點說明..."></textarea>
+    </div>
+
+    <div class="card" id="cardSubjective">
+      <h2>第三部分：主觀解答計算題 (40 分)</h2>
       <p style="margin-bottom: 10px;"><strong>【題目】</strong>試利用 $v = v_0 + at$ 與 $\Delta x = v_0 t + \frac{1}{2}at^2$ 推導 $v^2 = v_0^2 + 2a\Delta x$。並求初速 $v_0 = 3\,\text{m/s}$、加速度 $a = 4\,\text{m/s}^2$、位移 $\Delta x = 10\,\text{m}$ 時之末速度 $v$？請於作答紙書寫過程並拍照上傳。</p>
       <div class="camera-box" id="cameraBox"><video id="videoPreview" autoplay playsinline></video></div>
       <div class="preview-box">
@@ -163,37 +181,73 @@ const CONFIG = {
 const ANSWER_KEY = { q1: 'B', q2: 'A', q3: 'A', q4: 'A', q5: 'True', q6: 'True' };
 
 // 40 分鐘計時器
-let timeLeft = 40 * 60;
-const timerEl = document.getElementById('stickyTimer'), timerTextEl = document.getElementById('timerText');
+// 雙階段計時器 (40 分鐘客觀題作答 + 10 分鐘拍照與填空緩衝)
+let phase = 1; // 1: 客觀題作答, 2: 拍照與填空緩衝
+let timeLeft = 40 * 60; // 40 分鐘 = 2400 秒
+let timerId = null;
+const timerEl = document.getElementById('stickyTimer');
+const timerTextEl = document.getElementById('timerText');
+const timerPhaseLabel = document.getElementById('timerPhaseLabel');
+
 function updateTimer() {
   const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
-  timerTextEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-  timerEl.className = timeLeft <= 60 ? 'sticky-timer danger' : (timeLeft <= 300 ? 'sticky-timer warn' : 'sticky-timer');
+  timerTextEl.textContent = ${String(m).padStart(2, '0')}:;
+  if (phase === 1) {
+    if (timerPhaseLabel) timerPhaseLabel.textContent = '【客觀題作答】剩餘：';
+    timerEl.className = timeLeft <= 60 ? 'sticky-timer danger' : (timeLeft <= 300 ? 'sticky-timer warn' : 'sticky-timer');
+  } else {
+    if (timerPhaseLabel) timerPhaseLabel.textContent = '【拍照與填空緩衝】剩餘：';
+    timerEl.className = timeLeft <= 60 ? 'sticky-timer danger' : 'sticky-timer warn';
+  }
 }
-let timerId = null;
+
+function lockObjectiveQuestions() {
+  const objCard = document.getElementById('cardObjective');
+  if (objCard) {
+    const inputs = objCard.querySelectorAll('input[type="radio"], input[type="checkbox"]');
+    inputs.forEach(input => {
+      input.disabled = true;
+    });
+    objCard.style.opacity = '0.7';
+    objCard.style.pointerEvents = 'none';
+  }
+  const banner = document.getElementById('objectiveLockBanner');
+  if (banner) {
+    banner.style.display = 'block';
+  }
+}
+
 function startExam() {
   document.getElementById('startScreen').style.display = 'none';
   document.getElementById('examContainer').style.display = 'block';
+  updateTimer();
   timerId = setInterval(() => {
-    if (--timeLeft <= 0) {
-      clearInterval(timerId);
-      alert('40 分鐘測驗時間已到！系統將自動完成提交。');
-      autoSubmit();
+    timeLeft--;
+    if (timeLeft <= 0) {
+      if (phase === 1) {
+        // 40 分鐘結束：鎖定客觀題，進入額外 10 分鐘緩衝
+        phase = 2;
+        timeLeft = 10 * 60;
+        lockObjectiveQuestions();
+        updateTimer();
+        alert('⏰ 40 分鐘客觀題作答時間已結束！
+
+所有選擇題與是非題已全面鎖定無法更改。
+
+系統已為您開放【額外 10 分鐘緩衝時間】，請把握時間完成：
+1. 填空題文字輸入與修訂
+2. 主觀大題手寫過程拍照上傳！');
+      } else {
+        // 額外 10 分鐘緩衝結束：強制交卷
+        clearInterval(timerId);
+        alert('⏰ 測驗總時間 (40+10分鐘) 已全部結束！系統將自動完成提交。');
+        autoSubmit();
+      }
+    } else {
+      updateTimer();
     }
-    updateTimer();
   }, 1000);
 }
-
-
-// 客觀題自動批改 (支援 DOM 與 Node.js 測試傳參)
-function gradeObjectiveQuestions(providedAnswers) {
-  const answers = providedAnswers || {};
-  if (!providedAnswers) {
-    for (let i = 1; i <= 6; i++) {
-      const checked = document.querySelector(`input[name="q${i}"]:checked`);
-      answers[`q${i}`] = checked ? checked.value : '';
-    }
-  }
   let score = 0; const details = {};
   for (const [qid, correctVal] of Object.entries(ANSWER_KEY)) {
     const userVal = answers[qid] || '', isCorrect = userVal === correctVal, pts = isCorrect ? 10 : 0;
@@ -273,7 +327,8 @@ async function submitExam(isAuto = false) {
       const gasRes = await fetch(CONFIG.GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ studentId, studentName, imageBase64: currentCompressedBase64 })
+        const fillInText = document.getElementById('fillInAnswer') ? document.getElementById('fillInAnswer').value.trim() : '';
+      body: JSON.stringify({ studentId, studentName, fillInAnswer: fillInText, imageBase64: currentCompressedBase64 })
       });
       const gasData = await gasRes.json();
       if (gasData.status === 'success' && gasData.fileUrl) uploadedFileUrl = gasData.fileUrl;
@@ -285,7 +340,8 @@ async function submitExam(isAuto = false) {
     formParams.append(CONFIG.FORM_ENTRIES.studentId, studentId);
     formParams.append(CONFIG.FORM_ENTRIES.studentName, studentName);
     formParams.append(CONFIG.FORM_ENTRIES.score, String(grading.score));
-    formParams.append(CONFIG.FORM_ENTRIES.details, JSON.stringify(grading.details));
+    const fillInText = document.getElementById('fillInAnswer') ? document.getElementById('fillInAnswer').value.trim() : '';
+    formParams.append(CONFIG.FORM_ENTRIES.details, JSON.stringify({ ...grading.details, fillInAnswer: fillInText }));
     formParams.append(CONFIG.FORM_ENTRIES.imageUrl, uploadedFileUrl);
 
     await fetch(CONFIG.FORM_URL, {
