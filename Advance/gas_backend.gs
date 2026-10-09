@@ -1,11 +1,12 @@
 /**
  * =========================================================================
- * 高一理組進階大測 - Google Apps Script (GAS) 雲端後端程式
+ * 高一理組數學大測(一) - Google Apps Script (GAS) 雲端後端程式
  * 檔案：gas_backend.gs
  * 說明：
  * 接收學生前端網頁上傳的 Base64 壓縮解答圖片，將其轉為二進位檔案儲存至指定的
  * Google 雲端硬碟 (Google Drive) 資料夾，並自動設定檢視權限，回傳該圖片的
  * 雲端硬碟公開檢視 URL 給前端，以供後續步驟寫入 Google 表單。
+ * 支援 2026-2027 學年高一理上學期數學大測卷(一) 27題正式考試。
  * =========================================================================
  * 
  * 【部署步驟】
@@ -105,7 +106,7 @@ function doPost(e) {
     const timestampStr = Utilities.formatDate(new Date(), 'Asia/Taipei', 'yyyyMMdd_HHmmss');
     const safeStudentName = studentName.toString().replace(/[\/\\:*?"<>|]/g, '_');
     const safeStudentId = studentId.toString().replace(/[\/\\:*?"<>|]/g, '_');
-    const filename = `大測解答_${safeStudentId}_${safeStudentName}_${timestampStr}.${fileExt}`;
+    const filename = `數學大測解答_${safeStudentId}_${safeStudentName}_${timestampStr}.${fileExt}`;
 
     const blob = Utilities.newBlob(decodedBytes, mimeType, filename);
     const uploadedFile = targetFolder.createFile(blob);
@@ -139,7 +140,7 @@ function doPost(e) {
 function doGet(e) {
   return createJsonResponse({
     status: 'online',
-    service: 'High School Science Testing - GAS Webhook Backend',
+    service: 'High School Mathematics Exam - GAS Webhook Backend',
     timestamp: new Date().toISOString(),
     message: 'GAS Web App 運作正常。請使用 POST 方法上傳 Base64 解答圖片。'
   });

@@ -3,404 +3,2757 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>高一理組進階大測 - 自然科測驗系統</title>
-  <!-- MathJax LaTeX 顯影配置與核心庫 -->
+  <title>2026-2027 學年高一理上學期數學大測卷(一)</title>
+
+  <!-- MathJax 3 LaTeX 公式顯影規範 (符合全局規範) -->
   <script>
-    window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] } };
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
   <style>
-    :root { --pri: #2563eb; --warn: #f59e0b; --dang: #dc2626; --bg: #f8fafc; }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: #1e293b; line-height: 1.5; padding-bottom: 40px; }
-    .sticky-timer { position: sticky; top: 0; z-index: 1000; background: var(--pri); color: #fff; padding: 10px 16px; text-align: center; font-size: 1.15rem; font-weight: 700; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-    .sticky-timer.warn { background: var(--warn); } .sticky-timer.danger { background: var(--dang); animation: pulse 1s infinite alternate; }
-    @keyframes pulse { from { opacity: 1; } to { opacity: 0.8; } }
-    .container { max-width: 820px; margin: 16px auto; padding: 0 16px; }
-    .card { background: #fff; border-radius: 10px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
-    h1 { font-size: 1.35rem; text-align: center; color: #0f172a; margin-bottom: 4px; }
-    h2 { font-size: 1.1rem; color: #1e40af; border-left: 4px solid var(--pri); padding-left: 10px; margin-bottom: 10px; }
-    .grid-2, .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    label { font-weight: 600; font-size: 0.95rem; display: block; margin-bottom: 4px; }
-    input[type="text"] { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 1rem; }
-    .question { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px dashed #e2e8f0; }
-    .q-title { font-weight: 600; margin-bottom: 6px; }
-    .opt { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 8px; border-radius: 6px; } .opt:hover { background: #f1f5f9; }
-    .camera-box { background: #0f172a; border-radius: 8px; overflow: hidden; max-width: 440px; margin: 8px auto; display: none; }
-    video { width: 100%; display: block; }
-    .preview-box { text-align: center; margin: 8px 0; }
-    .preview-box img { max-width: 100%; max-height: 260px; border-radius: 6px; border: 2px solid #cbd5e1; display: none; margin: 0 auto; }
-    .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
-    button { padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; font-size: 0.95rem; } button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-primary { background: var(--pri); color: #fff; } .btn-secondary { background: #64748b; color: #fff; }
-    .btn-submit { background: #16a34a; color: #fff; width: 100%; font-size: 1.05rem; padding: 12px; margin-top: 8px; }
-    .status-msg { margin-top: 10px; text-align: center; font-weight: 600; padding: 10px; border-radius: 6px; display: none; }
-    .status-info { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; } .status-success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; } .status-error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
-    @media (max-width: 600px) { .grid-2, .options { grid-template-columns: 1fr; } }
+
+:root {
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-light: #eff6ff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --bg-page: #f8fafc;
+  --card-bg: #ffffff;
+  --border-color: #e2e8f0;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --warning: #d97706;
+  --warn-bg: #fffbeb;
+  --lock-bg: #fef2f2;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  line-height: 1.6;
+  padding-bottom: 80px;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* 頂部網絡心跳與離線保護指示條 */
+.heartbeat-bar {
+  background: #1e293b;
+  color: #f8fafc;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.heartbeat-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.heartbeat-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.heartbeat-status.online .heartbeat-dot {
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+}
+
+.heartbeat-status.offline .heartbeat-dot {
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+  animation: pulse-red 1s infinite alternate;
+}
+
+@keyframes pulse-red {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
+
+.autosave-badge {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 網絡斷線重試醒目標題 */
+.network-retry-banner {
+  display: none;
+  background: #fee2e2;
+  border: 2px solid #ef4444;
+  color: #991b1b;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin: 16px auto;
+  max-width: 960px;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  animation: shake 0.5s ease-in-out;
+}
+
+.network-retry-banner.visible {
+  display: flex;
+}
+
+.btn-retry {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-retry:hover {
+  background: #b91c1c;
+}
+
+/* 置頂計時器導覽列 */
+.sticky-timer-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #ffffff;
+  border-bottom: 2px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  padding: 12px 20px;
+  display: none;
+}
+
+.timer-content {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.timer-phase-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.timer-phase-badge.phase1 {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.timer-phase-badge.phase2 {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.timer-countdown {
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: #1e293b;
+  letter-spacing: 1px;
+}
+
+.timer-countdown.warn {
+  color: var(--warning);
+}
+
+.timer-countdown.danger {
+  color: var(--danger);
+  animation: timer-pulse 1s infinite alternate;
+}
+
+@keyframes timer-pulse {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+
+/* 卡片與佈局 */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.section-header {
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.section-pts {
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+/* 客觀題鎖定狀態 */
+.objective-locked {
+  opacity: 0.65;
+  pointer-events: none;
+  filter: grayscale(30%);
+  user-select: none;
+  position: relative;
+}
+
+.objective-lock-banner {
+  display: none;
+  background: var(--lock-bg);
+  border: 2px solid var(--danger);
+  color: #991b1b;
+  padding: 16px 20px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.objective-lock-banner.visible {
+  display: block;
+}
+
+/* 題目樣式 */
+.question-item {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.question-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.question-stem {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 12px;
+}
+
+.question-meta {
+  font-size: 0.85rem;
+  color: var(--primary);
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+/* 單選與判斷題選項 */
+.options-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.options-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.option-btn-label {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.option-btn-label:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.option-btn-label input[type="radio"] {
+  margin-right: 10px;
+  accent-color: var(--primary);
+  width: 18px;
+  height: 18px;
+}
+
+/* 填空題輸入框 */
+.blank-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.blank-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.blank-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.blank-input {
+  border: 1.5px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  color: #0f172a;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-width: 120px;
+}
+
+.blank-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* 符號快捷鍵面板 */
+.symbol-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  background: #f1f5f9;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+.symbol-bar-title {
+  font-size: 0.8rem;
+  color: #475569;
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.btn-symbol {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btn-symbol:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* 解答題手寫拍照區 */
+.camera-box {
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  margin-top: 14px;
+}
+
+.video-container {
+  position: relative;
+  max-width: 480px;
+  margin: 12px auto;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+  display: none;
+}
+
+.video-container video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.preview-container {
+  max-width: 480px;
+  margin: 12px auto;
+  display: none;
+}
+
+.preview-container img {
+  width: 100%;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-color);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.camera-controls {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.btn-camera {
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+}
+
+.btn-cam-primary {
+  background: var(--primary);
+  color: #fff;
+}
+.btn-cam-primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn-cam-capture {
+  background: #16a34a;
+  color: #fff;
+  display: none;
+}
+.btn-cam-capture:hover {
+  background: #15803d;
+}
+
+.btn-cam-retake {
+  background: #e2e8f0;
+  color: #334155;
+  display: none;
+}
+.btn-cam-retake:hover {
+  background: #cbd5e1;
+}
+
+/* 認證與考前確認畫面 */
+.auth-container, .confirm-container {
+  max-width: 580px;
+  margin: 40px auto;
+}
+
+.auth-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 32px 28px;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #334155;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #0f172a;
+  background: #fff;
+  transition: border-color 0.2s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.btn-block {
+  width: 100%;
+  padding: 14px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-block:hover {
+  background: var(--primary-hover);
+}
+
+.btn-block:active {
+  transform: translateY(1px);
+}
+
+/* 身分標記 */
+.identity-badge {
+  background: #eff6ff;
+  border: 1.5px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.identity-name {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #1e3a8a;
+  margin-top: 4px;
+}
+
+/* 狀態訊息盒 */
+.status-box {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 8px;
+  display: none;
+  font-weight: 600;
+  text-align: center;
+}
+
+.status-box.info {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+  display: block;
+}
+
+.status-box.success {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  display: block;
+}
+
+.status-box.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .card { padding: 18px 14px; }
+  .auth-card { padding: 24px 16px; }
+  .timer-countdown { font-size: 1.25rem; }
+  .blank-input { min-width: 100%; }
+}
+
   </style>
 </head>
 <body>
-  <div id="startScreen" class="container" style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 80vh; text-align: center;">
-    <div class="card" style="max-width: 560px; padding: 36px 24px; text-align: left;">
-      <h1 style="color: var(--dang); font-size: 1.6rem; margin-bottom: 16px; text-align: center;">⚠️ 測驗注意事項與規則</h1>
-      <ul style="font-size: 1.02rem; line-height: 1.7; margin-bottom: 24px; color: #334155; padding-left: 20px;">
-        <li><strong>閉卷考試</strong>：嚴禁查閱任何書籍、筆記或網路資源。</li>
-        <li><strong>作答時間結構 (40 + 10 分鐘)</strong>：
-          <ul style="margin-top: 6px; margin-bottom: 6px;">
-            <li><span style="color: #2563eb; font-weight: 600;">前 40 分鐘</span>：正式作答時間（全卷開放）。</li>
-            <li><span style="color: #dc2626; font-weight: 600;">滿 40 分鐘瞬間</span>：<strong>選擇題與是非題將立即鎖定，無法修改！</strong></li>
-            <li><span style="color: #16a34a; font-weight: 600;">額外 10 分鐘緩衝</span>：專供修訂填空題文字輸入，以及拍照壓縮上傳主觀大題手寫過程。</li>
-          </ul>
-        </li>
-        <li><strong>總限時 50 分鐘</strong>：緩衝時間倒數結束後，系統將<strong>自動強制交卷</strong>。</li>
-        <li><strong>僅有一次機會</strong>：每位同學作答機會僅有一次，中途請勿重新整理頁面。</li>
-      </ul>
-      <button type="button" class="btn-primary" style="font-size: 1.15rem; padding: 12px 24px; width: 100%; cursor: pointer;" onclick="startExam()">✅ 我已清楚理解規則，開始測驗</button>
+
+  <!-- 頂部網絡心跳探測與離線保護指示條 -->
+  <div class="heartbeat-bar">
+    <div id="heartbeatStatus" class="heartbeat-status online">
+      <span class="heartbeat-dot"></span> 🟢 網絡連通正常
     </div>
-  </div>
-  <div id="examContainer" style="display: none;">
-
-
-<div id="stickyTimer" class="sticky-timer"><span id="timerPhaseLabel">【客觀題作答】剩餘：</span><span id="timerText">40:00</span></div>
-
-<div class="container">
-  <div class="card">
-    <h1>高一自然科學科能力測驗</h1>
-    <p style="text-align: center; color: #64748b; margin-bottom: 10px;">測驗限時 40 分鐘。客觀題（60分，系統即時核分），主觀解答題（40分，拍照上傳）。</p>
-    <div class="grid-2">
-      <div><label for="studentId">學號 *</label><input type="text" id="studentId" placeholder="例如：S112001" required></div>
-      <div><label for="studentName">姓名 *</label><input type="text" id="studentName" placeholder="例如：陳大明" required></div>
+    <div id="autosaveBadge" class="autosave-badge">
+      💾 離線自動保護已啟用
     </div>
   </div>
 
-  <form id="examForm">
-    <div class="card" id="cardObjective">
-      <div id="objectiveLockBanner" class="lock-banner" style="display: none; background: #fee2e2; border: 1.5px solid #ef4444; color: #b91c1c; padding: 10px 14px; border-radius: 6px; font-weight: 700; margin-bottom: 14px; text-align: center;">
-        🔒 40 分鐘作答時間已結束！選擇題與是非題已全面鎖定無法更改。請把握剩餘 10 分鐘完成填空題與大題拍照上傳。
+  <!-- 網絡連線中斷醒目重試橫幅 -->
+  <div id="networkRetryBanner" class="network-retry-banner">
+    <div>
+      <strong>⚠️ 網絡連線中斷，請檢查連線</strong>
+      <span style="font-size: 0.9rem; margin-left: 8px;">作答進度與照片已完整保存在本機，無需慌張！</span>
+    </div>
+    <button type="button" id="btnRetrySubmit" class="btn-retry" onclick="submitExam(false)">
+      🔄 重新提交 / 重試
+    </button>
+  </div>
+
+  <!-- 置頂計時器導覽列 -->
+  <div id="stickyTimer" class="sticky-timer-bar">
+    <div class="timer-content">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span id="timerPhaseBadge" class="timer-phase-badge phase1">【第一階段：客觀題作答】剩餘：</span>
+        <span id="timerCountdownDisplay" class="timer-countdown">40:00</span>
       </div>
-      <h2>第一部分：客觀科學素養題 (共 60 分)</h2>
-      <div class="question" id="sec-q1">
-        <div class="q-title">1. 【物理】質點初速 $v_0 = 0\,\text{m/s}$，加速度 $a = 2\,\text{m/s}^2$，位移 $\Delta x = 16\,\text{m}$。依公式 $v^2 = v_0^2 + 2a\Delta x$，末速度 $v$ 為何？(10分)</div>
-        <div class="options">
-          <label class="opt"><input type="radio" name="q1" value="A"> A. $4\,\text{m/s}$</label>
-          <label class="opt"><input type="radio" name="q1" value="B"> B. $8\,\text{m/s}$</label>
-          <label class="opt"><input type="radio" name="q1" value="C"> C. $16\,\text{m/s}$</label>
-          <label class="opt"><input type="radio" name="q1" value="D"> D. $32\,\text{m/s}$</label>
+      <div id="examStudentBadge" style="font-weight: 700; color: #1e40af; font-size: 0.95rem;">
+        --
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- 階段 1：身分登入核驗視圖 -->
+    <div id="authScreen" class="auth-container" style="display: block;">
+      <div class="auth-card">
+        <h2 style="text-align: center; color: #1e3a8a; margin-bottom: 8px;">🎓 高一理組數學大測</h2>
+        <p style="text-align: center; color: #64748b; font-size: 0.9rem; margin-bottom: 24px;">請選擇身分並驗證登入以進入測驗系統</p>
+
+        <div id="authErrorMessage" class="status-box error" style="margin-top: 0; margin-bottom: 16px; display: none;"></div>
+
+        <div class="form-group">
+          <label for="selectClass">1. 選擇班級</label>
+          <select id="selectClass" class="form-control">
+            <option value="4C">高一 (4C 班 - 29人)</option>
+            <option value="4D">高一 (4D 班 - 31人)</option>
+            <option value="5B">高二 (5B 班 - 28人)</option>
+          </select>
         </div>
-      </div>
-      <div class="question" id="sec-q2">
-        <div class="q-title">2. 【化學】平衡反應 $\text{N}_2(g) + 3\text{H}_2(g) \rightleftharpoons 2\text{NH}_3(g)$，平衡常數 $K_c$ 正確式為何？(10分)</div>
-        <div class="options">
-          <label class="opt"><input type="radio" name="q2" value="A"> A. $K_c = \frac{[\text{NH}_3]^2}{[\text{N}_2][\text{H}_2]^3}$</label>
-          <label class="opt"><input type="radio" name="q2" value="B"> B. $K_c = \frac{[\text{N}_2][\text{H}_2]^3}{[\text{NH}_3]^2}$</label>
-          <label class="opt"><input type="radio" name="q2" value="C"> C. $K_c = \frac{2[\text{NH}_3]}{[\text{N}_2] + 3[\text{H}_2]}$</label>
-          <label class="opt"><input type="radio" name="q2" value="D"> D. $K_c = [\text{NH}_3]^2 - [\text{N}_2][\text{H}_2]^3$</label>
+
+        <div class="form-group">
+          <label for="selectStudent">2. 選擇學生學號與姓名</label>
+          <select id="selectStudent" class="form-control">
+            <option value="">-- 請先選擇班級 --</option>
+          </select>
         </div>
-      </div>
-      <div class="question" id="sec-q3">
-        <div class="q-title">3. 【數學】一元二次方程式 $ax^2 + bx + c = 0$ ($a \neq 0, \Delta = b^2 - 4ac \ge 0$)，公式解 $x$ 為何？(10分)</div>
-        <div class="options">
-          <label class="opt"><input type="radio" name="q3" value="A"> A. $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$</label>
-          <label class="opt"><input type="radio" name="q3" value="B"> B. $x = \frac{-b \pm \sqrt{b^2 + 4ac}}{2a}$</label>
-          <label class="opt"><input type="radio" name="q3" value="C"> C. $x = \frac{b \pm \sqrt{b^2 - 4ac}}{2a}$</label>
-          <label class="opt"><input type="radio" name="q3" value="D"> D. $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{a}$</label>
+
+        <div class="identity-badge" style="margin-bottom: 16px;">
+          <div style="font-size: 0.85rem; color: #64748b;">考生姓名確認：</div>
+          <div id="loginStudentNamePreview" class="identity-name">（請選擇學生）</div>
         </div>
-      </div>
-      <div class="question" id="sec-q4">
-        <div class="q-title">4. 【生物】光合作用總式：$6\text{CO}_2 + 6\text{H}_2\text{O} \to \text{C}_6\text{H}_{12}\text{O}_6 + 6\text{O}_2$。下列敘述何者正確？(10分)</div>
-        <div class="options">
-          <label class="opt"><input type="radio" name="q4" value="A"> A. 光反應產生的 $\text{ATP}$ 與 $\text{NADPH}$ 供卡爾文循環固定 $\text{CO}_2$</label>
-          <label class="opt"><input type="radio" name="q4" value="B"> B. 釋放的氧氣 $\text{O}_2$ 是卡爾文循環分解 $\text{CO}_2$ 的產物</label>
-          <label class="opt"><input type="radio" name="q4" value="C"> C. 光反應在基質中進行，暗反應在類囊體膜上進行</label>
-          <label class="opt"><input type="radio" name="q4" value="D"> D. 植物在無光環境中仍能長時間持續合成葡萄糖</label>
+
+        <div class="form-group">
+          <label for="inputPassword">3. 身分密碼 (預設為 1234)</label>
+          <input type="password" id="inputPassword" class="form-control" value="1234" placeholder="請輸入身分密碼">
         </div>
-      </div>
-      <div class="question" id="sec-q5">
-        <div class="q-title">5. 【是非題】在孤立系統中，總能量保持恆定，能量只能轉換形式不能憑空生滅（能量守恆定律）。(10分)</div>
-        <div class="options">
-          <label class="opt"><input type="radio" name="q5" value="True"> A. 正確 (True)</label>
-          <label class="opt"><input type="radio" name="q5" value="False"> B. 錯誤 (False)</label>
-        </div>
-      </div>
-      <div class="question" id="sec-q6">
-        <div class="q-title">6. 【是非題】在 $25^\circ\text{C}$ 水溶液中，$\text{pH} = -\log_{10}[\text{H}^+]$。若 $[\text{H}^+] = 10^{-3}\,\text{M}$，則 $\text{pH} = 3$，呈酸性。(10分)</div>
-        <div class="options">
-          <label class="opt"><input type="radio" name="q6" value="True"> A. 正確 (True)</label>
-          <label class="opt"><input type="radio" name="q6" value="False"> B. 錯誤 (False)</label>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 24px;">
+          <button type="button" id="btnLogin" class="btn-block" onclick="handlePasswordLogin()">
+            🔑 密碼登入身分驗證
+          </button>
+          <button type="button" id="btnFaceLogin" class="btn-block" style="background: #059669;" onclick="handleFaceLogin()">
+            📷 相機人臉辨識快速核驗
+          </button>
         </div>
       </div>
     </div>
 
-    <div class="card" id="cardFillIn">
-      <h2>第二部分：填空與文字論述題</h2>
-      <p style="margin-bottom: 8px; color: #64748b;">請使用自然語言清楚描述您的填空答案或推導結論（40分鐘後仍有額外10分鐘緩衝時間可修訂）：</p>
-      <textarea id="fillInAnswer" style="width: 100%; height: 95px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 14px; resize: vertical;" placeholder="1. 填空題答案...&#10;2. 推導重點說明..."></textarea>
+    <!-- 階段 2：考前確認畫面 (Pre-Exam Confirmation Screen) -->
+    <div id="screenPreExamConfirm" class="confirm-container" style="display: none;">
+      <div class="auth-card">
+        <div class="identity-badge">
+          <h3 style="color: #1e40af; font-size: 1.1rem; margin-bottom: 6px;">🎓 考生身分核對</h3>
+          <div class="identity-name">
+            <span id="confirmClassDisplay">--</span> 班 
+            <span id="confirmIdDisplay">--</span> 號 ➜ 
+            <span id="confirmNameDisplay" style="color: #2563eb;">--</span> 同學
+          </div>
+          <div style="font-size: 0.85rem; color: #64748b; margin-top: 6px;">
+            如身分有誤，請點擊此處 <a href="#" onclick="returnToLogin(); return false;" style="color: #2563eb; font-weight: 600;">重新驗證登入</a>
+          </div>
+        </div>
+
+        <h3 style="color: #dc2626; font-size: 1.15rem; margin-bottom: 12px;">⚠️ 測驗注意事項與規則</h3>
+        <ul style="line-height: 1.8; color: #334155; font-size: 0.95rem; padding-left: 20px; margin-bottom: 24px;">
+          <li><strong>閉卷考試</strong>：嚴禁查閱任何書籍、筆記、計算機或利用網絡設備搜尋。</li>
+          <li><strong>作答時間結構 (40 + 10 分鐘，共 50 分鐘)</strong>：
+            <ul style="margin-top: 4px; margin-bottom: 4px;">
+              <li><span style="color: #2563eb; font-weight: 700;">前 40 分鐘</span>：正式作答時間（全卷五個部分均可作答）。</li>
+              <li><span style="color: #dc2626; font-weight: 700;">滿 40 分鐘瞬間</span>：<strong>第一部分判斷題（1~6題）與第二部分單選題（7~11題）立即強制鎖定！</strong></li>
+              <li><span style="color: #16a34a; font-weight: 700;">額外 10 分鐘緩衝</span>：專供修訂填充題文字輸入，以及解答題手寫過程拍照壓縮上傳。</li>
+            </ul>
+          </li>
+          <li><strong>總限時 50 分鐘</strong>：緩衝時間歸零時，系統將自動強制交卷。</li>
+          <li><strong>離線保護機制</strong>：作答進度每秒自動暫存至本地存儲，網絡異常不丟失答案，可安心作答。</li>
+        </ul>
+
+        <button type="button" id="btnStartExamCountdown" class="btn-block" onclick="startExamCountdown()">
+          🚀 我已核對身分並清楚理解規則，開始測驗
+        </button>
+      </div>
     </div>
 
-    <div class="card" id="cardSubjective">
-      <h2>第三部分：主觀解答計算題 (40 分)</h2>
-      <p style="margin-bottom: 10px;"><strong>【題目】</strong>試利用 $v = v_0 + at$ 與 $\Delta x = v_0 t + \frac{1}{2}at^2$ 推導 $v^2 = v_0^2 + 2a\Delta x$。並求初速 $v_0 = 3\,\text{m/s}$、加速度 $a = 4\,\text{m/s}^2$、位移 $\Delta x = 10\,\text{m}$ 時之末速度 $v$？請於作答紙書寫過程並拍照上傳。</p>
-      <div class="camera-box" id="cameraBox"><video id="videoPreview" autoplay playsinline></video></div>
-      <div class="preview-box">
-        <img id="imagePreview" alt="預覽圖片">
-        <canvas id="hiddenCanvas" style="display: none;"></canvas>
+    <!-- 階段 3：正式大測試卷 (Exam Container) -->
+    <div id="examContainer" style="display: none;">
+
+      <!-- 試卷標題區 -->
+      <div class="card" style="text-align: center; margin-top: 10px;">
+        <h1 style="font-size: 1.5rem; color: #1e3a8a; margin-bottom: 6px;">新 華 學 校（中學部）</h1>
+        <h2 style="font-size: 1.25rem; color: #0f172a; margin-bottom: 10px;">2026-2027學年上學期數學科（理科）大測卷(一)</h2>
+        <div style="font-size: 0.9rem; color: #64748b;">
+          滿分：120 分（含客觀題 22 分、填充題 38 分、解答題 40 分、附加題 20 分）｜ 總限時：50 分鐘（40+10 雙階段機制）
+        </div>
       </div>
-      <div class="btn-row">
-        <button type="button" class="btn-primary" id="btnStartCamera">開啟相機鏡頭</button>
-        <button type="button" class="btn-primary" id="btnCapture" style="display:none;">拍攝照片快照</button>
-        <button type="button" class="btn-secondary" id="btnRetake" style="display:none;">重拍照片</button>
-        <button type="button" class="btn-secondary" id="btnStopCamera" style="display:none;">關閉鏡頭</button>
+
+      <!-- 客觀題 40 分鐘鎖定警告橫幅 -->
+      <div id="objectiveLockBanner" class="objective-lock-banner">
+        🔒 40 分鐘客觀題作答時間已結束！第一部分（判斷題）與第二部分（單選題）已全面強制鎖定，請於剩餘 10 分鐘內完成填空題與解答題拍照上傳。
       </div>
-      <div style="margin-top: 12px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
-        <label for="fileFallback">相機無法使用？備用本地上傳：</label>
-        <input type="file" id="fileFallback" accept="image/*" capture="environment">
+
+      <!-- 第一部分：判斷題 (Q1~Q6, 12分) -->
+      <div id="sectionPart1" class="card">
+        <div class="section-header">
+          <div class="section-title">第一部分：判斷題</div>
+          <div class="section-pts">第 1~6 題，每題 2 分，共 12 分</div>
+        </div>
+        <div style="font-size: 0.9rem; color: #64748b; margin-bottom: 16px;">
+          說明：對的選 “O”，錯的選 “X”。（40 分鐘後自動鎖定）
+        </div>
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">1.</span>地球上的數學精英可以構成一個集合。</div>
+      <div class="options-row">
+        <label class="option-btn-label">
+          <input type="radio" name="q1" value="O"> 正確 (O)
+        </label>
+        <label class="option-btn-label">
+          <input type="radio" name="q1" value="X"> 錯誤 (X)
+        </label>
       </div>
     </div>
+  
 
-    <button type="submit" id="submitBtn" class="btn-submit">立即交卷 (提交客觀題與主觀題解答)</button>
-    <div id="statusBox" class="status-msg"></div>
-  </form>
-</div>
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">2.</span>集合 $A=\{4,8\}$ 和集合 $B=\{x \mid (x-4)(x-8)=0\}$ 是同一個集合。</div>
+      <div class="options-row">
+        <label class="option-btn-label">
+          <input type="radio" name="q2" value="O"> 正確 (O)
+        </label>
+        <label class="option-btn-label">
+          <input type="radio" name="q2" value="X"> 錯誤 (X)
+        </label>
+      </div>
+    </div>
+  
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">3.</span>若 $p \Rightarrow q$，則 $p$ 的一個必要條件是 $q$。</div>
+      <div class="options-row">
+        <label class="option-btn-label">
+          <input type="radio" name="q3" value="O"> 正確 (O)
+        </label>
+        <label class="option-btn-label">
+          <input type="radio" name="q3" value="X"> 錯誤 (X)
+        </label>
+      </div>
+    </div>
+  
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">4.</span>如果集合 $A=\{1,2,3,4,5,6\}$，集合 $B=\{3,4,5\}$，則 $A>B$。</div>
+      <div class="options-row">
+        <label class="option-btn-label">
+          <input type="radio" name="q4" value="O"> 正確 (O)
+        </label>
+        <label class="option-btn-label">
+          <input type="radio" name="q4" value="X"> 錯誤 (X)
+        </label>
+      </div>
+    </div>
+  
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">5.</span>若 $ac>bc$，則有 $a>b$。</div>
+      <div class="options-row">
+        <label class="option-btn-label">
+          <input type="radio" name="q5" value="O"> 正確 (O)
+        </label>
+        <label class="option-btn-label">
+          <input type="radio" name="q5" value="X"> 錯誤 (X)
+        </label>
+      </div>
+    </div>
+  
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">6.</span>自然數集 $N$ 與實數集 $R$ 的關係是 $N \in R$。</div>
+      <div class="options-row">
+        <label class="option-btn-label">
+          <input type="radio" name="q6" value="O"> 正確 (O)
+        </label>
+        <label class="option-btn-label">
+          <input type="radio" name="q6" value="X"> 錯誤 (X)
+        </label>
+      </div>
+    </div>
+  
+      </div>
+
+      <!-- 第二部分：單項選擇題 (Q7~Q11, 10分) -->
+      <div id="sectionPart2" class="card">
+        <div class="section-header">
+          <div class="section-title">第二部分：單項選擇題</div>
+          <div class="section-pts">第 7~11 題，每題 2 分，共 10 分</div>
+        </div>
+        <div style="font-size: 0.9rem; color: #64748b; margin-bottom: 16px;">
+          說明：每小題選出唯一正確答案。（40 分鐘後自動鎖定）
+        </div>
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">7.</span>設集合 $A=\{1,2,3,10\}$，$B=\{2,3,7,9,10\}$，$C=\{x \mid 0 \le x \le 8\}$，則 $(A \cap B) \cup C=$（ ）。</div>
+      <div class="options-group">
+        
+          <label class="option-btn-label">
+            <input type="radio" name="q7" value="A">
+            <strong>A.</strong>&nbsp;$\{x \mid 0 \le x \le 8\}$
+          </label>
+        
+
+          <label class="option-btn-label">
+            <input type="radio" name="q7" value="B">
+            <strong>B.</strong>&nbsp;$\{2,3,10\}$
+          </label>
+        
+
+          <label class="option-btn-label">
+            <input type="radio" name="q7" value="C">
+            <strong>C.</strong>&nbsp;$\{2,3,8,10\}$
+          </label>
+        
+
+          <label class="option-btn-label">
+            <input type="radio" name="q7" value="D">
+            <strong>D.</strong>&nbsp;$\{x \mid 0 \le x \le 8 \text{ 或 } x=10\}$
+          </label>
+        
+      </div>
+    </div>
+  
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">8.</span>下列命題中的假命題是（ ）。</div>
+      <div class="options-group">
+        
+          <label class="option-btn-label">
+            <input type="radio" name="q8" value="A">
+            <strong>A.</strong>&nbsp;$\forall x \in \mathbb{R},\ |x|+1>0$
+          </label>
+        
+
+          <label class="option-btn-label">
+            <input type="radio" name="q8" value="B">
+            <strong>B.</strong>&nbsp;$\forall x \in \mathbb{N}^{*},\ (x-1)^{2}>0$
+          </label>
+        
+
+          <label class="option-btn-label">
+            <input type="radio" name="q8" value="C">
+            <strong>C.</strong>&nbsp;$\exists x \in \mathbb{R},\ |x|<1$
+          </label>
+        
+
+          <label class="option-btn-label">
+            <input type="radio" name="q8" value="D">
+            <strong>D.</strong>&nbsp;$\exists x \in \mathbb{R},\ \frac{1}{|x|}+1=2$
+          </label>
+        
+      </div>
+    </div>
+  
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">9.</span>若 $P=\{0, 1, 2\}$，$Q=\{0, 2, 3\}$，$R=\{1, 2, 3, 4\}$，則 $P \cap (Q \cup R)=$（ ）。</div>
+      <div class="options-group">
+        
+          <label class="option-btn-label">
+            <input type="radio" name="q9" value="A">
+            <strong>A.</strong>&nbsp;$\{0, 1, 2\}$
+          </label>
+        
+
+          <label class="option-btn-label">
+            <input type="radio" name="q9" value="B">
+            <strong>B.</strong>&nbsp;$\{0, 1, 2, 3, 4\}$
+          </label>
+        
+
+          <label class="option-btn-label">
+            <input type="radio" name="q9" value="C">
+            <strong>C.</strong>&nbsp;$\{2\}$
+          </label>
+        
+
+          <label class="option-btn-label">
+            <input type="radio" name="q9" value="D">
+            <strong>D.</strong>&nbsp;$\varnothing$
+          </label>
+        
+      </div>
+    </div>
+  
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">10.</span>“四邊形的四隻角相等”是“四邊形是矩形”（ ）。</div>
+      <div class="options-group">
+        
+          <label class="option-btn-label">
+            <input type="radio" name="q10" value="A">
+            <strong>A.</strong>&nbsp;充分條件
+          </label>
+        
+
+          <label class="option-btn-label">
+            <input type="radio" name="q10" value="B">
+            <strong>B.</strong>&nbsp;必要條件
+          </label>
+        
+
+          <label class="option-btn-label">
+            <input type="radio" name="q10" value="C">
+            <strong>C.</strong>&nbsp;充要條件
+          </label>
+        
+
+          <label class="option-btn-label">
+            <input type="radio" name="q10" value="D">
+            <strong>D.</strong>&nbsp;既不是充分條件也不是必要條件
+          </label>
+        
+      </div>
+    </div>
+  
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">11.</span>集合 $A=\{1,2,3,5,6\}$ 的真子集個數是（ ）。</div>
+      <div class="options-group">
+        
+          <label class="option-btn-label">
+            <input type="radio" name="q11" value="A">
+            <strong>A.</strong>&nbsp;$31$
+          </label>
+        
+
+          <label class="option-btn-label">
+            <input type="radio" name="q11" value="B">
+            <strong>B.</strong>&nbsp;$32$
+          </label>
+        
+
+          <label class="option-btn-label">
+            <input type="radio" name="q11" value="C">
+            <strong>C.</strong>&nbsp;$63$
+          </label>
+        
+
+          <label class="option-btn-label">
+            <input type="radio" name="q11" value="D">
+            <strong>D.</strong>&nbsp;$64$
+          </label>
+        
+      </div>
+    </div>
+  
+      </div>
+
+      <!-- 第三部分：填充題 (Q12~Q19, 38分) -->
+      <div id="sectionPart3" class="card">
+        <div class="section-header">
+          <div class="section-title">第三部分：填充題</div>
+          <div class="section-pts">第 12~19 題，共 19 空，每空 2 分，共 38 分</div>
+        </div>
+
+        <!-- 符號快速插入工具列 -->
+        <div class="symbol-bar">
+          <span class="symbol-bar-title">數學符號快捷點擊插入：</span>
+          <button type="button" class="btn-symbol" onclick="insertSymbol('∈')">∈</button>
+          <button type="button" class="btn-symbol" onclick="insertSymbol('∉')">∉</button>
+          <button type="button" class="btn-symbol" onclick="insertSymbol('⫋')">⫋</button>
+          <button type="button" class="btn-symbol" onclick="insertSymbol('⊇')">⊇</button>
+          <button type="button" class="btn-symbol" onclick="insertSymbol('≥')">≥</button>
+          <button type="button" class="btn-symbol" onclick="insertSymbol('≤')">≤</button>
+          <button type="button" class="btn-symbol" onclick="insertSymbol('∅')">∅</button>
+          <button type="button" class="btn-symbol" onclick="insertSymbol('∀')">∀</button>
+          <button type="button" class="btn-symbol" onclick="insertSymbol('∃')">∃</button>
+          <button type="button" class="btn-symbol" onclick="insertSymbol('¬')">¬</button>
+          <button type="button" class="btn-symbol" onclick="insertSymbol('R')">R</button>
+          <button type="button" class="btn-symbol" onclick="insertSymbol('Q')">Q</button>
+        </div>
+
+      <div class="question-item">
+        <div class="question-stem"><span class="question-meta">12.</span>集合中元素的特性：[空1]______，[空2]______，[空3]______。</div>
+        
+        <div class="blank-container">
+          
+            <div class="blank-wrapper">
+              <span class="blank-label">特性一：</span>
+              <input type="text" class="blank-input" name="q12_1" id="q12_1" placeholder="請輸入答案" autocomplete="off">
+            </div>
+          
+
+            <div class="blank-wrapper">
+              <span class="blank-label">特性二：</span>
+              <input type="text" class="blank-input" name="q12_2" id="q12_2" placeholder="請輸入答案" autocomplete="off">
+            </div>
+          
+
+            <div class="blank-wrapper">
+              <span class="blank-label">特性三：</span>
+              <input type="text" class="blank-input" name="q12_3" id="q12_3" placeholder="請輸入答案" autocomplete="off">
+            </div>
+          
+        </div>
+      
+      </div>
+    
+
+      <div class="question-item">
+        <div class="question-stem"><span class="question-meta">13.</span>交集：$A \cap B = \{x \mid \underline{\hspace{4em}}\}$。</div>
+        
+        <div class="blank-container">
+          
+            <div class="blank-wrapper">
+              <span class="blank-label">條件描述：</span>
+              <input type="text" class="blank-input" name="q13_1" id="q13_1" placeholder="請輸入答案" autocomplete="off">
+            </div>
+          
+        </div>
+      
+      </div>
+    
+
+      <div class="question-item">
+        <div class="question-stem"><span class="question-meta">14.</span>全稱量詞命題 $p: \forall x \in M,\ p(x)$，它的否定 $\neg p:$ $\underline{\hspace{4em}}$。</div>
+        
+        <div class="blank-container">
+          
+            <div class="blank-wrapper">
+              <span class="blank-label">否定命題：</span>
+              <input type="text" class="blank-input" name="q14_1" id="q14_1" placeholder="請輸入答案" autocomplete="off">
+            </div>
+          
+        </div>
+      
+      </div>
+    
+
+      <div class="question-item">
+        <div class="question-stem"><span class="question-meta">15.</span>若 $a \ge b > 0$，$c < 0$，用最適當的不等式號填空：(填 “$>$” 或 “$<$” 或 “$\ge$” 或 “$\le$”)</div>
+        
+        <div class="blank-container">
+          
+            <div class="blank-wrapper" style="margin-right: 16px;">
+              <strong>(1)</strong>&nbsp;$ac$&nbsp;
+              <input type="text" class="blank-input" name="q15_1" id="q15_1" style="width: 70px; text-align: center;" placeholder="符號" autocomplete="off">&nbsp;$bc$
+            </div>
+          
+
+            <div class="blank-wrapper" style="margin-right: 16px;">
+              <strong>(2)</strong>&nbsp;$b - c$&nbsp;
+              <input type="text" class="blank-input" name="q15_2" id="q15_2" style="width: 70px; text-align: center;" placeholder="符號" autocomplete="off">&nbsp;$a - c$
+            </div>
+          
+
+            <div class="blank-wrapper" style="margin-right: 16px;">
+              <strong>(3)</strong>&nbsp;$\frac{a}{c^{2}}$&nbsp;
+              <input type="text" class="blank-input" name="q15_3" id="q15_3" style="width: 70px; text-align: center;" placeholder="符號" autocomplete="off">&nbsp;$\frac{b}{c^{2}}$
+            </div>
+          
+
+            <div class="blank-wrapper" style="margin-right: 16px;">
+              <strong>(4)</strong>&nbsp;$\frac{b}{a}$&nbsp;
+              <input type="text" class="blank-input" name="q15_4" id="q15_4" style="width: 70px; text-align: center;" placeholder="符號" autocomplete="off">&nbsp;$-1$
+            </div>
+          
+        </div>
+      
+      </div>
+    
+
+      <div class="question-item">
+        <div class="question-stem"><span class="question-meta">16.</span>用適當符號填空：(填 “$\in$” 或 “$\notin$” 或 “$\subsetneqq$” 或 “$\supsetneqq$” 或 “$=$”)</div>
+        
+        <div class="blank-container">
+          
+            <div class="blank-wrapper" style="margin-right: 16px;">
+              <strong>(1)</strong>&nbsp;$0$&nbsp;
+              <input type="text" class="blank-input" name="q16_1" id="q16_1" style="width: 70px; text-align: center;" placeholder="關係" autocomplete="off">&nbsp;$\{1,3\}$
+            </div>
+          
+
+            <div class="blank-wrapper" style="margin-right: 16px;">
+              <strong>(2)</strong>&nbsp;$\varnothing$&nbsp;
+              <input type="text" class="blank-input" name="q16_2" id="q16_2" style="width: 70px; text-align: center;" placeholder="關係" autocomplete="off">&nbsp;$\{0\}$
+            </div>
+          
+
+            <div class="blank-wrapper" style="margin-right: 16px;">
+              <strong>(3)</strong>&nbsp;$-1$&nbsp;
+              <input type="text" class="blank-input" name="q16_3" id="q16_3" style="width: 70px; text-align: center;" placeholder="關係" autocomplete="off">&nbsp;$\{x \mid x^{2}+3x+2=0\}$
+            </div>
+          
+
+            <div class="blank-wrapper" style="margin-right: 16px;">
+              <strong>(4)</strong>&nbsp;$\{-3\}$&nbsp;
+              <input type="text" class="blank-input" name="q16_4" id="q16_4" style="width: 70px; text-align: center;" placeholder="關係" autocomplete="off">&nbsp;$\{x \mid |x|=3\}$
+            </div>
+          
+
+            <div class="blank-wrapper" style="margin-right: 16px;">
+              <strong>(5)</strong>&nbsp;$\{1\}$&nbsp;
+              <input type="text" class="blank-input" name="q16_5" id="q16_5" style="width: 70px; text-align: center;" placeholder="關係" autocomplete="off">&nbsp;$\{x \mid x \ge 1\}$
+            </div>
+          
+
+            <div class="blank-wrapper" style="margin-right: 16px;">
+              <strong>(6)</strong>&nbsp;$\sqrt{1521}$&nbsp;
+              <input type="text" class="blank-input" name="q16_6" id="q16_6" style="width: 70px; text-align: center;" placeholder="關係" autocomplete="off">&nbsp;$\mathbb{Q}$
+            </div>
+          
+        </div>
+      
+      </div>
+    
+
+      <div class="question-item">
+        <div class="question-stem"><span class="question-meta">17.</span>已知集合 $A=\{a, a^{2}\}$，且 $1 \in A$，則實數 $a=$ $\underline{\hspace{3em}}$，集合 $A$ 的子集的個數為 $\underline{\hspace{3em}}$。</div>
+        
+        <div class="blank-container">
+          
+            <div class="blank-wrapper">
+              <span class="blank-label">實數 a：</span>
+              <input type="text" class="blank-input" name="q17_1" id="q17_1" placeholder="請輸入答案" autocomplete="off">
+            </div>
+          
+
+            <div class="blank-wrapper">
+              <span class="blank-label">子集個數：</span>
+              <input type="text" class="blank-input" name="q17_2" id="q17_2" placeholder="請輸入答案" autocomplete="off">
+            </div>
+          
+        </div>
+      
+      </div>
+    
+
+      <div class="question-item">
+        <div class="question-stem"><span class="question-meta">18.</span>設全集為 $U=\mathbb{R}$，若集合 $A \subseteq B$，則 $\complement_{U}A \ \underline{\hspace{3em}}\ \complement_{U}B$。</div>
+        
+        <div class="blank-container">
+          
+            <div class="blank-wrapper">
+              <span class="blank-label">關係符號：</span>
+              <input type="text" class="blank-input" name="q18_1" id="q18_1" placeholder="請輸入答案" autocomplete="off">
+            </div>
+          
+        </div>
+      
+      </div>
+    
+
+      <div class="question-item">
+        <div class="question-stem"><span class="question-meta">19.</span>寫出命題 “$\exists x \in \mathbb{R},\ x^{2}+x+4 \le 0$” 的否命題：$\underline{\hspace{6em}}$。</div>
+        
+        <div class="blank-container">
+          
+            <div class="blank-wrapper">
+              <span class="blank-label">否命題表達式：</span>
+              <input type="text" class="blank-input" name="q19_1" id="q19_1" placeholder="請輸入答案" autocomplete="off">
+            </div>
+          
+        </div>
+      
+      </div>
+    
+      </div>
+
+      <!-- 第四部分：解答題 (Q20~Q23, 40分) -->
+      <div id="sectionPart4" class="card">
+        <div class="section-header">
+          <div class="section-title">第四部分：解答題（主觀手寫題）</div>
+          <div class="section-pts">第 20~23 題，每題 10 分，共 40 分</div>
+        </div>
+        <div style="font-size: 0.9rem; color: #64748b; margin-bottom: 16px;">
+          說明：請在草稿紙/答題紙上完成完整推導與證明步驟，並透過下方相機拍照或上傳檔案。
+        </div>
+
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">20.</span>【集合的交並補綜合運算】(10分)<br>已知集合 $A=\{x \mid 3 \le x < 7\}$，$B=\{x \mid 5 < x \le 12\}$，求下列問題：<br>(1) $A \cup B$；<br>(2) $A \cap B$；<br>(3) $\complement_{\mathbb{R}}(A \cup B)$；<br>(4) $(\complement_{\mathbb{R}}A) \cap B$；<br>(5) $A \cup (\complement_{\mathbb{R}}B)$。</div>
+      <div style="margin-top: 8px;">
+        <label style="font-size: 0.85rem; color: #64748b; font-weight: 600;">備註 / 文字步驟（選填）：</label>
+        <textarea id="q20_notes" class="form-control" rows="2" placeholder="可於此處輸入計算要點或文字補充說明..."></textarea>
+      </div>
+    </div>
+  
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">21.</span>【不等式性質證明題】(10分)<br>已知 $a>b>0$，$c<d<0$，$e<0$，求證：$$\frac{e}{a-c} > \frac{e}{b-d}$$</div>
+      <div style="margin-top: 8px;">
+        <label style="font-size: 0.85rem; color: #64748b; font-weight: 600;">備註 / 文字步驟（選填）：</label>
+        <textarea id="q21_notes" class="form-control" rows="2" placeholder="可於此處輸入計算要點或文字補充說明..."></textarea>
+      </div>
+    </div>
+  
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">22.</span>【基本不等式求最值】(10分)<br>已知 $x>0$，求 $x + \frac{4}{x-1}$ 的最小值，並求出最小值時 $x$ 的值。</div>
+      <div style="margin-top: 8px;">
+        <label style="font-size: 0.85rem; color: #64748b; font-weight: 600;">備註 / 文字步驟（選填）：</label>
+        <textarea id="q22_notes" class="form-control" rows="2" placeholder="可於此處輸入計算要點或文字補充說明..."></textarea>
+      </div>
+    </div>
+  
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">23.</span>【含參集合包含關係求解】(10分)<br>已知 $A=\{x \mid -1 < x \le 3\}$，$B=\{x \mid m \le x < 1+3m\}$。<br>(1) 當 $m=3$ 時，求 $A \cup B$；<br>(2) 若 $B \subseteq \complement_{\mathbb{R}}A$，求實數 $m$ 的取值範圍。</div>
+      <div style="margin-top: 8px;">
+        <label style="font-size: 0.85rem; color: #64748b; font-weight: 600;">備註 / 文字步驟（選填）：</label>
+        <textarea id="q23_notes" class="form-control" rows="2" placeholder="可於此處輸入計算要點或文字補充說明..."></textarea>
+      </div>
+    </div>
+  
+
+        <!-- 手寫解答相機拍照與壓縮上傳區 -->
+        <div class="camera-box">
+          <h4 style="color: #1e3a8a; margin-bottom: 8px;">📷 手寫解答相機拍照與上傳 (支援 10 分鐘緩衝時間拍照)</h4>
+          <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px;">
+            拍攝手寫紙張過程，系統將自動進行最高 1200px 等比壓縮 (JPEG 0.7 質量) 並儲存至 Google 雲端硬碟。
+          </p>
+
+          <div id="videoContainer" class="video-container">
+            <video id="videoPreview" playsinline></video>
+          </div>
+
+          <canvas id="canvasCompressed" style="display: none;"></canvas>
+
+          <div id="previewContainer" class="preview-container">
+            <img id="imgPreview" alt="學生解答預覽圖">
+            <div style="font-size: 0.85rem; color: #16a34a; font-weight: 600; margin-top: 6px;">
+              ✅ 照片已成功壓縮 (小於 1200px)，已安全就緒！
+            </div>
+          </div>
+
+          <div class="camera-controls">
+            <button type="button" id="btnStartCamera" class="btn-camera btn-cam-primary">
+              📹 開啟後置相機拍照
+            </button>
+            <button type="button" id="btnCapturePhoto" class="btn-camera btn-cam-capture">
+              📸 立即拍攝並壓縮
+            </button>
+            <button type="button" id="btnRetakePhoto" class="btn-camera btn-cam-retake">
+              🔄 重新拍攝照片
+            </button>
+          </div>
+
+          <div style="margin-top: 14px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+            <label style="font-size: 0.85rem; color: #64748b;">
+              無攝影機或權限受限時備用方案：
+              <input type="file" id="fileFallback" accept="image/*" capture="environment" style="margin-left: 6px;">
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 第五部分：附加題 (Q24~Q27, 20分) -->
+      <div id="sectionPart5" class="card">
+        <div class="section-header">
+          <div class="section-title">第五部分：附加題（進階挑戰題）</div>
+          <div class="section-pts">第 24~27 題，每題 5 分，共 20 分</div>
+        </div>
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">24.</span>設集合 $A=\{a^{2}, a+1, -1\}$，$B=\{2a-1, |a-2|, 3a^{2}+4\}$，若 $A \cap B = \{-1\}$，則 $a=$ $\underline{\hspace{3em}}$。</div>
+      <div class="blank-container">
+        <div class="blank-wrapper">
+          <span class="blank-label">實數 a 的值：</span>
+          <input type="text" class="blank-input" name="q24" id="q24" placeholder="請輸入答案" autocomplete="off">
+        </div>
+      </div>
+    </div>
+  
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">25.</span>對於任意兩個正整數 $m, n$，定義某種運算 “$※$” 如下：當 $m, n$ 都為正偶數或正奇數時，$m ※ n = m + n$；當 $m, n$ 中一個為正偶數，另一個為正奇數時，$m ※ n = mn$。則在此定義下，集合 $M=\{(a, b) \mid a ※ b = 16\}$ 中的元素個數是 $\underline{\hspace{3em}}$。</div>
+      <div class="blank-container">
+        <div class="blank-wrapper">
+          <span class="blank-label">元素個數：</span>
+          <input type="text" class="blank-input" name="q25" id="q25" placeholder="請輸入答案" autocomplete="off">
+        </div>
+      </div>
+    </div>
+  
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">26.</span>已知 $a, b \in \mathbb{R}$，若 $ab = 1$，則 $a^{2} + b^{2}$ 的最小值是 $\underline{\hspace{3em}}$。</div>
+      <div class="blank-container">
+        <div class="blank-wrapper">
+          <span class="blank-label">最小值：</span>
+          <input type="text" class="blank-input" name="q26" id="q26" placeholder="請輸入答案" autocomplete="off">
+        </div>
+      </div>
+    </div>
+  
+
+    <div class="question-item">
+      <div class="question-stem"><span class="question-meta">27.</span>某網店統計了連續三天售出商品的種類情況：第一天售出19種商品，第二天售出13種商品，第三天售出18種商品；前兩天都售出的商品有3種，後兩天都售出的商品有4種，則該網店這三天售出的商品最少有 $\underline{\hspace{3em}}$ 種。</div>
+      <div class="blank-container">
+        <div class="blank-wrapper">
+          <span class="blank-label">最少種類數：</span>
+          <input type="text" class="blank-input" name="q27" id="q27" placeholder="請輸入答案" autocomplete="off">
+        </div>
+      </div>
+    </div>
+  
+      </div>
+
+      <!-- 交卷與狀態區 -->
+      <div class="card" style="text-align: center; padding: 32px 20px;">
+        <button type="button" id="submitBtn" class="btn-block" style="max-width: 420px; margin: 0 auto; background: #16a34a; font-size: 1.25rem;" onclick="submitExam(false)">
+          📤 正式交卷 (提交大測試卷)
+        </button>
+
+        <div id="statusBox" class="status-box"></div>
+      </div>
+
+    </div>
 
   </div>
-<script>
-// 系統配置 (可切換 local mock 與 Google production)
+
+  <!-- 內嵌花名冊數據以保障 100% 離線與全平台獨立運行 -->
+  <script>
+    window.ROSTER_DATA = {
+  "4C": [
+    {
+      "id": 1,
+      "name": "古永晴",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 2,
+      "name": "王嘉熙",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 3,
+      "name": "宋榛",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 4,
+      "name": "周子謙",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 5,
+      "name": "李藝彤",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 6,
+      "name": "谷雨",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 7,
+      "name": "冼周蔚",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 8,
+      "name": "林國榮",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 9,
+      "name": "林晨欣",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 10,
+      "name": "徐浟",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 11,
+      "name": "曹爵先",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 12,
+      "name": "梁寶娟",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 14,
+      "name": "莫芷瑤",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 15,
+      "name": "陳子豪",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 16,
+      "name": "陳心怡",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 17,
+      "name": "陳芷澄",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 18,
+      "name": "陳穎彤",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 19,
+      "name": "陸恩希",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 20,
+      "name": "麥曉楠",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 21,
+      "name": "溫愛嫦",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 22,
+      "name": "葉峰",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 23,
+      "name": "趙政熹",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 24,
+      "name": "劉卓盈",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 25,
+      "name": "蔡清琰",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 26,
+      "name": "謝嘉瑩",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 27,
+      "name": "譚梓鈞",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 28,
+      "name": "譚志坤",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 29,
+      "name": "譚欣",
+      "grade": 10,
+      "classID": "4C"
+    },
+    {
+      "id": 30,
+      "name": "羅清璋",
+      "grade": 10,
+      "classID": "4C"
+    }
+  ],
+  "4D": [
+    {
+      "id": 1,
+      "name": "洪佳佳",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 2,
+      "name": "王偉德",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 3,
+      "name": "王煜鑫",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 4,
+      "name": "甘俊誠",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 5,
+      "name": "余浩賢",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 6,
+      "name": "李青霞",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 7,
+      "name": "李語鵑",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 8,
+      "name": "李樂瞳",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 9,
+      "name": "李穎欣",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 10,
+      "name": "李臻斌",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 11,
+      "name": "周梓霖",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 12,
+      "name": "林川雲",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 13,
+      "name": "施舒晨",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 14,
+      "name": "徐芷瑤",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 15,
+      "name": "翁淮洋",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 16,
+      "name": "馬雨彤",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 17,
+      "name": "張博聰",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 18,
+      "name": "曾浚恩",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 19,
+      "name": "黃悅軒",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 20,
+      "name": "黃梓建",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 21,
+      "name": "黃嫣然",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 22,
+      "name": "董清霞",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 23,
+      "name": "劉付穎",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 24,
+      "name": "劉泳欣",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 25,
+      "name": "鄭佩芝",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 26,
+      "name": "鄭東沅",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 27,
+      "name": "盧肇琪",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 28,
+      "name": "賴君華",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 29,
+      "name": "譚佩泳",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 30,
+      "name": "鄭梓浩",
+      "grade": 10,
+      "classID": "4D"
+    },
+    {
+      "id": 31,
+      "name": "鄭國樺",
+      "grade": 10,
+      "classID": "4D"
+    }
+  ],
+  "5B": [
+    {
+      "id": 1,
+      "name": "吳鎂澄",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 2,
+      "name": "蘇子恩",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 3,
+      "name": "李潤歌",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 4,
+      "name": "李曉熹",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 5,
+      "name": "周鈺燕",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 6,
+      "name": "林煜皓",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 7,
+      "name": "林穎豪",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 8,
+      "name": "柯鈺鑫",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 9,
+      "name": "洪泳棋",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 10,
+      "name": "高尚禮",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 11,
+      "name": "張啟赫",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 12,
+      "name": "張嘉城",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 13,
+      "name": "梁泳心",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 14,
+      "name": "梁芷韻",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 15,
+      "name": "梁偉烽",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 16,
+      "name": "姚皓然",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 17,
+      "name": "陳施攸",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 18,
+      "name": "陳柏琳",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 19,
+      "name": "陳國良",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 20,
+      "name": "陳紫涵",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 21,
+      "name": "陳鑫源",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 22,
+      "name": "彭婷婷",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 23,
+      "name": "黃少彬",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 24,
+      "name": "黃卓琳",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 25,
+      "name": "黃婉瑜",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 26,
+      "name": "葉棨釗",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 27,
+      "name": "潘子聰",
+      "grade": 11,
+      "classID": "5B"
+    },
+    {
+      "id": 28,
+      "name": "黎宛旻",
+      "grade": 11,
+      "classID": "5B"
+    }
+  ]
+};
+  </script>
+
+  <!-- 核心測驗客戶端邏輯腳本 -->
+  <script>
+
+// ==========================================
+// 1. 全局配置與客觀題標準答案
+// ==========================================
 const CONFIG = {
-  MODE: 'mock',
+  MODE: (typeof window !== 'undefined' && window.location && window.location.hostname === 'localhost') ? 'mock' : 'mock',
   MOCK_GAS_URL: 'http://localhost:3000/api/gas-upload',
   MOCK_FORM_URL: 'http://localhost:3000/api/form-submit',
-  PROD_GAS_URL: 'https://script.google.com/macros/s/YOUR_GAS_DEPLOY_ID/exec',
-  PROD_FORM_URL: 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse',
+  PROD_GAS_URL: 'https://script.google.com/macros/s/AKfycbxjkXzqp4WOghvi__SF8qoVBGAcXcSKv96JoRsKN3hLU6xHwLjK4rHyaXODIv_fE9Ak/exec',
+  PROD_FORM_URL: 'https://docs.google.com/forms/d/e/1FAIpQLSc_EXAMPLE/formResponse',
+  STORAGE_KEY: 'ADVANCE_MATH_EXAM_STATE',
+  TOTAL_SECONDS: 3000,    // 50 分鐘總時長 (3000 秒)
+  PHASE1_SECONDS: 2400,   // 40 分鐘第一階段 (2400 秒)
+  BUFFER_SECONDS: 600,    // 10 分鐘緩衝時間 (600 秒)
   FORM_ENTRIES: {
-    studentId: 'entry.1000001', studentName: 'entry.1000002',
-    score: 'entry.1000003', details: 'entry.1000004', imageUrl: 'entry.1000005'
+    studentId: 'entry.1000001',
+    studentName: 'entry.1000002',
+    classId: 'entry.1000003',
+    score: 'entry.1000004',
+    details: 'entry.1000005',
+    imageUrl: 'entry.1000006'
   },
   get GAS_URL() { return this.MODE === 'production' ? this.PROD_GAS_URL : this.MOCK_GAS_URL; },
   get FORM_URL() { return this.MODE === 'production' ? this.PROD_FORM_URL : this.MOCK_FORM_URL; }
 };
-const ANSWER_KEY = { q1: 'B', q2: 'A', q3: 'A', q4: 'A', q5: 'True', q6: 'True' };
 
-// 雙階段計時器 (40 分鐘客觀題作答 + 10 分鐘拍照與填空緩衝)
-let phase = 1; // 1: 客觀題作答, 2: 拍照與填空緩衝
-let timeLeft = 40 * 60; // 40 分鐘 = 2400 秒
-let timerId = null;
-const timerEl = document.getElementById('stickyTimer');
-const timerTextEl = document.getElementById('timerText');
-const timerPhaseLabel = document.getElementById('timerPhaseLabel');
+// 官方答案鍵 (滿分 22 分：第 1~6 題是非題每題 2 分，第 7~11 題單選題每題 2 分)
+const ANSWER_KEY = {
+  q1: 'X', q2: 'O', q3: 'O', q4: 'X', q5: 'X', q6: 'X',
+  q7: 'D', q8: 'B', q9: 'A', q10: 'B', q11: 'A'
+};
 
-function updateTimer() {
-  const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
-  if (timerTextEl) {
-    timerTextEl.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+// 全局考試運行時狀態
+var ExamState = {
+  currentStudent: null,   // { classID, studentID, name, grade, isTeacher }
+  phase: 1,               // 1: 40分鐘全卷, 2: 10分鐘緩衝
+  timeLeft: CONFIG.TOTAL_SECONDS,
+  timerInterval: null,
+  isLocked: false,
+  isSubmitting: false,
+  isExamStarted: false,
+  currentCompressedBase64: '',
+  uploadedFileUrl: '',
+  cameraStream: null
+};
+if (typeof window !== 'undefined') {
+  window.ExamState = ExamState;
+}
+
+// ==========================================
+// 2. 花名冊與登入認證模組
+// ==========================================
+function initRosterUI() {
+  const classSelect = document.getElementById('selectClass');
+  const studentSelect = document.getElementById('selectStudent');
+  if (!classSelect || !studentSelect) return;
+
+  classSelect.addEventListener('change', function() {
+    populateStudentsDropdown(this.value);
+  });
+
+  studentSelect.addEventListener('change', function() {
+    updateStudentDisplayInfo();
+  });
+
+  // 初始預設 4C 班
+  populateStudentsDropdown(classSelect.value || '4C');
+}
+
+function getStudentsListForClass(cls) {
+  const list = [];
+  const norm = String(cls).trim().toUpperCase();
+  if (typeof ROSTER_DATA !== 'undefined' && ROSTER_DATA[norm]) {
+    ROSTER_DATA[norm].forEach(s => {
+      list.push({ classID: norm, studentID: s.id, id: s.id, name: s.name, grade: s.grade });
+    });
   }
-  if (timerEl) {
-    if (phase === 1) {
-      if (timerPhaseLabel) timerPhaseLabel.textContent = '【客觀題作答】剩餘：';
-      timerEl.className = timeLeft <= 60 ? 'sticky-timer danger' : (timeLeft <= 300 ? 'sticky-timer warn' : 'sticky-timer');
+  // 全班級均支援 99 號教師測試員
+  list.push({
+    classID: norm,
+    studentID: 99,
+    id: 99,
+    name: '教師測試員',
+    grade: norm === '5B' ? 11 : 10,
+    isTeacher: true
+  });
+  return list;
+}
+
+function populateStudentsDropdown(classID) {
+  const studentSelect = document.getElementById('selectStudent');
+  if (!studentSelect) return;
+  studentSelect.innerHTML = '<option value="">-- 請選擇學生學號與姓名 --</option>';
+
+  const students = getStudentsListForClass(classID);
+  students.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.studentID;
+    if (s.isTeacher) {
+      opt.textContent = classID === '5B' ? '... (教師測試員 99號)' : '99 - 教師測試員';
     } else {
-      if (timerPhaseLabel) timerPhaseLabel.textContent = '【拍照與填空緩衝】剩餘：';
-      timerEl.className = timeLeft <= 60 ? 'sticky-timer danger' : 'sticky-timer warn';
+      const paddedId = String(s.studentID).padStart(2, '0');
+      opt.textContent = paddedId + ' - ' + s.name;
+    }
+    studentSelect.appendChild(opt);
+  });
+
+  updateStudentDisplayInfo();
+}
+
+function updateStudentDisplayInfo() {
+  const classSelect = document.getElementById('selectClass');
+  const studentSelect = document.getElementById('selectStudent');
+  const nameDisplay = document.getElementById('loginStudentNamePreview');
+  if (!classSelect || !studentSelect || !nameDisplay) return;
+
+  const sid = studentSelect.value;
+  if (!sid) {
+    nameDisplay.textContent = '（請選擇學生）';
+    return;
+  }
+
+  const students = getStudentsListForClass(classSelect.value);
+  const found = students.find(s => String(s.studentID) === String(sid));
+  if (found) {
+    nameDisplay.textContent = found.name;
+  } else {
+    nameDisplay.textContent = '未知學生';
+  }
+}
+
+function verifyStudentCredentials(classID, studentID, password) {
+  if (!classID || !studentID) return false;
+  const pwd = String(password !== undefined && password !== null ? password : "").trim();
+  // 系統預設密碼 1234
+  return pwd === '1234';
+}
+
+function handlePasswordLogin() {
+  const classSelect = document.getElementById('selectClass');
+  const studentSelect = document.getElementById('selectStudent');
+  const passwordInput = document.getElementById('inputPassword');
+  const errorMsg = document.getElementById('authErrorMessage');
+
+  if (errorMsg) errorMsg.style.display = 'none';
+
+  const classID = classSelect ? classSelect.value : '';
+  const studentID = studentSelect ? studentSelect.value : '';
+  const password = passwordInput ? passwordInput.value : '';
+
+  if (!classID || !studentID) {
+    showAuthError('請先選擇班級與學生學號！');
+    return;
+  }
+
+  if (!verifyStudentCredentials(classID, studentID, password)) {
+    showAuthError('密碼錯誤！預設密碼為 1234。');
+    return;
+  }
+
+  const students = getStudentsListForClass(classID);
+  const student = students.find(s => String(s.studentID) === String(studentID));
+  if (!student) {
+    showAuthError('查無此學生名冊資料！');
+    return;
+  }
+
+  // 登入成功，進入考前確認畫面
+  proceedToPreExamConfirm(student);
+}
+
+function handleFaceLogin() {
+  const classSelect = document.getElementById('selectClass');
+  const studentSelect = document.getElementById('selectStudent');
+  const classID = classSelect ? classSelect.value : '4C';
+  let studentID = studentSelect ? studentSelect.value : '';
+
+  if (!studentID) {
+    // 預設第一位學生
+    const list = getStudentsListForClass(classID);
+    if (list.length > 0) studentID = list[0].studentID;
+  }
+
+  const students = getStudentsListForClass(classID);
+  const student = students.find(s => String(s.studentID) === String(studentID));
+  if (!student) {
+    showAuthError('請先選擇學生身分！');
+    return;
+  }
+
+  // 人臉核驗通過 (Demo 回退模式)
+  proceedToPreExamConfirm(student);
+}
+
+function showAuthError(msg) {
+  const errorMsg = document.getElementById('authErrorMessage');
+  if (errorMsg) {
+    errorMsg.textContent = '⚠️ ' + msg;
+    errorMsg.style.display = 'block';
+  } else {
+    alert(msg);
+  }
+}
+
+function proceedToPreExamConfirm(student) {
+  ExamState.currentStudent = student;
+
+  const authScreen = document.getElementById('authScreen');
+  const confirmScreen = document.getElementById('screenPreExamConfirm');
+  if (authScreen) authScreen.style.display = 'none';
+  if (confirmScreen) confirmScreen.style.display = 'block';
+
+  // 渲染學生身分核對標籤
+  const dispClass = document.getElementById('confirmClassDisplay');
+  const dispId = document.getElementById('confirmIdDisplay');
+  const dispName = document.getElementById('confirmNameDisplay');
+  if (dispClass) dispClass.textContent = student.classID;
+  if (dispId) dispId.textContent = String(student.studentID).padStart(2, '0');
+  if (dispName) dispName.textContent = student.name;
+
+  // 更新頂部常駐學生標籤
+  const examStudentBadge = document.getElementById('examStudentBadge');
+  if (examStudentBadge) {
+    examStudentBadge.textContent = student.classID + ' 班 ' + String(student.studentID).padStart(2, '0') + ' 號 ' + student.name;
+  }
+}
+
+function returnToLogin() {
+  const authScreen = document.getElementById('authScreen');
+  const confirmScreen = document.getElementById('screenPreExamConfirm');
+  if (confirmScreen) confirmScreen.style.display = 'none';
+  if (authScreen) authScreen.style.display = 'block';
+}
+
+// ==========================================
+// 3. 考前確認畫面與倒數計時引擎
+// ==========================================
+function startExamCountdown() {
+  const confirmScreen = document.getElementById('screenPreExamConfirm');
+  const examContainer = document.getElementById('examContainer');
+  const stickyTimer = document.getElementById('stickyTimer');
+
+  if (confirmScreen) confirmScreen.style.display = 'none';
+  if (examContainer) examContainer.style.display = 'block';
+  if (stickyTimer) stickyTimer.style.display = 'block';
+
+  ExamState.isExamStarted = true;
+  saveExamState();
+
+  // 啟動每秒計時器
+  if (ExamState.timerInterval) clearInterval(ExamState.timerInterval);
+  ExamState.timerInterval = setInterval(tickTimer, 1000);
+  updateTimerUI();
+}
+
+function tickTimer() {
+  if (ExamState.timeLeft <= 0) {
+    clearInterval(ExamState.timerInterval);
+    ExamState.timerInterval = null;
+    autoSubmit();
+    return;
+  }
+
+  ExamState.timeLeft--;
+
+  // 檢查是否跨入第二階段 (滿 40 分鐘，剩餘時間 <= 600 秒)
+  if (ExamState.timeLeft <= CONFIG.BUFFER_SECONDS && ExamState.phase === 1) {
+    transitionToPhase2();
+  }
+
+  updateTimerUI();
+
+  // 定時自動存檔 (每 5 秒或整點)
+  if (ExamState.timeLeft % 5 === 0) {
+    saveExamState();
+  }
+}
+
+function updateTimerUI() {
+  const timerDisplay = document.getElementById('timerCountdownDisplay');
+  const badge = document.getElementById('timerPhaseBadge');
+  if (!timerDisplay) return;
+
+  const mins = Math.floor(ExamState.timeLeft / 60);
+  const secs = ExamState.timeLeft % 60;
+  const timeStr = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+  timerDisplay.textContent = timeStr;
+
+  // 樣式調整
+  timerDisplay.classList.remove('warn', 'danger');
+  if (ExamState.timeLeft <= 60) {
+    timerDisplay.classList.add('danger');
+  } else if (ExamState.timeLeft <= 300) {
+    timerDisplay.classList.add('warn');
+  }
+
+  if (badge) {
+    if (ExamState.phase === 1) {
+      badge.textContent = '【第一階段：客觀題作答】剩餘：';
+      badge.className = 'timer-phase-badge phase1';
+    } else {
+      badge.textContent = '【第二階段：拍照與填空緩衝】剩餘：';
+      badge.className = 'timer-phase-badge phase2';
     }
   }
+}
+
+function transitionToPhase2() {
+  ExamState.phase = 2;
+  lockObjectiveQuestions();
+  saveExamState();
+
+  // 醒目警告彈窗
+  try {
+    alert('⏰ 40 分鐘客觀題作答時間已結束！\n第一部分判斷題與第二部分單選題已強制鎖定，請於剩餘 10 分鐘緩衝時間內完成填空題與解答題拍照上傳。');
+  } catch (e) {}
 }
 
 function lockObjectiveQuestions() {
-  const objCard = document.getElementById('cardObjective');
-  if (objCard) {
-    const inputs = objCard.querySelectorAll('input[type="radio"], input[type="checkbox"]');
-    inputs.forEach(input => {
-      input.disabled = true;
-    });
-    objCard.style.opacity = '0.7';
-    objCard.style.pointerEvents = 'none';
+  ExamState.isLocked = true;
+
+  // 鎖定第一部分與第二部分的所有 input 元素
+  const part1 = document.getElementById('sectionPart1');
+  const part2 = document.getElementById('sectionPart2');
+  if (part1) {
+    part1.classList.add('objective-locked');
+    part1.querySelectorAll('input').forEach(inp => inp.disabled = true);
   }
-  const banner = document.getElementById('objectiveLockBanner');
-  if (banner) {
-    banner.style.display = 'block';
+  if (part2) {
+    part2.classList.add('objective-locked');
+    part2.querySelectorAll('input').forEach(inp => inp.disabled = true);
   }
+
+  // 顯示鎖定警告橫幅
+  const lockBanner = document.getElementById('objectiveLockBanner');
+  if (lockBanner) lockBanner.classList.add('visible');
 }
 
-function startExam() {
-  const startScr = document.getElementById('startScreen');
-  const examCont = document.getElementById('examContainer');
-  if (startScr) startScr.style.display = 'none';
-  if (examCont) examCont.style.display = 'block';
-  updateTimer();
-  timerId = setInterval(() => {
-    timeLeft--;
-    if (timeLeft <= 0) {
-      if (phase === 1) {
-        // 40 分鐘結束：鎖定客觀題，進入額外 10 分鐘緩衝
-        phase = 2;
-        timeLeft = 10 * 60;
-        lockObjectiveQuestions();
-        updateTimer();
-        alert('⏰ 40 分鐘客觀題作答時間已結束！\n\n所有選擇題與是非題已全面鎖定無法更改。\n\n系統已為您開放【額外 10 分鐘緩衝時間】，請把握時間完成：\n1. 填空題文字輸入與修訂\n2. 主觀大題手寫過程拍照上傳！');
-      } else {
-        // 額外 10 分鐘緩衝結束：強制交卷
-        clearInterval(timerId);
-        alert('⏰ 測驗總時間 (40+10分鐘) 已全部結束！系統將自動完成提交。');
-        autoSubmit();
-      }
-    } else {
-      updateTimer();
-    }
-  }, 1000);
+function autoSubmit() {
+  alert('⏰ 測驗總時間 (40+10分鐘) 已全部結束！系統正在為您自動交卷...');
+  submitExam(true);
 }
 
-// 客觀題自動批改 (支援 DOM 與 Node.js 測試傳參)
-function gradeObjectiveQuestions(providedAnswers) {
-  const answers = providedAnswers || {};
-  if (!providedAnswers) {
-    for (let i = 1; i <= 6; i++) {
-      const checked = document.querySelector('input[name="q' + i + '"]:checked');
-      answers['q' + i] = checked ? checked.value : '';
-    }
-  }
+// ==========================================
+// 4. 本地客觀題自動評分 (滿分 22 分)
+// ==========================================
+function gradeObjectiveQuestions() {
   let score = 0;
+  const maxScore = 22;
   const details = {};
-  for (const [qid, correctVal] of Object.entries(ANSWER_KEY)) {
-    const userVal = answers[qid] || '';
-    const isCorrect = userVal === correctVal;
-    const pts = isCorrect ? 10 : 0;
-    score += pts;
-    details[qid] = { userAns: userVal, correctAns: correctVal, isCorrect, points: pts };
+
+  // Part 1: Q1~Q6 (每題 2 分，共 12 分)
+  for (let i = 1; i <= 6; i++) {
+    const key = 'q' + i;
+    const selected = document.querySelector('input[name="' + key + '"]:checked');
+    const ans = selected ? selected.value : '';
+    const isCorrect = (ans === ANSWER_KEY[key]);
+    if (isCorrect) score += 2;
+    details[key] = { answer: ans, standard: ANSWER_KEY[key], isCorrect: isCorrect, pts: isCorrect ? 2 : 0 };
   }
-  return { score, maxScore: 60, details, summary: '客觀題實得分數：' + score + ' / 60' };
+
+  // Part 2: Q7~Q11 (每題 2 分，共 10 分)
+  for (let i = 7; i <= 11; i++) {
+    const key = 'q' + i;
+    const selected = document.querySelector('input[name="' + key + '"]:checked');
+    const ans = selected ? selected.value : '';
+    const isCorrect = (ans === ANSWER_KEY[key]);
+    if (isCorrect) score += 2;
+    details[key] = { answer: ans, standard: ANSWER_KEY[key], isCorrect: isCorrect, pts: isCorrect ? 2 : 0 };
+  }
+
+  return { score: score, maxScore: maxScore, details: details };
 }
 
-// 相機與圖片處理 (JPEG 0.7 壓縮)
-let activeStream = null, currentCompressedBase64 = '';
-const video = document.getElementById('videoPreview'), cameraBox = document.getElementById('cameraBox');
-const canvas = document.getElementById('hiddenCanvas'), imgPreview = document.getElementById('imagePreview');
-const btnStart = document.getElementById('btnStartCamera'), btnCapture = document.getElementById('btnCapture');
-const btnRetake = document.getElementById('btnRetake'), btnStop = document.getElementById('btnStopCamera');
-const fileInput = document.getElementById('fileFallback');
+// 收集所有填空題與附加題答案
+function collectAllInputAnswers() {
+  const answers = {};
 
-if (btnStart) {
-  btnStart.addEventListener('click', async () => {
-    try {
-      activeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 } } });
-      video.srcObject = activeStream;
-      cameraBox.style.display = 'block';
-      btnCapture.style.display = btnStop.style.display = 'inline-block';
-      btnStart.style.display = 'none';
-    } catch (err) { alert('無法存取相機，請使用下方圖片上傳備用方案。(' + err.message + ')'); }
+  // Part 1 & 2
+  for (let i = 1; i <= 11; i++) {
+    const key = 'q' + i;
+    const sel = document.querySelector('input[name="' + key + '"]:checked');
+    answers[key] = sel ? sel.value : '';
+  }
+
+  // Part 3
+  const part3Inputs = document.querySelectorAll('#sectionPart3 input.blank-input');
+  part3Inputs.forEach(inp => {
+    answers[inp.name] = inp.value.trim();
   });
+
+  // Part 4 手寫備註
+  for (let i = 20; i <= 23; i++) {
+    const ta = document.getElementById('q' + i + '_notes');
+    if (ta) answers['q' + i + '_notes'] = ta.value.trim();
+  }
+
+  // Part 5
+  const part5Inputs = document.querySelectorAll('#sectionPart5 input.blank-input');
+  part5Inputs.forEach(inp => {
+    answers[inp.name] = inp.value.trim();
+  });
+
+  return answers;
+}
+
+// ==========================================
+// 5. 解答題相機調用與 Canvas 1200px 壓縮
+// ==========================================
+function initCameraModule() {
+  const btnStartCam = document.getElementById('btnStartCamera');
+  const btnCapture = document.getElementById('btnCapturePhoto');
+  const btnRetake = document.getElementById('btnRetakePhoto');
+  const fileFallback = document.getElementById('fileFallback');
+
+  if (btnStartCam) btnStartCam.addEventListener('click', startWebCamStream);
+  if (btnCapture) btnCapture.addEventListener('click', captureCanvasPhoto);
+  if (btnRetake) btnRetake.addEventListener('click', retakePhoto);
+  if (fileFallback) fileFallback.addEventListener('change', handleFileFallback);
+}
+
+async function startWebCamStream() {
+  const video = document.getElementById('videoPreview');
+  const videoBox = document.getElementById('videoContainer');
+  const btnStartCam = document.getElementById('btnStartCamera');
+  const btnCapture = document.getElementById('btnCapturePhoto');
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+      audio: false
+    });
+    ExamState.cameraStream = stream;
+    if (video) {
+      video.srcObject = stream;
+      await video.play();
+    }
+    if (videoBox) videoBox.style.display = 'block';
+    if (btnStartCam) btnStartCam.style.display = 'none';
+    if (btnCapture) btnCapture.style.display = 'inline-block';
+  } catch (err) {
+    console.warn('無法開啟攝影機，請使用檔案上傳備用方案：', err);
+    alert('無法開啟攝像頭，請直接使用下方的「選擇圖片檔案/拍照」備用按鈕！');
+  }
+}
+
+function captureCanvasPhoto() {
+  const video = document.getElementById('videoPreview');
+  if (!video) return;
+  compressAndStore(video);
+  stopCameraStream();
 }
 
 function stopCameraStream() {
-  if (activeStream) { activeStream.getTracks().forEach(t => t.stop()); activeStream = null; }
-  if (cameraBox) cameraBox.style.display = 'none';
+  if (ExamState.cameraStream) {
+    ExamState.cameraStream.getTracks().forEach(t => t.stop());
+    ExamState.cameraStream = null;
+  }
+  const videoBox = document.getElementById('videoContainer');
+  const btnCapture = document.getElementById('btnCapturePhoto');
+  if (videoBox) videoBox.style.display = 'none';
   if (btnCapture) btnCapture.style.display = 'none';
-  if (btnStop) btnStop.style.display = 'none';
-  if (btnStart) btnStart.style.display = 'inline-block';
 }
-if (btnStop) btnStop.addEventListener('click', stopCameraStream);
 
 function compressAndStore(sourceImg) {
-  const MAX_W = 1200;
-  let w = sourceImg.width || sourceImg.videoWidth, h = sourceImg.height || sourceImg.videoHeight;
-  if (w > MAX_W) { h = Math.round((h * MAX_W) / w); w = MAX_W; }
-  canvas.width = w; canvas.height = h;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(sourceImg, 0, 0, w, h);
-  currentCompressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-  imgPreview.src = currentCompressedBase64;
-  imgPreview.style.display = 'block';
-  if (btnRetake) btnRetake.style.display = 'block';
-}
+  const canvas = document.getElementById('canvasCompressed');
+  const preview = document.getElementById('imgPreview');
+  const previewBox = document.getElementById('previewContainer');
+  const btnRetake = document.getElementById('btnRetakePhoto');
+  const btnStartCam = document.getElementById('btnStartCamera');
+  if (!canvas || !preview) return;
 
-if (btnCapture) btnCapture.addEventListener('click', () => { compressAndStore(video); stopCameraStream(); });
-if (btnRetake) btnRetake.addEventListener('click', () => {
-  currentCompressedBase64 = ''; imgPreview.src = '';
-  imgPreview.style.display = 'none';
-  btnRetake.style.display = 'none';
-  if (btnStart) btnStart.click();
-});
-if (fileInput) {
-  fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const tempImg = new Image();
-      tempImg.onload = () => compressAndStore(tempImg);
-      tempImg.src = evt.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
+  const MAX_DIM = 1200;
+  let w = sourceImg.videoWidth || sourceImg.naturalWidth || sourceImg.width || 1200;
+  let h = sourceImg.videoHeight || sourceImg.naturalHeight || sourceImg.height || 900;
 
-// 二階段提交邏輯
-async function submitExam(isAuto = false) {
-  const studentId = document.getElementById('studentId') ? document.getElementById('studentId').value.trim() : (isAuto ? 'S_TIMEOUT' : '');
-  const studentName = document.getElementById('studentName') ? document.getElementById('studentName').value.trim() : (isAuto ? '超時繳卷' : '');
-  if (!studentId || !studentName) return alert('請填寫學號與姓名！');
-  if (!currentCompressedBase64 && !isAuto && !confirm('未附解答照片，確定繳卷？')) return;
-
-  const submitBtn = document.getElementById('submitBtn'), statusBox = document.getElementById('statusBox');
-  if (submitBtn) submitBtn.disabled = true;
-  if (statusBox) {
-    statusBox.className = 'status-msg status-info';
-    statusBox.style.display = 'block';
-    statusBox.textContent = '【第 1/2 步】正在上傳解答照片至 Google Apps Script 雲端圖床...';
+  // 嚴格將寬與高雙向限制在 1200px 內，等比縮放
+  if (w > MAX_DIM || h > MAX_DIM) {
+    if (w >= h) {
+      h = Math.round((h * MAX_DIM) / w);
+      w = MAX_DIM;
+    } else {
+      w = Math.round((w * MAX_DIM) / h);
+      h = MAX_DIM;
+    }
   }
 
-  const grading = gradeObjectiveQuestions();
-  const fillInText = document.getElementById('fillInAnswer') ? document.getElementById('fillInAnswer').value.trim() : '';
-  let uploadedFileUrl = '未附照片';
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(sourceImg, 0, 0, w, h);
+
+  // JPEG 壓縮質量 0.7
+  ExamState.currentCompressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+  preview.src = ExamState.currentCompressedBase64;
+  if (previewBox) previewBox.style.display = 'block';
+  if (btnRetake) btnRetake.style.display = 'inline-block';
+  if (btnStartCam) btnStartCam.style.display = 'none';
+
+  saveExamState();
+}
+
+function retakePhoto() {
+  ExamState.currentCompressedBase64 = '';
+  ExamState.uploadedFileUrl = '';
+  const previewBox = document.getElementById('previewContainer');
+  const btnRetake = document.getElementById('btnRetakePhoto');
+  const btnStartCam = document.getElementById('btnStartCamera');
+
+  if (previewBox) previewBox.style.display = 'none';
+  if (btnRetake) btnRetake.style.display = 'none';
+  if (btnStartCam) btnStartCam.style.display = 'inline-block';
+
+  saveExamState();
+}
+
+function handleFileFallback(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    const img = new Image();
+    img.onload = function() {
+      compressAndStore(img);
+    };
+    img.src = evt.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ==========================================
+// 6. 離線 LocalStorage 自動暫存與恢復
+// ==========================================
+function saveExamState() {
+  if (!ExamState.currentStudent || !ExamState.isExamStarted) return;
+
+  const stateData = {
+    student: ExamState.currentStudent,
+    phase: ExamState.phase,
+    timeLeft: ExamState.timeLeft,
+    isLocked: ExamState.isLocked,
+    answers: collectAllInputAnswers(),
+    capturedImage: ExamState.currentCompressedBase64,
+    uploadedFileUrl: ExamState.uploadedFileUrl,
+    timestamp: Date.now()
+  };
 
   try {
-    if (currentCompressedBase64) {
+    localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(stateData));
+    updateAutosaveBadge(new Date());
+  } catch (err) {
+    console.warn('LocalStorage 存檔失敗：', err);
+  }
+}
+
+function restoreExamState() {
+  try {
+    const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (!data || !data.student) return false;
+
+    ExamState.currentStudent = data.student;
+    ExamState.phase = data.phase || 1;
+    ExamState.timeLeft = (typeof data.timeLeft === 'number') ? data.timeLeft : CONFIG.TOTAL_SECONDS;
+    ExamState.isLocked = !!data.isLocked;
+    ExamState.currentCompressedBase64 = data.capturedImage || '';
+    ExamState.uploadedFileUrl = data.uploadedFileUrl || '';
+
+    // 恢復身分
+    proceedToPreExamConfirm(data.student);
+
+    // 恢復填答
+    if (data.answers) {
+      Object.keys(data.answers).forEach(k => {
+        const val = data.answers[k];
+        if (k.startsWith('q') && parseInt(k.substring(1), 10) <= 11) {
+          const radio = document.querySelector('input[name="' + k + '"][value="' + val + '"]');
+          if (radio) radio.checked = true;
+        } else {
+          const inp = document.querySelector('input[name="' + k + '"]') || document.getElementById(k);
+          if (inp) inp.value = val;
+        }
+      });
+    }
+
+    // 恢復照片預覽
+    if (ExamState.currentCompressedBase64) {
+      const preview = document.getElementById('imgPreview');
+      const previewBox = document.getElementById('previewContainer');
+      const btnRetake = document.getElementById('btnRetakePhoto');
+      const btnStartCam = document.getElementById('btnStartCamera');
+      if (preview) preview.src = ExamState.currentCompressedBase64;
+      if (previewBox) previewBox.style.display = 'block';
+      if (btnRetake) btnRetake.style.display = 'inline-block';
+      if (btnStartCam) btnStartCam.style.display = 'none';
+    }
+
+    // 恢復進入大測並啟動計時
+    startExamCountdown();
+
+    // 若處於第二階段或已鎖定，執行客觀題鎖定
+    if (ExamState.phase === 2 || ExamState.isLocked || ExamState.timeLeft <= CONFIG.BUFFER_SECONDS) {
+      lockObjectiveQuestions();
+    }
+
+    console.log('✅ 已無縫恢復上次大測進度！剩餘時間：' + ExamState.timeLeft + '秒');
+    return true;
+  } catch (err) {
+    console.error('恢復進度時發生例外：', err);
+    return false;
+  }
+}
+
+function clearExamState() {
+  try {
+    localStorage.removeItem(CONFIG.STORAGE_KEY);
+  } catch (e) {}
+}
+
+function updateAutosaveBadge(date) {
+  const badge = document.getElementById('autosaveBadge');
+  if (!badge) return;
+  const timeStr = date.toLocaleTimeString();
+  badge.textContent = '💾 已離線自動保存 ' + timeStr;
+}
+
+// ==========================================
+// 7. 網絡心跳探測與斷網容錯重試機制
+// ==========================================
+function initNetworkHeartbeat() {
+  const isOnline = (typeof navigator !== 'undefined' && typeof navigator.onLine === 'boolean') ? navigator.onLine : true;
+  updateHeartbeatStatus(isOnline);
+
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('online', () => updateHeartbeatStatus(true));
+    window.addEventListener('offline', () => updateHeartbeatStatus(false));
+  }
+
+  // 定期探測 (每 30 秒)
+  setInterval(async () => {
+    if (!navigator.onLine) {
+      updateHeartbeatStatus(false);
+      return;
+    }
+    // 輕量探測
+    try {
+      const probeUrl = CONFIG.MODE === 'production' ? 'https://www.google.com/generate_204' : CONFIG.MOCK_GAS_URL;
+      const res = await fetch(probeUrl, { method: 'HEAD', mode: 'no-cors', cache: 'no-store' });
+      updateHeartbeatStatus(true);
+    } catch (e) {
+      // 若在 mock 模式下 mock server 暫時離線
+      updateHeartbeatStatus(navigator.onLine);
+    }
+  }, 30000);
+}
+
+function updateHeartbeatStatus(isOnline) {
+  const statusEl = document.getElementById('heartbeatStatus');
+  if (!statusEl) return;
+
+  if (isOnline) {
+    statusEl.className = 'heartbeat-status online';
+    statusEl.innerHTML = '<span class="heartbeat-dot"></span> 🟢 網絡連通正常';
+    hideNetworkRetryBanner();
+  } else {
+    statusEl.className = 'heartbeat-status offline';
+    statusEl.innerHTML = '<span class="heartbeat-dot"></span> 🔴 網絡已斷開，已進入離線保護模式';
+  }
+}
+
+function showNetworkRetryBanner() {
+  const banner = document.getElementById('networkRetryBanner');
+  if (banner) banner.classList.add('visible');
+}
+
+function hideNetworkRetryBanner() {
+  const banner = document.getElementById('networkRetryBanner');
+  if (banner) banner.classList.remove('visible');
+}
+
+// ==========================================
+// 8. 兩階段雲端提交管道 (GAS -> Google Form)
+// ==========================================
+async function submitExam(isAuto) {
+  if (ExamState.isSubmitting) return;
+
+  const statusBox = document.getElementById('statusBox');
+  const submitBtn = document.getElementById('submitBtn');
+
+  if (!isAuto) {
+    const confirmed = confirm('確定要正式提交大測試卷嗎？提交後將無法修改！');
+    if (!confirmed) return;
+  }
+
+  ExamState.isSubmitting = true;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = '⏳ 正在提交試卷中...';
+  }
+
+  showStatus('正在核算客觀題分數並準備上傳解答...', 'info');
+
+  const gradeResult = gradeObjectiveQuestions();
+  const allAnswers = collectAllInputAnswers();
+  const student = ExamState.currentStudent || { classID: '4C', studentID: 1, name: '未登記' };
+
+  try {
+    // -------------------------------------------------------------
+    // 步驟 1：上傳壓縮解答相片至 Google Drive (GAS Webhook)
+    // -------------------------------------------------------------
+    if (ExamState.currentCompressedBase64 && !ExamState.uploadedFileUrl) {
+      showStatus('正在上傳手寫解答相片至 Google 雲端硬碟 (步驟 1/2)...', 'info');
+
+      const gasPayload = {
+        studentId: student.classID + String(student.studentID).padStart(2, '0'),
+        studentName: student.name,
+        classId: student.classID,
+        fillInAnswer: JSON.stringify(allAnswers),
+        imageBase64: ExamState.currentCompressedBase64
+      };
+
       const gasRes = await fetch(CONFIG.GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ studentId, studentName, fillInAnswer: fillInText, imageBase64: currentCompressedBase64 })
+        body: JSON.stringify(gasPayload)
       });
+
+      if (!gasRes.ok) {
+        throw new Error('GAS 上傳 HTTP 錯誤：' + gasRes.status);
+      }
+
       const gasData = await gasRes.json();
-      if (gasData.status === 'success' && gasData.fileUrl) uploadedFileUrl = gasData.fileUrl;
-      else throw new Error(gasData.message || '雲端硬碟上傳失敗');
+      if (gasData.status === 'success' && gasData.fileUrl) {
+        ExamState.uploadedFileUrl = gasData.fileUrl;
+        saveExamState();
+      } else {
+        throw new Error(gasData.message || '雲端硬碟圖床回傳失敗');
+      }
     }
 
-    if (statusBox) statusBox.textContent = '【第 2/2 步】正在將作答成果、客觀成績與解答圖網址提交至表單...';
-    const formParams = new URLSearchParams();
-    formParams.append(CONFIG.FORM_ENTRIES.studentId, studentId);
-    formParams.append(CONFIG.FORM_ENTRIES.studentName, studentName);
-    formParams.append(CONFIG.FORM_ENTRIES.score, String(grading.score));
-    formParams.append(CONFIG.FORM_ENTRIES.details, JSON.stringify({ ...grading.details, fillInAnswer: fillInText }));
-    formParams.append(CONFIG.FORM_ENTRIES.imageUrl, uploadedFileUrl);
+    // -------------------------------------------------------------
+    // 步驟 2：封裝總成績與明細送交 Google 表單
+    // -------------------------------------------------------------
+    showStatus('正在將測驗記錄與客觀題分數提交至後台 (步驟 2/2)...', 'info');
 
-    await fetch(CONFIG.FORM_URL, {
+    const formParams = new URLSearchParams();
+    formParams.append(CONFIG.FORM_ENTRIES.studentId, student.classID + String(student.studentID).padStart(2, '0'));
+    formParams.append(CONFIG.FORM_ENTRIES.studentName, student.name);
+    formParams.append(CONFIG.FORM_ENTRIES.classId, student.classID);
+    formParams.append(CONFIG.FORM_ENTRIES.score, String(gradeResult.score));
+    formParams.append(CONFIG.FORM_ENTRIES.details, JSON.stringify({
+      objectiveScore: gradeResult.score,
+      maxScore: gradeResult.maxScore,
+      objectiveDetails: gradeResult.details,
+      fillInAnswers: allAnswers
+    }));
+    formParams.append(CONFIG.FORM_ENTRIES.imageUrl, ExamState.uploadedFileUrl || '無照片上傳');
+
+    const formRes = await fetch(CONFIG.FORM_URL, {
       method: 'POST',
       mode: CONFIG.MODE === 'production' ? 'no-cors' : 'cors',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: formParams.toString()
     });
 
-    if (timerId) clearInterval(timerId);
-    if (statusBox) {
-      statusBox.className = 'status-msg status-success';
-      statusBox.innerHTML = '<h3>繳卷成功！</h3><p>學號：' + studentId + ' | 姓名：' + studentName + '</p><p>' + grading.summary + '</p><p>解答圖：<a href="' + uploadedFileUrl + '" target="_blank">' + uploadedFileUrl + '</a></p>';
+    // 提交完成！
+    ExamState.isSubmitting = false;
+    clearExamState(); // 清除暫存
+
+    showStatus('🎉 大測交卷成功！客觀題得分：' + gradeResult.score + ' / 22 分。手寫照片與作答紀錄已安全歸檔！', 'success');
+    if (submitBtn) {
+      submitBtn.textContent = '✅ 已成功交卷';
+      submitBtn.disabled = true;
     }
+
+    if (ExamState.timerInterval) clearInterval(ExamState.timerInterval);
+
   } catch (err) {
-    if (statusBox) {
-      statusBox.className = 'status-msg status-error';
-      statusBox.textContent = '提交過程發生錯誤：' + err.message + '，請聯繫監考教師或重試。';
+    console.error('交卷過程中斷：', err);
+    ExamState.isSubmitting = false;
+
+    // ⚠️ 斷網容錯：絕不清空照片或答案，醒目展示重試橫幅
+    showStatus('⚠️ 網絡連線中斷或伺服器回應異常，作答進度與照片已完整保存在本機，請檢查連線後重試！', 'error');
+    showNetworkRetryBanner();
+
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = '🔄 重新提交 / 重試交卷';
     }
-    if (submitBtn) submitBtn.disabled = false;
   }
 }
 
-const examFormEl = document.getElementById('examForm');
-if (examFormEl) {
-  examFormEl.addEventListener('submit', (e) => { e.preventDefault(); submitExam(false); });
+function showStatus(msg, type) {
+  const box = document.getElementById('statusBox');
+  if (!box) return;
+  box.textContent = msg;
+  box.className = 'status-box ' + type;
 }
-function autoSubmit() { submitExam(true); }
 
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { CONFIG, ANSWER_KEY, gradeObjectiveQuestions };
+// 符號快捷插入
+function insertSymbol(sym) {
+  const activeEl = document.activeElement;
+  if (activeEl && activeEl.classList && activeEl.classList.contains('blank-input')) {
+    const start = activeEl.selectionStart || activeEl.value.length;
+    const end = activeEl.selectionEnd || activeEl.value.length;
+    activeEl.value = activeEl.value.substring(0, start) + sym + activeEl.value.substring(end);
+    activeEl.selectionStart = activeEl.selectionEnd = start + sym.length;
+    activeEl.focus();
+    saveExamState();
+  }
 }
-</script>
+
+// 監聽所有輸入以觸發離線自動存檔
+function bindAutoSaveListeners() {
+  if (typeof document === 'undefined' || typeof document.addEventListener !== 'function') return;
+  document.addEventListener('change', function(e) {
+    if (e.target && (e.target.matches('input') || e.target.matches('textarea'))) {
+      saveExamState();
+    }
+  });
+  document.addEventListener('input', function(e) {
+    if (e.target && (e.target.matches('input.blank-input') || e.target.matches('textarea'))) {
+      saveExamState();
+    }
+  });
+}
+
+// ==========================================
+// 9. 頁面啟動初始化
+// ==========================================
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+  window.addEventListener('DOMContentLoaded', function() {
+    initRosterUI();
+    initCameraModule();
+    initNetworkHeartbeat();
+    bindAutoSaveListeners();
+
+    // 嘗試從離線存檔恢復
+    const restored = restoreExamState();
+    if (!restored) {
+      // 預設呈現身分登錄卡片
+      const authScreen = document.getElementById('authScreen');
+      if (authScreen) authScreen.style.display = 'block';
+    }
+  });
+}
+
+  </script>
 </body>
 </html>
