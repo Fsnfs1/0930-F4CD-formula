@@ -1,0 +1,2877 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>高中數學互動練習平臺</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- USER GLOBAL RULE: MathJax script for LaTeX math formula rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- External Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .auth-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+    .auth-modal-card {
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 16px;
+      max-width: 420px;
+      width: 100%;
+      padding: 24px 20px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+      color: #f8fafc;
+      box-sizing: border-box;
+    }
+  </style>
+
+  <!-- Font Awesome Icons for Floating Refresh & UI elements -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- @vladmandic/face-api Library via jsDelivr CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
+</head>
+<body>
+
+  <!-- ====================================================================
+       SCREEN 0: Google Macau Network Connectivity Lock (R5)
+       ==================================================================== -->
+  <div id="screen0-macau-lock" class="macau-lock-overlay" style="display: none;">
+    <div class="macau-lock-card">
+      <div class="lock-signal-icon">
+        <span class="signal-symbol">📡</span>
+      </div>
+      <h2 class="lock-title">網絡信號驗證</h2>
+      <div class="lock-mandatory-warning">
+        <p class="lock-warning-text">網絡未連接到澳門，需要使用澳門網絡的信號答題</p>
+      </div>
+      <p class="lock-desc">
+        本平臺要求在澳門網絡信號覆蓋環境下進行練習。請確認您的行動數據已漫遊至澳門網絡，或已連接澳門校園 Wi-Fi。
+      </p>
+      <div class="lock-status-indicator" id="macauLockStatusText">
+        <span class="status-dot dot-red"></span> 未檢測到澳門網絡信號
+      </div>
+      <button id="btnRetryMacauProbe" class="btn btn-primary lock-retry-btn">
+        <span id="btnRetryText">重新探測澳門網絡</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile-first Portrait Shell Container -->
+  <div class="mobile-app-shell">
+    
+    <!-- Top App Header -->
+    <header class="app-header">
+      <div class="brand-wrapper">
+        <span class="brand-icon">📐</span>
+        <div>
+          <h1 class="brand-title">高中數學互動練習平臺</h1>
+          <p class="brand-subtitle">智慧型手機練習 · 身分驗證</p>
+        </div>
+      </div>
+      <div id="syncStatusBadge" class="sync-badge synced">
+        <span class="badge-dot dot-green"></span> 數據已同步
+      </div>
+    </header>
+
+    <!-- ====================================================================
+         SCREEN 1: Roster Selection & Student Identity Verification
+         ==================================================================== -->
+    <!-- ====================================================================
+         SCREEN 1: Face Capture & Identification Screen
+         第一頁：僅照片刷臉，不顯其他內容
+         ==================================================================== -->
+    <section id="screen1-roster" class="screen-container active">
+      <div class="card" id="cardFaceFirstLogin">
+        <h2 class="card-title"><span>📷</span> 智能刷臉秒速登入</h2>
+        <p class="card-subtitle">正對鏡頭並眨眨眼，系統將自動比對人臉特徵庫並直接登入。</p>
+
+        <!-- Live Camera Viewport -->
+        <div id="faceFirstCameraWrapper" class="camera-wrapper" style="max-height: 240px; margin-bottom: 12px;">
+          <video id="faceFirstVideo" class="camera-video" playsinline autoplay muted></video>
+          <div class="camera-oval-guide"></div>
+          <div id="faceFirstOverlay" class="camera-status-overlay">📷 點擊下方按鈕啟動刷臉辨識</div>
+        </div>
+
+        <!-- Realtime Status Alert -->
+        <div id="faceFirstAlert" class="alert-box" style="display: none; margin-bottom: 12px;"></div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button id="btnFaceFirstStart" class="btn btn-primary" style="flex: 1;">
+            <span>📷 啟動相機識別</span>
+          </button>
+          <button id="btnFaceFirstCapture" class="btn btn-success" style="flex: 1; display: none;">
+            <span>🔍 拍照識別身分</span>
+          </button>
+        </div>
+
+        <div style="text-align: center; margin-top: 14px;">
+          <a href="javascript:void(0)" id="linkGoToManualPage" style="font-size: 13px; color: var(--primary); text-decoration: underline;">
+            首次登入或無法刷臉？前往身分選擇 ➜
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCREEN 2: Student Identity Confirmation & Selection Screen
+         第二頁：第二次登錄直接顯示確認按鈕；首次登錄顯示姓名班別選擇
+         ==================================================================== -->
+    <section id="screen-name-confirm" class="screen-container">
+      <!-- 視圖 A：第二次登錄（老生模式 - 不顯示選擇，直接顯示確認按鈕） -->
+      <div class="card" id="cardReturningConfirm" style="text-align: center; padding: 24px 16px; display: none;">
+        <div style="font-size: 44px; margin-bottom: 12px;">🎉</div>
+        <h2 class="card-title" style="justify-content: center; font-size: 20px;">
+          <span>學生身分確認</span>
+        </h2>
+        <p class="card-subtitle" style="margin-bottom: 16px;">刷臉身分核驗成功！歡迎回來</p>
+
+        <div class="confirm-welcome-box">
+          <h3 id="confirmWelcomeGreeting" class="confirm-welcome-title">
+            歡迎 <span id="confirmStudentClass">4C</span> 班 <span id="confirmStudentID">17</span> 號 <span id="confirmStudentName">陳芷澄</span> 同學！
+          </h3>
+          <p id="confirmStudentDetails" class="confirm-student-meta">
+            1:N 人臉特徵比對通過 · 活體驗證完成
+          </p>
+          <div id="confirmGradeBadge" class="student-grade-badge" style="margin-top: 10px; display: inline-block;">
+            高一題庫
+          </div>
+        </div>
+
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+          系統已為您備妥測驗題目，點擊下方按鈕即可直接開始答題。
+        </p>
+
+        <!-- Direct-to-Quiz Action Button -->
+        <button id="btnEnterQuiz" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 16px; margin-bottom: 10px;">
+          <span>🚀 確認身分，直接進入答題</span>
+        </button>
+
+        <!-- Manual self-selection button if misidentified (Crucial for first-time or misrecognized students) -->
+        <button id="btnManualSelectSelf" class="btn btn-outline" style="width: 100%; padding: 12px; font-size: 15px; margin-bottom: 10px; border: 1.5px solid var(--primary); color: var(--primary); background: #f0f7ff; font-weight: 600; cursor: pointer;">
+          <span id="btnNotMe">👤 不是本人 / 非本人？手動選擇我的真實姓名（更正身分 / 密碼登錄）</span>
+        </button>
+
+        <!-- Not me / return button -->
+        <button id="btnConfirmNotMe" class="btn btn-secondary" style="width: 100%;">
+          <span>← 重新對準鏡頭拍照識別</span>
+        </button>
+      </div>
+
+      <!-- 視圖 B：首次登錄（新生模式 - 選擇班別與姓名） -->
+      <div class="card" id="cardFirstTimeSelect" style="display: none; margin-top: 14px;">
+        <h2 class="card-title"><span>👤</span> 學生身分選擇與登記</h2>
+        <p class="card-subtitle">請在下方選擇您的班別與學號，確認姓名無誤後登記人臉並開始答題。</p>
+
+        <input type="checkbox" id="demoModeCheckbox" style="display: none;">
+
+        <!-- 第一頁拍攝之頭像縮圖預覽 -->
+        <div id="firstTimePhotoPreviewBox" style="text-align: center; margin-bottom: 14px; display: none;">
+          <img id="firstTimePhotoPreviewImg" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.15);" alt="人臉預覽">
+          <div style="font-size: 12px; color: var(--success); margin-top: 4px;">✓ 人臉照片已採集就緒</div>
+        </div>
+
+        <!-- Class Selection Dropdown -->
+        <div class="form-group">
+          <label class="form-label" for="classSelect">班別 (Class)</label>
+          <select id="classSelect" class="form-select">
+            <option value="" disabled selected>-- 請選擇班別 --</option>
+            <option value="4C">4C 班 (高一 · 29人)</option>
+            <option value="4D">4D 班 (高一 · 31人)</option>
+            <option value="5B">5B 班 (高二 · 28人)</option>
+          </select>
+        </div>
+
+        <!-- Student ID Selection Dropdown -->
+        <div class="form-group">
+          <label class="form-label" for="studentSelect">學號 (Student ID)</label>
+          <select id="studentSelect" class="form-select" disabled>
+            <option value="" disabled selected>-- 請先選擇班別 --</option>
+          </select>
+        </div>
+
+        <!-- Real-time Student Name Display Box -->
+        <div class="form-group">
+          <label class="form-label">確認學生姓名</label>
+          <div id="studentNameBox" class="student-name-box">
+            <span id="studentNameDisplay" class="student-name-text">請選擇班別與學號</span>
+            <span id="gradeBadgeDisplay" class="student-grade-badge" style="display: none;">高一</span>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <button id="btnConfirmIdentity" class="btn btn-primary" style="width: 100%; margin-top: 8px;" disabled>
+          <span>🔒 確認身分並綁定人臉，開始答題</span>
+        </button>
+
+        <!-- Return to Screen 1 Button -->
+        <button id="btnBackToFaceFirst" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">
+          <span>← 返回第一頁拍照</span>
+        </button>
+
+        <!-- Clear Local Cache link for testing/resetting device -->
+        <div style="text-align: center; margin-top: 14px;">
+          <a href="javascript:void(0)" id="linkClearLocalData" style="font-size: 12px; color: var(--text-muted); text-decoration: underline;">
+            🛠️ 測試專用：清空此設備的本機人臉與暫存緩存
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCREEN 2: First-time Face Registration & Identity Lock
+         ==================================================================== -->
+    <section id="screen2-register" class="screen-container">
+      <div class="card">
+        <h2 class="card-title"><span>📸</span> 首次登入：拍照登記身分</h2>
+        <p class="card-subtitle">請將面部正對鏡頭置於引導線中央，點擊拍照完成身分登記。</p>
+
+        <!-- Live Camera Viewport -->
+        <div id="cameraViewport" class="camera-wrapper">
+          <video id="webcamVideo" class="camera-video" playsinline autoplay muted></video>
+          <div class="camera-oval-guide"></div>
+          <div id="cameraStatusOverlay" class="camera-status-overlay">📷 正在啟動前置相機...</div>
+        </div>
+
+        <!-- Camera Actions -->
+        <button id="btnCaptureFace" class="btn btn-primary" style="margin-bottom: 12px;">
+          <span>📷 拍照確認身分</span>
+        </button>
+
+        <!-- Verification Snapshot Preview Card (Hidden until captured) -->
+        <div id="registrationPreviewCard" class="preview-card" style="display: none;">
+          <h3 style="font-size: 15px; margin-bottom: 8px; color: var(--text-highlight);">
+            ✓ 照片拍攝成功！請核對身分資料
+          </h3>
+          <img id="previewSnapshotImg" class="preview-snapshot-img" alt="Captured Face Snapshot">
+          
+          <div class="verify-details-list">
+            <div class="verify-item">
+              <span class="verify-item-label">學生姓名</span>
+              <span id="previewStudentName" class="verify-item-value">--</span>
+            </div>
+            <div class="verify-item">
+              <span class="verify-item-label">班別 / 學號</span>
+              <span id="previewClassAndId" class="verify-item-value">--</span>
+            </div>
+            <div class="verify-item">
+              <span class="verify-item-label">身分驗證碼</span>
+              <span id="previewVectorHash" class="verify-item-value">--</span>
+            </div>
+            <div class="verify-item">
+              <span class="verify-item-label">照片壓縮大小</span>
+              <span id="previewPhotoSize" class="verify-item-value">-- KB</span>
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button id="btnRetakeFace" class="btn btn-secondary">
+              <span>🔄 重新拍攝</span>
+            </button>
+            <button id="btnConfirmAndLock" class="btn btn-success">
+              <span>🔒 確認無誤並完成登記</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Back to Screen 1 Button -->
+        <button id="btnBackToScreen1" class="btn btn-secondary" style="margin-top: 8px;">
+          <span>← 返回選擇身分</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCREEN 3: Secondary Face Login Verification (M3 Foundation)
+         ==================================================================== -->
+    <section id="screen3-reauth" class="screen-container">
+      <div class="card">
+        <h2 class="card-title"><span>🛡️</span> 刷臉登入身分驗證</h2>
+        <p class="card-subtitle">請正對鏡頭進行身分驗證以登入系統。</p>
+
+        <div class="camera-wrapper">
+          <video id="reauthWebcamVideo" class="camera-video" playsinline autoplay muted></video>
+          <div class="camera-oval-guide"></div>
+        </div>
+
+        <div class="similarity-meter-box">
+          <div style="display: flex; justify-content: space-between; font-size: 13px;">
+            <span>身分吻合度：</span>
+            <span id="reauthSimilarityText" style="font-weight: 700; color: var(--text-highlight);">等待驗證...</span>
+          </div>
+          <div class="similarity-bar-bg">
+            <div id="reauthSimilarityBar" class="similarity-bar-fill"></div>
+          </div>
+          <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">請保持光線充足並正對鏡頭進行驗證</p>
+        </div>
+
+        <button id="btnReauthVerify" class="btn btn-primary" style="margin-bottom: 8px;">
+          <span>🔍 刷臉驗證並進入系統</span>
+        </button>
+        <button id="btnReauthBack" class="btn btn-secondary">
+          <span>← 更換學生身分</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCREEN 4: Student Dashboard & Grade Auto-Routing (M3/M4 Foundation)
+         ==================================================================== -->
+    <section id="screen4-dashboard" class="screen-container">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <div>
+            <h2 id="dashStudentName" style="font-size: 20px; font-weight: 700; color: var(--text-main);">同學</h2>
+            <p id="dashClassAndId" style="font-size: 13px; color: var(--text-muted);">4D 班 23 號</p>
+          </div>
+          <div id="dashGradeTag" class="student-grade-badge" style="font-size: 13px; padding: 4px 10px;">
+            高一題庫
+          </div>
+        </div>
+
+        <div class="placeholder-banner">
+          <div class="placeholder-icon">📚</div>
+          <h3 id="dashTopicTitle" style="font-size: 16px; margin-bottom: 4px; color: var(--text-highlight);">
+            高一數學 (集合、常用邏輯用語與不等式)
+          </h3>
+          <p class="placeholder-text">題庫已根據您的班級自動鎖定年級，準備就緒！</p>
+        </div>
+
+        <button id="btnStartPractice" class="btn btn-primary" style="margin-bottom: 10px;">
+          <span>🚀 開始隨機數學練習</span>
+        </button>
+        <button id="btnReviewWrong" class="btn btn-warning" style="margin-bottom: 10px; background: #f59e0b; border-color: #d97706; color: #ffffff;">
+          <span>📖 上一輪錯題溫習 <span id="badgeWrongCount" class="badge rounded-pill" style="display: none; margin-left: 6px; font-size: 11px; background-color: #ef4444; color: #ffffff; padding: 2px 7px;">0</span></span>
+        </button>
+        <button id="btnViewLeaderboard" class="btn btn-secondary" style="margin-bottom: 10px;">
+          <span>🏆 查看榮譽榜</span>
+        </button>
+        <button id="btnLogout" class="btn btn-secondary" style="color: var(--danger-color);">
+          <span>🚪 退出登入</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCREEN 5: Interactive Quiz Container (M4 Foundation)
+         ==================================================================== -->
+    <section id="screen5-quiz" class="screen-container">
+      <div class="card quiz-card-wrapper">
+        <div class="quiz-hud-bar">
+          <span id="quizProgressText">第 1 / 20 題</span>
+          <span id="quizQuestionTimer" class="quiz-timer-hidden" style="display: none;"><span id="quizTimerText">⏱ 00:00</span></span>
+          <button id="btnQuizBackDashboard" class="btn-text-action" style="font-size: 13px; color: var(--text-muted); cursor: pointer;">✕ 暫停返回</button>
+        </div>
+        <div id="quizQuestionContainer">
+          <div class="placeholder-banner">
+            <div class="placeholder-icon">📝</div>
+            <p class="placeholder-text">測驗互動模組載入中...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCREEN 6: 40-Min Eye Protection Overlay (M3 Foundation)
+         ==================================================================== -->
+    <div id="screen6-eyecare" class="screen-container" style="position: fixed; inset: 0; z-index: 99999; background: rgba(15,23,42,0.95); justify-content: center; align-items: center; padding: 24px;">
+      <div class="card" style="text-align: center; max-width: 360px;">
+        <div style="font-size: 40px; margin-bottom: 12px;">🌿</div>
+        <h2 style="font-size: 18px; margin-bottom: 8px; color: var(--success-color);">護眼休息提醒 (5 分鐘)</h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          您已連續專注練習滿 40 分鐘。為保護視力健康，請向窗外遠眺放鬆眼睛。
+        </p>
+        <div id="eyeCareCountdown" style="font-size: 32px; font-weight: 700; font-family: var(--font-mono); color: var(--text-highlight); margin-bottom: 16px;">
+          05:00
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         SCREEN 7: 15-Min Face Re-Auth Overlay (M3 Foundation)
+         ==================================================================== -->
+    <div id="screen7-freeze" class="screen-container" style="position: fixed; inset: 0; z-index: 99990; background: rgba(15,23,42,0.95); justify-content: center; align-items: center; padding: 24px;">
+      <div class="card" style="text-align: center; max-width: 360px;">
+        <div style="font-size: 40px; margin-bottom: 12px;">🛡️</div>
+        <h2 style="font-size: 18px; margin-bottom: 8px; color: var(--warning-color);">定時身分核驗</h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          測驗進行每滿 15 分鐘需進行本人身分確認。
+        </p>
+        <button id="btnReauthUnlock" class="btn btn-primary">
+          <span>📸 立即進行身分驗證以繼續作答</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         SCREEN 8: Real-time Leaderboard Container (M5 Foundation)
+         ==================================================================== -->
+    <section id="screen8-leaderboard" class="screen-container">
+      <div class="card">
+        <h2 class="card-title"><span>🏆</span> 數學實時榮譽榜</h2>
+        <p class="card-subtitle">每 10 分鐘自動同步最新成績榜單</p>
+        <div class="placeholder-banner">
+          <div class="placeholder-icon">🥇</div>
+          <p class="placeholder-text">榮譽榜資料載入槽位</p>
+        </div>
+        <button id="btnBackToDashboard" class="btn btn-secondary">
+          <span>← 返回練習首頁</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCREEN 9: Previous Round Wrong Questions Review (R4)
+         ==================================================================== -->
+    <section id="screen9-wrong-review" class="screen-container">
+      <div class="card" style="padding: 16px;">
+        <!-- Header -->
+        <div class="review-header">
+          <div>
+            <h2 style="font-size: 18px; font-weight: 700; color: var(--text-highlight); margin: 0;">
+              📖 上一輪錯題溫習
+            </h2>
+            <p id="reviewSubtitleText" style="font-size: 12px; color: var(--text-muted); margin: 4px 0 0 0;">
+              共計 <span id="summaryTotalWrong">0</span> 道錯題待溫習掌握
+            </p>
+          </div>
+          <button id="btnBackFromWrongReview" class="btn-text-action" style="font-size: 14px; color: var(--text-muted); cursor: pointer;" title="返回練習首頁">
+            ✕ 返回
+          </button>
+        </div>
+
+        <!-- Summary HUD -->
+        <div class="review-hud-grid">
+          <div class="stat-box review-stat-box">
+            <span id="statTotalWrong" class="stat-number" style="font-size: 18px; color: var(--danger-color);">0</span>
+            <span class="stat-label" style="font-size: 11px;">全部錯題</span>
+          </div>
+          <div class="stat-box review-stat-box">
+            <span id="statSingleWrong" class="stat-number" style="font-size: 18px; color: #60a5fa;">0</span>
+            <span class="stat-label" style="font-size: 11px;">單選題</span>
+          </div>
+          <div class="stat-box review-stat-box">
+            <span id="statMultiWrong" class="stat-number" style="font-size: 18px; color: #a78bfa;">0</span>
+            <span class="stat-label" style="font-size: 11px;">多選題</span>
+          </div>
+          <div class="stat-box review-stat-box">
+            <span id="statStepWrong" class="stat-number" style="font-size: 18px; color: #f59e0b;">0</span>
+            <span class="stat-label" style="font-size: 11px;">思維排序</span>
+          </div>
+        </div>
+
+        <!-- Filter Pills Bar -->
+        <div class="review-filter-bar">
+          <button class="filter-pill active" data-filter="all" id="filterPillAll">全部 (<span id="countFilterAll">0</span>)</button>
+          <button class="filter-pill" data-filter="single_choice" id="filterPillSingle">單選題 (<span id="countFilterSingle">0</span>)</button>
+          <button class="filter-pill" data-filter="multiple_choice" id="filterPillMulti">多選題 (<span id="countFilterMulti">0</span>)</button>
+          <button class="filter-pill" data-filter="step_order" id="filterPillStep">思維步驟排序題 (<span id="countFilterStep">0</span>)</button>
+        </div>
+
+        <!-- Actions Toolbar -->
+        <div id="wrongActionsToolbar" style="display: flex; gap: 8px; margin-bottom: 14px;">
+          <button id="btnStartWrongRetest" class="btn btn-primary" style="flex: 1; padding: 10px 14px; font-size: 14px;">
+            <span>🎯 開始錯題專項重測</span>
+          </button>
+          <button id="btnClearMasteredWrong" class="btn btn-secondary" style="padding: 10px 12px; font-size: 13px;" title="清空已重測正確的錯題">
+            <span>🧹 清除已掌握</span>
+          </button>
+        </div>
+
+        <!-- Empty State (when 0 wrong questions) -->
+        <div id="wrongEmptyState" class="placeholder-banner" style="display: none; padding: 32px 16px;">
+          <div class="placeholder-icon">🎉</div>
+          <h3 style="font-size: 16px; color: var(--success-color); margin-bottom: 6px;">太棒了！目前沒有錯題記錄</h3>
+          <p class="placeholder-text" style="font-size: 13px;">上一輪測驗無回答錯誤題目，或錯題已全數溫習掌握！</p>
+          <button id="btnEmptyStartNew" class="btn btn-primary" style="margin-top: 14px; max-width: 220px;">
+            <span>🚀 開始隨機數學練習</span>
+          </button>
+        </div>
+
+        <!-- Dynamic Cards Container -->
+        <div id="wrongQuestionsListContainer" class="wrong-questions-container">
+          <div id="wrongQuestionsList" class="wrong-questions-list" style="display: flex; flex-direction: column; gap: 14px;">
+            <!-- Dynamic wrong question cards injected here -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Anti-Screenshot Protection Overlay (R2) -->
+    <div id="screenshotWarningOverlay" class="screenshot-overlay" style="display: none;">
+      <div class="screenshot-warning-box">
+        <div style="font-size: 42px; margin-bottom: 10px;">⚠️</div>
+        <h3 style="font-size: 18px; font-weight: 700; color: #ef4444; margin-bottom: 8px;">
+          ⚠️ 偵測到截圖行為，已防護題目內容
+        </h3>
+        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">
+          為維護測驗公平性，系統已對題目內容實施保護。
+        </p>
+        <button id="btnDismissScreenshotWarning" class="btn btn-secondary" style="max-width: 220px; margin: 0 auto;">
+          <span>我已知曉並返回作答</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab-Switch 5s Countdown Auto-Kick Modal (R2) -->
+    <div id="tabSwitchWarningModal" class="tab-switch-modal" style="display: none;">
+      <div class="tab-switch-card">
+        <div class="tab-switch-icon">⚠️</div>
+        <h2 class="tab-switch-title">偵測到離開作答頁面！</h2>
+        <p class="tab-switch-desc">
+          ⚠️ 偵測到離開作答頁面！請於 <span id="tabSwitchCountdown">5</span> 秒內返回，否則將自動退出答題系統！
+        </p>
+        <div class="tab-switch-meter">
+          <div id="tabSwitchMeterBar" class="tab-switch-meter-fill"></div>
+        </div>
+        <p style="font-size: 11px; color: #64748b; margin-top: 12px;">
+          切換分頁、離開視窗或分割畫面均屬違規
+        </p>
+      </div>
+    </div>
+
+    <!-- Print Security Warning Banner (R2) -->
+    <div id="printSecurityWarning" class="print-security-warning">
+      ⚠️ 測驗保護：禁止列印或匯出題目內容！
+    </div>
+
+    <!-- ====================================================================
+         R2: 首次登入強制修改密碼彈窗 (Modal Force Change Password)
+         ==================================================================== -->
+    <div id="modalForceChangePassword" class="auth-modal-overlay" style="display: none;">
+      <div class="auth-modal-card">
+        <div style="font-size: 40px; text-align: center; margin-bottom: 8px;">🛡️</div>
+        <h3 style="text-align: center; margin-bottom: 6px; font-size: 18px; font-weight: 700; color: #f8fafc;">
+          安全提示：首次登入必須修改密碼
+        </h3>
+        <p style="text-align: center; font-size: 13px; color: #94a3b8; margin-bottom: 16px;">
+          為保障帳號安全，首次登入必須將預設密碼（1234）修改為自訂純數字密碼，完成後方可進入答題。
+        </p>
+
+        <div id="forcePasswordStudentInfo" style="background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.3); padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; font-size: 14px; text-align: center; font-weight: 600; color: #a5b4fc;">
+          <!-- e.g. 4C 班 1 號 古永晴 同學 -->
+        </div>
+
+        <div id="alertForcePasswordError" class="alert-box alert-danger" style="display: none; margin-bottom: 12px; font-size: 13px; padding: 10px; border-radius: 6px;"></div>
+
+        <div class="form-group" style="margin-bottom: 12px; text-align: left;">
+          <label class="form-label" for="inputOldPassword" style="font-size: 13px; margin-bottom: 4px; display: block; color: #cbd5e1;">原密碼（預設 1234）</label>
+          <input type="password" id="inputOldPassword" class="form-select" placeholder="請輸入原密碼 (1234)" inputmode="numeric" maxlength="20" autocomplete="off" style="width: 100%; box-sizing: border-box; background: #0f172a; color: #f8fafc; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px; text-align: left;">
+          <label class="form-label" for="inputNewPassword" style="font-size: 13px; margin-bottom: 4px; display: block; color: #cbd5e1;">設定新密碼（至少 4 位純數字）</label>
+          <input type="password" id="inputNewPassword" class="form-select" placeholder="至少 4 位純數字，不得為 1234" inputmode="numeric" maxlength="20" autocomplete="off" style="width: 100%; box-sizing: border-box; background: #0f172a; color: #f8fafc; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 18px; text-align: left;">
+          <label class="form-label" for="inputConfirmNewPassword" style="font-size: 13px; margin-bottom: 4px; display: block; color: #cbd5e1;">再次確認新密碼</label>
+          <input type="password" id="inputConfirmNewPassword" class="form-select" placeholder="請再次輸入新密碼" inputmode="numeric" maxlength="20" autocomplete="off" style="width: 100%; box-sizing: border-box; background: #0f172a; color: #f8fafc; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px;">
+        </div>
+
+        <button id="btnSubmitForcePassword" class="btn btn-primary" style="width: 100%; padding: 13px; font-size: 15px; font-weight: 600;">
+          <span>🔒 確認修改並解鎖答題</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         R3: 密碼輔助鑑別與特徵重採樣升級彈窗 (Modal Password Identification & Resampling)
+         ==================================================================== -->
+    <div id="modalPasswordAuth" class="auth-modal-overlay" style="display: none;">
+      <div class="auth-modal-card">
+        <div style="font-size: 40px; text-align: center; margin-bottom: 8px;">🔐</div>
+        <h3 id="authModalTitle" style="text-align: center; margin-bottom: 6px; font-size: 18px; font-weight: 700; color: #f8fafc;">
+          密碼二次身分驗證
+        </h3>
+        <p id="authModalSubtitle" style="text-align: center; font-size: 13px; color: #94a3b8; margin-bottom: 14px;">
+          人臉未能唯一確認。請輸入您的個人密碼進行鑑別，系統將融合更新特徵以消除後續衝突。
+        </p>
+
+        <!-- Candidate list container for ambiguous / multi-face recognition (Requirement 2) -->
+        <div id="authCandidateSection" style="margin-bottom: 14px; text-align: left; display: none;">
+          <label class="form-label" style="font-size: 13px; color: #cbd5e1; margin-bottom: 6px; display: block; font-weight: 600;">
+            偵測到多位相似特徵，請選擇最可能的本人身分：
+          </label>
+          <div id="authCandidateList" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
+            <!-- Rendered dynamically -->
+          </div>
+          <div style="text-align: right; margin-bottom: 6px;">
+            <a href="javascript:void(0)" id="linkAuthManualSelect" style="font-size: 12px; color: #60a5fa; text-decoration: underline;">
+              非以上候選人？手動選擇其他學生 ▾
+            </a>
+          </div>
+          <div id="authManualSelectFields" style="display: none; padding: 10px; background: rgba(15, 23, 42, 0.6); border-radius: 8px; border: 1px solid #334155;">
+            <div style="display: flex; gap: 8px;">
+              <select id="authClassSelect" class="form-select" style="flex: 1; padding: 8px; font-size: 13px; background: #0f172a; color: #f8fafc; border: 1px solid #334155; border-radius: 6px;">
+                <option value="" disabled selected>-- 選擇班別 --</option>
+                <option value="4C">4C 班</option>
+                <option value="4D">4D 班</option>
+                <option value="5B">5B 班</option>
+              </select>
+              <select id="authStudentSelect" class="form-select" disabled style="flex: 1.5; padding: 8px; font-size: 13px; background: #0f172a; color: #f8fafc; border: 1px solid #334155; border-radius: 6px;">
+                <option value="" disabled selected>-- 選擇學號 --</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="authStudentInfo" style="background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.3); padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; font-size: 14px; text-align: center; font-weight: 600; color: #a5b4fc;">
+          <!-- e.g. 4D 班 7 號 李語鵑 同學 -->
+        </div>
+
+        <div id="alertPasswordAuthError" class="alert-box alert-danger" style="display: none; margin-bottom: 12px; font-size: 13px; padding: 10px; border-radius: 6px;"></div>
+
+        <div class="form-group" style="margin-bottom: 12px; text-align: left;">
+          <label class="form-label" for="inputAuthPassword" style="font-size: 13px; margin-bottom: 4px; display: block; color: #cbd5e1;">個人密碼</label>
+          <input type="password" id="inputAuthPassword" class="form-select" placeholder="請輸入個人密碼（預設 1234 或已改密碼）" inputmode="numeric" maxlength="20" autocomplete="off" style="width: 100%; box-sizing: border-box; background: #0f172a; color: #f8fafc; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px;">
+        </div>
+
+        <div style="margin-bottom: 14px; text-align: left; font-size: 13px; color: #cbd5e1;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="chkAuthChangePassword" style="width: 16px; height: 16px; accent-color: var(--primary);">
+            <span>同時修改新密碼</span>
+          </label>
+        </div>
+
+        <div id="authChangePasswordFields" style="display: none; border-top: 1px dashed #334155; padding-top: 12px; margin-bottom: 14px; text-align: left;">
+          <div class="form-group" style="margin-bottom: 10px;">
+            <label class="form-label" for="inputAuthNewPassword" style="font-size: 13px; margin-bottom: 4px; display: block; color: #cbd5e1;">設定新密碼（至少 4 位純數字）</label>
+            <input type="password" id="inputAuthNewPassword" class="form-select" placeholder="至少 4 位純數字，不得為 1234" inputmode="numeric" maxlength="20" autocomplete="off" style="width: 100%; box-sizing: border-box; background: #0f172a; color: #f8fafc; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px;">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="inputAuthConfirmPassword" style="font-size: 13px; margin-bottom: 4px; display: block; color: #cbd5e1;">確認新密碼</label>
+            <input type="password" id="inputAuthConfirmPassword" class="form-select" placeholder="再次輸入新密碼" inputmode="numeric" maxlength="20" autocomplete="off" style="width: 100%; box-sizing: border-box; background: #0f172a; color: #f8fafc; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px;">
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button id="btnCancelPasswordAuth" class="btn btn-secondary" style="flex: 1; padding: 12px;">
+            <span>取消</span>
+          </button>
+          <button id="btnSubmitPasswordAuth" class="btn btn-primary" style="flex: 2; padding: 12px; font-weight: 600;">
+            <span>🔒 驗證並更新特徵</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div> <!-- /mobile-app-shell -->
+
+  <!-- Floating Global Refresh Button (#btnGlobalRefresh) -->
+  <button id="btnGlobalRefresh" class="floating-refresh-btn" title="刷新頁面 (保留進度)" aria-label="刷新頁面 (保留進度)">
+    <i class="fa-solid fa-rotate-right refresh-icon"></i>
+    <span class="refresh-label">刷新頁面 (保留進度)</span>
+  </button>
+
+  <!-- Application Modules -->
+  <script src="js/roster.js"></script>
+  <script src="js/admin_snapshot.js"></script>
+  <script src="js/face_auth.js"></script>
+  <script src="js/persistence.js"></script>
+  <script src="js/questions_g10.js"></script>
+  <script src="js/questions_g11.js"></script>
+  <script src="js/timers.js"></script>
+  <script src="js/quiz_engine.js"></script>
+  <script src="js/leaderboard.js"></script>
+
+  <!-- Main SPA Controller Script -->
+  <script>
+    (function () {
+      'use strict';
+
+      // SPA State
+      const AppState = {
+        currentClass: "",
+        currentStudentId: null,
+        currentStudentName: "",
+        currentGradeInfo: null,
+        capturedSnapshot: null, // { descriptor, imageBase64, sizeKb }
+        lastCapturedSnapshot: null,
+        pendingRegistrationDescriptor: null,
+        pendingRegistrationSnapshot: null,
+        isAmbiguousScan: false,
+        isUnrecognizedScan: false,
+        isPasswordAuthMode: false,
+        isPasswordAuthenticated: false,
+        pendingActionAfterPasswordChange: null,
+        pendingActionAfterPasswordAuth: null
+      };
+
+      // DOM Elements - Screen 1 Face-First 1:N
+      const cardFaceFirstLogin = document.getElementById("cardFaceFirstLogin");
+      const faceFirstVideo = document.getElementById("faceFirstVideo");
+      const faceFirstOverlay = document.getElementById("faceFirstOverlay");
+      const faceFirstAlert = document.getElementById("faceFirstAlert");
+      const btnFaceFirstStart = document.getElementById("btnFaceFirstStart");
+      const btnFaceFirstCapture = document.getElementById("btnFaceFirstCapture");
+      const linkGoToManualPage = document.getElementById("linkGoToManualPage");
+
+      // DOM Elements - Screen 2 Confirm & Select (screen-name-confirm)
+      const screenNameConfirm = document.getElementById("screen-name-confirm");
+      const cardReturningConfirm = document.getElementById("cardReturningConfirm");
+      const cardFirstTimeSelect = document.getElementById("cardFirstTimeSelect");
+      const firstTimePhotoPreviewBox = document.getElementById("firstTimePhotoPreviewBox");
+      const firstTimePhotoPreviewImg = document.getElementById("firstTimePhotoPreviewImg");
+      const btnBackToFaceFirst = document.getElementById("btnBackToFaceFirst");
+      const linkClearLocalData = document.getElementById("linkClearLocalData");
+
+      const confirmWelcomeGreeting = document.getElementById("confirmWelcomeGreeting");
+      const confirmStudentClass = document.getElementById("confirmStudentClass");
+      const confirmStudentID = document.getElementById("confirmStudentID");
+      const confirmStudentName = document.getElementById("confirmStudentName");
+      const confirmGradeBadge = document.getElementById("confirmGradeBadge");
+      const btnEnterQuiz = document.getElementById("btnEnterQuiz");
+      const btnManualSelectSelf = document.getElementById("btnManualSelectSelf");
+      const btnConfirmNotMe = document.getElementById("btnConfirmNotMe");
+
+      const classSelect = document.getElementById("classSelect");
+      const studentSelect = document.getElementById("studentSelect");
+      const studentNameDisplay = document.getElementById("studentNameDisplay");
+      const gradeBadgeDisplay = document.getElementById("gradeBadgeDisplay");
+      const btnConfirmIdentity = document.getElementById("btnConfirmIdentity");
+      const btnGlobalRefresh = document.getElementById("btnGlobalRefresh");
+
+      // R2 & R3 Modal Elements
+      const modalForceChangePassword = document.getElementById("modalForceChangePassword");
+      const forcePasswordStudentInfo = document.getElementById("forcePasswordStudentInfo");
+      const alertForcePasswordError = document.getElementById("alertForcePasswordError");
+      const inputOldPassword = document.getElementById("inputOldPassword");
+      const inputNewPassword = document.getElementById("inputNewPassword");
+      const inputConfirmNewPassword = document.getElementById("inputConfirmNewPassword");
+      const btnSubmitForcePassword = document.getElementById("btnSubmitForcePassword");
+
+      const modalPasswordAuth = document.getElementById("modalPasswordAuth");
+      const authStudentInfo = document.getElementById("authStudentInfo");
+      const alertPasswordAuthError = document.getElementById("alertPasswordAuthError");
+      const inputAuthPassword = document.getElementById("inputAuthPassword");
+      const chkAuthChangePassword = document.getElementById("chkAuthChangePassword");
+      const authChangePasswordFields = document.getElementById("authChangePasswordFields");
+      const inputAuthNewPassword = document.getElementById("inputAuthNewPassword");
+      const inputAuthConfirmPassword = document.getElementById("inputAuthConfirmPassword");
+      const btnCancelPasswordAuth = document.getElementById("btnCancelPasswordAuth");
+      const btnSubmitPasswordAuth = document.getElementById("btnSubmitPasswordAuth");
+
+      // Screen 2 elements
+      const webcamVideo = document.getElementById("webcamVideo");
+      const cameraStatusOverlay = document.getElementById("cameraStatusOverlay");
+      const btnCaptureFace = document.getElementById("btnCaptureFace");
+      const registrationPreviewCard = document.getElementById("registrationPreviewCard");
+      const previewSnapshotImg = document.getElementById("previewSnapshotImg");
+      const previewStudentName = document.getElementById("previewStudentName");
+      const previewClassAndId = document.getElementById("previewClassAndId");
+      const previewVectorHash = document.getElementById("previewVectorHash");
+      const previewPhotoSize = document.getElementById("previewPhotoSize");
+      const btnRetakeFace = document.getElementById("btnRetakeFace");
+      const btnConfirmAndLock = document.getElementById("btnConfirmAndLock");
+      const btnBackToScreen1 = document.getElementById("btnBackToScreen1");
+
+      // Screen 3 & 4 elements
+      const reauthWebcamVideo = document.getElementById("reauthWebcamVideo");
+      const reauthSimilarityText = document.getElementById("reauthSimilarityText");
+      const reauthSimilarityBar = document.getElementById("reauthSimilarityBar");
+      const btnReauthVerify = document.getElementById("btnReauthVerify");
+      const btnReauthBack = document.getElementById("btnReauthBack");
+      const dashStudentName = document.getElementById("dashStudentName");
+      const dashClassAndId = document.getElementById("dashClassAndId");
+      const dashGradeTag = document.getElementById("dashGradeTag");
+      const dashTopicTitle = document.getElementById("dashTopicTitle");
+      const btnStartPractice = document.getElementById("btnStartPractice");
+      const btnViewLeaderboard = document.getElementById("btnViewLeaderboard");
+      const btnLogout = document.getElementById("btnLogout");
+      const btnBackToDashboard = document.getElementById("btnBackToDashboard");
+
+      // Screen Navigation
+      function showScreen(screenId) {
+        document.querySelectorAll(".screen-container").forEach(function (el) {
+          el.classList.remove("active");
+        });
+        const target = document.getElementById(screenId);
+        if (target) {
+          target.classList.add("active");
+        }
+        if (screenId === "screen8-leaderboard" && window.LeaderboardManager && typeof window.LeaderboardManager.renderLeaderboardUI === 'function') {
+          window.LeaderboardManager.renderLeaderboardUI();
+        }
+      }
+
+      // Initialize Face API & Preload models asynchronously
+      window.addEventListener("DOMContentLoaded", async function () {
+        console.log("[App] Initializing Mobile Math Platform SPA...");
+        try {
+          if (window.initFaceApi) {
+            window.initFaceApi().catch(function (e) {
+              console.warn("[App] Face API init error:", e);
+            });
+          }
+        } catch (e) {}
+
+        // Bind Sync status listener
+        if (window.OfflineSyncManager) {
+          window.OfflineSyncManager.subscribe(function (status) {
+            console.log("[App] Sync Manager status changed:", status);
+          });
+        }
+
+        // Asynchronously synchronize all cloud registered faces from Google Sheet
+        if (window.syncAllProfilesFromSheet) {
+          window.syncAllProfilesFromSheet().then(function (res) {
+            console.log("[App] Cloud face profiles synchronized:", res);
+            if (classSelect && classSelect.value) {
+              updateStudentDropdown(classSelect.value);
+            }
+          }).catch(function (e) {
+            console.warn("[App] Background cloud face sync error:", e);
+          });
+        }
+
+        // Setup AntiCheatTimers.restore capability
+        if (window.AntiCheatTimers && !window.AntiCheatTimers.restore) {
+          let timerOffsets = { practice: 0, question: 0, total: 0 };
+          const origGetPractice = window.AntiCheatTimers.getPracticeElapsedSeconds;
+          const origGetQuestion = window.AntiCheatTimers.getQuestionElapsedSeconds;
+          const origGetTotal = window.AntiCheatTimers.getTotalSessionSeconds;
+          const origReset = window.AntiCheatTimers.reset;
+          const origResetQuestion = window.AntiCheatTimers.resetQuestionTimer;
+
+          function formatMMSS(sec) {
+            const s = Math.max(0, Math.floor(sec));
+            const m = Math.floor(s / 60);
+            const rem = s % 60;
+            return String(m).padStart(2, '0') + ':' + String(rem).padStart(2, '0');
+          }
+
+          window.AntiCheatTimers.restore = function (timerState) {
+            if (!timerState) return;
+            timerOffsets.practice = Number(timerState.practiceElapsedSeconds) || 0;
+            timerOffsets.question = Number(timerState.questionElapsedSeconds) || 0;
+            timerOffsets.total = Number(timerState.totalSessionSeconds) || 0;
+
+            const el = document.getElementById('quizTimerText');
+            if (el) {
+              el.textContent = '⏱ ' + formatMMSS(window.AntiCheatTimers.getQuestionElapsedSeconds());
+            }
+          };
+
+          window.AntiCheatTimers.getPracticeElapsedSeconds = function () {
+            return (origGetPractice ? origGetPractice.call(window.AntiCheatTimers) : 0) + timerOffsets.practice;
+          };
+          window.AntiCheatTimers.getQuestionElapsedSeconds = function () {
+            return (origGetQuestion ? origGetQuestion.call(window.AntiCheatTimers) : 0) + timerOffsets.question;
+          };
+          window.AntiCheatTimers.getTotalSessionSeconds = function () {
+            return (origGetTotal ? origGetTotal.call(window.AntiCheatTimers) : 0) + timerOffsets.total;
+          };
+          window.AntiCheatTimers.reset = function () {
+            timerOffsets = { practice: 0, question: 0, total: 0 };
+            if (origReset) origReset.call(window.AntiCheatTimers);
+          };
+          window.AntiCheatTimers.resetQuestionTimer = function () {
+            timerOffsets.question = 0;
+            if (origResetQuestion) origResetQuestion.call(window.AntiCheatTimers);
+          };
+
+          window.AntiCheatTimers.setCallbacks({
+            onTick: function () {
+              const el = document.getElementById('quizTimerText');
+              if (el && timerOffsets.question > 0) {
+                el.textContent = '⏱ ' + formatMMSS(window.AntiCheatTimers.getQuestionElapsedSeconds());
+              }
+              const totalPractice = window.AntiCheatTimers.getPracticeElapsedSeconds();
+              if (timerOffsets.practice > 0 && totalPractice > 0 && totalPractice % 900 === 0) {
+                if (window.AntiCheatTimers.triggerReauth && !window.AntiCheatTimers.isReauthActive() && !window.AntiCheatTimers.isEyeBreakActive()) {
+                  window.AntiCheatTimers.triggerReauth();
+                }
+              }
+            }
+          });
+        }
+
+        // Restore active quiz progress from LocalStorage if present (R3 Global Refresh Recovery)
+        const savedProgressRaw = localStorage.getItem("MATH_ACTIVE_QUIZ_PROGRESS");
+        if (savedProgressRaw) {
+          try {
+            const savedData = JSON.parse(savedProgressRaw);
+            if (savedData && savedData.classID && savedData.studentID && Array.isArray(savedData.questionIds) && savedData.questionIds.length > 0) {
+              console.log("[App] Restoring active quiz progress from snapshot:", savedData);
+              AppState.currentClass = savedData.classID;
+              AppState.currentStudentId = savedData.studentID;
+              AppState.currentStudentName = savedData.studentName || "";
+              AppState.currentGradeInfo = window.getGradeByClass ? window.getGradeByClass(savedData.classID) : null;
+
+              if (window.AntiCheatTimers) {
+                window.AntiCheatTimers.reset();
+                if (typeof window.AntiCheatTimers.restore === 'function') {
+                  window.AntiCheatTimers.restore(savedData.timerState);
+                }
+              }
+
+              if (window.QuizEngine && typeof window.QuizEngine.resumeQuiz === 'function') {
+                window.QuizEngine.resumeQuiz(savedData);
+                showScreen("screen5-quiz");
+              }
+            }
+          } catch (err) {
+            console.warn("[App] Error recovering quiz progress:", err);
+          }
+        }
+      });
+
+      // ====================================================================
+      // Screen 1: Face-First 1:N Facial Recognition & Liveness Controller
+      // ====================================================================
+      let faceFirstBlinkTracker = null;
+      let isFaceFirstScanning = false;
+      let faceFirstCameraSeq = 0;
+
+      async function startFaceFirstCamera(isAutoStart) {
+        if (!btnFaceFirstStart) return;
+        if (isAutoStart) {
+          try {
+            if (window.location && window.location.search) {
+              const urlParams = new URLSearchParams(window.location.search);
+              if (urlParams.get('test_bypass_probe') === '1' || urlParams.get('test_disable_autocamera') === '1') {
+                return;
+              }
+            }
+          } catch (e) {}
+        }
+        const currentSeq = ++faceFirstCameraSeq;
+        if (!isAutoStart) {
+          btnFaceFirstStart.disabled = true;
+          btnFaceFirstStart.innerHTML = "<span>⏳ 正在開啟前置鏡頭...</span>";
+        }
+        if (faceFirstOverlay) faceFirstOverlay.textContent = "📷 正在連接鏡頭，請正面面向鏡頭...";
+        try {
+          if (window.startCamera) {
+            await window.startCamera(faceFirstVideo);
+            if (currentSeq !== faceFirstCameraSeq) return;
+            if (faceFirstVideo && faceFirstVideo.srcObject && (!window.isCameraRunning || window.isCameraRunning())) {
+              if (faceFirstOverlay) faceFirstOverlay.textContent = "🟢 相機運作中 · 請面向鏡頭並眨眼以進行活體檢測";
+              btnFaceFirstStart.style.display = "none";
+              if (btnFaceFirstCapture) btnFaceFirstCapture.style.display = "inline-flex";
+              startLivenessAnd1toN();
+            } else {
+              if (faceFirstOverlay) faceFirstOverlay.textContent = "⚠️ 請允許相機權限以進行身分驗證";
+              if (!isAutoStart) alert("⚠️ 請允許相機權限以進行身分驗證");
+              btnFaceFirstStart.style.display = "inline-flex";
+              btnFaceFirstStart.disabled = false;
+              btnFaceFirstStart.innerHTML = "<span>📷 啟動相機識別</span>";
+            }
+          }
+        } catch (err) {
+          if (currentSeq !== faceFirstCameraSeq) return;
+          if (faceFirstOverlay) faceFirstOverlay.textContent = "⚠️ 請允許相機權限以進行身分驗證";
+          if (!isAutoStart) alert("⚠️ 請允許相機權限以進行身分驗證");
+          btnFaceFirstStart.style.display = "inline-flex";
+          btnFaceFirstStart.disabled = false;
+          btnFaceFirstStart.innerHTML = "<span>📷 啟動相機識別</span>";
+        }
+      }
+
+      function startLivenessAnd1toN() {
+        if (window.startBlinkDetection && faceFirstVideo) {
+          if (faceFirstBlinkTracker) faceFirstBlinkTracker.stop();
+          faceFirstBlinkTracker = window.startBlinkDetection(faceFirstVideo, {
+            onBlink: function (blinkData) {
+              console.log("[FaceFirst] Blink detected! Liveness passed:", blinkData);
+              if (!isFaceFirstScanning) {
+                executeFaceFirstScan('liveness_loop');
+              }
+            },
+            onStatusUpdate: function (status) {
+              if (isFaceFirstScanning) return;
+              if (faceFirstOverlay) {
+                if (status.isFaceDetected) {
+                  faceFirstOverlay.textContent = "🟢 偵測到面孔 · 請眨眨眼完成活體驗證";
+                } else {
+                  faceFirstOverlay.textContent = "🟡 請將面部置於引導線中央";
+                }
+              }
+            }
+          });
+        }
+      }
+
+      async function executeFaceFirstScan(isLiveBlinkVerified) {
+        if (isFaceFirstScanning && isLiveBlinkVerified !== 'liveness_loop') {
+          isFaceFirstScanning = false;
+        }
+        if (isFaceFirstScanning) return;
+        isFaceFirstScanning = true;
+        if (faceFirstBlinkTracker) {
+          faceFirstBlinkTracker.stop();
+          faceFirstBlinkTracker = null;
+        }
+
+        if (btnFaceFirstCapture) {
+          btnFaceFirstCapture.disabled = true;
+          btnFaceFirstCapture.innerHTML = "<span>⏳ 正在特徵比對中...</span>";
+        }
+        if (faceFirstOverlay) faceFirstOverlay.textContent = "⏳ 正在提取人臉特徵並比對資料庫...";
+
+        try {
+          const snap = await window.captureFace(faceFirstVideo);
+          const isDemoScan = (demoModeCheckbox && demoModeCheckbox.checked) ||
+            (window.FaceAuthModule && typeof window.FaceAuthModule.isDemoMode === 'function' && window.FaceAuthModule.isDemoMode());
+          if (!snap || (!isDemoScan && snap.isDemo)) {
+            alert("⚠️ 請允許相機權限以進行身分驗證");
+            isFaceFirstScanning = false;
+            if (btnFaceFirstCapture) {
+              btnFaceFirstCapture.disabled = false;
+              btnFaceFirstCapture.innerHTML = "<span>🔍 拍照識別身分</span>";
+            }
+            return;
+          }
+
+          // 1:N match against all registered student profiles
+          const profiles = window.getAllStudentProfiles ? window.getAllStudentProfiles() : [];
+          const matchResult = window.identifyFace1toN(snap.descriptor, profiles, 0.82);
+
+          const isAmbiguous = (matchResult.status === "AMBIGUOUS_MARGIN") ||
+            (matchResult.delta < 0.08 && matchResult.topCandidate && matchResult.secondMatch &&
+             (matchResult.centeredSimilarity >= 0.75 || matchResult.euclideanDistance < 0.48));
+
+          if (isAmbiguous) {
+            // R2: Ambiguous security margin (Delta < 0.08): strictly prohibit auto-jumping to top student!
+            AppState.isAmbiguousScan = true;
+            AppState.isPasswordAuthMode = true;
+            AppState.pendingRegistrationDescriptor = snap.descriptor;
+            AppState.pendingRegistrationSnapshot = snap;
+            AppState.capturedSnapshot = snap;
+
+            if (window.stopCamera && faceFirstVideo) {
+              window.stopCamera(faceFirstVideo);
+            }
+            if (faceFirstBlinkTracker) {
+              faceFirstBlinkTracker.stop();
+              faceFirstBlinkTracker = null;
+            }
+
+            if (faceFirstAlert) {
+              faceFirstAlert.style.display = "block";
+              faceFirstAlert.className = "alert-box alert-warning";
+              faceFirstAlert.innerHTML = `⚠️ <strong>偵測到多位相似特徵 (無法唯一確認本人)</strong><br><small>最高匹配與次高匹配差距小於安全邊際 (Δ < 0.08)，為維護帳號安全，請在彈出視窗選擇您的姓名並輸入個人密碼完成二次驗證！</small>`;
+            }
+            if (faceFirstOverlay) faceFirstOverlay.textContent = "⚠️ 偵測到多位相似特徵 · 請輸入密碼二次驗證";
+
+            isFaceFirstScanning = false;
+            if (btnFaceFirstCapture) {
+              btnFaceFirstCapture.disabled = false;
+              btnFaceFirstCapture.innerHTML = "<span>🔍 拍照識別身分</span>";
+            }
+
+            const candidates = (matchResult.candidates && matchResult.candidates.length > 0)
+              ? matchResult.candidates
+              : [
+                  { profile: matchResult.topCandidate, centeredSim: matchResult.centeredSimilarity, percentage: matchResult.percentage },
+                  { profile: matchResult.secondMatch, centeredSim: matchResult.secondSimilarity, percentage: Math.round(Math.max(0, matchResult.secondSimilarity) * 1000) / 10 }
+                ].filter(function (c) { return !!c.profile; });
+
+            AppState.ambiguousCandidates = candidates;
+            showPasswordAuthModal(null, candidates);
+            return;
+          }
+
+          if (matchResult.isMatch && matchResult.bestMatch) {
+            // ==========================================
+            // 第二次登錄（老生）：已有人臉特徵記錄且無邊際衝突 (Δ >= 0.08)
+            // ==========================================
+            AppState.isAmbiguousScan = false;
+            AppState.isPasswordAuthMode = false;
+            const matchedStudent = matchResult.bestMatch;
+            AppState.currentClass = matchedStudent.classID;
+            AppState.currentStudentId = matchedStudent.studentID;
+            AppState.currentStudentName = matchedStudent.name;
+            AppState.currentGradeInfo = window.getGradeByClass ? window.getGradeByClass(matchedStudent.classID) : null;
+            AppState.capturedSnapshot = snap;
+
+            if (faceFirstAlert) {
+              faceFirstAlert.style.display = "block";
+              faceFirstAlert.className = "alert-box alert-success";
+              faceFirstAlert.innerHTML = `✅ <strong>識別成功！</strong> ${matchedStudent.classID} 班 ${matchedStudent.studentID} 號 ${matchedStudent.name} 同學 (相似度: ${matchResult.percentage}%)<br><small>正前往身分確認頁面...</small>`;
+            }
+            if (faceFirstOverlay) faceFirstOverlay.textContent = `🟢 驗證通過 · 歡迎 ${matchedStudent.name} 同學`;
+
+            if (window.stopCamera) window.stopCamera(faceFirstVideo);
+
+            // 第二次登錄：轉場至第二頁，直接顯示確認按鈕，不顯示下拉選單
+            setTimeout(function () {
+              showScreen2ReturningConfirm(matchedStudent, matchResult.percentage);
+              isFaceFirstScanning = false;
+            }, 450);
+          } else {
+            // ==========================================
+            // 第一次登錄（新生）：尚未建立特徵記錄
+            // ==========================================
+            AppState.isAmbiguousScan = false;
+            AppState.isPasswordAuthMode = false;
+            AppState.isUnrecognizedScan = true;
+            AppState.pendingRegistrationDescriptor = snap.descriptor;
+            AppState.pendingRegistrationSnapshot = snap;
+            AppState.capturedSnapshot = snap;
+
+            if (faceFirstAlert) {
+              faceFirstAlert.style.display = "block";
+              faceFirstAlert.className = "alert-box alert-info";
+              faceFirstAlert.innerHTML = `📸 <strong>未比對到登記特徵（未檢索到現存特徵，請進行初次註冊配對）</strong><br><small>特徵庫中暫無記錄，請在下方選擇身分與班別完成首次綁定...</small>`;
+            }
+            if (faceFirstOverlay) faceFirstOverlay.textContent = "📸 人臉已採集 · 請在下方選擇身分並完成綁定";
+
+            if (window.stopCamera) window.stopCamera(faceFirstVideo);
+
+            setTimeout(function () {
+              showScreen2FirstTimeSelect(snap);
+              isFaceFirstScanning = false;
+            }, 450);
+            if (btnFaceFirstCapture) {
+              btnFaceFirstCapture.disabled = false;
+              btnFaceFirstCapture.innerHTML = "<span>🔍 拍照識別身分</span>";
+            }
+          }
+        } catch (err) {
+          console.error("[FaceFirst] Scan error:", err);
+          if (faceFirstAlert) {
+            faceFirstAlert.style.display = "block";
+            faceFirstAlert.className = "alert-box alert-danger";
+            faceFirstAlert.textContent = "識別過程發生錯誤，請重試: " + err.message;
+          }
+          isFaceFirstScanning = false;
+          if (btnFaceFirstCapture) {
+            btnFaceFirstCapture.disabled = false;
+            btnFaceFirstCapture.innerHTML = "<span>🔍 拍照識別身分</span>";
+          }
+        }
+      }
+
+      if (btnFaceFirstStart) {
+        btnFaceFirstStart.addEventListener("click", function () {
+          startFaceFirstCamera(false);
+        });
+      }
+      if (btnFaceFirstCapture) {
+        btnFaceFirstCapture.addEventListener("click", function () {
+          executeFaceFirstScan(false);
+        });
+      }
+
+      // 第一頁前往第二頁手動選擇身分連結
+      if (linkGoToManualPage) {
+        linkGoToManualPage.addEventListener("click", function (e) {
+          e.preventDefault();
+          const snap = AppState.capturedSnapshot || AppState.pendingRegistrationSnapshot || AppState.lastCapturedSnapshot;
+          showScreen2FirstTimeSelect(snap);
+        });
+      }
+
+      // ====================================================================
+      // Screen 2: 學生身分確認頁 (雙模式視圖)
+      // ====================================================================
+
+      // 視圖 A：第二次登錄（老生模式）- 不顯示下拉選擇，直接顯示確認按鈕
+      function showScreen2ReturningConfirm(studentInfo, percentage) {
+        if (window.stopCamera && faceFirstVideo) {
+          window.stopCamera(faceFirstVideo);
+        }
+        if (faceFirstBlinkTracker) {
+          faceFirstBlinkTracker.stop();
+          faceFirstBlinkTracker = null;
+        }
+
+        showScreen("screen-name-confirm");
+
+        // 僅顯示老生身分確認卡片，隱藏新生下拉選擇卡片
+        if (cardReturningConfirm) cardReturningConfirm.style.display = "block";
+        if (cardFirstTimeSelect) cardFirstTimeSelect.style.display = "none";
+
+        const cls = studentInfo.classID || AppState.currentClass;
+        const sid = studentInfo.studentID || AppState.currentStudentId;
+        const name = studentInfo.name || studentInfo.studentName || AppState.currentStudentName;
+        const gradeInfo = window.getGradeByClass ? window.getGradeByClass(cls) : AppState.currentGradeInfo;
+
+        // 同步 AppState 學生憑據
+        AppState.currentClass = cls;
+        AppState.currentStudentId = sid;
+        AppState.currentStudentName = name;
+        AppState.currentGradeInfo = gradeInfo;
+
+        if (confirmStudentClass) confirmStudentClass.textContent = cls;
+        if (confirmStudentID) confirmStudentID.textContent = sid;
+        if (confirmStudentName) confirmStudentName.textContent = name;
+        const confirmDetails = document.getElementById("confirmStudentDetails");
+        if (confirmDetails) {
+          confirmDetails.textContent = `1:N 人臉特徵比對通過 · 相似度: ${percentage || 95}%`;
+        }
+        if (confirmGradeBadge && gradeInfo) {
+          confirmGradeBadge.textContent = `${gradeInfo.gradeName} 題庫 (${gradeInfo.gradeLevel})`;
+        }
+        if (btnEnterQuiz) {
+          btnEnterQuiz.disabled = false;
+        }
+
+        // 預填儀表板資料，維持體驗一致
+        if (dashStudentName) dashStudentName.textContent = name + " 同學";
+        if (dashClassAndId) dashClassAndId.textContent = `${cls} 班 ${sid} 號`;
+        if (dashGradeTag && gradeInfo) {
+          dashGradeTag.textContent = `${gradeInfo.gradeName} 題庫 (${gradeInfo.gradeLevel})`;
+        }
+        if (dashTopicTitle && gradeInfo) {
+          dashTopicTitle.textContent = `${gradeInfo.gradeName} 數學 · ${gradeInfo.topicTitle}`;
+        }
+      }
+
+      // 相容個別模組呼叫之別名
+      function showNameConfirmation(studentInfo) {
+        showScreen2ReturningConfirm(studentInfo, 95);
+      }
+
+      // 視圖 B：身分選擇與登記（新生或未匹配模式）
+      function showScreen2FirstTimeSelect(snapshot) {
+        if (window.stopCamera && faceFirstVideo) {
+          window.stopCamera(faceFirstVideo);
+        }
+        if (faceFirstBlinkTracker) {
+          faceFirstBlinkTracker.stop();
+          faceFirstBlinkTracker = null;
+        }
+
+        showScreen("screen-name-confirm");
+        if (cardReturningConfirm) cardReturningConfirm.style.display = "none";
+        if (cardFirstTimeSelect) cardFirstTimeSelect.style.display = "block";
+
+        const snap = snapshot || AppState.capturedSnapshot || AppState.pendingRegistrationSnapshot || AppState.lastCapturedSnapshot;
+
+        // 第一頁已拍照，顯示縮圖預覽
+        if (snap && snap.imageBase64) {
+          AppState.pendingRegistrationSnapshot = snap;
+          AppState.capturedSnapshot = snap;
+          if (firstTimePhotoPreviewBox) firstTimePhotoPreviewBox.style.display = "block";
+          if (firstTimePhotoPreviewImg) firstTimePhotoPreviewImg.src = snap.imageBase64;
+        } else {
+          if (firstTimePhotoPreviewBox) firstTimePhotoPreviewBox.style.display = "none";
+        }
+
+        if (classSelect && classSelect.value) {
+          updateStudentDropdown(classSelect.value);
+        } else if (studentSelect) {
+          studentSelect.innerHTML = '<option value="" disabled selected>-- 請先選擇班別 --</option>';
+          studentSelect.disabled = true;
+          if (studentNameDisplay) {
+            studentNameDisplay.textContent = "請選擇班別與學號";
+            studentNameDisplay.style.color = "var(--text-muted)";
+          }
+          if (gradeBadgeDisplay) gradeBadgeDisplay.style.display = "none";
+          if (btnConfirmIdentity) btnConfirmIdentity.disabled = true;
+        }
+      }
+
+      // 老生確認頁面：確認身分，直接開始答題按鈕
+      if (btnEnterQuiz) {
+        btnEnterQuiz.addEventListener("click", function () {
+          if (btnEnterQuiz.disabled) return;
+          if (!AppState.currentClass || !AppState.currentStudentId) {
+            console.warn("[App] Cannot enter quiz: missing class or student ID.");
+            showScreen("screen1-roster");
+            return;
+          }
+
+          const cls = AppState.currentClass;
+          const sid = AppState.currentStudentId;
+          const name = AppState.currentStudentName;
+
+          // Check if password has been changed (R2)
+          const pwdRec = window.getStudentPasswordRecord ? window.getStudentPasswordRecord(cls, sid) : null;
+          if (!pwdRec || !pwdRec.passwordChanged) {
+            showForceChangePasswordModal(function () {
+              btnEnterQuiz.disabled = true;
+              showScreen("screen5-quiz");
+              if (window.QuizEngine && window.QuizEngine.startQuiz) {
+                window.QuizEngine.startQuiz(cls, sid, name);
+              }
+            });
+            return;
+          }
+
+          btnEnterQuiz.disabled = true;
+          showScreen("screen5-quiz");
+          if (window.QuizEngine && window.QuizEngine.startQuiz) {
+            window.QuizEngine.startQuiz(AppState.currentClass, AppState.currentStudentId, AppState.currentStudentName);
+          }
+        });
+      }
+
+      // 老生確認頁面：非本人？手動選擇我的真實姓名（首次登記 / 更正身分）
+      if (btnManualSelectSelf) {
+        btnManualSelectSelf.addEventListener("click", function () {
+          const snap = AppState.capturedSnapshot || AppState.pendingRegistrationSnapshot || AppState.lastCapturedSnapshot;
+          if (snap) {
+            AppState.capturedSnapshot = snap;
+            AppState.pendingRegistrationSnapshot = snap;
+            AppState.lastCapturedSnapshot = snap;
+            if (snap.descriptor) {
+              AppState.pendingRegistrationDescriptor = snap.descriptor;
+            }
+          }
+          AppState.currentClass = "";
+          AppState.currentStudentId = null;
+          AppState.currentStudentName = "";
+          AppState.currentGradeInfo = null;
+          AppState.isAmbiguousScan = false;
+          AppState.isPasswordAuthMode = false;
+          AppState.isMisrecognizedCorrection = true;
+          AppState.isPasswordAuthenticated = false;
+
+          if (classSelect) classSelect.value = "";
+          if (studentSelect) {
+            studentSelect.innerHTML = '<option value="" disabled selected>-- 請先選擇班別 --</option>';
+            studentSelect.disabled = true;
+          }
+          if (studentNameDisplay) {
+            studentNameDisplay.textContent = "請選擇班別與學號";
+            studentNameDisplay.style.color = "var(--text-muted)";
+          }
+          if (gradeBadgeDisplay) gradeBadgeDisplay.style.display = "none";
+          if (btnConfirmIdentity) btnConfirmIdentity.disabled = true;
+
+          showScreen2FirstTimeSelect(snap);
+        });
+      }
+
+      // 老生確認頁面：非本人？重新對準鏡頭拍照識別按鈕
+      if (btnConfirmNotMe) {
+        btnConfirmNotMe.addEventListener("click", function () {
+          if (AppState.capturedSnapshot) {
+            AppState.lastCapturedSnapshot = AppState.capturedSnapshot;
+          }
+          AppState.currentClass = "";
+          AppState.currentStudentId = null;
+          AppState.currentStudentName = "";
+          AppState.currentGradeInfo = null;
+          AppState.isAmbiguousScan = false;
+          AppState.isPasswordAuthMode = false;
+          AppState.isMisrecognizedCorrection = false;
+          AppState.isPasswordAuthenticated = false;
+
+          if (classSelect) classSelect.value = "";
+          if (studentSelect) {
+            studentSelect.innerHTML = '<option value="" disabled selected>-- 請先選擇班別 --</option>';
+            studentSelect.disabled = true;
+          }
+          if (studentNameDisplay) {
+            studentNameDisplay.textContent = "請選擇班別與學號";
+            studentNameDisplay.style.color = "var(--text-muted)";
+          }
+          if (gradeBadgeDisplay) gradeBadgeDisplay.style.display = "none";
+          if (btnConfirmIdentity) btnConfirmIdentity.disabled = true;
+
+          showScreen("screen1-roster");
+          isFaceFirstScanning = false;
+          if (btnFaceFirstStart) {
+            btnFaceFirstStart.disabled = false;
+            btnFaceFirstStart.style.display = "inline-flex";
+            btnFaceFirstStart.innerHTML = "<span>📷 啟動相機識別</span>";
+          }
+          if (btnFaceFirstCapture) {
+            btnFaceFirstCapture.style.display = "none";
+            btnFaceFirstCapture.disabled = false;
+          }
+          if (faceFirstOverlay) {
+            faceFirstOverlay.textContent = "📷 點擊下方按鈕啟動刷臉辨識";
+          }
+          if (faceFirstAlert) {
+            faceFirstAlert.style.display = "none";
+          }
+          startFaceFirstCamera(true);
+        });
+      }
+
+      // 返回第一頁拍照按鈕
+      if (btnBackToFaceFirst) {
+        btnBackToFaceFirst.addEventListener("click", function () {
+          if (AppState.capturedSnapshot) {
+            AppState.lastCapturedSnapshot = AppState.capturedSnapshot;
+          }
+          showScreen("screen1-roster");
+          isFaceFirstScanning = false;
+          if (btnFaceFirstStart) {
+            btnFaceFirstStart.disabled = false;
+            btnFaceFirstStart.style.display = "inline-flex";
+            btnFaceFirstStart.innerHTML = "<span>📷 啟動相機識別</span>";
+          }
+          if (btnFaceFirstCapture) {
+            btnFaceFirstCapture.style.display = "none";
+            btnFaceFirstCapture.disabled = false;
+          }
+          if (faceFirstOverlay) {
+            faceFirstOverlay.textContent = "📷 點擊下方按鈕啟動刷臉辨識";
+          }
+          if (faceFirstAlert) {
+            faceFirstAlert.style.display = "none";
+          }
+          startFaceFirstCamera(true).catch(function () {});
+        });
+      }
+
+      // 清除本機緩存連結（測試用）
+      if (linkClearLocalData) {
+        linkClearLocalData.addEventListener("click", function (e) {
+          e.preventDefault();
+          if (confirm("確定要清空本機的人臉緩存與暫存資料嗎？")) {
+            localStorage.clear();
+            alert("已清空本機緩存，即將重新載入頁面。");
+            window.location.reload();
+          }
+        });
+      }
+
+      // ====================================================================
+      // 學生下拉選單生成：過濾已登記學生，動態排除，並兼容重測
+      // ====================================================================
+      function updateStudentDropdown(cls) {
+        studentSelect.innerHTML = '<option value="" disabled selected>-- 請選擇學號 --</option>';
+        studentNameDisplay.textContent = "請選擇學號";
+        studentNameDisplay.style.color = "var(--text-muted)";
+        gradeBadgeDisplay.style.display = "none";
+        btnConfirmIdentity.disabled = true;
+        AppState.currentStudentId = null;
+        AppState.currentStudentName = "";
+
+        if (!cls) {
+          studentSelect.disabled = true;
+          return;
+        }
+
+        const isAmbiguousOrReauth = AppState.isAmbiguousScan || AppState.isPasswordAuthMode || AppState.isMisrecognizedCorrection;
+
+        // 從名單模組獲取此班全體學生名單（來源於 StudentID.txt）
+        const allStudents = window.getStudentsByClass ? window.getStudentsByClass(cls) : [];
+        
+        if (allStudents.length === 0 && cls !== "5B") {
+          studentSelect.innerHTML = '<option value="" disabled selected>⚠️ 未找到此班學生名單</option>';
+          studentSelect.disabled = true;
+          return;
+        }
+
+        const unregStudents = allStudents.filter(function (s) {
+          return !(window.hasStudentProfile && window.hasStudentProfile(cls, s.id));
+        });
+
+        if (!isAmbiguousOrReauth && unregStudents.length === 0 && cls !== "5B") {
+          studentSelect.innerHTML = '<option value="" disabled selected>⚠️ 本班全部同學均已完成人臉登記</option>';
+          studentSelect.disabled = true;
+          studentNameDisplay.textContent = "本班所有學生均已建立人臉特徵";
+          studentNameDisplay.style.color = "var(--success)";
+          return;
+        }
+
+        allStudents.forEach(function (s) {
+          const hasProfile = window.hasStudentProfile && window.hasStudentProfile(cls, s.id);
+          const opt = document.createElement("option");
+          opt.value = s.id;
+          opt.textContent = `${s.id} 號 - ${s.name}` + (hasProfile ? " (已登記人臉)" : "");
+          studentSelect.appendChild(opt);
+        });
+
+        // R4: 5B 班最後額外提供專用教師測試帳號，選項文字嚴格設定為：...
+        if (cls === "5B") {
+          const teacherOpt = document.createElement("option");
+          teacherOpt.value = "99";
+          teacherOpt.textContent = "...";
+          studentSelect.appendChild(teacherOpt);
+        }
+
+        studentSelect.disabled = false;
+      }
+
+      // 班別選擇事件
+      classSelect.addEventListener("change", function () {
+        const cls = this.value;
+        AppState.currentClass = cls;
+        AppState.currentStudentId = null;
+        AppState.currentStudentName = "";
+        AppState.currentGradeInfo = window.getGradeByClass ? window.getGradeByClass(cls) : null;
+        updateStudentDropdown(cls);
+      });
+
+      // 學號選擇事件
+      studentSelect.addEventListener("change", function () {
+        if (!this.value) {
+          AppState.currentStudentId = null;
+          AppState.currentStudentName = "";
+          studentNameDisplay.textContent = "請選擇班別與學號";
+          studentNameDisplay.style.color = "var(--text-muted)";
+          gradeBadgeDisplay.style.display = "none";
+          btnConfirmIdentity.disabled = true;
+          return;
+        }
+
+        // R4: Handle teacher test account ("99" or "...")
+        if (this.value === "99" || this.value === "...") {
+          AppState.currentClass = "5B";
+          AppState.currentStudentId = 99;
+          AppState.currentStudentName = "教師測試員";
+          AppState.currentGradeInfo = window.getGradeByClass ? window.getGradeByClass("5B") : null;
+          studentNameDisplay.textContent = "5B 班 99 號 ➜ 教師測試員 同學";
+          studentNameDisplay.style.color = "#60a5fa";
+          if (gradeBadgeDisplay) {
+            gradeBadgeDisplay.textContent = "高二";
+            gradeBadgeDisplay.style.display = "inline-block";
+          }
+          btnConfirmIdentity.disabled = false;
+          const hasProfile = window.hasStudentProfile && window.hasStudentProfile("5B", 99);
+          if (hasProfile || AppState.isAmbiguousScan || AppState.isPasswordAuthMode) {
+            btnConfirmIdentity.innerHTML = "<span>🔒 密碼驗證登入</span>";
+          } else {
+            btnConfirmIdentity.innerHTML = "<span>使用剛拍攝的人臉配對並登記</span>";
+          }
+          return;
+        }
+
+        const sid = parseInt(this.value, 10);
+        AppState.currentStudentId = sid;
+        const student = window.getStudent ? window.getStudent(AppState.currentClass, sid) : null;
+
+        if (student) {
+          AppState.currentStudentName = student.name;
+          studentNameDisplay.textContent = `${AppState.currentClass} 班 ${sid} 號 ➜ ${student.name} 同學`;
+          studentNameDisplay.style.color = "#60a5fa";
+
+          if (AppState.currentGradeInfo) {
+            gradeBadgeDisplay.textContent = AppState.currentGradeInfo.gradeName;
+            gradeBadgeDisplay.style.display = "inline-block";
+          }
+
+          btnConfirmIdentity.disabled = false;
+
+          const hasProfile = window.hasStudentProfile && window.hasStudentProfile(AppState.currentClass, sid);
+          const snap = AppState.pendingRegistrationSnapshot || AppState.capturedSnapshot || AppState.lastCapturedSnapshot;
+          if (AppState.isAmbiguousScan || AppState.isPasswordAuthMode || hasProfile) {
+            btnConfirmIdentity.innerHTML = "<span>🔒 密碼驗證登入</span>";
+          } else if (snap && snap.descriptor) {
+            btnConfirmIdentity.innerHTML = "<span>🔒 密碼核驗並綁定人臉</span>";
+          } else {
+            btnConfirmIdentity.innerHTML = "<span>📸 前往拍照登記人臉</span>";
+          }
+
+          // 背景探測：若本機無此學生特徵，向雲端嘗試同步
+          if (!hasProfile && window.fetchStudentFromSheet) {
+            window.fetchStudentFromSheet(AppState.currentClass, sid).then(function (sheetData) {
+              if (sheetData && sheetData.normalizedVector) {
+                console.log("[App] Found profile in Sheet for student, syncing to localStorage...");
+                window.saveStudentProfile({
+                  classID: AppState.currentClass,
+                  studentID: sid,
+                  name: student.name,
+                  vector: sheetData.normalizedVector,
+                  photoJpgBase64: sheetData.photoJpgBase64 || "",
+                  timestamp: sheetData.timestamp || Date.now(),
+                  version: sheetData.version || 1
+                });
+              }
+            }).catch(function () {});
+          }
+        }
+      });
+
+      // 身分確認按鈕：老生跳轉至密碼驗證，新生跳轉至確認拍照鎖定頁面
+      btnConfirmIdentity.addEventListener("click", async function () {
+        if (!AppState.currentClass || !AppState.currentStudentId) return;
+
+        const hasProfile = window.hasStudentProfile && window.hasStudentProfile(AppState.currentClass, AppState.currentStudentId);
+
+        // R3: Ambiguous scan OR already registered student manual identification:
+        // Use Password-Assisted Authentication & Resampling flow (R3)
+        if (AppState.isAmbiguousScan || AppState.isPasswordAuthMode || hasProfile) {
+          showPasswordAuthModal();
+          return;
+        }
+
+        const isDemo = (demoModeCheckbox && demoModeCheckbox.checked) ||
+          (window.FaceAuthModule && typeof window.FaceAuthModule.isDemoMode === 'function' && window.FaceAuthModule.isDemoMode());
+
+        const snapshot = AppState.pendingRegistrationSnapshot || AppState.capturedSnapshot || AppState.lastCapturedSnapshot;
+
+        // 新生首次登記：導向 screen2-register 進行預覽或補拍，嚴禁死循環阻斷彈窗！
+        AppState.capturedSnapshot = snapshot;
+        showScreen("screen2-register");
+        if (previewStudentName) previewStudentName.textContent = AppState.currentStudentName;
+        if (previewClassAndId) previewClassAndId.textContent = `${AppState.currentClass} 班 ${AppState.currentStudentId} 號`;
+
+        if (snapshot && !snapshot.isDemo && snapshot.descriptor) {
+          if (previewPhotoSize) previewPhotoSize.textContent = `${snapshot.sizeKb || 28} KB`;
+          if (previewSnapshotImg) previewSnapshotImg.src = snapshot.imageBase64 || "";
+          if (registrationPreviewCard) registrationPreviewCard.style.display = "block";
+          if (webcamVideo) webcamVideo.style.display = "none";
+          if (cameraStatusOverlay) cameraStatusOverlay.style.display = "none";
+          if (btnCaptureFace) btnCaptureFace.style.display = "none";
+        } else {
+          if (registrationPreviewCard) registrationPreviewCard.style.display = "none";
+          if (btnCaptureFace) btnCaptureFace.style.display = "inline-flex";
+          if (webcamVideo) webcamVideo.style.display = "block";
+          if (typeof setupCameraForRegistration === 'function') {
+            setupCameraForRegistration();
+          }
+        }
+      });
+
+      // Screen 2: Setup camera for registration
+      async function setupCameraForRegistration() {
+        const isDemo = (demoModeCheckbox && demoModeCheckbox.checked) ||
+          (window.FaceAuthModule && typeof window.FaceAuthModule.isDemoMode === 'function' && window.FaceAuthModule.isDemoMode());
+        registrationPreviewCard.style.display = "none";
+        btnCaptureFace.style.display = "inline-flex";
+        if (isDemo) {
+          cameraStatusOverlay.textContent = "🟢 演示模式就緒 · 點擊下方拍照登記人臉";
+          return;
+        }
+        cameraStatusOverlay.textContent = "📷 正在連接鏡頭，請正面面向鏡頭...";
+        try {
+          if (window.startCamera) {
+            await window.startCamera(webcamVideo);
+            if (webcamVideo.srcObject && (!window.isCameraRunning || window.isCameraRunning())) {
+              cameraStatusOverlay.textContent = "🟢 相機運作中 · 請正面對齊引導線";
+            } else {
+              cameraStatusOverlay.textContent = "⚠️ 請允許相機權限以進行身分驗證";
+              alert("⚠️ 請允許相機權限以進行身分驗證");
+            }
+          }
+        } catch (err) {
+          cameraStatusOverlay.textContent = "⚠️ 請允許相機權限以進行身分驗證";
+          alert("⚠️ 請允許相機權限以進行身分驗證");
+        }
+      }
+
+      // Screen 2: Capture Snapshot
+      btnCaptureFace.addEventListener("click", async function () {
+        const isDemo = (demoModeCheckbox && demoModeCheckbox.checked) ||
+          (window.FaceAuthModule && typeof window.FaceAuthModule.isDemoMode === 'function' && window.FaceAuthModule.isDemoMode());
+        if (!isDemo && (!webcamVideo.srcObject || !window.isCameraRunning || !window.isCameraRunning())) {
+          alert("⚠️ 請允許相機權限以進行身分驗證");
+          return;
+        }
+
+        this.disabled = true;
+        this.innerHTML = "<span>⏳ 正在確認照片與身分資料...</span>";
+
+        try {
+          const result = await window.captureFace(webcamVideo, {
+            classID: AppState.currentClass,
+            studentID: AppState.currentStudentId,
+            studentName: AppState.currentStudentName
+          });
+
+          if (!result || (!isDemo && result.isDemo)) {
+            alert("⚠️ 請允許相機權限以進行身分驗證");
+            return;
+          }
+
+          AppState.capturedSnapshot = result;
+
+          // Display preview
+          previewSnapshotImg.src = result.imageBase64;
+          previewStudentName.textContent = AppState.currentStudentName;
+          previewClassAndId.textContent = `${AppState.currentClass} 班 ${AppState.currentStudentId} 號`;
+          previewPhotoSize.textContent = result.sizeKb;
+
+          // Compute 8-hex verification summary code
+          let hashSum = 0;
+          for (let i = 0; i < result.descriptor.length; i++) {
+            hashSum = (hashSum * 31 + Math.round(result.descriptor[i] * 10000)) & 0x7FFFFFFF;
+          }
+          previewVectorHash.textContent = "SHA256-" + hashSum.toString(16).toUpperCase().padStart(8, "0");
+
+          registrationPreviewCard.style.display = "block";
+          btnCaptureFace.style.display = "none";
+        } catch (err) {
+          alert("身分登記失敗，請重新拍攝: " + err.message);
+        } finally {
+          this.disabled = false;
+          this.innerHTML = "<span>📷 拍照確認身分</span>";
+        }
+      });
+
+      // Screen 2: Retake Face
+      btnRetakeFace.addEventListener("click", async function () {
+        registrationPreviewCard.style.display = "none";
+        btnCaptureFace.style.display = "inline-flex";
+        AppState.pendingRegistrationSnapshot = null;
+        AppState.capturedSnapshot = null;
+        await setupCameraForRegistration();
+      });
+
+      // Screen 2: Confirm and Lock Face Profile
+      btnConfirmAndLock.addEventListener("click", async function () {
+        const isDemo = (demoModeCheckbox && demoModeCheckbox.checked) ||
+          (window.FaceAuthModule && typeof window.FaceAuthModule.isDemoMode === 'function' && window.FaceAuthModule.isDemoMode());
+        if (!AppState.capturedSnapshot || (!isDemo && AppState.capturedSnapshot.isDemo)) {
+          alert("⚠️ 請允許相機權限以進行身分驗證");
+          return;
+        }
+
+        const snapshot = AppState.capturedSnapshot;
+
+        // R3: Duplicate registration defense check (similarity >= 92% alert/reject)
+        const faceAuth = window.FaceAuthModule || globalThis.FaceAuthModule;
+        if (faceAuth && typeof faceAuth.checkDuplicateFace === 'function') {
+          const allProfiles = window.getAllStudentProfiles ? window.getAllStudentProfiles() : [];
+          const dupCheck = faceAuth.checkDuplicateFace(
+            snapshot.descriptor,
+            AppState.currentClass,
+            AppState.currentStudentId,
+            allProfiles,
+            0.92
+          );
+          if (dupCheck.isDuplicate && dupCheck.duplicateStudent) {
+            if (!AppState.isPasswordAuthenticated) {
+              alert(`⚠️ 該面孔特徵已登記為其他學號，請勿重複綁定或代刷！特徵與 [${dupCheck.duplicateStudent.classID} 班 ${dupCheck.duplicateStudent.studentID} 號 ${dupCheck.duplicateStudent.name}] 相似度較高 (${dupCheck.percentage}%)。請在接下來的視窗輸入您的個人密碼（初始值 1234）以確認身分！`);
+              showPasswordAuthModal(function () {
+                btnConfirmAndLock.click();
+              });
+              this.disabled = false;
+              this.innerHTML = "<span>🔒 確認無誤並完成登記</span>";
+              return;
+            } else {
+              console.log("[Registration] Duplicate face warning bypassed: student confirmed via account password (similarity: " + dupCheck.percentage + "%).");
+            }
+          }
+        }
+
+        this.disabled = true;
+        this.innerHTML = "<span>🔒 正在確認身分並登入...</span>";
+        try {
+          const regTimestamp = Date.now();
+          const profile = {
+            classID: AppState.currentClass,
+            studentID: AppState.currentStudentId,
+            name: AppState.currentStudentName,
+            vector: snapshot.descriptor,
+            photoJpgBase64: snapshot.imageBase64,
+            registeredAt: new Date(regTimestamp).toISOString(),
+            updatedAt: regTimestamp,
+            timestamp: regTimestamp,
+            version: 1
+          };
+
+          // 1. Save locally
+          window.saveStudentProfile(profile);
+
+          // 2. Dual persistence Channel A: Google Drive photo
+          window.uploadDrivePhoto({
+            timestamp: regTimestamp,
+            version: 1,
+            folderId: "1oY52JyAqLLQQiETq8A-hre9jZ_goLHiY",
+            classID: AppState.currentClass,
+            studentID: AppState.currentStudentId,
+            studentName: AppState.currentStudentName,
+            imageBase64: snapshot.imageBase64,
+            tag: "REGISTRATION"
+          }).catch(function (e) {
+            console.warn("[App] Drive photo upload background error:", e);
+          });
+
+          // 3. Dual persistence Channel B: Google Form vector
+          const serializedVector = window.serializeDescriptorWithTimestamp
+            ? window.serializeDescriptorWithTimestamp(snapshot.descriptor, regTimestamp, 1)
+            : (window.serializeDescriptor ? window.serializeDescriptor(snapshot.descriptor) : "");
+          window.submitFormRecord({
+            classID: AppState.currentClass,
+            studentID: AppState.currentStudentId,
+            dateID: serializedVector,
+            scoreTag: "REGISTRATION_v1_" + regTimestamp,
+            timestamp: regTimestamp,
+            version: 1
+          }).catch(function (e) {
+            console.warn("[App] Form vector record background error:", e);
+          });
+
+          // Stop camera stream
+          if (window.stopCamera) {
+            window.stopCamera(webcamVideo);
+          }
+
+          // Populate dashboard info for session continuity
+          if (dashStudentName) dashStudentName.textContent = AppState.currentStudentName + " 同學";
+          if (dashClassAndId) dashClassAndId.textContent = `${AppState.currentClass} 班 ${AppState.currentStudentId} 號`;
+          const gradeInfo = AppState.currentGradeInfo || (window.getGradeByClass ? window.getGradeByClass(AppState.currentClass) : null);
+          if (gradeInfo) {
+            if (dashGradeTag) dashGradeTag.textContent = `${gradeInfo.gradeName} 題庫 (${gradeInfo.gradeLevel})`;
+            if (dashTopicTitle) dashTopicTitle.textContent = `${gradeInfo.gradeName} 數學 · ${gradeInfo.topicTitle}`;
+          }
+
+          AppState.pendingRegistrationSnapshot = null;
+          AppState.pendingRegistrationDescriptor = null;
+
+          // Check if password must be forced changed (R2)
+          const pwdRec = window.getStudentPasswordRecord ? window.getStudentPasswordRecord(AppState.currentClass, AppState.currentStudentId) : null;
+          if (!pwdRec || !pwdRec.passwordChanged) {
+            this.disabled = false;
+            this.innerHTML = "<span>🔒 確認無誤並完成登記</span>";
+            showForceChangePasswordModal(function () {
+              showScreen("screen5-quiz");
+              if (window.QuizEngine && window.QuizEngine.startQuiz) {
+                window.QuizEngine.startQuiz(AppState.currentClass, AppState.currentStudentId, AppState.currentStudentName);
+              }
+            });
+            return;
+          }
+
+          showScreen("screen5-quiz");
+          if (window.QuizEngine && window.QuizEngine.startQuiz) {
+            window.QuizEngine.startQuiz(AppState.currentClass, AppState.currentStudentId, AppState.currentStudentName);
+          }
+        } catch (err) {
+          console.error("[Registration] Error confirming identity:", err);
+          alert("登記過程發生錯誤，請重試: " + err.message);
+          this.disabled = false;
+          this.innerHTML = "<span>🔒 確認無誤並完成登記</span>";
+        }
+      });
+
+      // Screen 2: Back to Screen 1
+      btnBackToScreen1.addEventListener("click", function () {
+        if (window.stopCamera) {
+          window.stopCamera(webcamVideo);
+        }
+        AppState.pendingRegistrationSnapshot = null;
+        AppState.capturedSnapshot = null;
+        showScreen("screen1-roster");
+        if (btnFaceFirstStart) {
+          btnFaceFirstStart.disabled = false;
+          btnFaceFirstStart.style.display = "inline-flex";
+          btnFaceFirstStart.innerHTML = "<span>📷 啟動相機識別</span>";
+        }
+        if (btnFaceFirstCapture) {
+          btnFaceFirstCapture.style.display = "none";
+          btnFaceFirstCapture.disabled = false;
+        }
+        if (faceFirstOverlay) {
+          faceFirstOverlay.textContent = "📷 點擊下方按鈕啟動刷臉辨識";
+        }
+        if (faceFirstAlert) {
+          faceFirstAlert.style.display = "none";
+        }
+        if (classSelect && classSelect.value) {
+          updateStudentDropdown(classSelect.value);
+        }
+        startFaceFirstCamera(true);
+      });
+
+      // Screen 3: Reauth Setup
+      async function setupCameraForReauth() {
+        reauthSimilarityText.textContent = "請點擊下方按鈕進行驗證";
+        reauthSimilarityBar.style.width = "0%";
+
+        try {
+          if (window.startCamera) {
+            await window.startCamera(reauthWebcamVideo);
+          }
+        } catch (e) {
+          alert("⚠️ 請允許相機權限以進行身分驗證");
+        }
+      }
+
+      const demoModeCheckbox = document.getElementById("demoModeCheckbox");
+      if (demoModeCheckbox) {
+        demoModeCheckbox.addEventListener("change", function () {
+          if (window.FaceAuthModule && window.FaceAuthModule.setDemoMode) {
+            window.FaceAuthModule.setDemoMode(this.checked);
+          }
+        });
+      }
+
+      // Screen 3: Reauth Verification Button
+      btnReauthVerify.addEventListener("click", async function () {
+        this.disabled = true;
+        this.innerHTML = "<span>⏳ 正在進行身分驗證...</span>";
+
+        const storedProfile = window.getStudentProfile(AppState.currentClass, AppState.currentStudentId);
+        if (!storedProfile || !storedProfile.vector) {
+          alert("未找到此學生的登記資料，請先進行拍照登記。");
+          showScreen("screen2-register");
+          this.disabled = false;
+          this.innerHTML = "<span>🔍 刷臉驗證並進入系統</span>";
+          return;
+        }
+
+        const isDemo = (demoModeCheckbox && demoModeCheckbox.checked) ||
+                       (window.FaceAuthModule && typeof window.FaceAuthModule.isDemoMode === 'function' && window.FaceAuthModule.isDemoMode());
+
+        if (!isDemo && !reauthWebcamVideo.srcObject) {
+          alert("⚠️ 請允許相機權限以進行身分驗證");
+          this.disabled = false;
+          this.innerHTML = "<span>🔍 刷臉驗證並進入系統</span>";
+          return;
+        }
+
+        let currentDescriptor;
+        const profileVersion = storedProfile.version || 1;
+        try {
+          const snap = await window.captureFace(reauthWebcamVideo, {
+            classID: AppState.currentClass,
+            studentID: AppState.currentStudentId,
+            version: profileVersion
+          });
+          currentDescriptor = snap.descriptor;
+        } catch (e) {
+          if (isDemo && window.getDemoDescriptor) {
+            currentDescriptor = window.getDemoDescriptor(AppState.currentClass, AppState.currentStudentId, true, profileVersion);
+          } else {
+            alert("⚠️ 請允許相機權限以進行身分驗證: " + (e.message || "未能擷取面部畫面"));
+            this.disabled = false;
+            this.innerHTML = "<span>🔍 刷臉驗證並進入系統</span>";
+            return;
+          }
+        }
+
+        const verifyResult = window.verifyFace(currentDescriptor, storedProfile.vector, 0.85);
+        reauthSimilarityText.textContent = `${verifyResult.percentage}% (${verifyResult.isMatch ? "驗證通過" : "未達門檻"})`;
+        reauthSimilarityBar.style.width = `${Math.min(100, verifyResult.percentage)}%`;
+
+        if (verifyResult.isMatch) {
+          reauthSimilarityBar.style.backgroundColor = "var(--success-color)";
+          reauthSimilarityText.style.color = "var(--success-color)";
+
+          if (window.stopCamera) window.stopCamera(reauthWebcamVideo);
+          enterDashboard();
+        } else {
+          reauthSimilarityBar.style.backgroundColor = "var(--danger-color)";
+          reauthSimilarityText.style.color = "var(--danger-color)";
+          alert("身分驗證未通過，請正面端坐並保持光線充足後重試！");
+          this.disabled = false;
+          this.innerHTML = "<span>🔍 刷臉驗證並進入系統</span>";
+        }
+      });
+
+      // Screen 3: Back to Roster
+      btnReauthBack.addEventListener("click", function () {
+        if (window.stopCamera) window.stopCamera(reauthWebcamVideo);
+        showScreen("screen1-roster");
+        if (btnFaceFirstStart) {
+          btnFaceFirstStart.disabled = false;
+          btnFaceFirstStart.style.display = "inline-flex";
+          btnFaceFirstStart.innerHTML = "<span>📷 啟動相機識別</span>";
+        }
+        if (btnFaceFirstCapture) {
+          btnFaceFirstCapture.style.display = "none";
+          btnFaceFirstCapture.disabled = false;
+        }
+        if (faceFirstOverlay) {
+          faceFirstOverlay.textContent = "📷 點擊下方按鈕啟動刷臉辨識";
+        }
+        if (faceFirstAlert) {
+          faceFirstAlert.style.display = "none";
+        }
+        if (classSelect && classSelect.value) {
+          updateStudentDropdown(classSelect.value);
+        }
+        startFaceFirstCamera(true);
+      });
+
+      // Enter Dashboard (Screen 4)
+      function enterDashboard() {
+        if (AppState.currentStudentName) {
+          dashStudentName.textContent = AppState.currentStudentName + " 同學";
+        }
+        if (AppState.currentClass && AppState.currentStudentId) {
+          dashClassAndId.textContent = `${AppState.currentClass} 班 ${AppState.currentStudentId} 號`;
+        }
+
+        const gradeInfo = AppState.currentGradeInfo || (window.getGradeByClass ? window.getGradeByClass(AppState.currentClass) : null);
+        if (gradeInfo) {
+          dashGradeTag.textContent = `${gradeInfo.gradeName} 題庫 (${gradeInfo.gradeLevel})`;
+          dashTopicTitle.textContent = `${gradeInfo.gradeName} 數學 · ${gradeInfo.topicTitle}`;
+        }
+
+        showScreen("screen4-dashboard");
+
+        // Update wrong questions badge on dashboard
+        if (window.QuizEngine && typeof window.QuizEngine.updateDashboardBadge === 'function') {
+          window.QuizEngine.updateDashboardBadge(AppState.currentClass, AppState.currentStudentId);
+        }
+
+        // Start 10-minute dynamic leaderboard polling
+        if (window.LeaderboardManager && window.LeaderboardManager.startPolling) {
+          window.LeaderboardManager.startPolling(AppState.currentClass, AppState.currentStudentId, AppState.currentStudentName);
+        }
+      }
+
+      // Screen 4: Actions
+      btnStartPractice.addEventListener("click", function () {
+        const cls = AppState.currentClass;
+        const sid = AppState.currentStudentId;
+        const name = AppState.currentStudentName;
+        const pwdRec = window.getStudentPasswordRecord ? window.getStudentPasswordRecord(cls, sid) : null;
+        if (!pwdRec || !pwdRec.passwordChanged) {
+          showForceChangePasswordModal(function () {
+            showScreen("screen5-quiz");
+            if (window.QuizEngine && window.QuizEngine.startQuiz) {
+              window.QuizEngine.startQuiz(cls, sid, name);
+            }
+          });
+          return;
+        }
+        showScreen("screen5-quiz");
+        if (window.QuizEngine && window.QuizEngine.startQuiz) {
+          window.QuizEngine.startQuiz(cls, sid, name);
+        }
+      });
+
+      // Screen 4 -> Screen 9 (Review Wrong Questions)
+      const btnReviewWrong = document.getElementById("btnReviewWrong");
+      if (btnReviewWrong) {
+        btnReviewWrong.addEventListener("click", function () {
+          showScreen("screen9-wrong-review");
+          if (window.QuizEngine && typeof window.QuizEngine.renderWrongReviewScreen === 'function') {
+            window.QuizEngine.renderWrongReviewScreen();
+          }
+        });
+      }
+
+      btnViewLeaderboard.addEventListener("click", function () {
+        showScreen("screen8-leaderboard");
+        if (window.LeaderboardManager && window.LeaderboardManager.renderLeaderboardUI) {
+          window.LeaderboardManager.renderLeaderboardUI();
+        }
+      });
+
+      btnBackToDashboard.addEventListener("click", function () {
+        showScreen("screen4-dashboard");
+      });
+
+      // Screen 9: Back to Dashboard
+      const btnBackFromWrongReview = document.getElementById("btnBackFromWrongReview");
+      if (btnBackFromWrongReview) {
+        btnBackFromWrongReview.addEventListener("click", function () {
+          enterDashboard();
+        });
+      }
+      const btnBackDashboardFromReview = document.getElementById("btnBackDashboardFromReview");
+      if (btnBackDashboardFromReview) {
+        btnBackDashboardFromReview.addEventListener("click", function () {
+          enterDashboard();
+        });
+      }
+
+      // Screen 9: Type filter pills
+      document.querySelectorAll(".review-filter-bar .filter-pill").forEach(function (pill) {
+        pill.addEventListener("click", function () {
+          const filter = this.getAttribute("data-filter") || "all";
+          if (window.QuizEngine && typeof window.QuizEngine.renderWrongReviewScreen === 'function') {
+            window.QuizEngine.renderWrongReviewScreen(filter);
+          }
+        });
+      });
+
+      // Screen 9: Start Wrong Questions Retest
+      const btnStartWrongRetest = document.getElementById("btnStartWrongRetest");
+      if (btnStartWrongRetest) {
+        btnStartWrongRetest.addEventListener("click", function () {
+          if (window.QuizEngine && typeof window.QuizEngine.startRetest === 'function') {
+            window.QuizEngine.startRetest();
+          }
+        });
+      }
+
+      // Screen 9: Clear Mastered Wrong Questions
+      const btnClearMasteredWrong = document.getElementById("btnClearMasteredWrong");
+      if (btnClearMasteredWrong) {
+        btnClearMasteredWrong.addEventListener("click", function () {
+          if (window.QuizEngine && typeof window.QuizEngine.clearMasteredWrongQuestions === 'function') {
+            window.QuizEngine.clearMasteredWrongQuestions();
+          }
+        });
+      }
+
+      // Screen 9: Empty State Start New
+      const btnEmptyStartNew = document.getElementById("btnEmptyStartNew");
+      if (btnEmptyStartNew) {
+        btnEmptyStartNew.addEventListener("click", function () {
+          showScreen("screen5-quiz");
+          if (window.QuizEngine && window.QuizEngine.startQuiz) {
+            window.QuizEngine.startQuiz(AppState.currentClass, AppState.currentStudentId, AppState.currentStudentName);
+          }
+        });
+      }
+
+      const btnQuizBackDashboard = document.getElementById("btnQuizBackDashboard");
+      if (btnQuizBackDashboard) {
+        btnQuizBackDashboard.addEventListener("click", function () {
+          if (window.AntiCheatTimers && window.AntiCheatTimers.pause) {
+            window.AntiCheatTimers.pause();
+          }
+          localStorage.removeItem("MATH_ACTIVE_QUIZ_PROGRESS");
+          showScreen("screen4-dashboard");
+        });
+      }
+
+      // Screen 7: Periodic Identity Re-auth Unlock
+      const btnReauthUnlock = document.getElementById("btnReauthUnlock");
+      if (btnReauthUnlock) {
+        btnReauthUnlock.addEventListener("click", async function () {
+          btnReauthUnlock.disabled = true;
+          btnReauthUnlock.innerHTML = "<span>⏳ 正在進行身分驗證...</span>";
+
+          const storedProfile = window.getStudentProfile(AppState.currentClass, AppState.currentStudentId);
+          if (!storedProfile || !storedProfile.vector) {
+            alert("未找到此學生的登記資料！");
+            btnReauthUnlock.disabled = false;
+            btnReauthUnlock.innerHTML = "<span>📸 立即進行身分驗證以繼續作答</span>";
+            return;
+          }
+
+          const isDemo = (demoModeCheckbox && demoModeCheckbox.checked) ||
+                         (window.FaceAuthModule && typeof window.FaceAuthModule.isDemoMode === 'function' && window.FaceAuthModule.isDemoMode());
+
+          if (!isDemo && (!window.isCameraRunning || !window.isCameraRunning())) {
+            alert("⚠️ 請允許相機權限以進行身分驗證");
+            btnReauthUnlock.disabled = false;
+            btnReauthUnlock.innerHTML = "<span>📸 立即進行身分驗證以繼續作答</span>";
+            return;
+          }
+
+          let currentDescriptor;
+          const profileVersion = storedProfile.version || 1;
+          try {
+            const snap = await window.captureFace(webcamVideo, {
+              classID: AppState.currentClass,
+              studentID: AppState.currentStudentId,
+              version: profileVersion
+            });
+            currentDescriptor = snap.descriptor;
+          } catch (e) {
+            if (isDemo && window.getDemoDescriptor) {
+              currentDescriptor = window.getDemoDescriptor(AppState.currentClass, AppState.currentStudentId, false, profileVersion);
+            } else {
+              alert("⚠️ 請允許相機權限以進行身分驗證: " + (e.message || "未能擷取面部畫面"));
+              btnReauthUnlock.disabled = false;
+              btnReauthUnlock.innerHTML = "<span>📸 立即進行身分驗證以繼續作答</span>";
+              return;
+            }
+          }
+
+          const verifyResult = window.verifyFace(currentDescriptor, storedProfile.vector, 0.85);
+          if (verifyResult.isMatch) {
+            if (window.AntiCheatTimers) {
+              window.AntiCheatTimers.resolveReauth(true, verifyResult.similarity);
+            }
+            if (window.submitFormRecord) {
+              window.submitFormRecord({
+                classID: AppState.currentClass,
+                studentID: AppState.currentStudentId,
+                dateID: `REVERIFY_PASS_SIM${Math.round(verifyResult.similarity * 100)}`,
+                scoreTag: "AUDIT_PASS"
+              }).catch(function () {});
+            }
+          } else {
+            alert("身分核驗未通過，請正對鏡頭重試！");
+            if (window.AntiCheatTimers) {
+              window.AntiCheatTimers.resolveReauth(false, verifyResult.similarity);
+            }
+          }
+          btnReauthUnlock.disabled = false;
+          btnReauthUnlock.innerHTML = "<span>📸 立即進行身分驗證以繼續作答</span>";
+        });
+      }
+
+      btnLogout.addEventListener("click", function () {
+        if (window.AntiCheatTimers && window.AntiCheatTimers.pause) {
+          window.AntiCheatTimers.pause();
+        }
+        localStorage.removeItem("MATH_ACTIVE_QUIZ_PROGRESS");
+        showScreen("screen1-roster");
+        isFaceFirstScanning = false;
+        if (btnFaceFirstStart) {
+          btnFaceFirstStart.disabled = false;
+          btnFaceFirstStart.style.display = "inline-flex";
+          btnFaceFirstStart.innerHTML = "<span>📷 啟動相機識別</span>";
+        }
+        if (btnFaceFirstCapture) {
+          btnFaceFirstCapture.style.display = "none";
+          btnFaceFirstCapture.disabled = false;
+        }
+        if (faceFirstOverlay) {
+          faceFirstOverlay.textContent = "📷 點擊下方按鈕啟動刷臉辨識";
+        }
+        if (faceFirstAlert) {
+          faceFirstAlert.style.display = "none";
+        }
+        if (classSelect && classSelect.value) {
+          updateStudentDropdown(classSelect.value);
+        }
+        if (AppState.currentClass && AppState.currentStudentId) {
+          const hasProfile = window.hasStudentProfile && window.hasStudentProfile(AppState.currentClass, AppState.currentStudentId);
+          if (hasProfile) {
+            btnConfirmIdentity.innerHTML = "<span>🚀 確認身分，直接開始答題</span>";
+          } else {
+            btnConfirmIdentity.innerHTML = "<span>🔒 確認身分並綁定人臉，開始答題</span>";
+          }
+        }
+      });
+
+      // Auto-refresh profile registration status on Screen 1 when window regains focus
+      window.addEventListener("focus", function () {
+        if (classSelect && classSelect.value) {
+          updateStudentDropdown(classSelect.value);
+        }
+        if (AppState.currentClass && AppState.currentStudentId) {
+          const hasProfile = window.hasStudentProfile && window.hasStudentProfile(AppState.currentClass, AppState.currentStudentId);
+          if (hasProfile) {
+            btnConfirmIdentity.innerHTML = "<span>🚀 確認身分，直接開始答題</span>";
+          } else {
+            btnConfirmIdentity.innerHTML = "<span>🔒 確認身分並綁定人臉，開始答題</span>";
+          }
+        }
+      });
+
+      // Floating Global Refresh Button Persistence Logic (R3)
+      function saveActiveQuizProgress() {
+        if (!window.QuizEngine || typeof window.QuizEngine.getState !== 'function') return false;
+        const qState = window.QuizEngine.getState();
+        if (!qState || !qState.questions || qState.questions.length === 0 || !qState.studentID) return false;
+
+        // Check if quiz is already completed or summary card is visible
+        const isCompleted = !!qState.isCompleted || (qState.currentIndex >= qState.questions.length);
+        const hasSummaryCard = document.querySelector(".quiz-summary-card") !== null;
+        if (isCompleted || hasSummaryCard) {
+          localStorage.removeItem("MATH_ACTIVE_QUIZ_PROGRESS");
+          return false;
+        }
+
+        const timerApi = window.AntiCheatTimers || window.timers;
+        const timerState = (timerApi && typeof timerApi.getState === 'function')
+          ? timerApi.getState()
+          : (timerApi ? {
+            practiceElapsedSeconds: timerApi.getPracticeElapsedSeconds ? timerApi.getPracticeElapsedSeconds() : 0,
+            questionElapsedSeconds: timerApi.getQuestionElapsedSeconds ? timerApi.getQuestionElapsedSeconds() : 0,
+            totalSessionSeconds: timerApi.getTotalSessionSeconds ? timerApi.getTotalSessionSeconds() : 0,
+            isEyeBreakActive: timerApi.isEyeBreakActive ? timerApi.isEyeBreakActive() : false,
+            isReauthActive: timerApi.isReauthActive ? timerApi.isReauthActive() : false,
+            reauthPending: timerApi.isReauthPending ? timerApi.isReauthPending() : false
+          } : { practiceElapsedSeconds: 0, questionElapsedSeconds: 0, totalSessionSeconds: 0 });
+
+        const snapshot = {
+          classID: qState.classID || AppState.currentClass,
+          studentID: qState.studentID || AppState.currentStudentId,
+          studentName: qState.studentName || AppState.currentStudentName,
+          currentIndex: qState.currentIndex || 0,
+          questionIds: qState.questions.map(function (q) { return q.id; }),
+          totalAnswered: qState.totalAnswered || 0,
+          totalCorrect: qState.totalCorrect || 0,
+          sessionHistory: qState.sessionHistory || [],
+          timerState: timerState,
+          isRetest: !!qState.isRetestMode,
+          timestamp: Date.now()
+        };
+
+        localStorage.setItem("MATH_ACTIVE_QUIZ_PROGRESS", JSON.stringify(snapshot));
+        return true;
+      }
+
+      if (btnGlobalRefresh) {
+        btnGlobalRefresh.addEventListener("click", function () {
+          saveActiveQuizProgress();
+          window.location.reload();
+        });
+      }
+
+
+
+      window.addEventListener("beforeunload", function () {
+        const activeScreen = document.querySelector(".screen-container.active");
+        if (activeScreen && activeScreen.id === "screen5-quiz") {
+          saveActiveQuizProgress();
+        }
+      });
+
+      // Google Macau Network Connectivity Probe & Lock Controller (R5)
+      const screen0MacauLock = document.getElementById("screen0-macau-lock");
+      const btnRetryMacauProbe = document.getElementById("btnRetryMacauProbe");
+      const btnRetryText = document.getElementById("btnRetryText");
+
+      async function runMacauNetworkProbe() {
+        if (!window.probeMacauNetwork) return true;
+        const isConnected = await window.probeMacauNetwork(3500);
+        if (!isConnected) {
+          if (screen0MacauLock) {
+            screen0MacauLock.style.display = "flex";
+            screen0MacauLock.classList.add("active");
+          }
+          return false;
+        } else {
+          if (screen0MacauLock) {
+            screen0MacauLock.style.display = "none";
+            screen0MacauLock.classList.remove("active");
+          }
+          return true;
+        }
+      }
+
+      if (btnRetryMacauProbe) {
+        btnRetryMacauProbe.addEventListener("click", async function () {
+          btnRetryMacauProbe.disabled = true;
+          if (btnRetryText) btnRetryText.textContent = "⏳ 正在探測澳門網絡...";
+          const ok = await runMacauNetworkProbe();
+          btnRetryMacauProbe.disabled = false;
+          if (btnRetryText) {
+            btnRetryText.textContent = ok ? "重新探測澳門網絡" : "探測失敗，點擊重新探測";
+          }
+        });
+      }
+
+      // Auto-unlock when device regains network connectivity
+      window.addEventListener("online", function () {
+        runMacauNetworkProbe();
+      });
+
+      // Trap Escape key when locked
+      window.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && screen0MacauLock && screen0MacauLock.style.display !== "none") {
+          e.preventDefault();
+        }
+      });
+
+      // Execute probe at startup
+      runMacauNetworkProbe();
+
+      // Dismiss screenshot warning (R2)
+      const btnDismissScreenshotWarning = document.getElementById("btnDismissScreenshotWarning");
+      if (btnDismissScreenshotWarning) {
+        btnDismissScreenshotWarning.addEventListener("click", function () {
+          if (window.AntiCheatTimers && window.AntiCheatTimers.dismissScreenshotProtection) {
+            window.AntiCheatTimers.dismissScreenshotProtection();
+          }
+        });
+      }
+
+      // ====================================================================
+      // R2: 首次登入強制修改密碼機制 (Force Change Password Modal)
+      // ====================================================================
+      function showForceChangePasswordModal(onSuccessCallback) {
+        AppState.pendingActionAfterPasswordChange = onSuccessCallback || null;
+        if (modalForceChangePassword) {
+          modalForceChangePassword.style.display = "flex";
+        }
+        if (forcePasswordStudentInfo) {
+          forcePasswordStudentInfo.textContent = `${AppState.currentClass} 班 ${AppState.currentStudentId} 號 ${AppState.currentStudentName} 同學`;
+        }
+        if (alertForcePasswordError) {
+          alertForcePasswordError.style.display = "none";
+          alertForcePasswordError.textContent = "";
+        }
+        if (inputOldPassword) inputOldPassword.value = "";
+        if (inputNewPassword) inputNewPassword.value = "";
+        if (inputConfirmNewPassword) inputConfirmNewPassword.value = "";
+      }
+
+      function hideForceChangePasswordModal() {
+        if (modalForceChangePassword) {
+          modalForceChangePassword.style.display = "none";
+        }
+      }
+
+      function showForcePasswordError(msg) {
+        if (alertForcePasswordError) {
+          alertForcePasswordError.style.display = "block";
+          alertForcePasswordError.textContent = "⚠️ " + msg;
+        } else {
+          alert(msg);
+        }
+      }
+
+      if (btnSubmitForcePassword) {
+        btnSubmitForcePassword.addEventListener("click", function () {
+          const cls = AppState.currentClass;
+          const sid = AppState.currentStudentId;
+          if (!cls || !sid) {
+            showForcePasswordError("請先確認班別與學號！");
+            return;
+          }
+
+          const oldPwd = inputOldPassword ? inputOldPassword.value.trim() : "";
+          const newPwd = inputNewPassword ? inputNewPassword.value.trim() : "";
+          const confirmPwd = inputConfirmNewPassword ? inputConfirmNewPassword.value.trim() : "";
+
+          // 1. Verify old password
+          if (!oldPwd) {
+            showForcePasswordError("請輸入原密碼（預設為 1234）");
+            return;
+          }
+
+          const isOldValid = window.verifyStudentPassword ? window.verifyStudentPassword(cls, sid, oldPwd) : (oldPwd === "1234");
+          if (!isOldValid) {
+            showForcePasswordError("原密碼不正確，請重新輸入！");
+            return;
+          }
+
+          // 2. Validate new password (digits only, >= 4, != 1234, match confirm)
+          if (!newPwd) {
+            showForcePasswordError("請設定新密碼");
+            return;
+          }
+
+          if (!/^\d+$/.test(newPwd)) {
+            showForcePasswordError("新密碼必須為純數字！");
+            return;
+          }
+
+          if (newPwd.length < 4) {
+            showForcePasswordError("新密碼長度至少需要 4 位數字！");
+            return;
+          }
+
+          if (newPwd === "1234") {
+            showForcePasswordError("新密碼不能與預設密碼 1234 相同！");
+            return;
+          }
+
+          if (newPwd !== confirmPwd) {
+            showForcePasswordError("兩次輸入的新密碼不一致，請重新確認！");
+            return;
+          }
+
+          // 3. Save new password to LocalStorage and cloud
+          const updateRes = window.updateStudentPassword
+            ? window.updateStudentPassword(cls, sid, oldPwd, newPwd)
+            : { success: true };
+
+          if (!updateRes || !updateRes.success) {
+            showForcePasswordError(updateRes && (updateRes.message || updateRes.reason) ? (updateRes.message || updateRes.reason) : "修改密碼失敗，請重試！");
+            return;
+          }
+
+          hideForceChangePasswordModal();
+
+          if (typeof AppState.pendingActionAfterPasswordChange === "function") {
+            const cb = AppState.pendingActionAfterPasswordChange;
+            AppState.pendingActionAfterPasswordChange = null;
+            cb();
+          } else {
+            showScreen("screen5-quiz");
+            if (window.QuizEngine && window.QuizEngine.startQuiz) {
+              window.QuizEngine.startQuiz(cls, sid, AppState.currentStudentName);
+            }
+          }
+        });
+      }
+
+      // ====================================================================
+      // R2 & R3: 密碼二次身分驗證與特徵重採樣升級彈窗 (Password Auth & Resampling Modal)
+      // ====================================================================
+      function selectAuthCandidate(cls, sid, name) {
+        AppState.currentClass = cls;
+        AppState.currentStudentId = parseInt(sid, 10);
+        AppState.currentStudentName = name;
+        AppState.currentGradeInfo = window.getGradeByClass ? window.getGradeByClass(cls) : null;
+
+        if (authStudentInfo) {
+          authStudentInfo.textContent = `${cls} 班 ${sid} 號 ${name} 同學`;
+        }
+
+        // Highlight selected candidate button
+        document.querySelectorAll(".auth-candidate-btn").forEach(function (btn) {
+          const bCls = btn.getAttribute("data-class");
+          const bSid = parseInt(btn.getAttribute("data-id"), 10);
+          if (bCls === cls && bSid === parseInt(sid, 10)) {
+            btn.style.border = "1.5px solid #6366f1";
+            btn.style.background = "rgba(99, 102, 241, 0.25)";
+            btn.style.color = "#a5b4fc";
+          } else {
+            btn.style.border = "1.5px solid #334155";
+            btn.style.background = "#0f172a";
+            btn.style.color = "#f8fafc";
+          }
+        });
+
+        if (alertPasswordAuthError) {
+          alertPasswordAuthError.style.display = "none";
+        }
+      }
+
+      function showPasswordAuthModal(onSuccessCallback, candidates) {
+        AppState.pendingActionAfterPasswordAuth = onSuccessCallback || null;
+        if (modalPasswordAuth) {
+          modalPasswordAuth.style.display = "flex";
+        }
+
+        const candidateSection = document.getElementById("authCandidateSection");
+        const candidateList = document.getElementById("authCandidateList");
+        const modalSubtitle = document.getElementById("authModalSubtitle");
+        const manualFields = document.getElementById("authManualSelectFields");
+        const linkManual = document.getElementById("linkAuthManualSelect");
+
+        if (manualFields) manualFields.style.display = "none";
+        if (linkManual) linkManual.textContent = "非以上候選人？手動選擇其他學生 ▾";
+
+        // Check if candidates are provided
+        const candList = (Array.isArray(candidates) && candidates.length > 0)
+          ? candidates
+          : (AppState.ambiguousCandidates || null);
+
+        if (candList && candList.length > 0) {
+          if (modalSubtitle) {
+            modalSubtitle.innerHTML = "⚠️ <strong>偵測到多位相似特徵（無法唯一確認本人）</strong>，為維護帳號安全，請選擇您的姓名並輸入個人密碼完成二次驗證！";
+            modalSubtitle.style.color = "#fcd34d";
+          }
+          if (candidateSection) {
+            candidateSection.style.display = "block";
+          }
+          if (candidateList) {
+            candidateList.innerHTML = "";
+            candList.forEach(function (cItem, idx) {
+              const prof = cItem.profile || cItem;
+              if (!prof || !prof.classID || !prof.studentID) return;
+              const cls = prof.classID;
+              const sid = prof.studentID;
+              const name = prof.name || (window.getStudentName ? window.getStudentName(cls, sid) : "");
+              const pct = cItem.percentage || (cItem.centeredSim ? Math.round(cItem.centeredSim * 1000) / 10 : null);
+
+              const btn = document.createElement("button");
+              btn.type = "button";
+              btn.className = "auth-candidate-btn";
+              btn.id = `btnCandidate_${cls}_${sid}`;
+              btn.setAttribute("data-class", cls);
+              btn.setAttribute("data-id", sid);
+              btn.setAttribute("data-name", name);
+              btn.style.cssText = "width: 100%; text-align: left; padding: 10px 14px; border-radius: 8px; border: 1.5px solid #334155; background: #0f172a; color: #f8fafc; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s;";
+
+              const labelSpan = document.createElement("span");
+              labelSpan.style.cssText = "font-weight: 600; font-size: 14px;";
+              labelSpan.textContent = `Top ${idx + 1}: ${cls} 班 ${sid} 號 ${name}`;
+
+              const pctSpan = document.createElement("span");
+              pctSpan.style.cssText = "font-size: 12px; color: #94a3b8;";
+              pctSpan.textContent = pct ? `相似度: ${pct}%` : "";
+
+              btn.appendChild(labelSpan);
+              btn.appendChild(pctSpan);
+
+              btn.addEventListener("click", function () {
+                selectAuthCandidate(cls, sid, name);
+              });
+
+              candidateList.appendChild(btn);
+            });
+          }
+
+          // Default select Top 1 candidate
+          const firstCand = candList[0].profile || candList[0];
+          if (firstCand) {
+            selectAuthCandidate(firstCand.classID, firstCand.studentID, firstCand.name || (window.getStudentName ? window.getStudentName(firstCand.classID, firstCand.studentID) : ""));
+          }
+        } else {
+          // Normal single student mode (e.g. called from Screen 2 or existing tests)
+          if (modalSubtitle) {
+            modalSubtitle.textContent = "人臉未能唯一確認。請輸入您的個人密碼進行鑑別，系統將融合更新特徵以消除後續衝突。";
+            modalSubtitle.style.color = "#94a3b8";
+          }
+          if (candidateSection) {
+            candidateSection.style.display = "none";
+          }
+        }
+
+        if (authStudentInfo) {
+          authStudentInfo.textContent = `${AppState.currentClass} 班 ${AppState.currentStudentId} 號 ${AppState.currentStudentName} 同學`;
+        }
+        if (alertPasswordAuthError) {
+          alertPasswordAuthError.style.display = "none";
+          alertPasswordAuthError.textContent = "";
+        }
+        if (inputAuthPassword) {
+          inputAuthPassword.value = "";
+          setTimeout(function () { inputAuthPassword.focus(); }, 100);
+        }
+        if (chkAuthChangePassword) chkAuthChangePassword.checked = false;
+        if (authChangePasswordFields) authChangePasswordFields.style.display = "none";
+        if (inputAuthNewPassword) inputAuthNewPassword.value = "";
+        if (inputAuthConfirmPassword) inputAuthConfirmPassword.value = "";
+      }
+
+      function hidePasswordAuthModal() {
+        if (modalPasswordAuth) {
+          modalPasswordAuth.style.display = "none";
+        }
+      }
+
+      function showPasswordAuthError(msg) {
+        if (alertPasswordAuthError) {
+          alertPasswordAuthError.style.display = "block";
+          alertPasswordAuthError.textContent = "⚠️ " + msg;
+        } else {
+          alert(msg);
+        }
+      }
+
+      if (chkAuthChangePassword) {
+        chkAuthChangePassword.addEventListener("change", function () {
+          if (authChangePasswordFields) {
+            authChangePasswordFields.style.display = this.checked ? "block" : "none";
+          }
+        });
+      }
+
+      if (btnCancelPasswordAuth) {
+        btnCancelPasswordAuth.addEventListener("click", function () {
+          hidePasswordAuthModal();
+          AppState.isAmbiguousScan = false;
+          AppState.isPasswordAuthMode = false;
+          if (btnFaceFirstStart) {
+            btnFaceFirstStart.disabled = false;
+            btnFaceFirstStart.style.display = "inline-flex";
+            btnFaceFirstStart.innerHTML = "<span>📷 啟動相機識別</span>";
+          }
+          if (btnFaceFirstCapture) {
+            btnFaceFirstCapture.style.display = "none";
+          }
+          if (faceFirstOverlay) {
+            faceFirstOverlay.textContent = "📷 點擊下方按鈕啟動刷臉辨識";
+          }
+          if (faceFirstAlert) {
+            faceFirstAlert.style.display = "none";
+          }
+        });
+      }
+
+      const linkAuthManualSelect = document.getElementById("linkAuthManualSelect");
+      const authManualSelectFields = document.getElementById("authManualSelectFields");
+      const authClassSelect = document.getElementById("authClassSelect");
+      const authStudentSelect = document.getElementById("authStudentSelect");
+
+      if (linkAuthManualSelect) {
+        linkAuthManualSelect.addEventListener("click", function () {
+          if (authManualSelectFields) {
+            const isHidden = authManualSelectFields.style.display === "none";
+            authManualSelectFields.style.display = isHidden ? "block" : "none";
+            linkAuthManualSelect.textContent = isHidden ? "收起手動選擇 ▴" : "非以上候選人？手動選擇其他學生 ▾";
+          }
+        });
+      }
+
+      if (authClassSelect) {
+        authClassSelect.addEventListener("change", function () {
+          const cls = this.value;
+          if (!authStudentSelect) return;
+          authStudentSelect.innerHTML = '<option value="" disabled selected>-- 選擇學號 --</option>';
+          if (!cls) {
+            authStudentSelect.disabled = true;
+            return;
+          }
+          const allStudents = window.getStudentsByClass ? window.getStudentsByClass(cls) : [];
+          allStudents.forEach(function (s) {
+            const opt = document.createElement("option");
+            opt.value = s.id;
+            opt.textContent = `${s.id} 號 - ${s.name}`;
+            authStudentSelect.appendChild(opt);
+          });
+          if (cls === "5B") {
+            const teacherOpt = document.createElement("option");
+            teacherOpt.value = "99";
+            teacherOpt.textContent = "...";
+            authStudentSelect.appendChild(teacherOpt);
+          }
+          authStudentSelect.disabled = false;
+        });
+      }
+
+      if (authStudentSelect) {
+        authStudentSelect.addEventListener("change", function () {
+          const cls = authClassSelect ? authClassSelect.value : "";
+          const sid = parseInt(this.value, 10);
+          if (!cls || isNaN(sid)) return;
+          let name = "";
+          if (cls === "5B" && sid === 99) {
+            name = "教師測試員";
+          } else {
+            const sObj = window.getStudent ? window.getStudent(cls, sid) : null;
+            name = sObj ? sObj.name : "";
+          }
+          selectAuthCandidate(cls, sid, name);
+        });
+      }
+
+      if (btnSubmitPasswordAuth) {
+        btnSubmitPasswordAuth.addEventListener("click", function () {
+          const cls = AppState.currentClass;
+          const sid = AppState.currentStudentId;
+          if (!cls || !sid) {
+            showPasswordAuthError("請先選擇班別與學號！");
+            return;
+          }
+
+          const authPwd = inputAuthPassword ? inputAuthPassword.value.trim() : "";
+          if (!authPwd) {
+            showPasswordAuthError("請輸入個人密碼！");
+            return;
+          }
+
+          // 1. Verify password
+          const isPwdValid = window.verifyStudentPassword ? window.verifyStudentPassword(cls, sid, authPwd) : (authPwd === "1234");
+          if (!isPwdValid) {
+            showPasswordAuthError("密碼驗證失敗，請輸入正確的個人密碼！");
+            return;
+          }
+
+          // 2. Handle optional password update
+          const wantChange = chkAuthChangePassword && chkAuthChangePassword.checked;
+          const newPwd = inputAuthNewPassword ? inputAuthNewPassword.value.trim() : "";
+          const confirmPwd = inputAuthConfirmPassword ? inputAuthConfirmPassword.value.trim() : "";
+
+          if (wantChange || newPwd) {
+            if (!/^\d+$/.test(newPwd)) {
+              showPasswordAuthError("新密碼必須為純數字！");
+              return;
+            }
+            if (newPwd.length < 4) {
+              showPasswordAuthError("新密碼長度至少需要 4 位數字！");
+              return;
+            }
+            if (newPwd === "1234") {
+              showPasswordAuthError("新密碼不能與預設密碼 1234 相同！");
+              return;
+            }
+            if (newPwd !== confirmPwd) {
+              showPasswordAuthError("兩次輸入的新密碼不一致！");
+              return;
+            }
+
+            const updateRes = window.updateStudentPassword
+              ? window.updateStudentPassword(cls, sid, authPwd, newPwd)
+              : { success: true };
+            if (!updateRes || !updateRes.success) {
+              showPasswordAuthError(updateRes && (updateRes.message || updateRes.reason) ? (updateRes.message || updateRes.reason) : "修改密碼失敗！");
+              return;
+            }
+          }
+
+          // 3. Feature Resampling / Vector Enhancement
+          const candDescriptor = (AppState.capturedSnapshot && AppState.capturedSnapshot.descriptor) || AppState.pendingRegistrationDescriptor;
+          if (candDescriptor && window.enhanceStudentVector) {
+            window.enhanceStudentVector(cls, sid, candDescriptor, 0.7);
+            console.log("[App] Face vector resampled & enhanced for", cls, sid);
+          }
+
+          const snap = AppState.capturedSnapshot || AppState.pendingRegistrationSnapshot || AppState.lastCapturedSnapshot;
+          if (snap && snap.imageBase64) {
+            const prof = window.getStudentProfile ? window.getStudentProfile(cls, sid) : null;
+            if (prof && !prof.photoJpgBase64) {
+              prof.photoJpgBase64 = snap.imageBase64;
+              if (window.saveStudentProfile) window.saveStudentProfile(prof, { forceLatest: true });
+            }
+            if (window.uploadDrivePhoto) {
+              window.uploadDrivePhoto({
+                timestamp: Date.now(),
+                version: 1,
+                folderId: "1oY52JyAqLLQQiETq8A-hre9jZ_goLHiY",
+                classID: cls,
+                studentID: sid,
+                studentName: AppState.currentStudentName,
+                imageBase64: snap.imageBase64,
+                tag: "AUTH_REGISTRATION"
+              }).catch(function () {});
+            }
+          }
+
+          hidePasswordAuthModal();
+          AppState.isAmbiguousScan = false;
+          AppState.isPasswordAuthMode = false;
+          AppState.isPasswordAuthenticated = true;
+
+          const gradeInfo = window.getGradeByClass ? window.getGradeByClass(cls) : AppState.currentGradeInfo;
+          AppState.currentGradeInfo = gradeInfo;
+          if (dashStudentName) dashStudentName.textContent = AppState.currentStudentName + " 同學";
+          if (dashClassAndId) dashClassAndId.textContent = `${cls} 班 ${sid} 號`;
+          if (dashGradeTag && gradeInfo) {
+            dashGradeTag.textContent = `${gradeInfo.gradeName} 題庫 (${gradeInfo.gradeLevel})`;
+          }
+          if (dashTopicTitle && gradeInfo) {
+            dashTopicTitle.textContent = `${gradeInfo.gradeName} 數學 · ${gradeInfo.topicTitle}`;
+          }
+
+          // Check if password must be forced changed (R2)
+          const pwdRec = window.getStudentPasswordRecord ? window.getStudentPasswordRecord(cls, sid) : null;
+          if (!pwdRec || !pwdRec.passwordChanged) {
+            showForceChangePasswordModal(function () {
+              if (typeof AppState.pendingActionAfterPasswordAuth === "function") {
+                const cb = AppState.pendingActionAfterPasswordAuth;
+                AppState.pendingActionAfterPasswordAuth = null;
+                cb();
+              } else {
+                showScreen("screen5-quiz");
+                if (window.QuizEngine && window.QuizEngine.startQuiz) {
+                  window.QuizEngine.startQuiz(cls, sid, AppState.currentStudentName);
+                }
+              }
+            });
+            return;
+          }
+
+          // Seamless transition directly into quiz
+          if (typeof AppState.pendingActionAfterPasswordAuth === "function") {
+            const cb = AppState.pendingActionAfterPasswordAuth;
+            AppState.pendingActionAfterPasswordAuth = null;
+            cb();
+          } else {
+            showScreen("screen5-quiz");
+            if (window.QuizEngine && window.QuizEngine.startQuiz) {
+              window.QuizEngine.startQuiz(cls, sid, AppState.currentStudentName);
+            }
+          }
+        });
+      }
+
+      // Expose globally for module cross-communication
+      window.showScreen = showScreen;
+      window.enterDashboard = enterDashboard;
+      window.showNameConfirmation = showNameConfirmation;
+      window.showScreen2ReturningConfirm = showScreen2ReturningConfirm;
+      window.showScreen2FirstTimeSelect = showScreen2FirstTimeSelect;
+      window.updateStudentDropdown = updateStudentDropdown;
+      window.AppState = AppState;
+      window.saveActiveQuizProgress = saveActiveQuizProgress;
+      window.runMacauNetworkProbe = runMacauNetworkProbe;
+      window.executeFaceFirstScan = executeFaceFirstScan;
+      window.startFaceFirstCamera = startFaceFirstCamera;
+      window.showForceChangePasswordModal = showForceChangePasswordModal;
+      window.hideForceChangePasswordModal = hideForceChangePasswordModal;
+      window.showPasswordAuthModal = showPasswordAuthModal;
+      window.hidePasswordAuthModal = hidePasswordAuthModal;
+      window.selectAuthCandidate = selectAuthCandidate;
+
+      // Auto-start front camera for face-first flow
+      try {
+        const urlP = (window.location && window.location.search) ? new URLSearchParams(window.location.search) : null;
+        if (!urlP || (!urlP.get('test_bypass_probe') && !urlP.get('test_disable_autocamera'))) {
+          startFaceFirstCamera(true);
+        }
+      } catch (e) {}
+
+    })();
+  </script>
+</body>
+</html>

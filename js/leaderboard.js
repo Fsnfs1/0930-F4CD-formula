@@ -360,15 +360,17 @@
     } else {
       let podiumHtml = "";
       // Display order: 2nd place (Silver, left), 1st place (Gold, center), 3rd place (Bronze, right)
-      const podiumOrder = [1, 0, 2];
-      const medalIcons = ["🥈 亞軍", "🥇 冠軍", "🥉 季軍"];
-      const podiumClasses = ["podium-silver", "podium-gold", "podium-bronze"];
+      const podiumSlots = [
+        { rankIdx: 1, medal: "🥈 亞軍", className: "podium-silver" },
+        { rankIdx: 0, medal: "🥇 冠軍", className: "podium-gold" },
+        { rankIdx: 2, medal: "🥉 季軍", className: "podium-bronze" }
+      ];
 
-      podiumOrder.forEach(function (orderIdx) {
-        const student = top3[orderIdx];
+      podiumSlots.forEach(function (slot) {
+        const student = top3[slot.rankIdx];
         if (student) {
-          const medal = medalIcons[orderIdx];
-          const pClass = podiumClasses[orderIdx];
+          const medal = slot.medal;
+          const pClass = slot.className;
           podiumHtml += `
             <div class="podium-card ${pClass} ${student.isCurrentUser ? 'is-me' : ''}">
               <div class="podium-crown">${medal}</div>

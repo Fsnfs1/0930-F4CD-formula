@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>高一理組進階大測 - 自然科測驗系統</title>
+  <!-- MathJax LaTeX 顯影配置與核心庫 -->
+  <script>
+    window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] } };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    :root { --pri: #2563eb; --warn: #f59e0b; --dang: #dc2626; --bg: #f8fafc; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: #1e293b; line-height: 1.5; padding-bottom: 40px; }
+    .sticky-timer { position: sticky; top: 0; z-index: 1000; background: var(--pri); color: #fff; padding: 10px 16px; text-align: center; font-size: 1.15rem; font-weight: 700; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .sticky-timer.warn { background: var(--warn); } .sticky-timer.danger { background: var(--dang); animation: pulse 1s infinite alternate; }
+    @keyframes pulse { from { opacity: 1; } to { opacity: 0.8; } }
+    .container { max-width: 820px; margin: 16px auto; padding: 0 16px; }
+    .card { background: #fff; border-radius: 10px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+    h1 { font-size: 1.35rem; text-align: center; color: #0f172a; margin-bottom: 4px; }
+    h2 { font-size: 1.1rem; color: #1e40af; border-left: 4px solid var(--pri); padding-left: 10px; margin-bottom: 10px; }
+    .grid-2, .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    label { font-weight: 600; font-size: 0.95rem; display: block; margin-bottom: 4px; }
+    input[type="text"] { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 1rem; }
+    .question { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px dashed #e2e8f0; }
+    .q-title { font-weight: 600; margin-bottom: 6px; }
+    .opt { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 8px; border-radius: 6px; } .opt:hover { background: #f1f5f9; }
+    .camera-box { background: #0f172a; border-radius: 8px; overflow: hidden; max-width: 440px; margin: 8px auto; display: none; }
+    video { width: 100%; display: block; }
+    .preview-box { text-align: center; margin: 8px 0; }
+    .preview-box img { max-width: 100%; max-height: 260px; border-radius: 6px; border: 2px solid #cbd5e1; display: none; margin: 0 auto; }
+    .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+    button { padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; font-size: 0.95rem; } button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--pri); color: #fff; } .btn-secondary { background: #64748b; color: #fff; }
+    .btn-submit { background: #16a34a; color: #fff; width: 100%; font-size: 1.05rem; padding: 12px; margin-top: 8px; }
+    .status-msg { margin-top: 10px; text-align: center; font-weight: 600; padding: 10px; border-radius: 6px; display: none; }
+    .status-info { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; } .status-success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; } .status-error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    @media (max-width: 600px) { .grid-2, .options { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div id="startScreen" class="container" style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 80vh; text-align: center;">
+    <div class="card" style="max-width: 500px; padding: 40px 20px;">
+      <h1 style="color: var(--dang); font-size: 1.8rem; margin-bottom: 20px;">⚠️ 測驗注意事項</h1>
+      <p style="font-size: 1.1rem; margin-bottom: 15px; color: #334155;">本次測驗為<strong>閉卷考試</strong>。</p>
+      <p style="font-size: 1.1rem; margin-bottom: 15px; color: #334155;">測驗時間為完整的 <strong>40 分鐘</strong>，時間一到系統將自動強制交卷。</p>
+      <p style="font-size: 1.1rem; margin-bottom: 30px; color: #334155;">作答機會<strong>僅有一次</strong>，中途若重新載入頁面將可能導致測驗失效。</p>
+      <button type="button" class="btn-primary" style="font-size: 1.2rem; padding: 12px 24px;" onclick="startExam()">✅ 我已了解，確認開始測驗</button>
+    </div>
+  </div>
+  <div id="examContainer" style="display: none;">
+
+
+<div id="stickyTimer" class="sticky-timer">剩餘作答時間：<span id="timerText">40:00</span></div>
+
+<div class="container">
+  <div class="card">
+    <h1>高一自然科學科能力測驗</h1>
+    <p style="text-align: center; color: #64748b; margin-bottom: 10px;">測驗限時 40 分鐘。客觀題（60分，系統即時核分），主觀解答題（40分，拍照上傳）。</p>
+    <div class="grid-2">
+      <div><label for="studentId">學號 *</label><input type="text" id="studentId" placeholder="例如：S112001" required></div>
+      <div><label for="studentName">姓名 *</label><input type="text" id="studentName" placeholder="例如：陳大明" required></div>
+    </div>
+  </div>
+
+  <form id="examForm">
+    <div class="card">
+      <h2>第一部分：客觀科學素養題 (共 60 分)</h2>
+      <div class="question" id="sec-q1">
+        <div class="q-title">1. 【物理】質點初速 $v_0 = 0\,\text{m/s}$，加速度 $a = 2\,\text{m/s}^2$，位移 $\Delta x = 16\,\text{m}$。依公式 $v^2 = v_0^2 + 2a\Delta x$，末速度 $v$ 為何？(10分)</div>
+        <div class="options">
+          <label class="opt"><input type="radio" name="q1" value="A"> A. $4\,\text{m/s}$</label>
+          <label class="opt"><input type="radio" name="q1" value="B"> B. $8\,\text{m/s}$</label>
+          <label class="opt"><input type="radio" name="q1" value="C"> C. $16\,\text{m/s}$</label>
+          <label class="opt"><input type="radio" name="q1" value="D"> D. $32\,\text{m/s}$</label>
+        </div>
+      </div>
+      <div class="question" id="sec-q2">
+        <div class="q-title">2. 【化學】平衡反應 $\text{N}_2(g) + 3\text{H}_2(g) \rightleftharpoons 2\text{NH}_3(g)$，平衡常數 $K_c$ 正確式為何？(10分)</div>
+        <div class="options">
+          <label class="opt"><input type="radio" name="q2" value="A"> A. $K_c = \frac{[\text{NH}_3]^2}{[\text{N}_2][\text{H}_2]^3}$</label>
+          <label class="opt"><input type="radio" name="q2" value="B"> B. $K_c = \frac{[\text{N}_2][\text{H}_2]^3}{[\text{NH}_3]^2}$</label>
+          <label class="opt"><input type="radio" name="q2" value="C"> C. $K_c = \frac{2[\text{NH}_3]}{[\text{N}_2] + 3[\text{H}_2]}$</label>
+          <label class="opt"><input type="radio" name="q2" value="D"> D. $K_c = [\text{NH}_3]^2 - [\text{N}_2][\text{H}_2]^3$</label>
+        </div>
+      </div>
+      <div class="question" id="sec-q3">
+        <div class="q-title">3. 【數學】一元二次方程式 $ax^2 + bx + c = 0$ ($a \neq 0, \Delta = b^2 - 4ac \ge 0$)，公式解 $x$ 為何？(10分)</div>
+        <div class="options">
+          <label class="opt"><input type="radio" name="q3" value="A"> A. $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$</label>
+          <label class="opt"><input type="radio" name="q3" value="B"> B. $x = \frac{-b \pm \sqrt{b^2 + 4ac}}{2a}$</label>
+          <label class="opt"><input type="radio" name="q3" value="C"> C. $x = \frac{b \pm \sqrt{b^2 - 4ac}}{2a}$</label>
+          <label class="opt"><input type="radio" name="q3" value="D"> D. $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{a}$</label>
+        </div>
+      </div>
+      <div class="question" id="sec-q4">
+        <div class="q-title">4. 【生物】光合作用總式：$6\text{CO}_2 + 6\text{H}_2\text{O} \to \text{C}_6\text{H}_{12}\text{O}_6 + 6\text{O}_2$。下列敘述何者正確？(10分)</div>
+        <div class="options">
+          <label class="opt"><input type="radio" name="q4" value="A"> A. 光反應產生的 $\text{ATP}$ 與 $\text{NADPH}$ 供卡爾文循環固定 $\text{CO}_2$</label>
+          <label class="opt"><input type="radio" name="q4" value="B"> B. 釋放的氧氣 $\text{O}_2$ 是卡爾文循環分解 $\text{CO}_2$ 的產物</label>
+          <label class="opt"><input type="radio" name="q4" value="C"> C. 光反應在基質中進行，暗反應在類囊體膜上進行</label>
+          <label class="opt"><input type="radio" name="q4" value="D"> D. 植物在無光環境中仍能長時間持續合成葡萄糖</label>
+        </div>
+      </div>
+      <div class="question" id="sec-q5">
+        <div class="q-title">5. 【是非題】在孤立系統中，總能量保持恆定，能量只能轉換形式不能憑空生滅（能量守恆定律）。(10分)</div>
+        <div class="options">
+          <label class="opt"><input type="radio" name="q5" value="True"> A. 正確 (True)</label>
+          <label class="opt"><input type="radio" name="q5" value="False"> B. 錯誤 (False)</label>
+        </div>
+      </div>
+      <div class="question" id="sec-q6">
+        <div class="q-title">6. 【是非題】在 $25^\circ\text{C}$ 水溶液中，$\text{pH} = -\log_{10}[\text{H}^+]$。若 $[\text{H}^+] = 10^{-3}\,\text{M}$，則 $\text{pH} = 3$，呈酸性。(10分)</div>
+        <div class="options">
+          <label class="opt"><input type="radio" name="q6" value="True"> A. 正確 (True)</label>
+          <label class="opt"><input type="radio" name="q6" value="False"> B. 錯誤 (False)</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>第二部分：主觀解答計算題 (40 分)</h2>
+      <p style="margin-bottom: 10px;"><strong>【題目】</strong>試利用 $v = v_0 + at$ 與 $\Delta x = v_0 t + \frac{1}{2}at^2$ 推導 $v^2 = v_0^2 + 2a\Delta x$。並求初速 $v_0 = 3\,\text{m/s}$、加速度 $a = 4\,\text{m/s}^2$、位移 $\Delta x = 10\,\text{m}$ 時之末速度 $v$？請於作答紙書寫過程並拍照上傳。</p>
+      <div class="camera-box" id="cameraBox"><video id="videoPreview" autoplay playsinline></video></div>
+      <div class="preview-box">
+        <img id="imagePreview" alt="預覽圖片">
+        <canvas id="hiddenCanvas" style="display: none;"></canvas>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn-primary" id="btnStartCamera">開啟相機鏡頭</button>
+        <button type="button" class="btn-primary" id="btnCapture" style="display:none;">拍攝照片快照</button>
+        <button type="button" class="btn-secondary" id="btnRetake" style="display:none;">重拍照片</button>
+        <button type="button" class="btn-secondary" id="btnStopCamera" style="display:none;">關閉鏡頭</button>
+      </div>
+      <div style="margin-top: 12px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+        <label for="fileFallback">相機無法使用？備用本地上傳：</label>
+        <input type="file" id="fileFallback" accept="image/*" capture="environment">
+      </div>
+    </div>
+
+    <button type="submit" id="submitBtn" class="btn-submit">立即交卷 (提交客觀題與主觀題解答)</button>
+    <div id="statusBox" class="status-msg"></div>
+  </form>
+</div>
+
+  </div>
+<script>
+// 系統配置 (可切換 local mock 與 Google production)
+const CONFIG = {
+  MODE: 'mock',
+  MOCK_GAS_URL: 'http://localhost:3000/api/gas-upload',
+  MOCK_FORM_URL: 'http://localhost:3000/api/form-submit',
+  PROD_GAS_URL: 'https://script.google.com/macros/s/YOUR_GAS_DEPLOY_ID/exec',
+  PROD_FORM_URL: 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse',
+  FORM_ENTRIES: {
+    studentId: 'entry.1000001', studentName: 'entry.1000002',
+    score: 'entry.1000003', details: 'entry.1000004', imageUrl: 'entry.1000005'
+  },
+  get GAS_URL() { return this.MODE === 'production' ? this.PROD_GAS_URL : this.MOCK_GAS_URL; },
+  get FORM_URL() { return this.MODE === 'production' ? this.PROD_FORM_URL : this.MOCK_FORM_URL; }
+};
+const ANSWER_KEY = { q1: 'B', q2: 'A', q3: 'A', q4: 'A', q5: 'True', q6: 'True' };
+
+// 40 分鐘計時器
+let timeLeft = 40 * 60;
+const timerEl = document.getElementById('stickyTimer'), timerTextEl = document.getElementById('timerText');
+function updateTimer() {
+  const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+  timerTextEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  timerEl.className = timeLeft <= 60 ? 'sticky-timer danger' : (timeLeft <= 300 ? 'sticky-timer warn' : 'sticky-timer');
+}
+let timerId = null;
+function startExam() {
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('examContainer').style.display = 'block';
+  timerId = setInterval(() => {
+    if (--timeLeft <= 0) {
+      clearInterval(timerId);
+      alert('40 分鐘測驗時間已到！系統將自動完成提交。');
+      autoSubmit();
+    }
+    updateTimer();
+  }, 1000);
+}
+
+
+// 客觀題自動批改 (支援 DOM 與 Node.js 測試傳參)
+function gradeObjectiveQuestions(providedAnswers) {
+  const answers = providedAnswers || {};
+  if (!providedAnswers) {
+    for (let i = 1; i <= 6; i++) {
+      const checked = document.querySelector(`input[name="q${i}"]:checked`);
+      answers[`q${i}`] = checked ? checked.value : '';
+    }
+  }
+  let score = 0; const details = {};
+  for (const [qid, correctVal] of Object.entries(ANSWER_KEY)) {
+    const userVal = answers[qid] || '', isCorrect = userVal === correctVal, pts = isCorrect ? 10 : 0;
+    score += pts;
+    details[qid] = { userAns: userVal, correctAns: correctVal, isCorrect, points: pts };
+  }
+  return { score, maxScore: 60, details, summary: `客觀題實得分數：${score} / 60` };
+}
+
+// 相機與圖片處理 (JPEG 0.7 壓縮)
+let activeStream = null, currentCompressedBase64 = '';
+const video = document.getElementById('videoPreview'), cameraBox = document.getElementById('cameraBox');
+const canvas = document.getElementById('hiddenCanvas'), imgPreview = document.getElementById('imagePreview');
+const btnStart = document.getElementById('btnStartCamera'), btnCapture = document.getElementById('btnCapture');
+const btnRetake = document.getElementById('btnRetake'), btnStop = document.getElementById('btnStopCamera');
+const fileInput = document.getElementById('fileFallback');
+btnStart.addEventListener('click', async () => {
+  try {
+    activeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 } } });
+    video.srcObject = activeStream;
+    cameraBox.style.display = 'block';
+    btnCapture.style.display = btnStop.style.display = 'inline-block';
+    btnStart.style.display = 'none';
+  } catch (err) { alert('無法存取相機，請使用下方圖片上傳備用方案。(' + err.message + ')'); }
+});
+
+function stopCameraStream() {
+  if (activeStream) { activeStream.getTracks().forEach(t => t.stop()); activeStream = null; }
+  cameraBox.style.display = btnCapture.style.display = btnStop.style.display = 'none';
+  btnStart.style.display = 'inline-block';
+}
+btnStop.addEventListener('click', stopCameraStream);
+function compressAndStore(sourceImg) {
+  const MAX_W = 1200;
+  let w = sourceImg.width || sourceImg.videoWidth, h = sourceImg.height || sourceImg.videoHeight;
+  if (w > MAX_W) { h = Math.round((h * MAX_W) / w); w = MAX_W; }
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(sourceImg, 0, 0, w, h);
+  currentCompressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+  imgPreview.src = currentCompressedBase64;
+  imgPreview.style.display = btnRetake.style.display = 'block';
+}
+btnCapture.addEventListener('click', () => { compressAndStore(video); stopCameraStream(); });
+btnRetake.addEventListener('click', () => {
+  currentCompressedBase64 = ''; imgPreview.src = '';
+  imgPreview.style.display = btnRetake.style.display = 'none';
+  btnStart.click();
+});
+fileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    const tempImg = new Image();
+    tempImg.onload = () => compressAndStore(tempImg);
+    tempImg.src = evt.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+// 二階段提交邏輯
+async function submitExam(isAuto = false) {
+  const studentId = document.getElementById('studentId').value.trim() || (isAuto ? 'S_TIMEOUT' : '');
+  const studentName = document.getElementById('studentName').value.trim() || (isAuto ? '超時繳卷' : '');
+  if (!studentId || !studentName) return alert('請填寫學號與姓名！');
+  if (!currentCompressedBase64 && !isAuto && !confirm('未附解答照片，確定繳卷？')) return;
+  const submitBtn = document.getElementById('submitBtn'), statusBox = document.getElementById('statusBox');
+  submitBtn.disabled = true;
+  statusBox.className = 'status-msg status-info';
+  statusBox.style.display = 'block';
+  statusBox.textContent = '【第 1/2 步】正在上傳解答照片至 Google Apps Script 雲端圖床...';
+
+  const grading = gradeObjectiveQuestions();
+  let uploadedFileUrl = '未附照片';
+  try {
+    if (currentCompressedBase64) {
+      const gasRes = await fetch(CONFIG.GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ studentId, studentName, imageBase64: currentCompressedBase64 })
+      });
+      const gasData = await gasRes.json();
+      if (gasData.status === 'success' && gasData.fileUrl) uploadedFileUrl = gasData.fileUrl;
+      else throw new Error(gasData.message || '雲端硬碟上傳失敗');
+    }
+
+    statusBox.textContent = '【第 2/2 步】正在將作答成果、客觀成績與解答圖網址提交至表單...';
+    const formParams = new URLSearchParams();
+    formParams.append(CONFIG.FORM_ENTRIES.studentId, studentId);
+    formParams.append(CONFIG.FORM_ENTRIES.studentName, studentName);
+    formParams.append(CONFIG.FORM_ENTRIES.score, String(grading.score));
+    formParams.append(CONFIG.FORM_ENTRIES.details, JSON.stringify(grading.details));
+    formParams.append(CONFIG.FORM_ENTRIES.imageUrl, uploadedFileUrl);
+
+    await fetch(CONFIG.FORM_URL, {
+      method: 'POST',
+      mode: CONFIG.MODE === 'production' ? 'no-cors' : 'cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formParams.toString()
+    });
+
+    clearInterval(timerId);
+    statusBox.className = 'status-msg status-success';
+    statusBox.innerHTML = `<h3>繳卷成功！</h3><p>學號：${studentId} | 姓名：${studentName}</p><p>${grading.summary}</p><p>解答圖：<a href="${uploadedFileUrl}" target="_blank">${uploadedFileUrl}</a></p>`;
+  } catch (err) {
+    statusBox.className = 'status-msg status-error';
+    statusBox.textContent = '提交過程發生錯誤：' + err.message + '，請聯繫監考教師或重試。';
+    submitBtn.disabled = false;
+  }
+}
+
+document.getElementById('examForm').addEventListener('submit', (e) => { e.preventDefault(); submitExam(false); });
+function autoSubmit() { submitExam(true); }
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { CONFIG, ANSWER_KEY, gradeObjectiveQuestions };
+}
+</script>
+</body>
+</html>

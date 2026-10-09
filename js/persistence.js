@@ -159,7 +159,7 @@
     if (!profile || !profile.classID || !profile.studentID) return false;
     const cid = String(profile.classID).trim().toUpperCase();
     let sid = String(profile.studentID).trim();
-    if (cid === "5B" && (sid === "..." || sid === "99")) {
+    if ((cid === "5B" || cid === "4C" || cid === "4D") && (sid === "..." || sid === "99")) {
       sid = "99";
     }
     const key = PERSISTENCE_CONFIG.profilePrefix + cid + "_" + sid;
@@ -335,7 +335,7 @@
     if (!classID || studentID === undefined || studentID === null) return null;
     const cid = String(classID).trim().toUpperCase();
     let sid = String(studentID).trim();
-    if (cid === "5B" && (sid === "..." || sid === "99")) {
+    if ((cid === "5B" || cid === "4C" || cid === "4D") && (sid === "..." || sid === "99")) {
       sid = "99";
     }
     const key = PERSISTENCE_CONFIG.profilePrefix + cid + "_" + sid;
@@ -1300,7 +1300,7 @@
   function derivePasswordSalt(classID, studentID) {
     const cid = String(classID || "").trim().toUpperCase();
     let sid = String(studentID !== undefined && studentID !== null ? studentID : "").trim();
-    if (cid === "5B" && (sid === "..." || sid === "99")) {
+    if ((cid === "5B" || cid === "4C" || cid === "4D") && (sid === "..." || sid === "99")) {
       sid = "99";
     }
     return `${PASSWORD_SALT_PREFIX}${cid}_${sid}`;
@@ -1322,7 +1322,7 @@
     if (!classID || studentID === undefined || studentID === null) return null;
     const cid = String(classID).trim().toUpperCase();
     let sid = parseInt(studentID, 10);
-    if (cid === "5B" && (String(studentID).trim() === "..." || sid === 99)) {
+    if ((cid === "5B" || cid === "4C" || cid === "4D") && (String(studentID).trim() === "..." || sid === 99)) {
       sid = 99;
     }
     if (isNaN(sid)) return null;
@@ -1339,7 +1339,7 @@
     const snapKey = `${cid}_${sid}`;
     const snapRec = adminPasswords ? adminPasswords[snapKey] : null;
 
-    if (!rosterStudent && !snapRec && !(cid === "5B" && sid === 99)) {
+    if (!rosterStudent && !snapRec && !((cid === "5B" || cid === "4C" || cid === "4D") && sid === 99)) {
       return null;
     }
 
@@ -1415,7 +1415,7 @@
     if (!classID || studentID === undefined || studentID === null) return { success: false, reason: "無效的學生資訊", message: "無效的學生資訊" };
     const cid = String(classID).trim().toUpperCase();
     let sid = parseInt(studentID, 10);
-    if (cid === "5B" && (String(studentID).trim() === "..." || sid === 99)) {
+    if ((cid === "5B" || cid === "4C" || cid === "4D") && (String(studentID).trim() === "..." || sid === 99)) {
       sid = 99;
     }
     if (isNaN(sid)) return { success: false, reason: "無效的學生資訊", message: "無效的學生資訊" };
@@ -1508,7 +1508,7 @@
     if (!classID || studentID === undefined || studentID === null || !candidateDescriptor) return null;
     const cid = String(classID).trim().toUpperCase();
     let sid = parseInt(studentID, 10);
-    if (cid === "5B" && (String(studentID).trim() === "..." || sid === 99)) {
+    if ((cid === "5B" || cid === "4C" || cid === "4D") && (String(studentID).trim() === "..." || sid === 99)) {
       sid = 99;
     }
     if (isNaN(sid)) return null;
@@ -1587,7 +1587,7 @@
     const studentsToInit = roster.map(function (s) {
       return { classID: s.classID, studentID: s.studentID };
     });
-    studentsToInit.push({ classID: "5B", studentID: 99 });
+    studentsToInit.push({ classID: "5B", studentID: 99 }, { classID: "4C", studentID: 99 }, { classID: "4D", studentID: 99 });
 
     studentsToInit.forEach(function (s) {
       const cid = String(s.classID).trim().toUpperCase();

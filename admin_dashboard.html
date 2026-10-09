@@ -692,6 +692,10 @@
           const did = String(row.dateID || "").trim();
           const ts = String(row.Timestamp || "").trim();
 
+          if (did.startsWith("PWD") || did.startsWith("PASSWORD")) {
+            return;
+          }
+
           if (did.includes("|TS:")) {
             let tsVal = 0;
             let ver = 1;

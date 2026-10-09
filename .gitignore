@@ -1,0 +1,16 @@
+.agents/
+tests/
+*.bak
+*.csv
+*副本*
+*備份*
+*backup*
+一鍵發布到GitHub.bat
+corrected_report.json
+export_scores.py
+export_student_scores.bat
+mean_vector_js.txt
+raw_data_latest.json
+reference_mean_vector.json
+report_data.json
+summary_report.json

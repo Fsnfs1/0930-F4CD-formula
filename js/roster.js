@@ -169,13 +169,13 @@
     if (!classID || studentID === undefined || studentID === null) return null;
     const normCls = String(classID).trim().toUpperCase();
     const strSid = String(studentID).trim();
-    if (normCls === "5B" && (strSid === "99" || strSid === "..." || parseInt(studentID, 10) === 99)) {
+    if ((normCls === "5B" || normCls === "4C" || normCls === "4D") && (strSid === "99" || parseInt(studentID, 10) === 99)) {
       return {
-        classID: "5B",
+        classID: normCls,
         studentID: 99,
         id: 99,
         name: "教師測試員",
-        grade: 11,
+        grade: (normCls === "5B") ? 11 : 10,
         isTeacher: true
       };
     }
