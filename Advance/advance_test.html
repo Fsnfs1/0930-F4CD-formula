@@ -180,7 +180,6 @@ const CONFIG = {
 };
 const ANSWER_KEY = { q1: 'B', q2: 'A', q3: 'A', q4: 'A', q5: 'True', q6: 'True' };
 
-// 40 分鐘計時器
 // 雙階段計時器 (40 分鐘客觀題作答 + 10 分鐘拍照與填空緩衝)
 let phase = 1; // 1: 客觀題作答, 2: 拍照與填空緩衝
 let timeLeft = 40 * 60; // 40 分鐘 = 2400 秒
@@ -191,13 +190,17 @@ const timerPhaseLabel = document.getElementById('timerPhaseLabel');
 
 function updateTimer() {
   const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
-  timerTextEl.textContent = ${String(m).padStart(2, '0')}:;
-  if (phase === 1) {
-    if (timerPhaseLabel) timerPhaseLabel.textContent = '【客觀題作答】剩餘：';
-    timerEl.className = timeLeft <= 60 ? 'sticky-timer danger' : (timeLeft <= 300 ? 'sticky-timer warn' : 'sticky-timer');
-  } else {
-    if (timerPhaseLabel) timerPhaseLabel.textContent = '【拍照與填空緩衝】剩餘：';
-    timerEl.className = timeLeft <= 60 ? 'sticky-timer danger' : 'sticky-timer warn';
+  if (timerTextEl) {
+    timerTextEl.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  }
+  if (timerEl) {
+    if (phase === 1) {
+      if (timerPhaseLabel) timerPhaseLabel.textContent = '【客觀題作答】剩餘：';
+      timerEl.className = timeLeft <= 60 ? 'sticky-timer danger' : (timeLeft <= 300 ? 'sticky-timer warn' : 'sticky-timer');
+    } else {
+      if (timerPhaseLabel) timerPhaseLabel.textContent = '【拍照與填空緩衝】剩餘：';
+      timerEl.className = timeLeft <= 60 ? 'sticky-timer danger' : 'sticky-timer warn';
+    }
   }
 }
 
@@ -218,8 +221,10 @@ function lockObjectiveQuestions() {
 }
 
 function startExam() {
-  document.getElementById('startScreen').style.display = 'none';
-  document.getElementById('examContainer').style.display = 'block';
+  const startScr = document.getElementById('startScreen');
+  const examCont = document.getElementById('examContainer');
+  if (startScr) startScr.style.display = 'none';
+  if (examCont) examCont.style.display = 'block';
   updateTimer();
   timerId = setInterval(() => {
     timeLeft--;
@@ -230,13 +235,7 @@ function startExam() {
         timeLeft = 10 * 60;
         lockObjectiveQuestions();
         updateTimer();
-        alert('⏰ 40 分鐘客觀題作答時間已結束！
-
-所有選擇題與是非題已全面鎖定無法更改。
-
-系統已為您開放【額外 10 分鐘緩衝時間】，請把握時間完成：
-1. 填空題文字輸入與修訂
-2. 主觀大題手寫過程拍照上傳！');
+        alert('⏰ 40 分鐘客觀題作答時間已結束！\n\n所有選擇題與是非題已全面鎖定無法更改。\n\n系統已為您開放【額外 10 分鐘緩衝時間】，請把握時間完成：\n1. 填空題文字輸入與修訂\n2. 主觀大題手寫過程拍照上傳！');
       } else {
         // 額外 10 分鐘緩衝結束：強制交卷
         clearInterval(timerId);
@@ -248,13 +247,26 @@ function startExam() {
     }
   }, 1000);
 }
-  let score = 0; const details = {};
+
+// 客觀題自動批改 (支援 DOM 與 Node.js 測試傳參)
+function gradeObjectiveQuestions(providedAnswers) {
+  const answers = providedAnswers || {};
+  if (!providedAnswers) {
+    for (let i = 1; i <= 6; i++) {
+      const checked = document.querySelector('input[name="q' + i + '"]:checked');
+      answers['q' + i] = checked ? checked.value : '';
+    }
+  }
+  let score = 0;
+  const details = {};
   for (const [qid, correctVal] of Object.entries(ANSWER_KEY)) {
-    const userVal = answers[qid] || '', isCorrect = userVal === correctVal, pts = isCorrect ? 10 : 0;
+    const userVal = answers[qid] || '';
+    const isCorrect = userVal === correctVal;
+    const pts = isCorrect ? 10 : 0;
     score += pts;
     details[qid] = { userAns: userVal, correctAns: correctVal, isCorrect, points: pts };
   }
-  return { score, maxScore: 60, details, summary: `客觀題實得分數：${score} / 60` };
+  return { score, maxScore: 60, details, summary: '客觀題實得分數：' + score + ' / 60' };
 }
 
 // 相機與圖片處理 (JPEG 0.7 壓縮)
@@ -264,22 +276,28 @@ const canvas = document.getElementById('hiddenCanvas'), imgPreview = document.ge
 const btnStart = document.getElementById('btnStartCamera'), btnCapture = document.getElementById('btnCapture');
 const btnRetake = document.getElementById('btnRetake'), btnStop = document.getElementById('btnStopCamera');
 const fileInput = document.getElementById('fileFallback');
-btnStart.addEventListener('click', async () => {
-  try {
-    activeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 } } });
-    video.srcObject = activeStream;
-    cameraBox.style.display = 'block';
-    btnCapture.style.display = btnStop.style.display = 'inline-block';
-    btnStart.style.display = 'none';
-  } catch (err) { alert('無法存取相機，請使用下方圖片上傳備用方案。(' + err.message + ')'); }
-});
+
+if (btnStart) {
+  btnStart.addEventListener('click', async () => {
+    try {
+      activeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 } } });
+      video.srcObject = activeStream;
+      cameraBox.style.display = 'block';
+      btnCapture.style.display = btnStop.style.display = 'inline-block';
+      btnStart.style.display = 'none';
+    } catch (err) { alert('無法存取相機，請使用下方圖片上傳備用方案。(' + err.message + ')'); }
+  });
+}
 
 function stopCameraStream() {
   if (activeStream) { activeStream.getTracks().forEach(t => t.stop()); activeStream = null; }
-  cameraBox.style.display = btnCapture.style.display = btnStop.style.display = 'none';
-  btnStart.style.display = 'inline-block';
+  if (cameraBox) cameraBox.style.display = 'none';
+  if (btnCapture) btnCapture.style.display = 'none';
+  if (btnStop) btnStop.style.display = 'none';
+  if (btnStart) btnStart.style.display = 'inline-block';
 }
-btnStop.addEventListener('click', stopCameraStream);
+if (btnStop) btnStop.addEventListener('click', stopCameraStream);
+
 function compressAndStore(sourceImg) {
   const MAX_W = 1200;
   let w = sourceImg.width || sourceImg.videoWidth, h = sourceImg.height || sourceImg.videoHeight;
@@ -289,58 +307,67 @@ function compressAndStore(sourceImg) {
   ctx.drawImage(sourceImg, 0, 0, w, h);
   currentCompressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
   imgPreview.src = currentCompressedBase64;
-  imgPreview.style.display = btnRetake.style.display = 'block';
+  imgPreview.style.display = 'block';
+  if (btnRetake) btnRetake.style.display = 'block';
 }
-btnCapture.addEventListener('click', () => { compressAndStore(video); stopCameraStream(); });
-btnRetake.addEventListener('click', () => {
+
+if (btnCapture) btnCapture.addEventListener('click', () => { compressAndStore(video); stopCameraStream(); });
+if (btnRetake) btnRetake.addEventListener('click', () => {
   currentCompressedBase64 = ''; imgPreview.src = '';
-  imgPreview.style.display = btnRetake.style.display = 'none';
-  btnStart.click();
+  imgPreview.style.display = 'none';
+  btnRetake.style.display = 'none';
+  if (btnStart) btnStart.click();
 });
-fileInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (evt) => {
-    const tempImg = new Image();
-    tempImg.onload = () => compressAndStore(tempImg);
-    tempImg.src = evt.target.result;
-  };
-  reader.readAsDataURL(file);
-});
+if (fileInput) {
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const tempImg = new Image();
+      tempImg.onload = () => compressAndStore(tempImg);
+      tempImg.src = evt.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 // 二階段提交邏輯
 async function submitExam(isAuto = false) {
-  const studentId = document.getElementById('studentId').value.trim() || (isAuto ? 'S_TIMEOUT' : '');
-  const studentName = document.getElementById('studentName').value.trim() || (isAuto ? '超時繳卷' : '');
+  const studentId = document.getElementById('studentId') ? document.getElementById('studentId').value.trim() : (isAuto ? 'S_TIMEOUT' : '');
+  const studentName = document.getElementById('studentName') ? document.getElementById('studentName').value.trim() : (isAuto ? '超時繳卷' : '');
   if (!studentId || !studentName) return alert('請填寫學號與姓名！');
   if (!currentCompressedBase64 && !isAuto && !confirm('未附解答照片，確定繳卷？')) return;
+
   const submitBtn = document.getElementById('submitBtn'), statusBox = document.getElementById('statusBox');
-  submitBtn.disabled = true;
-  statusBox.className = 'status-msg status-info';
-  statusBox.style.display = 'block';
-  statusBox.textContent = '【第 1/2 步】正在上傳解答照片至 Google Apps Script 雲端圖床...';
+  if (submitBtn) submitBtn.disabled = true;
+  if (statusBox) {
+    statusBox.className = 'status-msg status-info';
+    statusBox.style.display = 'block';
+    statusBox.textContent = '【第 1/2 步】正在上傳解答照片至 Google Apps Script 雲端圖床...';
+  }
 
   const grading = gradeObjectiveQuestions();
+  const fillInText = document.getElementById('fillInAnswer') ? document.getElementById('fillInAnswer').value.trim() : '';
   let uploadedFileUrl = '未附照片';
+
   try {
     if (currentCompressedBase64) {
       const gasRes = await fetch(CONFIG.GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        const fillInText = document.getElementById('fillInAnswer') ? document.getElementById('fillInAnswer').value.trim() : '';
-      body: JSON.stringify({ studentId, studentName, fillInAnswer: fillInText, imageBase64: currentCompressedBase64 })
+        body: JSON.stringify({ studentId, studentName, fillInAnswer: fillInText, imageBase64: currentCompressedBase64 })
       });
       const gasData = await gasRes.json();
       if (gasData.status === 'success' && gasData.fileUrl) uploadedFileUrl = gasData.fileUrl;
       else throw new Error(gasData.message || '雲端硬碟上傳失敗');
     }
 
-    statusBox.textContent = '【第 2/2 步】正在將作答成果、客觀成績與解答圖網址提交至表單...';
+    if (statusBox) statusBox.textContent = '【第 2/2 步】正在將作答成果、客觀成績與解答圖網址提交至表單...';
     const formParams = new URLSearchParams();
     formParams.append(CONFIG.FORM_ENTRIES.studentId, studentId);
     formParams.append(CONFIG.FORM_ENTRIES.studentName, studentName);
     formParams.append(CONFIG.FORM_ENTRIES.score, String(grading.score));
-    const fillInText = document.getElementById('fillInAnswer') ? document.getElementById('fillInAnswer').value.trim() : '';
     formParams.append(CONFIG.FORM_ENTRIES.details, JSON.stringify({ ...grading.details, fillInAnswer: fillInText }));
     formParams.append(CONFIG.FORM_ENTRIES.imageUrl, uploadedFileUrl);
 
@@ -351,17 +378,24 @@ async function submitExam(isAuto = false) {
       body: formParams.toString()
     });
 
-    clearInterval(timerId);
-    statusBox.className = 'status-msg status-success';
-    statusBox.innerHTML = `<h3>繳卷成功！</h3><p>學號：${studentId} | 姓名：${studentName}</p><p>${grading.summary}</p><p>解答圖：<a href="${uploadedFileUrl}" target="_blank">${uploadedFileUrl}</a></p>`;
+    if (timerId) clearInterval(timerId);
+    if (statusBox) {
+      statusBox.className = 'status-msg status-success';
+      statusBox.innerHTML = '<h3>繳卷成功！</h3><p>學號：' + studentId + ' | 姓名：' + studentName + '</p><p>' + grading.summary + '</p><p>解答圖：<a href="' + uploadedFileUrl + '" target="_blank">' + uploadedFileUrl + '</a></p>';
+    }
   } catch (err) {
-    statusBox.className = 'status-msg status-error';
-    statusBox.textContent = '提交過程發生錯誤：' + err.message + '，請聯繫監考教師或重試。';
-    submitBtn.disabled = false;
+    if (statusBox) {
+      statusBox.className = 'status-msg status-error';
+      statusBox.textContent = '提交過程發生錯誤：' + err.message + '，請聯繫監考教師或重試。';
+    }
+    if (submitBtn) submitBtn.disabled = false;
   }
 }
 
-document.getElementById('examForm').addEventListener('submit', (e) => { e.preventDefault(); submitExam(false); });
+const examFormEl = document.getElementById('examForm');
+if (examFormEl) {
+  examFormEl.addEventListener('submit', (e) => { e.preventDefault(); submitExam(false); });
+}
 function autoSubmit() { submitExam(true); }
 
 if (typeof module !== 'undefined' && module.exports) {
