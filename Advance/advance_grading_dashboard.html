@@ -105,12 +105,23 @@
         }
     }
 
+    function getDirectDriveImgUrl(url) {
+        if (!url || typeof url !== 'string' || url === '無圖片') return '';
+        if (url.startsWith('data:') || url.startsWith('blob:')) return url;
+        const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+        if (match && match[1]) {
+            return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1200`;
+        }
+        return url;
+    }
+
     function renderPaperCard(paper, container) {
         const card = document.createElement('div');
         card.className = 'paper-card';
         card.id = `card_${paper.rowIndex}`;
         
         const timeStr = new Date(paper.timestamp).toLocaleString('zh-TW');
+        const directImgSrc = getDirectDriveImgUrl(paper.imageUrl);
         
         card.innerHTML = `
             <div class="paper-header">
@@ -124,7 +135,7 @@
             <div class="section-title">📸 解答題計算圖片</div>
             <div class="img-container">
                 ${paper.imageUrl && paper.imageUrl !== '無圖片' 
-                    ? `<a href="${paper.imageUrl}" target="_blank" title="點擊在新分頁開啟原圖"><img src="${paper.imageUrl}" alt="解答圖片"></a><br><small>點擊圖片可在新分頁檢視原圖</small>` 
+                    ? `<a href="${paper.imageUrl}" target="_blank" title="點擊在新分頁開啟原圖"><img src="${directImgSrc}" alt="解答圖片" loading="lazy"></a><br><small>點擊圖片可在新分頁檢視高解析原圖</small>` 
                     : '<p style="color:#e74c3c;">該生未上傳圖片或上傳失敗</p>'}
             </div>
             
