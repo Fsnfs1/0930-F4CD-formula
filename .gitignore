@@ -6,6 +6,7 @@ tests/
 *備份*
 *backup*
 一鍵發布到GitHub.bat
+publish.ps1
 corrected_report.json
 export_scores.py
 export_student_scores.bat
