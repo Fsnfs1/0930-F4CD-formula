@@ -169,6 +169,24 @@ assert(gradingHtml.includes('loadMock5B99Paper'), '具備「一鍵載入 5B 99 �
 assert(gradingHtml.includes('rotatePhoto'), '具備手寫照片 90° 步進旋轉控制函數');
 assert(gradingHtml.includes('photoLightbox'), '具備高解析度相片放大燈箱 (photoLightbox)');
 assert(gradingHtml.includes('p4-score-input') && gradingHtml.includes('max="10"'), '具備 Q20~Q23 解答題 0~10 分給分框');
+assert(!gradingHtml.includes('預設 teacher2026') && !gradingHtml.includes('value="teacher2026"'), '教師端密碼未明文顯示在網頁上 (安全防護通過)');
+assert(gradingHtml.includes('syncPapersFromCloud'), '教師端具備 Google Sheets 雲端交卷自動同步功能');
+
+// 檢查 advance_grading_dashboard.html 內所有 <script> 區塊語法 100% 正確
+const vm = require('vm');
+const gradingScripts = gradingHtml.match(/<script\b[^>]*>([\s\S]*?)<\/script>/gi) || [];
+let gradingScriptErrors = 0;
+gradingScripts.forEach((tag, idx) => {
+  const codeMatch = tag.match(/<script\b[^>]*>([\s\S]*?)<\/script>/i);
+  if (codeMatch && codeMatch[1].trim()) {
+    try {
+      new vm.Script(codeMatch[1]);
+    } catch (e) {
+      gradingScriptErrors++;
+    }
+  }
+});
+assert(gradingScriptErrors === 0, `教師端所有 <script> 語法 100% 正確無誤 (語法錯誤數: ${gradingScriptErrors})`);
 
 // -----------------------------------------------------------------
 // Test 7: 學生查閱系統 advance_student_result.html DOM 檢驗

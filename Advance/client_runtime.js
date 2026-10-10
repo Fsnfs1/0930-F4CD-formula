@@ -1419,6 +1419,18 @@ async function submitExam(isAuto) {
       submitBtn.disabled = true;
     }
 
+    // 渲染交卷後跳轉導航按鈕
+    const sBox = document.getElementById('statusBox');
+    if (sBox && !document.getElementById('postSubmitLinks')) {
+      const linksContainer = document.createElement('div');
+      linksContainer.id = 'postSubmitLinks';
+      linksContainer.style.cssText = 'margin-top: 14px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;';
+      linksContainer.innerHTML = '<a href="advance_student_result.html" target="_blank" style="display:inline-flex; align-items:center; gap:6px; padding:10px 18px; background:#0284c7; color:white; border-radius:6px; text-decoration:none; font-weight:700; font-size:14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">📊 前往學生查閱成績單 ↗</a><a href="advance_grading_dashboard.html" target="_blank" style="display:inline-flex; align-items:center; gap:6px; padding:10px 18px; background:#1e3a8a; color:white; border-radius:6px; text-decoration:none; font-weight:700; font-size:14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">👩‍🏫 前往教師批改工作台 ↗</a>';
+      if (sBox.parentNode) {
+        sBox.parentNode.insertBefore(linksContainer, sBox.nextSibling);
+      }
+    }
+
     if (ExamState.timerInterval) clearInterval(ExamState.timerInterval);
 
   } catch (err) {

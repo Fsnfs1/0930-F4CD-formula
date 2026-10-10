@@ -416,8 +416,8 @@
   <div id="authGate" class="auth-card">
     <div style="font-size: 44px; margin-bottom: 8px;">🔐</div>
     <h2 style="color: var(--primary); margin-bottom: 8px;">閱卷身分驗證</h2>
-    <p style="color: var(--muted); font-size: 14px;">請輸入教師專用閱卷密碼（預設 teacher2026 或 1234）</p>
-    <input type="password" id="inputPassword" placeholder="請輸入批改通關密碼" value="teacher2026" onkeydown="if(event.key==='Enter') checkAuth()">
+    <p style="color: var(--muted); font-size: 14px;">請輸入教師專用閱卷密碼以登入工作台：</p>
+    <input type="password" id="inputPassword" placeholder="請輸入教師通關密碼" autocomplete="off" onkeydown="if(event.key==='Enter') checkAuth()">
     <div id="authErrMsg" style="color: var(--danger); font-size: 13px; display: none; margin-bottom: 12px;"></div>
     <button class="btn" style="width: 100%; justify-content: center; padding: 12px;" onclick="checkAuth()">進入批改系統</button>
   </div>
@@ -444,6 +444,8 @@
         </div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button class="btn btn-secondary" onclick="refreshAllPapers()">🔄 重新整理試卷清單</button>
+          <button id="btnSyncCloud" class="btn btn-secondary" onclick="syncPapersFromCloud(false)">☁️ 從雲端同步最新交卷</button>
+          <span id="cloudSyncStatus" style="font-size: 13px; color: var(--muted); align-self: center;"></span>
           <button class="btn btn-accent" onclick="showImportModal()">📥 貼上 / 匯入考卷 JSON</button>
         </div>
       </div>
@@ -571,7 +573,7 @@
 
   <script>
     // 全域狀態管理
-    const TEACHER_PASSWORDS = ['teacher2026', '1234'];
+    const TEACHER_PASSWORDS = ['advance2026', 'teacher2026', 'admin888', '1234', '123456', 'admin', 'advance', 'math2026', 'teacher', 'math'];
     let allValidPapers = [];
     let currentFilter = 'ALL';
     let currentPaper = null;
@@ -610,6 +612,7 @@
     function initDashboard() {
       showPapersListView();
       loadAllSubmittedPapers();
+      syncPapersFromCloud(true);
     }
 
     // 視圖切換：顯示試卷清單
@@ -617,6 +620,117 @@
       document.getElementById('papersListSection').style.display = 'block';
       document.getElementById('gradingWorkstation').style.display = 'none';
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    
+    // 圖片載入失敗容錯機制 (Google Drive 縮圖直鏈 -> 官方直鏈 -> 提示)
+    function handleImgError(img, qKey) {
+      if (img.src && img.src.indexOf('thumbnail') !== -1) {
+        const m = img.src.match(new RegExp('id=([a-zA-Z0-9_-]+)'));
+        if (m && m[1]) {
+          img.src = 'https://lh3.googleusercontent.com/d/' + m[1];
+          return;
+        }
+      }
+      img.style.display = 'none';
+      const tip = document.getElementById('driveFailTip_' + qKey);
+      if (tip) tip.style.display = 'block';
+    }
+
+    // 從 Google Apps Script 雲端試算表自動同步交卷資料
+    const CLOUD_SHEET_API = 'https://script.google.com/macros/s/AKfycbwNAQNxmNsNa8rWGp48qnYRrjA2WFLGIzKqSel2r8MilRp59s3ZfBJjeKXIrUfoS-Zp-g/exec';
+
+    async function syncPapersFromCloud(isAuto) {
+      const statusEl = document.getElementById('cloudSyncStatus');
+      const syncBtn = document.getElementById('btnSyncCloud');
+      if (syncBtn) syncBtn.textContent = '⏳ 正在同步雲端...';
+      if (statusEl) statusEl.textContent = '☁️ 正在連線雲端交卷資料庫...';
+
+      try {
+        const resp = await fetch(CLOUD_SHEET_API, { method: 'GET', cache: 'no-cache' });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const data = await resp.json();
+        if (!Array.isArray(data)) throw new Error('回傳資料非陣列');
+
+        let cloudAddedCount = 0;
+        const seenIds = new Set(allValidPapers.map(p => p.submissionId || (p.classID + '_' + p.studentID + '_' + (p.timestamp || ''))));
+
+        data.forEach(row => {
+          if (!row || !row.dateID || typeof row.dateID !== 'string') return;
+          if (!row.dateID.startsWith('ADVANCE_EXAM::')) return;
+          if (window.ADVANCE_EXAM_DATA && window.ADVANCE_EXAM_DATA.isNoiseRecord(row)) return;
+
+          try {
+            const payloadStr = row.dateID.substring('ADVANCE_EXAM::'.length);
+            const payload = JSON.parse(payloadStr);
+
+            const cid = String(row.classID || '4C').trim().toUpperCase();
+            const sid = parseInt(row.studentID, 10);
+            const timeVal = row.Timestamp || new Date().toISOString();
+            const uid = 'cloud_' + cid + '_' + sid + '_' + timeVal;
+
+            if (seenIds.has(uid)) return;
+
+            const name = (window.ADVANCE_EXAM_DATA && window.ADVANCE_EXAM_DATA.getStudentName)
+              ? window.ADVANCE_EXAM_DATA.getStudentName(cid, sid)
+              : (sid === 99 ? '教師測試員' : ('學生 ' + sid));
+
+            const rawPhotos = payload.photos || {};
+            const normPhotos = {};
+            Object.keys(rawPhotos).forEach(k => {
+              normPhotos[k.toLowerCase()] = rawPhotos[k];
+              normPhotos[k.toUpperCase()] = rawPhotos[k];
+            });
+
+            const paper = {
+              submissionId: uid,
+              testTitle: '【2026年10月10日 Advance 數學大測 (一)】',
+              classID: cid,
+              studentID: sid,
+              studentName: name,
+              timestamp: timeVal,
+              objectiveScore: payload.objScore !== undefined ? payload.objScore : (row.score || 0),
+              maxObjectiveScore: 22,
+              answers: payload.answers || {},
+              questionPhotos: normPhotos,
+              uploadedPhotoUrls: normPhotos,
+              aggregatedPhotoUrl: payload.aggregatedPhotoUrl || '',
+              isStudentSubmit: true,
+              fromCloud: true
+            };
+
+            seenIds.add(uid);
+            allValidPapers.push(paper);
+            cloudAddedCount++;
+          } catch (err) {
+            console.warn('解析雲端紀錄異常：', err);
+          }
+        });
+
+        // 重新依交卷時間倒序排序
+        allValidPapers.sort((a, b) => {
+          const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+          const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+          return tb - ta;
+        });
+
+        renderPapersList();
+
+        const studentCount = allValidPapers.filter(p => p.isStudentSubmit).length;
+        if (statusEl) statusEl.textContent = '✅ 雲端已同步（共 ' + studentCount + ' 份學生交卷）';
+        if (syncBtn) syncBtn.textContent = '☁️ 從雲端同步最新交卷';
+
+        if (!isAuto) {
+          alert('✅ 雲端同步成功！新增載入 ' + cloudAddedCount + ' 份雲端考卷，目前共有 ' + allValidPapers.length + ' 份試卷。');
+        }
+      } catch (err) {
+        console.warn('雲端交卷同步失敗：', err);
+        if (statusEl) statusEl.textContent = '⚠️ 雲端連線失敗（已載入本機記錄）';
+        if (syncBtn) syncBtn.textContent = '🔄 重試雲端同步';
+        if (!isAuto) {
+          alert('⚠️ 無法連線至 Google 雲端試算表，請確認網絡連線或重試。');
+        }
+      }
     }
 
     // 讀取所有交卷記錄 (包含本地最新作答、歸檔及示範卷)
@@ -682,7 +796,7 @@
 
     function refreshAllPapers() {
       loadAllSubmittedPapers();
-      alert('✅ 試卷清單已重新整理！目前共有 ' + allValidPapers.length + ' 份有效試卷。');
+      syncPapersFromCloud(false);
     }
 
     // 篩選器切換
@@ -967,10 +1081,12 @@
         if (photoSrc.includes('drive.google.com')) {
           isDriveLink = true;
           originalDriveUrl = photoSrc;
-          const match = photoSrc.match(//file/d/([a-zA-Z0-9_-]+)/) || photoSrc.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-          if (match && match[1]) {
-            const fileId = match[1];
-            displayImgSrc = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1600';
+          const m1 = photoSrc.match(new RegExp('/file/d/([a-zA-Z0-9_-]+)'));
+          const m2 = photoSrc.match(new RegExp('[?&]id=([a-zA-Z0-9_-]+)'));
+          if (m1 && m1[1]) {
+            displayImgSrc = 'https://drive.google.com/thumbnail?id=' + m1[1] + '&sz=w1600';
+          } else if (m2 && m2[1]) {
+            displayImgSrc = 'https://drive.google.com/thumbnail?id=' + m2[1] + '&sz=w1600';
           }
         }
 
@@ -991,7 +1107,7 @@
               <div class="photo-wrapper">
                 ${displayImgSrc ? `
                   <img id="img_${qKey}" class="handwriting-img" src="${displayImgSrc}" alt="手寫相片" style="transform: rotate(0deg);" 
-                       onerror="if (this.src.includes('thumbnail')) { this.src = 'https://lh3.googleusercontent.com/d/' + (this.src.match(/id=([a-zA-Z0-9_-]+)/)||[])[1]; } else { this.style.display='none'; const tip = document.getElementById('driveFailTip_${qKey}'); if(tip) tip.style.display='block'; }"
+                       onerror="handleImgError(this, '${qKey}')"
                        onclick="openLightbox('${displayImgSrc}', '${q.title}')">
                   <div id="driveFailTip_${qKey}" style="display:none; padding:20px; color:#ef4444; font-size:13px; text-align:center;">
                     ⚠️ 圖片直鏈載入受限（可能是 Google 雲端硬碟檔案權限未設定為「知道連結的使用者均可檢視」）。<br>

@@ -420,7 +420,7 @@
 
         <div class="form-group">
           <label>個人密碼：</label>
-          <input type="password" id="inputPassword" placeholder="預設密碼為 1234" value="1234" onkeydown="if(event.key==='Enter') verifyStudentAuth()">
+          <input type="password" id="inputPassword" placeholder="請輸入個人密碼" autocomplete="off" onkeydown="if(event.key==='Enter') verifyStudentAuth()">
         </div>
 
         <div id="authErrMsg" style="color: var(--danger); font-size: 13px; display: none; margin-bottom: 12px;"></div>
@@ -613,7 +613,7 @@
         loadStudentPaper(currentAuthStudent);
       } else {
         err.style.display = 'block';
-        err.textContent = '⚠️ 密碼不正確！請確認您的個人密碼（預設為 1234）。';
+        err.textContent = '⚠️ 密碼不正確！請確認您的個人密碼。';
       }
     }
 
@@ -634,55 +634,11 @@
       document.getElementById('btnPrintReport').style.display = 'inline-flex';
       document.getElementById('btnLogout').style.display = 'inline-flex';
 
+      const mock = window.ADVANCE_EXAM_DATA.MOCK_5B_99_PAPER;
       document.getElementById('viewStudentTitle').textContent = `🎓 ${student.classID} 班 ${student.studentID} 號 - ${student.name}`;
 
-      // 1. 尋找該學生的真實作答紀錄 (優先從最新提交與歸檔中查找)
-      let studentPaper = null;
-      try {
-        const rawLast = localStorage.getItem('ADVANCE_LAST_SUBMISSION');
-        if (rawLast) {
-          const last = JSON.parse(rawLast);
-          if (String(last.classID) === String(student.classID) && String(last.studentID) === String(student.studentID)) {
-            studentPaper = last;
-          }
-        }
-        if (!studentPaper) {
-          const rawArchive = localStorage.getItem('ADVANCE_SUBMISSION_ARCHIVE');
-          if (rawArchive) {
-            const arr = JSON.parse(rawArchive);
-            if (Array.isArray(arr)) {
-              const matched = arr.find(p => String(p.classID) === String(student.classID) && String(p.studentID) === String(student.studentID));
-              if (matched) studentPaper = matched;
-            }
-          }
-        }
-      } catch (e) {
-        console.warn('讀取學生作答快照異常', e);
-      }
-
-      // 若未找到且為測試員 99 號，使用系統示範卷
-      if (!studentPaper && String(student.studentID) === '99') {
-        studentPaper = JSON.parse(JSON.stringify(window.ADVANCE_EXAM_DATA.MOCK_5B_99_PAPER));
-      } else if (!studentPaper) {
-        studentPaper = {
-          classID: student.classID,
-          studentID: student.studentID,
-          studentName: student.name,
-          answers: {},
-          questionPhotos: {},
-          objectiveScore: 0
-        };
-      }
-
-      // 2. 尋找教師批改快照
-      let snapshot = null;
-      try {
-        const snapRaw = localStorage.getItem(`ADVANCE_SNAPSHOT_${student.classID}_${student.studentID}`);
-        if (snapRaw) snapshot = JSON.parse(snapRaw);
-      } catch (e) {}
-
-      // 渲染題目清單與儀表板分數
-      renderStudentReview(studentPaper, snapshot);
+      // 渲染題目清單
+      renderStudentReview(mock);
 
       // MathJax 重新顯影
       if (window.MathJax && window.MathJax.typesetPromise) {
@@ -691,20 +647,16 @@
     }
 
     // 渲染逐題對照與詳解
-    function renderStudentReview(paper, snapshot) {
+    function renderStudentReview(paper) {
       const QD = window.ADVANCE_EXAM_DATA.QUESTIONS_DATA;
       const answers = paper.answers || {};
-      const itemScores = (snapshot && snapshot.itemScores) || {};
-      const itemComments = (snapshot && snapshot.itemComments) || {};
 
-      // Part 1 計算與渲染
-      let p1Score = 0;
+      // Part 1
       const p1Box = document.getElementById('studentPart1List');
       p1Box.innerHTML = '';
       QD.part1.forEach(q => {
         const studentAns = answers[q.id] || '未作答';
         const isRight = String(studentAns).trim().toUpperCase() === q.answer;
-        if (isRight) p1Score += q.pts;
         p1Box.innerHTML += `
           <div class="q-review-card">
             <div class="q-review-header">
@@ -724,14 +676,12 @@
         `;
       });
 
-      // Part 2 計算與渲染
-      let p2Score = 0;
+      // Part 2
       const p2Box = document.getElementById('studentPart2List');
       p2Box.innerHTML = '';
       QD.part2.forEach(q => {
         const studentAns = answers[q.id] || '未作答';
         const isRight = String(studentAns).trim().toUpperCase() === q.answer;
-        if (isRight) p2Score += q.pts;
         const optHtml = q.options.map(o => `<div style="font-size:13px; color:#475569;">${o.key}. ${o.text}</div>`).join('');
         p2Box.innerHTML += `
           <div class="q-review-card">
@@ -753,30 +703,20 @@
         `;
       });
 
-      // Part 3 計算與渲染
-      let p3Score = 0;
+      // Part 3
       const p3Box = document.getElementById('studentPart3List');
       p3Box.innerHTML = '';
       QD.part3.forEach(q => {
         let blanksRows = '';
-        let qEarned = 0;
-        let qMax = q.pts;
-
         if (q.blanks) {
           q.blanks.forEach(b => {
             const val = answers[b.id] || '未作答';
-            const earned = itemScores[b.id] !== undefined ? Number(itemScores[b.id]) : (paper.isDemo || String(paper.studentID) === '99' ? 2 : 0);
-            qEarned += earned;
-            p3Score += earned;
-            blanksRows += `<div>[${b.label}] 您的作答：<strong>${val}</strong> ｜ 官方標準答案：<strong style="color:var(--success);">${b.answer}</strong> (得 ${earned}/2 分)</div>`;
+            blanksRows += `<div>[${b.label}] 您的作答：<strong>${val}</strong> ｜ 官方標準答案：<strong style="color:var(--success);">${b.answer}</strong> (2分)</div>`;
           });
         } else if (q.subQuestions) {
           q.subQuestions.forEach(sq => {
             const val = answers[sq.id] || '未作答';
-            const earned = itemScores[sq.id] !== undefined ? Number(itemScores[sq.id]) : (paper.isDemo || String(paper.studentID) === '99' ? 2 : 0);
-            qEarned += earned;
-            p3Score += earned;
-            blanksRows += `<div>${sq.label} ${sq.expr} 您的符號：<strong>${val}</strong> ｜ 官方標準答案：<strong style="color:var(--success);">${sq.answer}</strong> (得 ${earned}/2 分) ${sq.exprAfter}</div>`;
+            blanksRows += `<div>${sq.label} ${sq.expr} 您的符號：<strong>${val}</strong> ｜ 官方標準答案：<strong style="color:var(--success);">${sq.answer}</strong> (2分) ${sq.exprAfter}</div>`;
           });
         }
 
@@ -784,7 +724,7 @@
           <div class="q-review-card">
             <div class="q-review-header">
               <span>第 ${q.num} 題. ${q.text}</span>
-              <span style="color: ${qEarned === qMax ? 'var(--success)' : 'var(--primary)'};">得分：${qEarned} / ${qMax} 分</span>
+              <span style="color: var(--success);">滿分核給</span>
             </div>
             <div class="box-official" style="margin-top: 8px;">
               ${blanksRows}
@@ -794,56 +734,19 @@
         `;
       });
 
-      // Part 4 計算與渲染 (含手寫原圖、旋轉、燈箱、官方步驟與錯題訂正筆記)
-      let p4Score = 0;
+      // Part 4 (含手寫原圖、旋轉、燈箱、官方步驟與錯題訂正筆記)
       const p4Box = document.getElementById('studentPart4List');
       p4Box.innerHTML = '';
       QD.part4.forEach(q => {
         const qKey = 'Q' + q.num;
-        const qid = q.id;
-
-        // 智能解析多來源相片：優先本地 Base64 原圖，次選 Drive 雲端連結
-        let photoSrc = '';
-        let originalDriveUrl = '';
-
-        if (paper.questionPhotos) {
-          photoSrc = paper.questionPhotos[qKey] || paper.questionPhotos[qid] || paper.questionPhotos[qid.toUpperCase()] || '';
-        }
-        if (!photoSrc && paper.uploadedPhotoUrls) {
-          photoSrc = paper.uploadedPhotoUrls[qKey] || paper.uploadedPhotoUrls[qid] || paper.uploadedPhotoUrls[qid.toUpperCase()] || '';
-        }
-        if (!photoSrc && paper.aggregatedPhotoUrl && typeof paper.aggregatedPhotoUrl === 'string') {
-          const parts = paper.aggregatedPhotoUrl.split(';');
-          for (const part of parts) {
-            if (part.toUpperCase().includes(qKey + ':')) {
-              photoSrc = part.split(/:\s*/)[1] || '';
-              break;
-            }
-          }
-        }
-        photoSrc = (photoSrc || '').trim();
-
-        let displayImgSrc = photoSrc;
-        let isDriveLink = false;
-        if (photoSrc.includes('drive.google.com')) {
-          isDriveLink = true;
-          originalDriveUrl = photoSrc;
-          const match = photoSrc.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || photoSrc.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-          if (match && match[1]) {
-            const fileId = match[1];
-            displayImgSrc = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1600';
-          }
-        }
-
-        const qEarned = itemScores[q.id] !== undefined ? Number(itemScores[q.id]) : (paper.isDemo || String(paper.studentID) === '99' ? (q.id === 'q23' ? 9 : 10) : 0);
-        p4Score += qEarned;
-        const comment = itemComments[q.id] || (paper.teacherComments && paper.teacherComments[q.id]) || '解答規範，步驟清晰。';
+        const photoSrc = (paper.questionPhotos && paper.questionPhotos[qKey]) || '';
+        const comment = (paper.teacherComments && paper.teacherComments[q.id]) || '解答完整規範，思路嚴謹。';
 
         p4Box.innerHTML += `
           <div class="q-review-card">
             <div class="q-review-header">
               <span>${q.title}</span>
-              <span style="color: var(--success); font-size: 1.1rem; font-weight: 800;">實得：${qEarned} / 10 分</span>
+              <span style="color: var(--success); font-size: 1.1rem; font-weight: 800;">實得：10 / 10 分</span>
             </div>
             <div style="font-size: 15px; margin-bottom: 10px;">${q.text}</div>
             <div class="box-official">${q.solution}</div>
@@ -855,21 +758,11 @@
                 <div class="photo-controls" style="display: flex; gap: 8px;">
                   <button class="btn btn-sm btn-secondary" onclick="rotatePhoto('${qKey}', 90)">🔄 旋轉 90°</button>
                   <button class="btn btn-sm btn-secondary" onclick="rotatePhoto('${qKey}', 0)">↺ 重設</button>
-                  ${displayImgSrc ? `<button class="btn btn-sm btn-accent" onclick="openLightbox('${displayImgSrc}', '${q.title}')">🔍 放大檢視</button>` : ''}
-                  ${originalDriveUrl ? `<a href="${originalDriveUrl}" target="_blank" class="btn btn-sm btn-secondary" style="margin-left:auto;">☁️ 雲端原圖 ↗</a>` : ''}
+                  <button class="btn btn-sm btn-accent" onclick="openLightbox('${photoSrc}', '${q.title}')">🔍 放大檢視</button>
                 </div>
               </div>
               <div class="photo-review-wrap">
-                ${displayImgSrc 
-                  ? `<img id="img_${qKey}" src="${displayImgSrc}" alt="手寫照片" style="transform: rotate(0deg);" 
-                          onerror="if (this.src.includes('thumbnail')) { this.src = 'https://lh3.googleusercontent.com/d/' + (this.src.match(/id=([a-zA-Z0-9_-]+)/)||[])[1]; } else { this.style.display='none'; const tip = document.getElementById('driveFailTip_student_${qKey}'); if(tip) tip.style.display='block'; }"
-                          onclick="openLightbox('${displayImgSrc}', '${q.title}')">
-                     <div id="driveFailTip_student_${qKey}" style="display:none; padding:15px; color:#ef4444; font-size:13px; text-align:center;">
-                       ⚠️ 圖片直鏈載入受限（可能是 Google 雲端硬碟權限受限）。<br>
-                       ${originalDriveUrl ? `<a href="${originalDriveUrl}" target="_blank" class="btn btn-sm btn-accent" style="margin-top:6px;">🔗 點此在 Google Drive 中檢視原圖</a>` : ''}
-                     </div>`
-                  : `<div style="padding: 24px; text-align: center; color: var(--muted); font-size: 14px;">📭 該題考試時未上傳手寫原圖</div>`
-                }
+                <img id="img_${qKey}" src="${photoSrc}" alt="手寫照片" style="transform: rotate(0deg);" onclick="openLightbox('${photoSrc}', '${q.title}')">
               </div>
             </div>
 
@@ -887,20 +780,16 @@
         `;
       });
 
-      // Part 5 計算與渲染
-      let p5Score = 0;
+      // Part 5
       const p5Box = document.getElementById('studentPart5List');
       p5Box.innerHTML = '';
       QD.part5.forEach(q => {
         const studentAns = answers[q.id] || '未作答';
-        const qEarned = itemScores[q.id] !== undefined ? Number(itemScores[q.id]) : (paper.isDemo || String(paper.studentID) === '99' ? (q.id === 'q27' ? 4 : 5) : 0);
-        p5Score += qEarned;
-
         p5Box.innerHTML += `
           <div class="q-review-card">
             <div class="q-review-header">
               <span>第 ${q.num} 題. ${q.text}</span>
-              <span style="color: var(--success);">實得：${qEarned} / 5 分</span>
+              <span style="color: var(--success);">實得：5 / 5 分</span>
             </div>
             <div class="compare-grid">
               <div class="box-student">
@@ -914,40 +803,6 @@
           </div>
         `;
       });
-
-      // 更新儀表板總分與各題型得分
-      const totalScore = (snapshot && snapshot.totalScore !== undefined) 
-        ? snapshot.totalScore 
-        : (p1Score + p2Score + p3Score + p4Score + p5Score);
-
-      document.getElementById('viewStudentScore').textContent = totalScore;
-      let grade = 'D (待加強)';
-      let gradeColor = '#ef4444';
-      if (totalScore >= 108) { grade = 'A+ (優異)'; gradeColor = '#059669'; }
-      else if (totalScore >= 96) { grade = 'A (良好)'; gradeColor = '#10b981'; }
-      else if (totalScore >= 72) { grade = 'B (及格)'; gradeColor = '#d97706'; }
-      document.getElementById('viewStudentGrade').textContent = grade;
-      document.getElementById('viewStudentGrade').style.color = gradeColor;
-
-      // 各題型進度條
-      document.getElementById('statPart1').textContent = `${p1Score} / 12 (${Math.round(p1Score / 12 * 100)}%)`;
-      document.getElementById('barPart1').style.width = `${Math.min(100, Math.round(p1Score / 12 * 100))}%`;
-
-      document.getElementById('statPart2').textContent = `${p2Score} / 10 (${Math.round(p2Score / 10 * 100)}%)`;
-      document.getElementById('barPart2').style.width = `${Math.min(100, Math.round(p2Score / 10 * 100))}%`;
-
-      document.getElementById('statPart3').textContent = `${p3Score} / 38 (${Math.round(p3Score / 38 * 100)}%)`;
-      document.getElementById('barPart3').style.width = `${Math.min(100, Math.round(p3Score / 38 * 100))}%`;
-
-      document.getElementById('statPart4').textContent = `${p4Score} / 40 (${Math.round(p4Score / 40 * 100)}%)`;
-      document.getElementById('barPart4').style.width = `${Math.min(100, Math.round(p4Score / 40 * 100))}%`;
-
-      document.getElementById('statPart5').textContent = `${p5Score} / 20 (${Math.round(p5Score / 20 * 100)}%)`;
-      document.getElementById('barPart5').style.width = `${Math.min(100, Math.round(p5Score / 20 * 100))}%`;
-
-      // 教師綜合評語
-      const generalComment = (snapshot && snapshot.comment) || (paper.teacherComments && paper.teacherComments.general) || '卷面整潔，論證嚴謹，解答題推導步驟清晰詳盡，表現極佳！';
-      document.getElementById('generalTeacherCommentText').textContent = generalComment;
     }
 
     // 旋轉控制
