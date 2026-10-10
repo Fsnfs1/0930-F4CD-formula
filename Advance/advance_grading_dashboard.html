@@ -154,41 +154,54 @@
     /* 考卷清單網格 */
     .papers-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 18px;
       margin-bottom: 30px;
     }
     .paper-item {
       background: white;
-      border-radius: 10px;
-      padding: 18px;
+      border-radius: 12px;
+      padding: 20px;
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
-      cursor: pointer;
       transition: all 0.2s;
-      border-left: 5px solid var(--secondary);
+      border-left: 6px solid var(--secondary);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
     .paper-item:hover {
       border-color: var(--primary);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 16px -2px rgba(0,0,0,0.12);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px -3px rgba(0,0,0,0.12);
     }
-    .paper-item.active {
-      border-left-color: var(--accent);
-      background: #f0fdf4;
-      border-color: #86efac;
+    .paper-item.is-student {
+      border-left-color: #10b981;
+    }
+    .paper-item.is-demo {
+      border-left-color: #f59e0b;
+      background: #fffdfa;
     }
     .paper-item-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
+      align-items: flex-start;
+      margin-bottom: 10px;
     }
     .student-badge {
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       font-weight: 700;
       color: var(--primary);
     }
+    .type-pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .type-pill.student { background: #dcfce7; color: #15803d; }
+    .type-pill.demo { background: #fef3c7; color: #b45309; }
 
     /* 閱卷主工作區 (Isomorphic to advance_test.html) */
     .grading-workspace {
@@ -197,7 +210,7 @@
       box-shadow: var(--shadow);
       border: 1px solid var(--border);
       overflow: hidden;
-      margin-top: 24px;
+      margin-top: 12px;
     }
     .workspace-header {
       background: #f1f5f9;
@@ -393,8 +406,9 @@
       <span class="badge-title">2026年10月10日 大測(一) 專用</span>
     </div>
     <div style="display: flex; gap: 10px;">
-      <button class="btn btn-accent" onclick="loadMock5B99Paper()">📑 載入 5B 99 教師測試員完整考卷 (含4道手寫大題)</button>
-      <button class="btn btn-secondary" onclick="logoutTeacher()">🚪 登出</button>
+      <button class="btn btn-secondary" onclick="showPapersListView()">📋 試卷列表</button>
+      <button class="btn btn-accent" onclick="loadMock5B99Paper()">📑 載入示範測試卷</button>
+      <button class="btn btn-danger" onclick="logoutTeacher()">🚪 登出</button>
     </div>
   </header>
 
@@ -413,31 +427,41 @@
     
     <!-- 雜訊過濾狀態通知列 -->
     <div class="notice-box">
-      🛡️ <strong>雜訊過濾引擎已全天候啟動</strong>：已自動過濾 Google Apps Script 後端 128 維人臉浮點向量特徵碼、密碼雜湊與舊刷題紀錄，目前僅呈現【2026年10月10日 Advance 數學大測 (一)】全卷 27 題有效答卷。
+      🛡️ <strong>雜訊過濾引擎已全天候啟動</strong>：已自動過濾後端 128 維人臉浮點向量特徵碼、密碼雜湊與舊刷題紀錄，目前僅呈現【2026年10月10日 Advance 數學大測 (一)】有效答卷。
     </div>
 
-    <!-- 頂部過濾與操作列 -->
-    <div class="toolbar-card">
-      <div class="filter-tabs">
-        <button class="tab-btn active" onclick="setFilter('ALL', this)">全部有效試卷</button>
-        <button class="tab-btn" onclick="setFilter('4C', this)">4C 班</button>
-        <button class="tab-btn" onclick="setFilter('4D', this)">4D 班</button>
-        <button class="tab-btn" onclick="setFilter('5B', this)">5B 班</button>
-        <button class="tab-btn" onclick="setFilter('PHOTO', this)">📸 僅看有手寫解答照片</button>
+    <!-- 試卷清單視圖 (預設展示) -->
+    <section id="papersListSection">
+      <!-- 頂部過濾與操作列 -->
+      <div class="toolbar-card">
+        <div class="filter-tabs">
+          <button class="tab-btn active" onclick="setFilter('ALL', this)">全部試卷</button>
+          <button class="tab-btn" onclick="setFilter('STUDENT', this)">🎓 學生實際交卷</button>
+          <button class="tab-btn" onclick="setFilter('4C', this)">4C 班</button>
+          <button class="tab-btn" onclick="setFilter('4D', this)">4D 班</button>
+          <button class="tab-btn" onclick="setFilter('5B', this)">5B 班</button>
+          <button class="tab-btn" onclick="setFilter('PHOTO', this)">📸 僅看有手寫解答照片</button>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="btn btn-secondary" onclick="refreshAllPapers()">🔄 重新整理試卷清單</button>
+          <button class="btn btn-accent" onclick="showImportModal()">📥 貼上 / 匯入考卷 JSON</button>
+        </div>
       </div>
-      <div style="display: flex; gap: 8px;">
-        <button class="btn btn-secondary" onclick="fetchCloudPapers()">🔄 重新整理雲端資料庫</button>
+
+      <!-- 統計摘要 -->
+      <div id="papersCountSummary" style="margin-bottom: 16px; font-weight: 600; color: #334155;">
+        正在統計試卷數量...
       </div>
-    </div>
 
-    <!-- 考卷選擇卡片清單 -->
-    <h3 style="margin-bottom: 12px; color: var(--primary);">📋 待評閱考卷清單（點擊展開同構閱卷工作台）</h3>
-    <div id="papersListContainer" class="papers-grid"></div>
+      <!-- 考卷選擇卡片清單 -->
+      <div id="papersListContainer" class="papers-grid"></div>
+    </section>
 
-    <!-- 同構閱卷工作台 (Grading Workstation) -->
-    <div id="gradingWorkstation" class="grading-workspace" style="display: none;">
+    <!-- 同構閱卷工作台 (點選後展開) -->
+    <section id="gradingWorkstation" class="grading-workspace" style="display: none;">
       <div class="workspace-header">
         <div>
+          <button class="btn btn-secondary" style="margin-bottom: 8px; font-size: 13px;" onclick="showPapersListView()">⬅️ 返回試卷清單</button>
           <h2 id="currentStudentHeader" style="color: var(--primary);">🎓 正在批改：5B 班 99 號 - 教師測試員</h2>
           <span id="currentSubmitTime" style="font-size: 13px; color: var(--muted);">交卷時間：2026-10-10 12:00:00</span>
         </div>
@@ -495,17 +519,38 @@
       </div>
 
       <!-- 全卷綜合評語與送出列 -->
-      <div style="padding: 24px; background: #f8fafc; border-top: 1px solid var(--border);">
-        <h4 style="color: var(--primary); margin-bottom: 8px;">📝 教師全卷綜合評語：</h4>
-        <textarea id="teacherGeneralComment" rows="3" style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 14px; outline: none; margin-bottom: 16px;" placeholder="請輸入對該名學生全卷之總結評語..."></textarea>
-        <div style="display: flex; justify-content: flex-end; gap: 12px;">
-          <button class="btn btn-success" style="font-size: 16px; padding: 10px 24px;" onclick="saveGradingResult()">💾 儲存並登記全卷批改結果</button>
+      <div style="padding: 24px; background: #f8fafc; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div style="flex: 1; min-width: 300px;">
+          <h4 style="color: var(--primary); margin-bottom: 8px;">📝 教師全卷綜合評語：</h4>
+          <textarea id="teacherGeneralComment" rows="3" style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 14px; outline: none;" placeholder="請輸入對該名學生全卷之總結評語..."></textarea>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: flex-end;">
+          <button class="btn btn-secondary" onclick="showPapersListView()">⬅️ 返回試卷清單</button>
+          <button class="btn btn-success" style="font-size: 16px; padding: 12px 24px;" onclick="saveGradingResult()">💾 儲存並登記全卷批改結果</button>
         </div>
       </div>
 
-    </div>
+    </section>
 
   </main>
+
+  <!-- 匯入考卷 JSON 彈窗 -->
+  <div id="importModal" class="lightbox-overlay" style="display: none;" onclick="closeImportModal(event)">
+    <div class="lightbox-modal" style="height: auto; max-height: 80vh; max-width: 600px;" onclick="event.stopPropagation()">
+      <div class="lightbox-header">
+        <span>📥 貼上或匯入考卷資料 (JSON)</span>
+        <button class="btn btn-sm btn-danger" onclick="closeImportModal()">✖ 關閉</button>
+      </div>
+      <div style="padding: 20px; background: white;">
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 8px;">若學生在其他視窗或設備作答，可將作答 JSON 貼在此處立即匯入批改：</p>
+        <textarea id="importJsonText" rows="10" style="width: 100%; padding: 10px; font-family: monospace; font-size: 13px; border: 1px solid var(--border); border-radius: 6px;"></textarea>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
+          <button class="btn btn-secondary" onclick="closeImportModal()">取消</button>
+          <button class="btn btn-primary" onclick="doImportJson()">確認匯入試卷</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- 照片高解析放大燈箱 (Lightbox Modal) -->
   <div id="photoLightbox" class="lightbox-overlay" style="display: none;" onclick="closeLightbox(event)">
@@ -561,24 +606,83 @@
       }
     });
 
-    // 初始化控制台
+    // 初始化控制台：先顯示全部作答過的試卷列表
     function initDashboard() {
-      // 預設將 5B 99 測試卷置入清單
-      allValidPapers = [window.ADVANCE_EXAM_DATA.MOCK_5B_99_PAPER];
-      
-      // 讀取本地已保存的歸檔紀錄
+      showPapersListView();
+      loadAllSubmittedPapers();
+    }
+
+    // 視圖切換：顯示試卷清單
+    function showPapersListView() {
+      document.getElementById('papersListSection').style.display = 'block';
+      document.getElementById('gradingWorkstation').style.display = 'none';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 讀取所有交卷記錄 (包含本地最新作答、歸檔及示範卷)
+    function loadAllSubmittedPapers() {
+      allValidPapers = [];
+      const seenIds = new Set();
+
+      // 1. 讀取 LocalStorage 中的歸檔紀錄 ADVANCE_SUBMISSION_ARCHIVE
       try {
-        const localArchive = JSON.parse(localStorage.getItem('ADVANCE_SUBMISSION_ARCHIVE') || '[]');
-        localArchive.forEach(item => {
-          if (!window.ADVANCE_EXAM_DATA.isNoiseRecord(item)) {
-            allValidPapers.push(item);
+        const rawArchive = localStorage.getItem('ADVANCE_SUBMISSION_ARCHIVE');
+        if (rawArchive) {
+          const archive = JSON.parse(rawArchive);
+          if (Array.isArray(archive)) {
+            archive.forEach(item => {
+              if (item && !window.ADVANCE_EXAM_DATA.isNoiseRecord(item)) {
+                item.isStudentSubmit = true;
+                const uid = item.submissionId || (item.classID + '_' + item.studentID + '_' + (item.timestamp || ''));
+                if (!seenIds.has(uid)) {
+                  seenIds.add(uid);
+                  allValidPapers.push(item);
+                }
+              }
+            });
           }
-        });
-      } catch (e) {}
+        }
+      } catch (e) {
+        console.warn('讀取 ADVANCE_SUBMISSION_ARCHIVE 異常：', e);
+      }
+
+      // 2. 讀取 LocalStorage 中的最新單次提交 ADVANCE_LAST_SUBMISSION (避免剛提交未寫入歸檔)
+      try {
+        const rawLast = localStorage.getItem('ADVANCE_LAST_SUBMISSION');
+        if (rawLast) {
+          const lastSub = JSON.parse(rawLast);
+          if (lastSub && !window.ADVANCE_EXAM_DATA.isNoiseRecord(lastSub)) {
+            lastSub.isStudentSubmit = true;
+            const uid = lastSub.submissionId || (lastSub.classID + '_' + lastSub.studentID + '_' + (lastSub.timestamp || ''));
+            if (!seenIds.has(uid)) {
+              seenIds.add(uid);
+              allValidPapers.unshift(lastSub); // 最新排在最前
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('讀取 ADVANCE_LAST_SUBMISSION 異常：', e);
+      }
+
+      // 3. 加入系統內建模擬示範卷 (標註 isDemo)
+      const mock = JSON.parse(JSON.stringify(window.ADVANCE_EXAM_DATA.MOCK_5B_99_PAPER));
+      mock.isDemo = true;
+      mock.submissionId = 'built_in_mock_5b_99';
+      allValidPapers.push(mock);
+
+      // 依交卷時間倒序排列（最新的在最上面）
+      allValidPapers.sort((a, b) => {
+        const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+        const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+        return tb - ta;
+      });
 
       renderPapersList();
-      // 預設直接加載 5B 99 測試卷
-      selectPaper(window.ADVANCE_EXAM_DATA.MOCK_5B_99_PAPER);
+    }
+
+    function refreshAllPapers() {
+      loadAllSubmittedPapers();
+      alert('✅ 試卷清單已重新整理！目前共有 ' + allValidPapers.length + ' 份有效試卷。');
     }
 
     // 篩選器切換
@@ -589,58 +693,126 @@
       renderPapersList();
     }
 
-    // 渲染考卷清單
+    // 渲染考卷清單網格
     function renderPapersList() {
       const container = document.getElementById('papersListContainer');
+      const countSummary = document.getElementById('papersCountSummary');
       container.innerHTML = '';
 
       let list = allValidPapers;
-      if (currentFilter === '4C') list = list.filter(p => p.classID === '4C');
+      if (currentFilter === 'STUDENT') list = list.filter(p => p.isStudentSubmit);
+      else if (currentFilter === '4C') list = list.filter(p => p.classID === '4C');
       else if (currentFilter === '4D') list = list.filter(p => p.classID === '4D');
       else if (currentFilter === '5B') list = list.filter(p => p.classID === '5B');
       else if (currentFilter === 'PHOTO') list = list.filter(p => p.questionPhotos && Object.keys(p.questionPhotos).length > 0);
 
+      countSummary.innerHTML = `共找到 <strong style="color:var(--primary); font-size:1.1rem;">${list.length}</strong> 份試卷（點擊卡片中的「✍️ 開始批改此卷」進入同構閱卷介面）`;
+
       if (list.length === 0) {
-        container.innerHTML = '<div style="color:var(--muted); padding: 20px;">此篩選條件下無考卷。</div>';
+        container.innerHTML = '<div style="color:var(--muted); padding: 40px; text-align: center; grid-column: 1/-1; background: white; border-radius: 8px;">📭 此篩選條件下目前無試卷記錄。</div>';
         return;
       }
 
       list.forEach((p, idx) => {
         const card = document.createElement('div');
-        card.className = 'paper-item' + (currentPaper && currentPaper.rowIndex === p.rowIndex ? ' active' : '');
-        const timeStr = p.timestamp ? new Date(p.timestamp).toLocaleString('zh-TW') : '無時間標記';
+        card.className = 'paper-item' + (p.isDemo ? ' is-demo' : ' is-student');
+        
+        const timeFormatted = p.timestamp ? new Date(p.timestamp).toLocaleString('zh-TW', { hour12: false }) : '無交卷時間';
+        const photoCount = p.questionPhotos ? Object.keys(p.questionPhotos).length : 0;
+        
+        // 檢查本地是否已有已評定快照
+        const snapshotKey = `ADVANCE_SNAPSHOT_${p.classID}_${p.studentID}`;
+        let savedSnapshot = null;
+        try { savedSnapshot = JSON.parse(localStorage.getItem(snapshotKey)); } catch (e) {}
+
+        const statusHtml = savedSnapshot 
+          ? `<span style="color:#059669; font-weight:700;">✅ 已批改 (總分 ${savedSnapshot.totalScore} 分)</span>` 
+          : (p.scores && p.scores.grandTotal ? `<span style="color:#059669; font-weight:700;">✅ 已批改 (總分 ${p.scores.grandTotal} 分)</span>` : `<span style="color:#d97706; font-weight:700;">⏳ 待批改</span>`);
+
         card.innerHTML = `
-          <div class="paper-item-header">
-            <span class="student-badge">${p.classID} 班 ${p.studentID} 號 - ${p.studentName}</span>
-            <span style="font-size: 12px; color: var(--muted);">${timeStr}</span>
+          <div>
+            <div class="paper-item-header">
+              <div>
+                <span class="student-badge">${p.classID} 班 ${p.studentID} 號 - ${p.studentName}</span>
+                ${p.isDemo ? '<span class="type-pill demo">系統示範卷</span>' : '<span class="type-pill student">學生交卷</span>'}
+              </div>
+              <span style="font-size: 12px; color: var(--muted);">${timeFormatted}</span>
+            </div>
+            
+            <div style="font-size: 14px; margin: 10px 0; color: #334155; line-height: 1.7;">
+              <div>客觀題得分：<strong style="color:var(--primary);">${p.objectiveScore !== undefined ? p.objectiveScore : 22}</strong> / 22 分</div>
+              <div>解答題照片：<strong>${photoCount}</strong> 張手寫作答原圖</div>
+              <div>批改狀態：${statusHtml}</div>
+            </div>
           </div>
-          <div style="font-size: 13px; color: #475569;">
-            客觀題：<strong>${p.objectiveScore || 22}</strong> / 22 分 ｜ 
-            預估總分：<strong style="color: var(--primary);">${p.scores ? p.scores.grandTotal : (p.totalPoints || '未批')}</strong> / 120 分
+
+          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border); display: flex; justify-content: flex-end;">
+            <button class="btn btn-primary" onclick="launchGradingPaper(${idx})" style="width: 100%; justify-content: center;">
+              ✍️ 開始批改此卷
+            </button>
           </div>
         `;
-        card.onclick = () => selectPaper(p);
         container.appendChild(card);
       });
+    }
+
+    // 啟動批改模式
+    function launchGradingPaper(index) {
+      let list = allValidPapers;
+      if (currentFilter === 'STUDENT') list = list.filter(p => p.isStudentSubmit);
+      else if (currentFilter === '4C') list = list.filter(p => p.classID === '4C');
+      else if (currentFilter === '4D') list = list.filter(p => p.classID === '4D');
+      else if (currentFilter === '5B') list = list.filter(p => p.classID === '5B');
+      else if (currentFilter === 'PHOTO') list = list.filter(p => p.questionPhotos && Object.keys(p.questionPhotos).length > 0);
+
+      const paper = list[index];
+      if (!paper) return;
+
+      selectPaper(paper);
     }
 
     // 一鍵載入 5B 99 測試卷
     function loadMock5B99Paper() {
       selectPaper(window.ADVANCE_EXAM_DATA.MOCK_5B_99_PAPER);
-      alert('✅ 已成功載入「5B 99 教師測試員」完整示範考卷（含 4 道大題手寫照片）！');
     }
 
     // 選取考卷並展開同構閱卷工作台
     function selectPaper(paper) {
       currentPaper = paper;
+      document.getElementById('papersListSection').style.display = 'none';
       document.getElementById('gradingWorkstation').style.display = 'block';
-      document.getElementById('currentStudentHeader').textContent = `🎓 正在批改：${paper.classID} 班 ${paper.studentID} 號 - ${paper.studentName} 同學`;
-      document.getElementById('currentSubmitTime').textContent = `交卷時間：${new Date(paper.timestamp).toLocaleString('zh-TW')}`;
-      document.getElementById('teacherGeneralComment').value = (paper.teacherComments && paper.teacherComments.general) || '';
+
+      const timeStr = paper.timestamp ? new Date(paper.timestamp).toLocaleString('zh-TW', { hour12: false }) : '無時間紀錄';
+      document.getElementById('currentStudentHeader').textContent = `🎓 正在批改：${paper.classID} 班 ${paper.studentID} 號 - ${paper.studentName} 同學 ${paper.isDemo ? '(系統示範卷)' : '(學生提交作答)'}`;
+      document.getElementById('currentSubmitTime').textContent = `交卷時間：${timeStr}`;
+      
+      // 讀取既有評語
+      const snapshotKey = `ADVANCE_SNAPSHOT_${paper.classID}_${paper.studentID}`;
+      let savedSnapshot = null;
+      try { savedSnapshot = JSON.parse(localStorage.getItem(snapshotKey)); } catch (e) {}
+      
+      document.getElementById('teacherGeneralComment').value = 
+        (savedSnapshot && savedSnapshot.comment) || 
+        (paper.teacherComments && paper.teacherComments.general) || '';
 
       renderGradingQuestions(paper);
-      renderPapersList();
+      
+      // 恢復既有批改得分與批註
+      if (savedSnapshot && savedSnapshot.itemScores) {
+        Object.entries(savedSnapshot.itemScores).forEach(([k, v]) => {
+          const inp = document.getElementById('score_' + k);
+          if (inp) inp.value = v;
+        });
+      }
+      if (savedSnapshot && savedSnapshot.itemComments) {
+        Object.entries(savedSnapshot.itemComments).forEach(([k, v]) => {
+          const inp = document.getElementById('comment_' + k);
+          if (inp) inp.value = v;
+        });
+      }
+
       recalculateTotal();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
 
       // MathJax 重新顯影
       if (window.MathJax && window.MathJax.typesetPromise) {
@@ -756,13 +928,15 @@
             <div class="photo-inspect-card">
               <div style="font-weight: 600; color: #1e3a8a; margin-bottom: 6px;">📸 學生手寫解答拍照推導：</div>
               <div class="photo-wrapper">
-                <img id="img_${qKey}" class="handwriting-img" src="${photoSrc}" alt="手寫相片" style="transform: rotate(0deg);" onclick="openLightbox('${photoSrc}', '${q.title}')">
+                ${photoSrc ? `<img id="img_${qKey}" class="handwriting-img" src="${photoSrc}" alt="手寫相片" style="transform: rotate(0deg);" onclick="openLightbox('${photoSrc}', '${q.title}')">` : '<p style="color:#94a3b8; padding:30px;">未附帶手寫解答照片</p>'}
               </div>
+              ${photoSrc ? `
               <div class="photo-controls">
                 <button class="btn btn-secondary" onclick="rotatePhoto('${qKey}', 90)">🔄 旋轉 90°</button>
                 <button class="btn btn-secondary" onclick="rotatePhoto('${qKey}', 0)">↺ 重設方向</button>
                 <button class="btn btn-accent" onclick="openLightbox('${photoSrc}', '${q.title}')">🔍 高解析放大燈箱</button>
               </div>
+              ` : ''}
             </div>
 
             <div class="rubric-score-box">
@@ -832,9 +1006,22 @@
     // 即時計算總分與各部小計
     function recalculateTotal() {
       // Part 1: 客觀固定核對 (滿分12)
-      let p1 = 12;
+      let p1 = 0;
+      const QD = window.ADVANCE_EXAM_DATA.QUESTIONS_DATA;
+      const answers = (currentPaper && currentPaper.answers) || {};
+      QD.part1.forEach(q => {
+        const studentAns = answers[q.id] || answers[q.id.toUpperCase()] || '';
+        if (String(studentAns).trim().toUpperCase() === q.answer) p1 += 2;
+      });
+      document.getElementById('scorePart1Badge').textContent = `得分：${p1} / 12 分`;
+
       // Part 2: 客觀固定核對 (滿分10)
-      let p2 = 10;
+      let p2 = 0;
+      QD.part2.forEach(q => {
+        const studentAns = answers[q.id] || answers[q.id.toUpperCase()] || '';
+        if (String(studentAns).trim().toUpperCase() === q.answer) p2 += 2;
+      });
+      document.getElementById('scorePart2Badge').textContent = `得分：${p2} / 10 分`;
       
       // Part 3
       let p3 = 0;
@@ -880,26 +1067,68 @@
       const comment = document.getElementById('teacherGeneralComment').value.trim();
 
       const snapshotKey = `ADVANCE_SNAPSHOT_${currentPaper.classID}_${currentPaper.studentID}`;
+      
+      const itemScores = {};
+      const itemComments = {};
+      document.querySelectorAll('input[id^="score_"]').forEach(inp => {
+        const qid = inp.id.replace('score_', '');
+        itemScores[qid] = parseFloat(inp.value) || 0;
+      });
+      document.querySelectorAll('input[id^="comment_"]').forEach(ta => {
+        const qid = ta.id.replace('comment_', '');
+        itemComments[qid] = ta.value.trim();
+      });
+
       const snapshotData = {
         classID: currentPaper.classID,
         studentID: currentPaper.studentID,
         studentName: currentPaper.studentName,
         totalScore: grandTotal,
         comment: comment,
+        itemScores: itemScores,
+        itemComments: itemComments,
         gradedAt: new Date().toISOString()
       };
 
       try {
         localStorage.setItem(snapshotKey, JSON.stringify(snapshotData));
         alert(`✅ 批改結果已成功登記！\n學生：${currentPaper.classID} ${currentPaper.studentName}\n總分：${grandTotal} / 120 分`);
+        renderPapersList();
       } catch (e) {
         alert('批改成功：總分 ' + grandTotal + ' 分');
       }
     }
 
-    // 雲端資料庫拉取 (含雜訊過濾)
-    async function fetchCloudPapers() {
-      alert('正在透過雜訊過濾引擎拉取雲端資料庫...');
+    // 匯入考卷 JSON
+    function showImportModal() {
+      document.getElementById('importJsonText').value = '';
+      document.getElementById('importModal').style.display = 'flex';
+    }
+
+    function closeImportModal() {
+      document.getElementById('importModal').style.display = 'none';
+    }
+
+    function doImportJson() {
+      const raw = document.getElementById('importJsonText').value.trim();
+      if (!raw) return;
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          parsed.forEach(p => {
+            p.isStudentSubmit = true;
+            allValidPapers.unshift(p);
+          });
+        } else {
+          parsed.isStudentSubmit = true;
+          allValidPapers.unshift(parsed);
+        }
+        closeImportModal();
+        renderPapersList();
+        alert('✅ 考卷已成功匯入！已列在試卷清單最頂部。');
+      } catch (e) {
+        alert('⚠️ JSON 格式解析失敗，請確認貼上的資料格式！');
+      }
     }
   </script>
 </body>

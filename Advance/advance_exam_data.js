@@ -371,8 +371,9 @@
   // 3. 雜訊過濾引擎 (100% 準確率過濾 128 維特徵向量、密碼雜湊與舊刷題代碼)
   function isNoiseRecord(row) {
     if (!row) return true;
+    
+    // 檢查字串或欄位中是否包含 128 維人臉向量、密碼雜湊或防作弊紀錄
     const did = String(row.dateID || row.textAnswer || '').trim();
-    if (!did) return true;
     
     // 1. 排除人臉 128 維浮點特徵向量 (包含 |TS:、|V: 或長度超過 30 個浮點數)
     if (did.includes('|TS:') || did.includes('|V:') || (did.includes(',') && did.split(',').length > 30)) {
@@ -401,6 +402,19 @@
     if (did.startsWith('TEST_PING')) {
       return true;
     }
+
+    // 若為客戶端本地已解析之考卷物件 (含 answers 或 questionPhotos 或 Advance 考卷標題)
+    if (row.answers || row.questionPhotos || (row.testTitle && row.testTitle.includes('Advance'))) {
+      const raw = JSON.stringify(row);
+      // 確保內部無 128 維人臉特徵向量滲漏
+      if (raw.includes('|TS:') || raw.includes('|V:') || (raw.includes(',') && raw.split(',').length > 30 && /-?0\.\d{3,}/.test(raw))) {
+        return true;
+      }
+      return false;
+    }
+
+    // 若非本地考卷結構，且亦無 dateID/textAnswer，則視為空紀錄/雜訊
+    if (!did) return true;
     
     return false;
   }
@@ -416,9 +430,11 @@
     const hasMarker = did.startsWith('ADVANCE_EXAM::') ||
                       did.includes('ADVANCE_TEST') ||
                       did.includes('大測') ||
-                      title.includes('Advance 數學大測') ||
+                      title.includes('Advance') ||
+                      title.includes('大測') ||
                       rawStr.includes('q12_') ||
-                      rawStr.includes('q20');
+                      rawStr.includes('q20') ||
+                      Boolean(row.answers && (row.answers.q1 !== undefined || row.answers.q12_1 !== undefined || row.answers.q20 !== undefined));
                       
     const cid = String(row.classID || '').trim().toUpperCase();
     const sid = parseInt(row.studentID, 10);

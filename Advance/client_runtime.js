@@ -1353,8 +1353,9 @@ async function submitExam(isAuto) {
 
     // 歸檔完整作答紀錄至本地 LocalStorage (供教師批改端即時調閱與持久儲存)
     const submissionRecord = {
-      testTitle: '10月10日 Advance 數學大測(一)',
+      testTitle: '【2026年10月10日 Advance 數學大測 (一)】',
       testCategory: '2026-2027學年上學期 高一（理）數學大測卷(一)',
+      dateID: 'ADVANCE_EXAM::' + student.classID + '_' + student.studentID + '_' + Date.now(),
       classID: student.classID,
       studentID: student.studentID,
       studentName: student.name,
@@ -1366,10 +1367,12 @@ async function submitExam(isAuto) {
       questionPhotos: ExamState.questionPhotos || {},
       uploadedPhotoUrls: ExamState.uploadedPhotoUrls || {},
       aggregatedPhotoUrl: aggregatedPhotoUrl,
-      status: 'submitted'
+      status: 'submitted',
+      isStudentSubmit: true
     };
 
-    try {
+      // 為每次交卷建立獨立唯一的提交記錄識別碼，保留歷史作答不被覆蓋
+      submissionRecord.submissionId = 'sub_' + student.classID + '_' + student.studentID + '_' + submissionRecord.timestamp;
       localStorage.setItem('ADVANCE_LAST_SUBMISSION', JSON.stringify(submissionRecord));
       let archive = [];
       try {
@@ -1377,8 +1380,10 @@ async function submitExam(isAuto) {
         if (rawArchive) archive = JSON.parse(rawArchive);
       } catch (e) {}
       if (!Array.isArray(archive)) archive = [];
-      archive = archive.filter(item => !(item.classID === student.classID && String(item.studentID) === String(student.studentID)));
+      // 僅排除完全相同時間戳的重複觸發，完整保留該學生的多次交卷紀錄
+      archive = archive.filter(item => String(item.timestamp) !== String(submissionRecord.timestamp));
       archive.unshift(submissionRecord);
+      if (archive.length > 100) archive = archive.slice(0, 100);
       localStorage.setItem('ADVANCE_SUBMISSION_ARCHIVE', JSON.stringify(archive));
     } catch (archErr) {
       console.warn('LocalStorage 歸檔試卷失敗：', archErr);
