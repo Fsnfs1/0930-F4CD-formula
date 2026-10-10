@@ -1023,6 +1023,7 @@ function restoreExamState() {
     if (!data || !data.student) return false;
 
     ExamState.currentStudent = data.student;
+    ExamState.isAuthenticated = true;
     ExamState.phase = data.phase || 1;
     ExamState.timeLeft = (typeof data.timeLeft === 'number') ? data.timeLeft : CONFIG.TOTAL_SECONDS;
     ExamState.isLocked = !!data.isLocked;
@@ -1371,6 +1372,7 @@ async function submitExam(isAuto) {
       isStudentSubmit: true
     };
 
+    try {
       // 為每次交卷建立獨立唯一的提交記錄識別碼，保留歷史作答不被覆蓋
       submissionRecord.submissionId = 'sub_' + student.classID + '_' + student.studentID + '_' + submissionRecord.timestamp;
       localStorage.setItem('ADVANCE_LAST_SUBMISSION', JSON.stringify(submissionRecord));
