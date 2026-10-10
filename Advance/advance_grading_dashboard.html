@@ -445,6 +445,7 @@
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button class="btn btn-secondary" onclick="refreshAllPapers()">🔄 重新整理試卷清單</button>
           <button id="btnSyncCloud" class="btn btn-secondary" onclick="syncPapersFromCloud(false)">☁️ 從雲端同步最新交卷</button>
+          <button id="btnDriveGuide" class="btn btn-accent" onclick="showDrivePermissionModal()">📁 Drive 照片權限設定說明</button>
           <span id="cloudSyncStatus" style="font-size: 13px; color: var(--muted); align-self: center;"></span>
           <button class="btn btn-accent" onclick="showImportModal()">📥 貼上 / 匯入考卷 JSON</button>
         </div>
@@ -536,6 +537,31 @@
 
   </main>
 
+  
+  <!-- Google Drive 權限設定指引彈窗 -->
+  <div id="driveGuideModal" class="lightbox-overlay" style="display: none;" onclick="closeDriveGuideModal(event)">
+    <div class="lightbox-modal" style="height: auto; max-height: 85vh; max-width: 650px;" onclick="event.stopPropagation()">
+      <div class="lightbox-header">
+        <span>📁 Google Drive 照片資料夾權限設定說明</span>
+        <button class="btn btn-sm btn-danger" onclick="closeDriveGuideModal()">✖ 關閉</button>
+      </div>
+      <div style="padding: 24px; background: white; font-size: 14px; line-height: 1.8; color: #334155;">
+        <h3 style="color: var(--primary); margin-bottom: 12px;">如何讓所有學生的手寫照片在閱卷端 100% 直連秒開？</h3>
+        <p>目前學生拍攝上傳的照片均安全儲存在您的 Google 雲端硬碟 <code>WEB+</code> 資料夾中。</p>
+        <div style="background: #eff6ff; padding: 14px; border-radius: 8px; border-left: 4px solid var(--secondary); margin: 14px 0;">
+          <strong>📱 手機 Google Drive App 3 步驟設定（僅需操作一次）：</strong><br>
+          1. 打開手機的 <strong>Google 雲端硬碟 (Google Drive) App</strong>。<br>
+          2. 回到【我的雲端硬碟】，找到 <strong>WEB+</strong> 資料夾，點擊右側的 <strong>···</strong>。<br>
+          3. 點選【共用】(或【管理存取權】) ➔ 將「一般存取權」從【已限制】改為 <strong>【知道連結的任何人】(檢視者)</strong>。
+        </div>
+        <p>💡 一旦設為「知道連結的任何人」，所有學生提交的照片皆能立刻在閱卷端直連高解析度渲染；未公開前，系統會自動切換為 Google Drive 內嵌檢視器或提供一鍵開啟按鈕。</p>
+        <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+          <button class="btn btn-primary" onclick="closeDriveGuideModal()">我已知悉</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 匯入考卷 JSON 彈窗 -->
   <div id="importModal" class="lightbox-overlay" style="display: none;" onclick="closeImportModal(event)">
     <div class="lightbox-modal" style="height: auto; max-height: 80vh; max-width: 600px;" onclick="event.stopPropagation()">
@@ -623,21 +649,29 @@
     }
 
     
-    // 圖片載入失敗容錯機制 (Google Drive 縮圖直鏈 -> 官方直鏈 -> 提示)
-    function handleImgError(img, qKey) {
-      if (img.src && img.src.indexOf('thumbnail') !== -1) {
-        const m = img.src.match(new RegExp('id=([a-zA-Z0-9_-]+)'));
-        if (m && m[1]) {
-          img.src = 'https://lh3.googleusercontent.com/d/' + m[1];
-          return;
-        }
+        // 圖片載入失敗容錯機制 (Google Drive 縮圖直鏈 -> 官方直鏈 -> 內嵌 Preview iframe)
+    function handleImgError(img, qKey, fileId, originalDriveUrl) {
+      if (img.dataset.triedLh3 !== 'true' && fileId) {
+        img.dataset.triedLh3 = 'true';
+        img.src = 'https://lh3.googleusercontent.com/d/' + fileId;
+        return;
       }
       img.style.display = 'none';
       const tip = document.getElementById('driveFailTip_' + qKey);
       if (tip) tip.style.display = 'block';
+      if (fileId) {
+        loadDriveIframe(qKey, fileId);
+      }
     }
 
-    // 從 Google Apps Script 雲端試算表自動同步交卷資料
+    function loadDriveIframe(qKey, fileId) {
+      const wrap = document.getElementById('driveIframeWrap_' + qKey);
+      if (wrap && fileId) {
+        wrap.style.display = 'block';
+        wrap.innerHTML = '<iframe src="https://drive.google.com/file/d/' + fileId + '/preview" width="100%" height="480" style="border:none; border-radius:8px; width:100%; height:480px; background:#fff;" allow="autoplay"></iframe>';
+      }
+    }
+
     const CLOUD_SHEET_API = 'https://script.google.com/macros/s/AKfycbwNAQNxmNsNa8rWGp48qnYRrjA2WFLGIzKqSel2r8MilRp59s3ZfBJjeKXIrUfoS-Zp-g/exec';
 
     async function syncPapersFromCloud(isAuto) {
@@ -1088,10 +1122,9 @@
           originalDriveUrl = photoSrc;
           const m1 = photoSrc.match(new RegExp('/file/d/([a-zA-Z0-9_-]+)'));
           const m2 = photoSrc.match(new RegExp('[?&]id=([a-zA-Z0-9_-]+)'));
-          if (m1 && m1[1]) {
-            displayImgSrc = 'https://drive.google.com/thumbnail?id=' + m1[1] + '&sz=w1600';
-          } else if (m2 && m2[1]) {
-            displayImgSrc = 'https://drive.google.com/thumbnail?id=' + m2[1] + '&sz=w1600';
+          let fileId = (m1 && m1[1]) || (m2 && m2[1]) || '';
+          if (fileId) {
+            displayImgSrc = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1600';
           }
         }
 
@@ -1291,6 +1324,15 @@
     }
 
     // 匯入考卷 JSON
+    
+    function showDrivePermissionModal() {
+      document.getElementById('driveGuideModal').style.display = 'flex';
+    }
+    function closeDriveGuideModal(e) {
+      if (e) e.stopPropagation();
+      document.getElementById('driveGuideModal').style.display = 'none';
+    }
+
     function showImportModal() {
       document.getElementById('importJsonText').value = '';
       document.getElementById('importModal').style.display = 'flex';

@@ -739,7 +739,23 @@
       p4Box.innerHTML = '';
       QD.part4.forEach(q => {
         const qKey = 'Q' + q.num;
-        const photoSrc = (paper.questionPhotos && paper.questionPhotos[qKey]) || '';
+        let photoSrc = '';
+        if (paper.questionPhotos) {
+          photoSrc = paper.questionPhotos[qKey] || paper.questionPhotos[q.id] || paper.questionPhotos[qKey.toLowerCase()] || '';
+        }
+        if (!photoSrc && paper.uploadedPhotoUrls) {
+          photoSrc = paper.uploadedPhotoUrls[qKey] || paper.uploadedPhotoUrls[q.id] || paper.uploadedPhotoUrls[qKey.toLowerCase()] || '';
+        }
+        let displayImgSrc = photoSrc;
+        let originalDriveUrl = '';
+        let fileId = '';
+        if (photoSrc.includes('drive.google.com')) {
+          originalDriveUrl = photoSrc;
+          const m1 = photoSrc.match(new RegExp('/file/d/([a-zA-Z0-9_-]+)'));
+          const m2 = photoSrc.match(new RegExp('[?&]id=([a-zA-Z0-9_-]+)'));
+          fileId = (m1 && m1[1]) || (m2 && m2[1]) || '';
+          if (fileId) displayImgSrc = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1600';
+        }
         const comment = (paper.teacherComments && paper.teacherComments[q.id]) || '解答完整規範，思路嚴謹。';
 
         p4Box.innerHTML += `

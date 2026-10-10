@@ -299,12 +299,12 @@
         solution: '<div class="solution-block">' +
                   '<strong>【官方 docx 完整步驟推導】</strong><br>' +
                   '證明：<br>' +
-                  '$\because c < d < 0$ 且 $a > b > 0$<br>' +
-                  '$\therefore -c > -d > 0$ 【2分】<br>' +
-                  '$\therefore a - c > b - d > 0$ 【3分】<br>' +
-                  '取倒數得：$\therefore \\frac{1}{a-c} < \\frac{1}{b-d}$ 【3分】<br>' +
-                  '又 $\because e < 0$（同乘負數，不等號方向反轉）：<br>' +
-                  '$\therefore \\frac{e}{a-c} > \\frac{e}{b-d}$ 證畢. 【2分】' +
+                  '∵ $c < d < 0$ 且 $a > b > 0$<br>' +
+                  '∴ $-c > -d > 0$ 【2分】<br>' +
+                  '∴ $a - c > b - d > 0$ 【3分】<br>' +
+                  '取倒數得：∴ $\\frac{1}{a-c} < \\frac{1}{b-d}$ 【3分】<br>' +
+                  '又 ∵ $e < 0$（同乘負數，不等號方向反轉）：<br>' +
+                  '∴ $\\frac{e}{a-c} > \\frac{e}{b-d}$ 證畢. 【2分】' +
                   '</div>'
       },
       {
@@ -314,7 +314,7 @@
         solution: '<div class="solution-block">' +
                   '<strong>【官方 docx 完整步驟解析】</strong><br>' +
                   '解：<br>' +
-                  '$\because x > 1$<br>' +
+                  '∵ $x > 1$<br>' +
                   '原式 $= (x - 1) + \\frac{4}{x - 1} + 1$ 【3分】<br>' +
                   '$\ge 2\\sqrt{(x - 1) \\cdot \\frac{4}{x - 1}} + 1 = 2 \\cdot 2 + 1 = 5$ 【4分】<br>' +
                   '當且僅當 $x - 1 = \\frac{4}{x - 1}$，即 $(x - 1)^2 = 4$。<br>' +
