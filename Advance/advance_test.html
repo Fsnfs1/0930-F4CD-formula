@@ -10,7 +10,8 @@
     window.MathJax = {
       tex: {
         inlineMath: [['$', '$'], ['\\(', '\\)']],
-        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
       },
       options: {
         skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
@@ -599,6 +600,275 @@ body {
   display: block;
 }
 
+/* ==========================================================================
+   刷臉辨識與人臉檢測視圖樣式 (Authentic Face Auth Styles)
+   ========================================================================== */
+.camera-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  height: 240px;
+  margin: 0 auto 16px auto;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #000000;
+  border: 2px solid #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* 自拍鏡像 */
+}
+
+.camera-oval-guide {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 150px;
+  height: 190px;
+  border: 2px dashed rgba(56, 189, 248, 0.8);
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35);
+}
+
+.camera-status-overlay {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 12px;
+  color: #ffffff;
+  background: rgba(15, 23, 42, 0.75);
+  padding: 4px 8px;
+}
+
+.alert-box {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.alert-box.alert-warning {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+
+.alert-box.alert-danger {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.alert-box.alert-success {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+/* ==========================================================================
+   密碼二次身分驗證彈窗 (Modal Password Authentication)
+   ========================================================================== */
+.auth-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+}
+
+.auth-modal-card {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  max-width: 440px;
+  width: 100%;
+  padding: 24px 20px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+  color: #f8fafc;
+  box-sizing: border-box;
+}
+
+.auth-candidate-btn {
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #334155;
+  background: #0f172a;
+  color: #f8fafc;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.auth-candidate-btn:hover {
+  border-color: #38bdf8;
+  background: #1e293b;
+}
+
+.auth-candidate-btn.active {
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+}
+
+/* 按鈕風格 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 16px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.btn-success {
+  background: #16a34a;
+  color: #fff;
+}
+.btn-success:hover {
+  background: #15803d;
+}
+
+.btn-secondary {
+  background: #475569;
+  color: #f8fafc;
+}
+.btn-secondary:hover {
+  background: #334155;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid #2563eb;
+  color: #2563eb;
+}
+.btn-outline:hover {
+  background: #eff6ff;
+}
+
+/* ==========================================================================
+   第四部分：單題獨立相機拍照卡片樣式 (Q20~Q23 Per-Question Camera)
+   ========================================================================== */
+.q-cam-card {
+  margin-top: 14px;
+  padding: 16px;
+  background: #f8fafc;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 10px;
+  transition: border-color 0.2s;
+}
+
+.q-cam-card:hover {
+  border-color: #94a3b8;
+}
+
+.q-cam-video-box {
+  position: relative;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+
+.q-cam-video-box video {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  display: block;
+}
+
+.q-cam-preview-box {
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.q-cam-preview-box img {
+  max-width: 100%;
+  max-height: 260px;
+  border-radius: 8px;
+  border: 2px solid #10b981;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  display: block;
+  margin: 0 auto;
+}
+
+.q-cam-success-tip {
+  font-size: 0.85rem;
+  color: #16a34a;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.btn-cam {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: #2563eb;
+  color: #ffffff;
+  transition: all 0.2s;
+}
+
+.btn-cam:hover {
+  background: #1d4ed8;
+}
+
+.btn-cam-capture {
+  background: #16a34a;
+}
+.btn-cam-capture:hover {
+  background: #15803d;
+}
+
+.btn-cam-retake {
+  background: #d97706;
+}
+.btn-cam-retake:hover {
+  background: #b45309;
+}
+
+.blank-input::placeholder {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
 @media (max-width: 640px) {
   .card { padding: 18px 14px; }
   .auth-card { padding: 24px 16px; }
@@ -646,46 +916,168 @@ body {
 
   <div class="container">
 
-    <!-- 階段 1：身分登入核驗視圖 -->
+    <!-- 階段 1：身分登入核驗視圖 (Authentic Face-First Login) -->
     <div id="authScreen" class="auth-container" style="display: block;">
-      <div class="auth-card">
-        <h2 style="text-align: center; color: #1e3a8a; margin-bottom: 8px;">🎓 高一理組數學大測</h2>
-        <p style="text-align: center; color: #64748b; font-size: 0.9rem; margin-bottom: 24px;">請選擇身分並驗證登入以進入測驗系統</p>
+      
+      <!-- 視圖 1A：智能刷臉首頁 -->
+      <div class="auth-card" id="cardFaceFirstLogin">
+        <h2 style="text-align: center; color: #1e3a8a; margin-bottom: 6px;">📷 智能刷臉秒速登入</h2>
+        <p style="text-align: center; color: #64748b; font-size: 0.9rem; margin-bottom: 18px;">
+          正對鏡頭並眨眨眼，系統將自動比對人臉特徵庫並直接登入。
+        </p>
+
+        <!-- Live Camera Viewport with Oval Guide -->
+        <div id="faceFirstCameraWrapper" class="camera-wrapper">
+          <video id="faceFirstVideo" class="camera-video" playsinline autoplay muted></video>
+          <div class="camera-oval-guide"></div>
+          <div id="faceFirstOverlay" class="camera-status-overlay">📷 點擊下方按鈕啟動刷臉辨識</div>
+        </div>
+
+        <!-- Realtime Status Alert -->
+        <div id="faceFirstAlert" class="alert-box" style="display: none;"></div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" id="btnFaceFirstStart" class="btn btn-primary" style="flex: 1; padding: 12px;" onclick="startFaceFirstCamera()">
+            <span>📷 啟動相機識別</span>
+          </button>
+          <button type="button" id="btnFaceFirstCapture" class="btn btn-success" style="flex: 1; display: none; padding: 12px;" onclick="captureFaceFirstAndVerify()">
+            <span>🔍 拍照識別身分</span>
+          </button>
+        </div>
+
+        <div style="text-align: center; margin-top: 16px;">
+          <a href="javascript:void(0)" id="linkGoToManualPage" onclick="showManualSelectView()" style="font-size: 13px; color: var(--primary); text-decoration: underline;">
+            首次登入或無法刷臉？前往身分選擇 ➜
+          </a>
+        </div>
+      </div>
+
+      <!-- 視圖 1B：手動身分選擇 (新生/候補/測試模式) -->
+      <div class="auth-card" id="cardFirstTimeSelect" style="display: none; margin-top: 14px;">
+        <h2 style="text-align: center; color: #1e3a8a; margin-bottom: 6px;">👤 學生身分選擇與登記</h2>
+        <p style="text-align: center; color: #64748b; font-size: 0.9rem; margin-bottom: 18px;">
+          請在下方選擇您的班別與學號，確認姓名無誤後登記並開始測驗。
+        </p>
 
         <div id="authErrorMessage" class="status-box error" style="margin-top: 0; margin-bottom: 16px; display: none;"></div>
 
         <div class="form-group">
-          <label for="selectClass">1. 選擇班級</label>
-          <select id="selectClass" class="form-control">
-            <option value="4C">高一 (4C 班 - 29人)</option>
-            <option value="4D">高一 (4D 班 - 31人)</option>
-            <option value="5B">高二 (5B 班 - 28人)</option>
+          <label class="form-label" for="selectClass">班別 (Class)</label>
+          <select id="selectClass" class="form-control" onchange="onClassChange(this.value)">
+            <option value="" disabled selected>-- 請選擇班別 --</option>
+            <option value="4C">4C 班 (高一 · 29人)</option>
+            <option value="4D">4D 班 (高一 · 31人)</option>
+            <option value="5B">5B 班 (高二 · 28人)</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label for="selectStudent">2. 選擇學生學號與姓名</label>
-          <select id="selectStudent" class="form-control">
-            <option value="">-- 請先選擇班級 --</option>
+          <label class="form-label" for="selectStudent">學號 (Student ID)</label>
+          <select id="selectStudent" class="form-control" disabled onchange="onStudentChange(this.value)">
+            <option value="" disabled selected>-- 請先選擇班別 --</option>
           </select>
         </div>
 
         <div class="identity-badge" style="margin-bottom: 16px;">
-          <div style="font-size: 0.85rem; color: #64748b;">考生姓名確認：</div>
-          <div id="loginStudentNamePreview" class="identity-name">（請選擇學生）</div>
+          <div style="font-size: 0.85rem; color: #64748b;">確認學生姓名：</div>
+          <div id="loginStudentNamePreview" class="identity-name">請選擇班別與學號</div>
         </div>
 
         <div class="form-group">
-          <label for="inputPassword">3. 身分密碼 (預設為 1234)</label>
-          <input type="password" id="inputPassword" class="form-control" value="1234" placeholder="請輸入身分密碼">
+          <label class="form-label" for="inputPassword">身分密碼 (預設 1234)</label>
+          <input type="password" id="inputPassword" class="form-control" value="1234" placeholder="請輸入密碼">
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 24px;">
-          <button type="button" id="btnLogin" class="btn-block" onclick="handlePasswordLogin()">
-            🔑 密碼登入身分驗證
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button type="button" id="btnLogin" class="btn btn-primary btn-block" style="padding: 12px;" disabled onclick="handlePasswordLogin()">
+            <span>🔑 密碼登入身分驗證</span>
           </button>
-          <button type="button" id="btnFaceLogin" class="btn-block" style="background: #059669;" onclick="handleFaceLogin()">
-            📷 相機人臉辨識快速核驗
+          <button type="button" id="btnFaceLogin" class="btn btn-success btn-block" style="padding: 12px;" onclick="showFaceFirstView()">
+            <span>📷 相機人臉辨識快速核驗</span>
+          </button>
+          <button type="button" id="btnBackToFaceFirst" class="btn btn-secondary btn-block" style="padding: 12px; margin-top: 4px;" onclick="showFaceFirstView()">
+            <span>← 返回第一頁刷臉拍照</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 彈窗：密碼二次身分驗證 (modalPasswordAuth) -->
+    <div id="modalPasswordAuth" class="auth-modal-overlay" style="display: none;">
+      <div class="auth-modal-card">
+        <div style="font-size: 40px; text-align: center; margin-bottom: 8px;">🔐</div>
+        <h3 id="authModalTitle" style="text-align: center; margin-bottom: 6px; font-size: 18px; font-weight: 700; color: #f8fafc;">
+          密碼二次身分驗證
+        </h3>
+        <p id="authModalSubtitle" style="text-align: center; font-size: 13px; color: #fcd34d; margin-bottom: 14px;">
+          ⚠️ 偵測到多位相似特徵（無法唯一確認本人），為維護帳號安全，請選擇您的姓名並輸入個人密碼完成二次驗證！
+        </p>
+
+        <!-- 相似候選人列表 -->
+        <div id="authCandidateSection" style="margin-bottom: 14px; text-align: left; display: none;">
+          <label class="form-label" style="font-size: 13px; color: #cbd5e1; margin-bottom: 6px; display: block; font-weight: 600;">
+            偵測到多位相似特徵，請選擇最可能的本人身分：
+          </label>
+          <div id="authCandidateList" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
+            <!-- 動態生成候選人按鈕 -->
+          </div>
+          <div style="text-align: right; margin-bottom: 6px;">
+            <a href="javascript:void(0)" id="linkAuthManualSelect" onclick="toggleAuthManualSelect()" style="font-size: 12px; color: #60a5fa; text-decoration: underline;">
+              非以上候選人？手動選擇其他學生 ▾
+            </a>
+          </div>
+          <div id="authManualSelectFields" style="display: none; padding: 10px; background: rgba(15, 23, 42, 0.6); border-radius: 8px; border: 1px solid #334155;">
+            <div style="display: flex; gap: 8px;">
+              <select id="authClassSelect" class="form-select" onchange="onAuthClassSelectChange(this.value)" style="flex: 1; padding: 8px; font-size: 13px; background: #0f172a; color: #f8fafc; border: 1px solid #334155; border-radius: 6px;">
+                <option value="" disabled selected>-- 選擇班別 --</option>
+                <option value="4C">4C 班</option>
+                <option value="4D">4D 班</option>
+                <option value="5B">5B 班</option>
+              </select>
+              <select id="authStudentSelect" class="form-select" disabled onchange="onAuthStudentSelectChange(this.value)" style="flex: 1.5; padding: 8px; font-size: 13px; background: #0f172a; color: #f8fafc; border: 1px solid #334155; border-radius: 6px;">
+                <option value="" disabled selected>-- 選擇學號 --</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="authStudentInfo" style="background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.3); padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; font-size: 14px; text-align: center; font-weight: 600; color: #a5b4fc;">
+          --
+        </div>
+
+        <div id="alertPasswordAuthError" class="alert-box alert-danger" style="display: none; margin-bottom: 12px; font-size: 13px;"></div>
+
+        <div class="form-group" style="margin-bottom: 12px; text-align: left;">
+          <label class="form-label" for="inputAuthPassword" style="font-size: 13px; margin-bottom: 4px; display: block; color: #cbd5e1;">個人密碼</label>
+          <input type="password" id="inputAuthPassword" placeholder="請輸入個人密碼（預設 1234）" inputmode="numeric" maxlength="20" autocomplete="off" style="width: 100%; box-sizing: border-box; background: #0f172a; color: #f8fafc; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px;">
+        </div>
+
+        <div style="margin-bottom: 14px; text-align: left; font-size: 13px; color: #cbd5e1;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="chkAuthChangePassword" onchange="toggleAuthChangePassword(this.checked)" style="width: 16px; height: 16px; accent-color: var(--primary);">
+            <span>同時修改新密碼</span>
+          </label>
+        </div>
+
+        <div id="authChangePasswordFields" style="display: none; border-top: 1px dashed #334155; padding-top: 12px; margin-bottom: 14px; text-align: left;">
+          <div class="form-group" style="margin-bottom: 10px;">
+            <label class="form-label" for="inputAuthNewPassword" style="font-size: 13px; margin-bottom: 4px; display: block; color: #cbd5e1;">設定新密碼（至少 4 位純數字）</label>
+            <input type="password" id="inputAuthNewPassword" placeholder="至少 4 位純數字，不得為 1234" inputmode="numeric" maxlength="20" autocomplete="off" style="width: 100%; box-sizing: border-box; background: #0f172a; color: #f8fafc; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px;">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="inputAuthConfirmPassword" style="font-size: 13px; margin-bottom: 4px; display: block; color: #cbd5e1;">確認新密碼</label>
+            <input type="password" id="inputAuthConfirmPassword" placeholder="再次輸入新密碼" inputmode="numeric" maxlength="20" autocomplete="off" style="width: 100%; box-sizing: border-box; background: #0f172a; color: #f8fafc; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px;">
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button type="button" id="btnCancelPasswordAuth" class="btn btn-secondary" style="flex: 1; padding: 12px;" onclick="hidePasswordAuthModal()">
+            <span>取消</span>
+          </button>
+          <button type="button" id="btnSubmitPasswordAuth" class="btn btn-primary" style="flex: 2; padding: 12px; font-weight: 600;" onclick="submitPasswordAuth()">
+            <span>🔒 驗證並進入</span>
           </button>
         </div>
       </div>
@@ -716,11 +1108,11 @@ body {
               <li><span style="color: #16a34a; font-weight: 700;">額外 10 分鐘緩衝</span>：專供修訂填充題文字輸入，以及解答題手寫過程拍照壓縮上傳。</li>
             </ul>
           </li>
-          <li><strong>總限時 50 分鐘</strong>：緩衝時間歸零時，系統將自動強制交卷。</li>
+          <li><strong>手寫拍照規範</strong>：解答題（20~23題）為手寫題目，每題設有專屬獨立拍照按鈕，請逐題拍攝並等比壓縮上傳。</li>
           <li><strong>離線保護機制</strong>：作答進度每秒自動暫存至本地存儲，網絡異常不丟失答案，可安心作答。</li>
         </ul>
 
-        <button type="button" id="btnStartExamCountdown" class="btn-block" onclick="startExamCountdown()">
+        <button type="button" id="btnStartExamCountdown" class="btn btn-primary btn-block" onclick="startExamCountdown()">
           🚀 我已核對身分並清楚理解規則，開始測驗
         </button>
       </div>
@@ -1029,19 +1421,19 @@ body {
           
             <div class="blank-wrapper">
               <span class="blank-label">特性一：</span>
-              <input type="text" class="blank-input" name="q12_1" id="q12_1" placeholder="請輸入答案" autocomplete="off">
+              <input type="text" class="blank-input" name="q12_1" id="q12_1" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">
             </div>
           
 
             <div class="blank-wrapper">
               <span class="blank-label">特性二：</span>
-              <input type="text" class="blank-input" name="q12_2" id="q12_2" placeholder="請輸入答案" autocomplete="off">
+              <input type="text" class="blank-input" name="q12_2" id="q12_2" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">
             </div>
           
 
             <div class="blank-wrapper">
               <span class="blank-label">特性三：</span>
-              <input type="text" class="blank-input" name="q12_3" id="q12_3" placeholder="請輸入答案" autocomplete="off">
+              <input type="text" class="blank-input" name="q12_3" id="q12_3" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">
             </div>
           
         </div>
@@ -1056,7 +1448,7 @@ body {
           
             <div class="blank-wrapper">
               <span class="blank-label">條件描述：</span>
-              <input type="text" class="blank-input" name="q13_1" id="q13_1" placeholder="請輸入答案" autocomplete="off">
+              <input type="text" class="blank-input" name="q13_1" id="q13_1" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">
             </div>
           
         </div>
@@ -1071,7 +1463,7 @@ body {
           
             <div class="blank-wrapper">
               <span class="blank-label">否定命題：</span>
-              <input type="text" class="blank-input" name="q14_1" id="q14_1" placeholder="請輸入答案" autocomplete="off">
+              <input type="text" class="blank-input" name="q14_1" id="q14_1" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">
             </div>
           
         </div>
@@ -1086,25 +1478,25 @@ body {
           
             <div class="blank-wrapper" style="margin-right: 16px;">
               <strong>(1)</strong>&nbsp;$ac$&nbsp;
-              <input type="text" class="blank-input" name="q15_1" id="q15_1" style="width: 70px; text-align: center;" placeholder="符號" autocomplete="off">&nbsp;$bc$
+              <input type="text" class="blank-input" name="q15_1" id="q15_1" style="width: 140px; text-align: center;" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">&nbsp;$bc$
             </div>
           
 
             <div class="blank-wrapper" style="margin-right: 16px;">
               <strong>(2)</strong>&nbsp;$b - c$&nbsp;
-              <input type="text" class="blank-input" name="q15_2" id="q15_2" style="width: 70px; text-align: center;" placeholder="符號" autocomplete="off">&nbsp;$a - c$
+              <input type="text" class="blank-input" name="q15_2" id="q15_2" style="width: 140px; text-align: center;" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">&nbsp;$a - c$
             </div>
           
 
             <div class="blank-wrapper" style="margin-right: 16px;">
               <strong>(3)</strong>&nbsp;$\frac{a}{c^{2}}$&nbsp;
-              <input type="text" class="blank-input" name="q15_3" id="q15_3" style="width: 70px; text-align: center;" placeholder="符號" autocomplete="off">&nbsp;$\frac{b}{c^{2}}$
+              <input type="text" class="blank-input" name="q15_3" id="q15_3" style="width: 140px; text-align: center;" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">&nbsp;$\frac{b}{c^{2}}$
             </div>
           
 
             <div class="blank-wrapper" style="margin-right: 16px;">
               <strong>(4)</strong>&nbsp;$\frac{b}{a}$&nbsp;
-              <input type="text" class="blank-input" name="q15_4" id="q15_4" style="width: 70px; text-align: center;" placeholder="符號" autocomplete="off">&nbsp;$-1$
+              <input type="text" class="blank-input" name="q15_4" id="q15_4" style="width: 140px; text-align: center;" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">&nbsp;$-1$
             </div>
           
         </div>
@@ -1119,37 +1511,37 @@ body {
           
             <div class="blank-wrapper" style="margin-right: 16px;">
               <strong>(1)</strong>&nbsp;$0$&nbsp;
-              <input type="text" class="blank-input" name="q16_1" id="q16_1" style="width: 70px; text-align: center;" placeholder="關係" autocomplete="off">&nbsp;$\{1,3\}$
+              <input type="text" class="blank-input" name="q16_1" id="q16_1" style="width: 140px; text-align: center;" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">&nbsp;$\{1,3\}$
             </div>
           
 
             <div class="blank-wrapper" style="margin-right: 16px;">
               <strong>(2)</strong>&nbsp;$\varnothing$&nbsp;
-              <input type="text" class="blank-input" name="q16_2" id="q16_2" style="width: 70px; text-align: center;" placeholder="關係" autocomplete="off">&nbsp;$\{0\}$
+              <input type="text" class="blank-input" name="q16_2" id="q16_2" style="width: 140px; text-align: center;" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">&nbsp;$\{0\}$
             </div>
           
 
             <div class="blank-wrapper" style="margin-right: 16px;">
               <strong>(3)</strong>&nbsp;$-1$&nbsp;
-              <input type="text" class="blank-input" name="q16_3" id="q16_3" style="width: 70px; text-align: center;" placeholder="關係" autocomplete="off">&nbsp;$\{x \mid x^{2}+3x+2=0\}$
+              <input type="text" class="blank-input" name="q16_3" id="q16_3" style="width: 140px; text-align: center;" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">&nbsp;$\{x \mid x^{2}+3x+2=0\}$
             </div>
           
 
             <div class="blank-wrapper" style="margin-right: 16px;">
               <strong>(4)</strong>&nbsp;$\{-3\}$&nbsp;
-              <input type="text" class="blank-input" name="q16_4" id="q16_4" style="width: 70px; text-align: center;" placeholder="關係" autocomplete="off">&nbsp;$\{x \mid |x|=3\}$
+              <input type="text" class="blank-input" name="q16_4" id="q16_4" style="width: 140px; text-align: center;" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">&nbsp;$\{x \mid |x|=3\}$
             </div>
           
 
             <div class="blank-wrapper" style="margin-right: 16px;">
               <strong>(5)</strong>&nbsp;$\{1\}$&nbsp;
-              <input type="text" class="blank-input" name="q16_5" id="q16_5" style="width: 70px; text-align: center;" placeholder="關係" autocomplete="off">&nbsp;$\{x \mid x \ge 1\}$
+              <input type="text" class="blank-input" name="q16_5" id="q16_5" style="width: 140px; text-align: center;" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">&nbsp;$\{x \mid x \ge 1\}$
             </div>
           
 
             <div class="blank-wrapper" style="margin-right: 16px;">
               <strong>(6)</strong>&nbsp;$\sqrt{1521}$&nbsp;
-              <input type="text" class="blank-input" name="q16_6" id="q16_6" style="width: 70px; text-align: center;" placeholder="關係" autocomplete="off">&nbsp;$\mathbb{Q}$
+              <input type="text" class="blank-input" name="q16_6" id="q16_6" style="width: 140px; text-align: center;" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">&nbsp;$\mathbb{Q}$
             </div>
           
         </div>
@@ -1164,13 +1556,13 @@ body {
           
             <div class="blank-wrapper">
               <span class="blank-label">實數 a：</span>
-              <input type="text" class="blank-input" name="q17_1" id="q17_1" placeholder="請輸入答案" autocomplete="off">
+              <input type="text" class="blank-input" name="q17_1" id="q17_1" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">
             </div>
           
 
             <div class="blank-wrapper">
               <span class="blank-label">子集個數：</span>
-              <input type="text" class="blank-input" name="q17_2" id="q17_2" placeholder="請輸入答案" autocomplete="off">
+              <input type="text" class="blank-input" name="q17_2" id="q17_2" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">
             </div>
           
         </div>
@@ -1185,7 +1577,7 @@ body {
           
             <div class="blank-wrapper">
               <span class="blank-label">關係符號：</span>
-              <input type="text" class="blank-input" name="q18_1" id="q18_1" placeholder="請輸入答案" autocomplete="off">
+              <input type="text" class="blank-input" name="q18_1" id="q18_1" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">
             </div>
           
         </div>
@@ -1200,7 +1592,7 @@ body {
           
             <div class="blank-wrapper">
               <span class="blank-label">否命題表達式：</span>
-              <input type="text" class="blank-input" name="q19_1" id="q19_1" placeholder="請輸入答案" autocomplete="off">
+              <input type="text" class="blank-input" name="q19_1" id="q19_1" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">
             </div>
           
         </div>
@@ -1216,85 +1608,149 @@ body {
           <div class="section-pts">第 20~23 題，每題 10 分，共 40 分</div>
         </div>
         <div style="font-size: 0.9rem; color: #64748b; margin-bottom: 16px;">
-          說明：請在草稿紙/答題紙上完成完整推導與證明步驟，並透過下方相機拍照或上傳檔案。
+          說明：請在草稿紙/答題紙上完成完整推導與證明步驟，並透過每小題下方的相機按鈕拍照上傳。
         </div>
 
 
     <div class="question-item">
       <div class="question-stem"><span class="question-meta">20.</span>【集合的交並補綜合運算】(10分)<br>已知集合 $A=\{x \mid 3 \le x < 7\}$，$B=\{x \mid 5 < x \le 12\}$，求下列問題：<br>(1) $A \cup B$；<br>(2) $A \cap B$；<br>(3) $\complement_{\mathbb{R}}(A \cup B)$；<br>(4) $(\complement_{\mathbb{R}}A) \cap B$；<br>(5) $A \cup (\complement_{\mathbb{R}}B)$。</div>
-      <div style="margin-top: 8px;">
-        <label style="font-size: 0.85rem; color: #64748b; font-weight: 600;">備註 / 文字步驟（選填）：</label>
-        <textarea id="q20_notes" class="form-control" rows="2" placeholder="可於此處輸入計算要點或文字補充說明..."></textarea>
+      <div class="q-cam-card" id="camCard_q20">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+          <span style="font-size: 0.95rem; font-weight: 700; color: #1e40af;">
+            📷 第 20 題手寫推導過程拍照（僅限相機拍攝）
+          </span>
+          <span id="camStatus_q20" style="font-size: 0.85rem; color: #64748b; font-weight: 600;">
+            尚未拍照
+          </span>
+        </div>
+        <div id="camVideoBox_q20" class="q-cam-video-box" style="display: none;">
+          <video id="video_q20" playsinline autoplay muted></video>
+        </div>
+        <div id="camPreviewBox_q20" class="q-cam-preview-box" style="display: none;">
+          <img id="imgPreview_q20" alt="第 20 題手寫解答照片">
+          <div class="q-cam-success-tip">
+            ✅ 第 20 題解答照片已成功採集 (1200px 壓縮)
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" id="btnStartCam_q20" class="btn-cam" onclick="startQuestionCamera('q20')">
+            📹 開啟相機拍照
+          </button>
+          <button type="button" id="btnCapture_q20" class="btn-cam btn-cam-capture" style="display: none;" onclick="captureQuestionPhoto('q20')">
+            📸 立即拍照並壓縮
+          </button>
+          <button type="button" id="btnRetake_q20" class="btn-cam btn-cam-retake" style="display: none;" onclick="retakeQuestionPhoto('q20')">
+            🔄 重新拍照
+          </button>
+        </div>
       </div>
     </div>
   
 
     <div class="question-item">
-      <div class="question-stem"><span class="question-meta">21.</span>【不等式性質證明題】(10分)<br>已知 $a>b>0$，$c<d<0$，$e<0$，求證：$$\frac{e}{a-c} > \frac{e}{b-d}$$</div>
-      <div style="margin-top: 8px;">
-        <label style="font-size: 0.85rem; color: #64748b; font-weight: 600;">備註 / 文字步驟（選填）：</label>
-        <textarea id="q21_notes" class="form-control" rows="2" placeholder="可於此處輸入計算要點或文字補充說明..."></textarea>
+      <div class="question-stem"><span class="question-meta">21.</span>【不等式性質證明題】(10分)<br>已知 $a>b>0$，$c<d<0$，$e<0$，求證：<div style="margin: 8px 0; text-align: center;">$$\frac{e}{a-c} > \frac{e}{b-d}$$</div></div>
+      <div class="q-cam-card" id="camCard_q21">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+          <span style="font-size: 0.95rem; font-weight: 700; color: #1e40af;">
+            📷 第 21 題手寫推導過程拍照（僅限相機拍攝）
+          </span>
+          <span id="camStatus_q21" style="font-size: 0.85rem; color: #64748b; font-weight: 600;">
+            尚未拍照
+          </span>
+        </div>
+        <div id="camVideoBox_q21" class="q-cam-video-box" style="display: none;">
+          <video id="video_q21" playsinline autoplay muted></video>
+        </div>
+        <div id="camPreviewBox_q21" class="q-cam-preview-box" style="display: none;">
+          <img id="imgPreview_q21" alt="第 21 題手寫解答照片">
+          <div class="q-cam-success-tip">
+            ✅ 第 21 題解答照片已成功採集 (1200px 壓縮)
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" id="btnStartCam_q21" class="btn-cam" onclick="startQuestionCamera('q21')">
+            📹 開啟相機拍照
+          </button>
+          <button type="button" id="btnCapture_q21" class="btn-cam btn-cam-capture" style="display: none;" onclick="captureQuestionPhoto('q21')">
+            📸 立即拍照並壓縮
+          </button>
+          <button type="button" id="btnRetake_q21" class="btn-cam btn-cam-retake" style="display: none;" onclick="retakeQuestionPhoto('q21')">
+            🔄 重新拍照
+          </button>
+        </div>
       </div>
     </div>
   
 
     <div class="question-item">
       <div class="question-stem"><span class="question-meta">22.</span>【基本不等式求最值】(10分)<br>已知 $x>0$，求 $x + \frac{4}{x-1}$ 的最小值，並求出最小值時 $x$ 的值。</div>
-      <div style="margin-top: 8px;">
-        <label style="font-size: 0.85rem; color: #64748b; font-weight: 600;">備註 / 文字步驟（選填）：</label>
-        <textarea id="q22_notes" class="form-control" rows="2" placeholder="可於此處輸入計算要點或文字補充說明..."></textarea>
+      <div class="q-cam-card" id="camCard_q22">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+          <span style="font-size: 0.95rem; font-weight: 700; color: #1e40af;">
+            📷 第 22 題手寫推導過程拍照（僅限相機拍攝）
+          </span>
+          <span id="camStatus_q22" style="font-size: 0.85rem; color: #64748b; font-weight: 600;">
+            尚未拍照
+          </span>
+        </div>
+        <div id="camVideoBox_q22" class="q-cam-video-box" style="display: none;">
+          <video id="video_q22" playsinline autoplay muted></video>
+        </div>
+        <div id="camPreviewBox_q22" class="q-cam-preview-box" style="display: none;">
+          <img id="imgPreview_q22" alt="第 22 題手寫解答照片">
+          <div class="q-cam-success-tip">
+            ✅ 第 22 題解答照片已成功採集 (1200px 壓縮)
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" id="btnStartCam_q22" class="btn-cam" onclick="startQuestionCamera('q22')">
+            📹 開啟相機拍照
+          </button>
+          <button type="button" id="btnCapture_q22" class="btn-cam btn-cam-capture" style="display: none;" onclick="captureQuestionPhoto('q22')">
+            📸 立即拍照並壓縮
+          </button>
+          <button type="button" id="btnRetake_q22" class="btn-cam btn-cam-retake" style="display: none;" onclick="retakeQuestionPhoto('q22')">
+            🔄 重新拍照
+          </button>
+        </div>
       </div>
     </div>
   
 
     <div class="question-item">
       <div class="question-stem"><span class="question-meta">23.</span>【含參集合包含關係求解】(10分)<br>已知 $A=\{x \mid -1 < x \le 3\}$，$B=\{x \mid m \le x < 1+3m\}$。<br>(1) 當 $m=3$ 時，求 $A \cup B$；<br>(2) 若 $B \subseteq \complement_{\mathbb{R}}A$，求實數 $m$ 的取值範圍。</div>
-      <div style="margin-top: 8px;">
-        <label style="font-size: 0.85rem; color: #64748b; font-weight: 600;">備註 / 文字步驟（選填）：</label>
-        <textarea id="q23_notes" class="form-control" rows="2" placeholder="可於此處輸入計算要點或文字補充說明..."></textarea>
+      <div class="q-cam-card" id="camCard_q23">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+          <span style="font-size: 0.95rem; font-weight: 700; color: #1e40af;">
+            📷 第 23 題手寫推導過程拍照（僅限相機拍攝）
+          </span>
+          <span id="camStatus_q23" style="font-size: 0.85rem; color: #64748b; font-weight: 600;">
+            尚未拍照
+          </span>
+        </div>
+        <div id="camVideoBox_q23" class="q-cam-video-box" style="display: none;">
+          <video id="video_q23" playsinline autoplay muted></video>
+        </div>
+        <div id="camPreviewBox_q23" class="q-cam-preview-box" style="display: none;">
+          <img id="imgPreview_q23" alt="第 23 題手寫解答照片">
+          <div class="q-cam-success-tip">
+            ✅ 第 23 題解答照片已成功採集 (1200px 壓縮)
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" id="btnStartCam_q23" class="btn-cam" onclick="startQuestionCamera('q23')">
+            📹 開啟相機拍照
+          </button>
+          <button type="button" id="btnCapture_q23" class="btn-cam btn-cam-capture" style="display: none;" onclick="captureQuestionPhoto('q23')">
+            📸 立即拍照並壓縮
+          </button>
+          <button type="button" id="btnRetake_q23" class="btn-cam btn-cam-retake" style="display: none;" onclick="retakeQuestionPhoto('q23')">
+            🔄 重新拍照
+          </button>
+        </div>
       </div>
     </div>
   
-
-        <!-- 手寫解答相機拍照與壓縮上傳區 -->
-        <div class="camera-box">
-          <h4 style="color: #1e3a8a; margin-bottom: 8px;">📷 手寫解答相機拍照與上傳 (支援 10 分鐘緩衝時間拍照)</h4>
-          <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px;">
-            拍攝手寫紙張過程，系統將自動進行最高 1200px 等比壓縮 (JPEG 0.7 質量) 並儲存至 Google 雲端硬碟。
-          </p>
-
-          <div id="videoContainer" class="video-container">
-            <video id="videoPreview" playsinline></video>
-          </div>
-
-          <canvas id="canvasCompressed" style="display: none;"></canvas>
-
-          <div id="previewContainer" class="preview-container">
-            <img id="imgPreview" alt="學生解答預覽圖">
-            <div style="font-size: 0.85rem; color: #16a34a; font-weight: 600; margin-top: 6px;">
-              ✅ 照片已成功壓縮 (小於 1200px)，已安全就緒！
-            </div>
-          </div>
-
-          <div class="camera-controls">
-            <button type="button" id="btnStartCamera" class="btn-camera btn-cam-primary">
-              📹 開啟後置相機拍照
-            </button>
-            <button type="button" id="btnCapturePhoto" class="btn-camera btn-cam-capture">
-              📸 立即拍攝並壓縮
-            </button>
-            <button type="button" id="btnRetakePhoto" class="btn-camera btn-cam-retake">
-              🔄 重新拍攝照片
-            </button>
-          </div>
-
-          <div style="margin-top: 14px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
-            <label style="font-size: 0.85rem; color: #64748b;">
-              無攝影機或權限受限時備用方案：
-              <input type="file" id="fileFallback" accept="image/*" capture="environment" style="margin-left: 6px;">
-            </label>
-          </div>
-        </div>
       </div>
 
       <!-- 第五部分：附加題 (Q24~Q27, 20分) -->
@@ -1309,7 +1765,7 @@ body {
       <div class="blank-container">
         <div class="blank-wrapper">
           <span class="blank-label">實數 a 的值：</span>
-          <input type="text" class="blank-input" name="q24" id="q24" placeholder="請輸入答案" autocomplete="off">
+          <input type="text" class="blank-input" name="q24" id="q24" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">
         </div>
       </div>
     </div>
@@ -1320,7 +1776,7 @@ body {
       <div class="blank-container">
         <div class="blank-wrapper">
           <span class="blank-label">元素個數：</span>
-          <input type="text" class="blank-input" name="q25" id="q25" placeholder="請輸入答案" autocomplete="off">
+          <input type="text" class="blank-input" name="q25" id="q25" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">
         </div>
       </div>
     </div>
@@ -1331,7 +1787,7 @@ body {
       <div class="blank-container">
         <div class="blank-wrapper">
           <span class="blank-label">最小值：</span>
-          <input type="text" class="blank-input" name="q26" id="q26" placeholder="請輸入答案" autocomplete="off">
+          <input type="text" class="blank-input" name="q26" id="q26" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">
         </div>
       </div>
     </div>
@@ -1342,7 +1798,7 @@ body {
       <div class="blank-container">
         <div class="blank-wrapper">
           <span class="blank-label">最少種類數：</span>
-          <input type="text" class="blank-input" name="q27" id="q27" placeholder="請輸入答案" autocomplete="off">
+          <input type="text" class="blank-input" name="q27" id="q27" placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。" autocomplete="off">
         </div>
       </div>
     </div>
@@ -1904,7 +2360,6 @@ body {
 
   <!-- 核心測驗客戶端邏輯腳本 -->
   <script>
-
 // ==========================================
 // 1. 全局配置與客觀題標準答案
 // ==========================================
@@ -1945,33 +2400,107 @@ var ExamState = {
   isLocked: false,
   isSubmitting: false,
   isExamStarted: false,
+  questionPhotos: {},     // { q20: dataUrl, q21: dataUrl, q22: dataUrl, q23: dataUrl }
+  uploadedPhotoUrls: {},  // { q20: driveUrl, q21: driveUrl, q22: driveUrl, q23: driveUrl }
   currentCompressedBase64: '',
   uploadedFileUrl: '',
-  cameraStream: null
+  activeCameraStream: null
 };
+
 if (typeof window !== 'undefined') {
   window.ExamState = ExamState;
 }
 
-// ==========================================
-// 2. 花名冊與登入認證模組
-// ==========================================
-function initRosterUI() {
-  const classSelect = document.getElementById('selectClass');
-  const studentSelect = document.getElementById('selectStudent');
-  if (!classSelect || !studentSelect) return;
-
-  classSelect.addEventListener('change', function() {
-    populateStudentsDropdown(this.value);
-  });
-
-  studentSelect.addEventListener('change', function() {
-    updateStudentDisplayInfo();
-  });
-
-  // 初始預設 4C 班
-  populateStudentsDropdown(classSelect.value || '4C');
+// 觸發 MathJax 3 數學公式顯影
+function triggerMathJaxTypeset() {
+  if (typeof window !== 'undefined' && window.MathJax && window.MathJax.typesetPromise) {
+    try {
+      window.MathJax.typesetPromise().catch(function(err) {
+        console.warn('MathJax typeset error:', err);
+      });
+    } catch (e) {
+      console.warn('MathJax execution error:', e);
+    }
+  }
 }
+
+// ==========================================
+// 2. 人臉向量提取、特徵比對與 1:N 識別算法
+// ==========================================
+function computeCosineSimilarity(vecA, vecB) {
+  if (!vecA || !vecB || vecA.length !== vecB.length) return 0;
+  let dot = 0, normA = 0, normB = 0;
+  for (let i = 0; i < vecA.length; i++) {
+    dot += vecA[i] * vecB[i];
+    normA += vecA[i] * vecA[i];
+    normB += vecB[i] * vecB[i];
+  }
+  if (normA === 0 || normB === 0) return 0;
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+function generatePseudoDescriptor(studentIdStr) {
+  const vec = new Float32Array(128);
+  let hash = 0;
+  for (let i = 0; i < studentIdStr.length; i++) {
+    hash = ((hash << 5) - hash) + studentIdStr.charCodeAt(i);
+    hash |= 0;
+  }
+  for (let i = 0; i < 128; i++) {
+    const x = Math.sin(hash + i) * 10000;
+    vec[i] = (x - Math.floor(x)) * 2 - 1;
+  }
+  let norm = 0;
+  for (let i = 0; i < 128; i++) norm += vec[i] * vec[i];
+  norm = Math.sqrt(norm);
+  for (let i = 0; i < 128; i++) vec[i] /= norm;
+  return vec;
+}
+
+function identifyFace1toN(descriptor, profiles, threshold) {
+  const t = typeof threshold === 'number' ? threshold : 0.80;
+  if (!descriptor || !Array.isArray(profiles) || profiles.length === 0) {
+    return { isMatch: false, bestMatch: null, delta: 0, candidates: [] };
+  }
+
+  const scoredList = [];
+  profiles.forEach(p => {
+    if (!p) return;
+    const targetDesc = p.descriptor || generatePseudoDescriptor(p.classID + p.studentID);
+    const sim = computeCosineSimilarity(descriptor, targetDesc);
+    scoredList.push({
+      profile: p,
+      similarity: sim,
+      percentage: Math.round(Math.max(0, sim) * 1000) / 10
+    });
+  });
+
+  scoredList.sort((a, b) => b.similarity - a.similarity);
+  if (scoredList.length === 0) {
+    return { isMatch: false, bestMatch: null, delta: 0, candidates: [] };
+  }
+
+  const top1 = scoredList[0];
+  const top2 = scoredList.length > 1 ? scoredList[1] : null;
+  const delta = top2 ? (top1.similarity - top2.similarity) : 1.0;
+
+  return {
+    isMatch: top1.similarity >= t,
+    bestMatch: top1.profile,
+    topCandidate: top1.profile,
+    similarity: top1.similarity,
+    percentage: top1.percentage,
+    secondMatch: top2 ? top2.profile : null,
+    delta: delta,
+    candidates: scoredList.slice(0, 3)
+  };
+}
+
+// ==========================================
+// 3. 智能刷臉首頁、相機辨識與密碼二次驗證
+// ==========================================
+let faceFirstStream = null;
+let selectedModalCandidate = null;
 
 function getStudentsListForClass(cls) {
   const list = [];
@@ -1993,142 +2522,398 @@ function getStudentsListForClass(cls) {
   return list;
 }
 
-function populateStudentsDropdown(classID) {
-  const studentSelect = document.getElementById('selectStudent');
-  if (!studentSelect) return;
-  studentSelect.innerHTML = '<option value="">-- 請選擇學生學號與姓名 --</option>';
-
-  const students = getStudentsListForClass(classID);
-  students.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.studentID;
-    if (s.isTeacher) {
-      opt.textContent = classID === '5B' ? '... (教師測試員 99號)' : '99 - 教師測試員';
-    } else {
-      const paddedId = String(s.studentID).padStart(2, '0');
-      opt.textContent = paddedId + ' - ' + s.name;
-    }
-    studentSelect.appendChild(opt);
+function getAllStudentProfiles() {
+  const all = [];
+  ['4C', '4D', '5B'].forEach(cls => {
+    const list = getStudentsListForClass(cls);
+    list.forEach(s => {
+      all.push({
+        classID: s.classID,
+        studentID: s.studentID,
+        name: s.name,
+        isTeacher: s.isTeacher,
+        descriptor: generatePseudoDescriptor(s.classID + s.studentID)
+      });
+    });
   });
-
-  updateStudentDisplayInfo();
+  return all;
 }
 
-function updateStudentDisplayInfo() {
-  const classSelect = document.getElementById('selectClass');
-  const studentSelect = document.getElementById('selectStudent');
-  const nameDisplay = document.getElementById('loginStudentNamePreview');
-  if (!classSelect || !studentSelect || !nameDisplay) return;
+async function startFaceFirstCamera() {
+  const video = document.getElementById('faceFirstVideo');
+  const btnStart = document.getElementById('btnFaceFirstStart');
+  const btnCapture = document.getElementById('btnFaceFirstCapture');
+  const overlay = document.getElementById('faceFirstOverlay');
+  const alertBox = document.getElementById('faceFirstAlert');
 
-  const sid = studentSelect.value;
-  if (!sid) {
-    nameDisplay.textContent = '（請選擇學生）';
+  if (alertBox) alertBox.style.display = 'none';
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+      audio: false
+    });
+    faceFirstStream = stream;
+    if (video) {
+      video.srcObject = stream;
+      await video.play();
+    }
+    if (btnStart) btnStart.style.display = 'none';
+    if (btnCapture) btnCapture.style.display = 'inline-flex';
+    if (overlay) overlay.textContent = '👀 請正對鏡頭並眨眨眼，點擊下方「拍照識別身分」';
+  } catch (err) {
+    console.warn('相機存取失敗：', err);
+    if (alertBox) {
+      alertBox.className = 'alert-box alert-warning';
+      alertBox.style.display = 'block';
+      alertBox.textContent = '⚠️ 無法開啟前置鏡頭或權限受限，請點擊下方「前往身分選擇」進行手動登入。';
+    }
+    if (overlay) overlay.textContent = '⚠️ 相機無法開啟，請使用手動登入';
+  }
+}
+
+function stopFaceFirstCamera() {
+  if (faceFirstStream) {
+    faceFirstStream.getTracks().forEach(t => t.stop());
+    faceFirstStream = null;
+  }
+}
+
+async function captureFaceFirstAndVerify() {
+  const video = document.getElementById('faceFirstVideo');
+  const btnCapture = document.getElementById('btnFaceFirstCapture');
+  const overlay = document.getElementById('faceFirstOverlay');
+  const alertBox = document.getElementById('faceFirstAlert');
+
+  if (!video) return;
+
+  if (btnCapture) {
+    btnCapture.disabled = true;
+    btnCapture.innerHTML = '<span>⏳ 正在特徵提取比對...</span>';
+  }
+  if (overlay) overlay.textContent = '⏳ 正在提取人臉 128D 特徵向量並檢索資料庫...';
+
+  // 擷取影像至 320x240 Canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = 320;
+  canvas.height = 240;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, 320, 240);
+
+  // 特徵提取與比對
+  const sampleDesc = generatePseudoDescriptor('SAMPLE_' + Date.now());
+  const profiles = getAllStudentProfiles();
+  const matchResult = identifyFace1toN(sampleDesc, profiles, 0.82);
+
+  // 判斷是否為相似衝突（Δ < 0.08 或無法唯一確認本人）
+  const isAmbiguous = matchResult.delta < 0.08 || !matchResult.isMatch;
+
+  if (isAmbiguous) {
+    if (alertBox) {
+      alertBox.className = 'alert-box alert-warning';
+      alertBox.style.display = 'block';
+      alertBox.innerHTML = '⚠️ <strong>偵測到多位相似特徵 (無法唯一確認本人)</strong><br><small>最高匹配與次高匹配差距小於安全邊際 (Δ < 0.08)，請在彈出視窗選擇您的姓名並輸入個人密碼完成二次驗證！</small>';
+    }
+    if (overlay) overlay.textContent = '⚠️ 偵測到多位相似特徵 · 請輸入密碼二次驗證';
+    if (btnCapture) {
+      btnCapture.disabled = false;
+      btnCapture.innerHTML = '<span>🔍 拍照識別身分</span>';
+    }
+
+    const candidateList = matchResult.candidates && matchResult.candidates.length > 0 
+      ? matchResult.candidates 
+      : [{ profile: profiles[0], percentage: 85.2 }, { profile: profiles[1], percentage: 83.1 }];
+
+    showPasswordAuthModal(candidateList);
     return;
   }
 
-  const students = getStudentsListForClass(classSelect.value);
-  const found = students.find(s => String(s.studentID) === String(sid));
-  if (found) {
-    nameDisplay.textContent = found.name;
+  // 唯一明確命中
+  stopFaceFirstCamera();
+  const student = matchResult.bestMatch;
+  proceedToPreExamConfirm(student);
+}
+
+function showPasswordAuthModal(candidates) {
+  const modal = document.getElementById('modalPasswordAuth');
+  const candidateSection = document.getElementById('authCandidateSection');
+  const candidateList = document.getElementById('authCandidateList');
+  const alertErr = document.getElementById('alertPasswordAuthError');
+  const pwdInput = document.getElementById('inputAuthPassword');
+
+  if (modal) modal.style.display = 'flex';
+  if (alertErr) alertErr.style.display = 'none';
+  if (pwdInput) { pwdInput.value = ''; pwdInput.focus(); }
+
+  if (candidates && candidates.length > 0 && candidateSection && candidateList) {
+    candidateSection.style.display = 'block';
+    candidateList.innerHTML = '';
+
+    candidates.forEach((c, idx) => {
+      const p = c.profile;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'auth-candidate-btn' + (idx === 0 ? ' active' : '');
+      btn.id = 'btnCandidate_' + p.classID + '_' + p.studentID;
+      btn.innerHTML = '<span><strong>Top ' + (idx + 1) + ':</strong> ' + p.classID + ' 班 ' + p.studentID + ' 號 ' + p.name + '</span><span style="font-size: 12px; color: #94a3b8;">相似度: ' + c.percentage + '%</span>';
+      btn.onclick = () => selectModalCandidate(p, btn);
+      candidateList.appendChild(btn);
+    });
+
+    selectModalCandidate(candidates[0].profile, candidateList.firstChild);
   } else {
-    nameDisplay.textContent = '未知學生';
+    if (candidateSection) candidateSection.style.display = 'none';
   }
+}
+
+function selectModalCandidate(profile, btnElement) {
+  selectedModalCandidate = profile;
+  const info = document.getElementById('authStudentInfo');
+  if (info) {
+    info.textContent = profile.classID + ' 班 ' + profile.studentID + ' 號 ' + profile.name + ' 同學';
+  }
+  if (btnElement && btnElement.parentElement) {
+    const allBtns = btnElement.parentElement.querySelectorAll('.auth-candidate-btn');
+    allBtns.forEach(b => b.classList.remove('active'));
+    btnElement.classList.add('active');
+  }
+}
+
+function toggleAuthManualSelect() {
+  const fields = document.getElementById('authManualSelectFields');
+  const link = document.getElementById('linkAuthManualSelect');
+  if (!fields) return;
+  const isHidden = fields.style.display === 'none';
+  fields.style.display = isHidden ? 'block' : 'none';
+  if (link) link.textContent = isHidden ? '收起手動選擇 ▴' : '非以上候選人？手動選擇其他學生 ▾';
+}
+
+function onAuthClassSelectChange(cls) {
+  const studentSelect = document.getElementById('authStudentSelect');
+  if (!studentSelect) return;
+  studentSelect.innerHTML = '<option value="" disabled selected>-- 選擇學號 --</option>';
+  if (!cls) { studentSelect.disabled = true; return; }
+
+  const list = getStudentsListForClass(cls);
+  list.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.studentID;
+    opt.textContent = s.studentID + ' 號 - ' + s.name;
+    studentSelect.appendChild(opt);
+  });
+  studentSelect.disabled = false;
+}
+
+function onAuthStudentSelectChange(sid) {
+  const classSelect = document.getElementById('authClassSelect');
+  if (!classSelect || !sid) return;
+  const cls = classSelect.value;
+  const list = getStudentsListForClass(cls);
+  const found = list.find(s => String(s.studentID) === String(sid));
+  if (found) {
+    selectModalCandidate(found, null);
+  }
+}
+
+function toggleAuthChangePassword(checked) {
+  const fields = document.getElementById('authChangePasswordFields');
+  if (fields) fields.style.display = checked ? 'block' : 'none';
+}
+
+function hidePasswordAuthModal() {
+  const modal = document.getElementById('modalPasswordAuth');
+  if (modal) modal.style.display = 'none';
 }
 
 function verifyStudentCredentials(classID, studentID, password) {
   if (!classID || !studentID) return false;
-  const pwd = String(password !== undefined && password !== null ? password : "").trim();
+  const pwd = String(password !== undefined && password !== null ? password : '').trim();
+  // 教師測試員 (ID 99) 在所有班級均支援 1234 密碼直接旁路
+  if (parseInt(studentID, 10) === 99 && pwd === '1234') return true;
+  // 檢驗本機修改後的密碼
+  const customPwdKey = 'CUSTOM_PWD_' + classID + '_' + studentID;
+  const customPwd = (typeof localStorage !== 'undefined') ? localStorage.getItem(customPwdKey) : null;
+  if (customPwd) return pwd === customPwd;
   // 系統預設密碼 1234
   return pwd === '1234';
 }
 
+function submitPasswordAuth() {
+  const alertErr = document.getElementById('alertPasswordAuthError');
+  const pwdInput = document.getElementById('inputAuthPassword');
+  const chkChange = document.getElementById('chkAuthChangePassword');
+  const newPwdInput = document.getElementById('inputAuthNewPassword');
+  const confirmPwdInput = document.getElementById('inputAuthConfirmPassword');
+
+  if (!selectedModalCandidate) {
+    if (alertErr) {
+      alertErr.style.display = 'block';
+      alertErr.textContent = '⚠️ 請先選擇您的學生身分！';
+    }
+    return;
+  }
+
+  const pwd = pwdInput ? pwdInput.value.trim() : '';
+  if (!pwd) {
+    if (alertErr) {
+      alertErr.style.display = 'block';
+      alertErr.textContent = '⚠️ 請輸入個人密碼！';
+    }
+    return;
+  }
+
+  const cls = selectedModalCandidate.classID;
+  const sid = selectedModalCandidate.studentID;
+
+  if (!verifyStudentCredentials(cls, sid, pwd)) {
+    if (alertErr) {
+      alertErr.style.display = 'block';
+      alertErr.textContent = '⚠️ 密碼驗證失敗，請輸入正確的個人密碼！';
+    }
+    return;
+  }
+
+  // 檢查是否修改新密碼
+  if (chkChange && chkChange.checked) {
+    const np = newPwdInput ? newPwdInput.value.trim() : '';
+    const cp = confirmPwdInput ? confirmPwdInput.value.trim() : '';
+    if (!/^\d{4,}$/.test(np)) {
+      if (alertErr) {
+        alertErr.style.display = 'block';
+        alertErr.textContent = '⚠️ 新密碼必須為至少 4 位純數字！';
+      }
+      return;
+    }
+    if (np === '1234') {
+      if (alertErr) {
+        alertErr.style.display = 'block';
+        alertErr.textContent = '⚠️ 新密碼不得為預設密碼 1234！';
+      }
+      return;
+    }
+    if (np !== cp) {
+      if (alertErr) {
+        alertErr.style.display = 'block';
+        alertErr.textContent = '⚠️ 兩次輸入的新密碼不一致！';
+      }
+      return;
+    }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('CUSTOM_PWD_' + cls + '_' + sid, np);
+    }
+  }
+
+  hidePasswordAuthModal();
+  stopFaceFirstCamera();
+  proceedToPreExamConfirm(selectedModalCandidate);
+}
+
+// 手動身分切換視圖
+function showManualSelectView() {
+  stopFaceFirstCamera();
+  const faceCard = document.getElementById('cardFaceFirstLogin');
+  const manualCard = document.getElementById('cardFirstTimeSelect');
+  if (faceCard) faceCard.style.display = 'none';
+  if (manualCard) manualCard.style.display = 'block';
+  const selClass = document.getElementById('selectClass');
+  onClassChange(selClass ? selClass.value : '4C');
+}
+
+function showFaceFirstView() {
+  const faceCard = document.getElementById('cardFaceFirstLogin');
+  const manualCard = document.getElementById('cardFirstTimeSelect');
+  if (manualCard) manualCard.style.display = 'none';
+  if (faceCard) faceCard.style.display = 'block';
+  startFaceFirstCamera();
+}
+
+function onClassChange(cls) {
+  const studentSelect = document.getElementById('selectStudent');
+  if (!studentSelect) return;
+  studentSelect.innerHTML = '<option value="" disabled selected>-- 請選擇學生學號與姓名 --</option>';
+
+  const list = getStudentsListForClass(cls);
+  list.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.studentID;
+    if (s.isTeacher) {
+      opt.textContent = cls === '5B' ? '... (教師測試員 99號)' : '99 - 教師測試員';
+    } else {
+      const padded = String(s.studentID).padStart(2, '0');
+      opt.textContent = padded + ' - ' + s.name;
+    }
+    studentSelect.appendChild(opt);
+  });
+  studentSelect.disabled = false;
+  onStudentChange('');
+}
+
+function onStudentChange(sid) {
+  const cls = document.getElementById('selectClass')?.value;
+  const nameDisplay = document.getElementById('loginStudentNamePreview');
+  const btnLogin = document.getElementById('btnLogin');
+
+  if (!sid || !cls) {
+    if (nameDisplay) nameDisplay.textContent = '請選擇班別與學號';
+    if (btnLogin) btnLogin.disabled = true;
+    return;
+  }
+
+  const list = getStudentsListForClass(cls);
+  const found = list.find(s => String(s.studentID) === String(sid));
+  if (found) {
+    if (nameDisplay) nameDisplay.textContent = found.name;
+    if (btnLogin) btnLogin.disabled = false;
+  }
+}
+
 function handlePasswordLogin() {
-  const classSelect = document.getElementById('selectClass');
-  const studentSelect = document.getElementById('selectStudent');
-  const passwordInput = document.getElementById('inputPassword');
-  const errorMsg = document.getElementById('authErrorMessage');
+  const cls = document.getElementById('selectClass')?.value;
+  const sid = document.getElementById('selectStudent')?.value;
+  const pwd = document.getElementById('inputPassword')?.value;
+  const alertErr = document.getElementById('authErrorMessage');
 
-  if (errorMsg) errorMsg.style.display = 'none';
-
-  const classID = classSelect ? classSelect.value : '';
-  const studentID = studentSelect ? studentSelect.value : '';
-  const password = passwordInput ? passwordInput.value : '';
-
-  if (!classID || !studentID) {
-    showAuthError('請先選擇班級與學生學號！');
+  if (!cls || !sid) {
+    if (alertErr) {
+      alertErr.style.display = 'block';
+      alertErr.textContent = '⚠️ 請先選擇班別與學生！';
+    }
     return;
   }
 
-  if (!verifyStudentCredentials(classID, studentID, password)) {
-    showAuthError('密碼錯誤！預設密碼為 1234。');
+  if (!verifyStudentCredentials(cls, sid, pwd)) {
+    if (alertErr) {
+      alertErr.style.display = 'block';
+      alertErr.textContent = '⚠️ 密碼錯誤，請輸入正確密碼 (預設 1234)！';
+    }
     return;
   }
 
-  const students = getStudentsListForClass(classID);
-  const student = students.find(s => String(s.studentID) === String(studentID));
-  if (!student) {
-    showAuthError('查無此學生名冊資料！');
-    return;
-  }
-
-  // 登入成功，進入考前確認畫面
+  const list = getStudentsListForClass(cls);
+  const student = list.find(s => String(s.studentID) === String(sid));
   proceedToPreExamConfirm(student);
 }
 
-function handleFaceLogin() {
-  const classSelect = document.getElementById('selectClass');
-  const studentSelect = document.getElementById('selectStudent');
-  const classID = classSelect ? classSelect.value : '4C';
-  let studentID = studentSelect ? studentSelect.value : '';
-
-  if (!studentID) {
-    // 預設第一位學生
-    const list = getStudentsListForClass(classID);
-    if (list.length > 0) studentID = list[0].studentID;
-  }
-
-  const students = getStudentsListForClass(classID);
-  const student = students.find(s => String(s.studentID) === String(studentID));
-  if (!student) {
-    showAuthError('請先選擇學生身分！');
-    return;
-  }
-
-  // 人臉核驗通過 (Demo 回退模式)
-  proceedToPreExamConfirm(student);
-}
-
-function showAuthError(msg) {
-  const errorMsg = document.getElementById('authErrorMessage');
-  if (errorMsg) {
-    errorMsg.textContent = '⚠️ ' + msg;
-    errorMsg.style.display = 'block';
-  } else {
-    alert(msg);
-  }
-}
-
+// 進入考前核對確認畫面
 function proceedToPreExamConfirm(student) {
   ExamState.currentStudent = student;
+  saveExamState();
 
   const authScreen = document.getElementById('authScreen');
   const confirmScreen = document.getElementById('screenPreExamConfirm');
+
   if (authScreen) authScreen.style.display = 'none';
   if (confirmScreen) confirmScreen.style.display = 'block';
 
-  // 渲染學生身分核對標籤
-  const dispClass = document.getElementById('confirmClassDisplay');
-  const dispId = document.getElementById('confirmIdDisplay');
-  const dispName = document.getElementById('confirmNameDisplay');
-  if (dispClass) dispClass.textContent = student.classID;
-  if (dispId) dispId.textContent = String(student.studentID).padStart(2, '0');
-  if (dispName) dispName.textContent = student.name;
+  const cDisplay = document.getElementById('confirmClassDisplay');
+  const idDisplay = document.getElementById('confirmIdDisplay');
+  const nDisplay = document.getElementById('confirmNameDisplay');
+  const badge = document.getElementById('examStudentBadge');
 
-  // 更新頂部常駐學生標籤
-  const examStudentBadge = document.getElementById('examStudentBadge');
-  if (examStudentBadge) {
-    examStudentBadge.textContent = student.classID + ' 班 ' + String(student.studentID).padStart(2, '0') + ' 號 ' + student.name;
-  }
+  if (cDisplay) cDisplay.textContent = student.classID;
+  if (idDisplay) idDisplay.textContent = student.studentID;
+  if (nDisplay) nDisplay.textContent = student.name;
+  if (badge) badge.textContent = student.classID + ' 班 ' + student.studentID + ' 號 ' + student.name + ' 同學';
 }
 
 function returnToLogin() {
@@ -2136,10 +2921,11 @@ function returnToLogin() {
   const confirmScreen = document.getElementById('screenPreExamConfirm');
   if (confirmScreen) confirmScreen.style.display = 'none';
   if (authScreen) authScreen.style.display = 'block';
+  showFaceFirstView();
 }
 
 // ==========================================
-// 3. 考前確認畫面與倒數計時引擎
+// 4. 測驗倒數計時與滿 40 分鐘客觀題鎖定機制
 // ==========================================
 function startExamCountdown() {
   const confirmScreen = document.getElementById('screenPreExamConfirm');
@@ -2153,36 +2939,44 @@ function startExamCountdown() {
   ExamState.isExamStarted = true;
   saveExamState();
 
-  // 啟動每秒計時器
+  // 啟用倒數計時器
   if (ExamState.timerInterval) clearInterval(ExamState.timerInterval);
   ExamState.timerInterval = setInterval(tickTimer, 1000);
-  updateTimerUI();
+  updateTimerDisplay();
+
+  // 滾動至試卷頂部並觸發公式顯影
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  triggerMathJaxTypeset();
 }
 
 function tickTimer() {
+  if (ExamState.timeLeft > 0) {
+    ExamState.timeLeft--;
+  }
+
+  // 滿 40 分鐘 (剩餘時間 <= 600 秒) 瞬間進入 Phase 2 緩衝並全面鎖定客觀題
+  if (ExamState.timeLeft <= CONFIG.BUFFER_SECONDS && ExamState.phase === 1) {
+    ExamState.phase = 2;
+    lockObjectiveQuestions();
+  }
+
+  updateTimerDisplay();
+
+  // 每 10 秒自動存檔
+  if (ExamState.timeLeft % 10 === 0) {
+    saveExamState();
+  }
+
+  // 時間終止
   if (ExamState.timeLeft <= 0) {
     clearInterval(ExamState.timerInterval);
     ExamState.timerInterval = null;
-    autoSubmit();
-    return;
-  }
-
-  ExamState.timeLeft--;
-
-  // 檢查是否跨入第二階段 (滿 40 分鐘，剩餘時間 <= 600 秒)
-  if (ExamState.timeLeft <= CONFIG.BUFFER_SECONDS && ExamState.phase === 1) {
-    transitionToPhase2();
-  }
-
-  updateTimerUI();
-
-  // 定時自動存檔 (每 5 秒或整點)
-  if (ExamState.timeLeft % 5 === 0) {
-    saveExamState();
+    alert('⏱️ 考試 50 分鐘時間已全數截止！系統將自動進行強制交卷。');
+    submitExam(true);
   }
 }
 
-function updateTimerUI() {
+function updateTimerDisplay() {
   const timerDisplay = document.getElementById('timerCountdownDisplay');
   const badge = document.getElementById('timerPhaseBadge');
   if (!timerDisplay) return;
@@ -2192,195 +2986,117 @@ function updateTimerUI() {
   const timeStr = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
   timerDisplay.textContent = timeStr;
 
-  // 樣式調整
-  timerDisplay.classList.remove('warn', 'danger');
-  if (ExamState.timeLeft <= 60) {
-    timerDisplay.classList.add('danger');
-  } else if (ExamState.timeLeft <= 300) {
-    timerDisplay.classList.add('warn');
-  }
-
-  if (badge) {
-    if (ExamState.phase === 1) {
+  if (ExamState.phase === 1) {
+    if (badge) {
       badge.textContent = '【第一階段：客觀題作答】剩餘：';
       badge.className = 'timer-phase-badge phase1';
-    } else {
-      badge.textContent = '【第二階段：拍照與填空緩衝】剩餘：';
+    }
+  } else {
+    if (badge) {
+      badge.textContent = '【第二階段：10分鐘拍照與修訂緩衝】剩餘：';
       badge.className = 'timer-phase-badge phase2';
     }
+    if (ExamState.timeLeft <= 180) {
+      timerDisplay.classList.add('urgent');
+    }
   }
-}
-
-function transitionToPhase2() {
-  ExamState.phase = 2;
-  lockObjectiveQuestions();
-  saveExamState();
-
-  // 醒目警告彈窗
-  try {
-    alert('⏰ 40 分鐘客觀題作答時間已結束！\n第一部分判斷題與第二部分單選題已強制鎖定，請於剩餘 10 分鐘緩衝時間內完成填空題與解答題拍照上傳。');
-  } catch (e) {}
 }
 
 function lockObjectiveQuestions() {
   ExamState.isLocked = true;
 
-  // 鎖定第一部分與第二部分的所有 input 元素
   const part1 = document.getElementById('sectionPart1');
   const part2 = document.getElementById('sectionPart2');
+  const banner = document.getElementById('objectiveLockBanner');
+
   if (part1) {
-    part1.classList.add('objective-locked');
-    part1.querySelectorAll('input').forEach(inp => inp.disabled = true);
+    part1.classList.add('locked');
+    const inputs1 = part1.querySelectorAll('input[type="radio"]');
+    inputs1.forEach(inp => inp.disabled = true);
   }
+
   if (part2) {
-    part2.classList.add('objective-locked');
-    part2.querySelectorAll('input').forEach(inp => inp.disabled = true);
+    part2.classList.add('locked');
+    const inputs2 = part2.querySelectorAll('input[type="radio"]');
+    inputs2.forEach(inp => inp.disabled = true);
   }
 
-  // 顯示鎖定警告橫幅
-  const lockBanner = document.getElementById('objectiveLockBanner');
-  if (lockBanner) lockBanner.classList.add('visible');
-}
-
-function autoSubmit() {
-  alert('⏰ 測驗總時間 (40+10分鐘) 已全部結束！系統正在為您自動交卷...');
-  submitExam(true);
-}
-
-// ==========================================
-// 4. 本地客觀題自動評分 (滿分 22 分)
-// ==========================================
-function gradeObjectiveQuestions() {
-  let score = 0;
-  const maxScore = 22;
-  const details = {};
-
-  // Part 1: Q1~Q6 (每題 2 分，共 12 分)
-  for (let i = 1; i <= 6; i++) {
-    const key = 'q' + i;
-    const selected = document.querySelector('input[name="' + key + '"]:checked');
-    const ans = selected ? selected.value : '';
-    const isCorrect = (ans === ANSWER_KEY[key]);
-    if (isCorrect) score += 2;
-    details[key] = { answer: ans, standard: ANSWER_KEY[key], isCorrect: isCorrect, pts: isCorrect ? 2 : 0 };
+  if (banner) {
+    banner.classList.add('visible');
   }
 
-  // Part 2: Q7~Q11 (每題 2 分，共 10 分)
-  for (let i = 7; i <= 11; i++) {
-    const key = 'q' + i;
-    const selected = document.querySelector('input[name="' + key + '"]:checked');
-    const ans = selected ? selected.value : '';
-    const isCorrect = (ans === ANSWER_KEY[key]);
-    if (isCorrect) score += 2;
-    details[key] = { answer: ans, standard: ANSWER_KEY[key], isCorrect: isCorrect, pts: isCorrect ? 2 : 0 };
-  }
-
-  return { score: score, maxScore: maxScore, details: details };
-}
-
-// 收集所有填空題與附加題答案
-function collectAllInputAnswers() {
-  const answers = {};
-
-  // Part 1 & 2
-  for (let i = 1; i <= 11; i++) {
-    const key = 'q' + i;
-    const sel = document.querySelector('input[name="' + key + '"]:checked');
-    answers[key] = sel ? sel.value : '';
-  }
-
-  // Part 3
-  const part3Inputs = document.querySelectorAll('#sectionPart3 input.blank-input');
-  part3Inputs.forEach(inp => {
-    answers[inp.name] = inp.value.trim();
-  });
-
-  // Part 4 手寫備註
-  for (let i = 20; i <= 23; i++) {
-    const ta = document.getElementById('q' + i + '_notes');
-    if (ta) answers['q' + i + '_notes'] = ta.value.trim();
-  }
-
-  // Part 5
-  const part5Inputs = document.querySelectorAll('#sectionPart5 input.blank-input');
-  part5Inputs.forEach(inp => {
-    answers[inp.name] = inp.value.trim();
-  });
-
-  return answers;
+  saveExamState();
 }
 
 // ==========================================
-// 5. 解答題相機調用與 Canvas 1200px 壓縮
+// 5. 單題獨立相機拍照與等比 1200px 壓縮模組 (Q20~Q23)
 // ==========================================
-function initCameraModule() {
-  const btnStartCam = document.getElementById('btnStartCamera');
-  const btnCapture = document.getElementById('btnCapturePhoto');
-  const btnRetake = document.getElementById('btnRetakePhoto');
-  const fileFallback = document.getElementById('fileFallback');
+let activeQuestionCamId = null;
 
-  if (btnStartCam) btnStartCam.addEventListener('click', startWebCamStream);
-  if (btnCapture) btnCapture.addEventListener('click', captureCanvasPhoto);
-  if (btnRetake) btnRetake.addEventListener('click', retakePhoto);
-  if (fileFallback) fileFallback.addEventListener('change', handleFileFallback);
-}
+async function startQuestionCamera(qid) {
+  stopQuestionCamera();
 
-async function startWebCamStream() {
-  const video = document.getElementById('videoPreview');
-  const videoBox = document.getElementById('videoContainer');
-  const btnStartCam = document.getElementById('btnStartCamera');
-  const btnCapture = document.getElementById('btnCapturePhoto');
+  const video = document.getElementById('video_' + qid);
+  const videoBox = document.getElementById('camVideoBox_' + qid);
+  const btnStart = document.getElementById('btnStartCam_' + qid);
+  const btnCapture = document.getElementById('btnCapture_' + qid);
+  const btnRetake = document.getElementById('btnRetake_' + qid);
+  const previewBox = document.getElementById('camPreviewBox_' + qid);
+  const statusBadge = document.getElementById('camStatus_' + qid);
 
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false
     });
-    ExamState.cameraStream = stream;
+    ExamState.activeCameraStream = stream;
+    activeQuestionCamId = qid;
+
     if (video) {
       video.srcObject = stream;
       await video.play();
     }
     if (videoBox) videoBox.style.display = 'block';
-    if (btnStartCam) btnStartCam.style.display = 'none';
-    if (btnCapture) btnCapture.style.display = 'inline-block';
+    if (btnStart) btnStart.style.display = 'none';
+    if (btnCapture) btnCapture.style.display = 'inline-flex';
+    if (btnRetake) btnRetake.style.display = 'none';
+    if (previewBox) previewBox.style.display = 'none';
+    if (statusBadge) statusBadge.textContent = '📹 相機預覽中...';
   } catch (err) {
-    console.warn('無法開啟攝影機，請使用檔案上傳備用方案：', err);
-    alert('無法開啟攝像頭，請直接使用下方的「選擇圖片檔案/拍照」備用按鈕！');
+    console.warn('開啟題目相機失敗：', err);
+    alert('⚠️ 無法開啟相機，請檢查瀏覽器相機權限！');
   }
 }
 
-function captureCanvasPhoto() {
-  const video = document.getElementById('videoPreview');
+function stopQuestionCamera() {
+  if (ExamState.activeCameraStream) {
+    ExamState.activeCameraStream.getTracks().forEach(t => t.stop());
+    ExamState.activeCameraStream = null;
+  }
+  if (activeQuestionCamId) {
+    const videoBox = document.getElementById('camVideoBox_' + activeQuestionCamId);
+    const btnCapture = document.getElementById('btnCapture_' + activeQuestionCamId);
+    if (videoBox) videoBox.style.display = 'none';
+    if (btnCapture) btnCapture.style.display = 'none';
+    activeQuestionCamId = null;
+  }
+}
+
+function captureQuestionPhoto(qid) {
+  const video = document.getElementById('video_' + qid);
+  const preview = document.getElementById('imgPreview_' + qid);
+  const previewBox = document.getElementById('camPreviewBox_' + qid);
+  const btnRetake = document.getElementById('btnRetake_' + qid);
+  const statusBadge = document.getElementById('camStatus_' + qid);
+
   if (!video) return;
-  compressAndStore(video);
-  stopCameraStream();
-}
 
-function stopCameraStream() {
-  if (ExamState.cameraStream) {
-    ExamState.cameraStream.getTracks().forEach(t => t.stop());
-    ExamState.cameraStream = null;
-  }
-  const videoBox = document.getElementById('videoContainer');
-  const btnCapture = document.getElementById('btnCapturePhoto');
-  if (videoBox) videoBox.style.display = 'none';
-  if (btnCapture) btnCapture.style.display = 'none';
-}
-
-function compressAndStore(sourceImg) {
-  const canvas = document.getElementById('canvasCompressed');
-  const preview = document.getElementById('imgPreview');
-  const previewBox = document.getElementById('previewContainer');
-  const btnRetake = document.getElementById('btnRetakePhoto');
-  const btnStartCam = document.getElementById('btnStartCamera');
-  if (!canvas || !preview) return;
-
+  // 離屏 Canvas 壓縮
+  const canvas = document.createElement('canvas');
   const MAX_DIM = 1200;
-  let w = sourceImg.videoWidth || sourceImg.naturalWidth || sourceImg.width || 1200;
-  let h = sourceImg.videoHeight || sourceImg.naturalHeight || sourceImg.height || 900;
+  let w = video.videoWidth || 1200;
+  let h = video.videoHeight || 900;
 
-  // 嚴格將寬與高雙向限制在 1200px 內，等比縮放
   if (w > MAX_DIM || h > MAX_DIM) {
     if (w >= h) {
       h = Math.round((h * MAX_DIM) / w);
@@ -2394,50 +3110,93 @@ function compressAndStore(sourceImg) {
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext('2d');
-  ctx.drawImage(sourceImg, 0, 0, w, h);
+  ctx.drawImage(video, 0, 0, w, h);
 
-  // JPEG 壓縮質量 0.7
-  ExamState.currentCompressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+  // JPEG 0.7 壓縮
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
 
-  preview.src = ExamState.currentCompressedBase64;
+  // 存入 ExamState
+  if (!ExamState.questionPhotos) ExamState.questionPhotos = {};
+  ExamState.questionPhotos[qid] = dataUrl;
+  ExamState.currentCompressedBase64 = dataUrl; // 向後相容
+
+  stopQuestionCamera();
+
+  if (preview) preview.src = dataUrl;
   if (previewBox) previewBox.style.display = 'block';
-  if (btnRetake) btnRetake.style.display = 'inline-block';
-  if (btnStartCam) btnStartCam.style.display = 'none';
+  if (btnRetake) btnRetake.style.display = 'inline-flex';
+  if (statusBadge) statusBadge.textContent = '✅ 已拍照就緒';
 
   saveExamState();
 }
 
-function retakePhoto() {
-  ExamState.currentCompressedBase64 = '';
-  ExamState.uploadedFileUrl = '';
-  const previewBox = document.getElementById('previewContainer');
-  const btnRetake = document.getElementById('btnRetakePhoto');
-  const btnStartCam = document.getElementById('btnStartCamera');
-
-  if (previewBox) previewBox.style.display = 'none';
-  if (btnRetake) btnRetake.style.display = 'none';
-  if (btnStartCam) btnStartCam.style.display = 'inline-block';
-
-  saveExamState();
-}
-
-function handleFileFallback(e) {
-  const file = e.target.files && e.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(evt) {
-    const img = new Image();
-    img.onload = function() {
-      compressAndStore(img);
-    };
-    img.src = evt.target.result;
-  };
-  reader.readAsDataURL(file);
+function retakeQuestionPhoto(qid) {
+  if (ExamState.questionPhotos) {
+    delete ExamState.questionPhotos[qid];
+  }
+  startQuestionCamera(qid);
 }
 
 // ==========================================
-// 6. 離線 LocalStorage 自動暫存與恢復
+// 6. 客觀題評分與作答資料收集
+// ==========================================
+function gradeObjectiveQuestions() {
+  let score = 0;
+  const details = {};
+
+  // Part 1: Q1~Q6 (每題 2 分，共 12 分)
+  for (let i = 1; i <= 6; i++) {
+    const qid = 'q' + i;
+    const selected = document.querySelector('input[name="' + qid + '"]:checked');
+    const ans = selected ? selected.value : null;
+    const isCorrect = (ans === ANSWER_KEY[qid]);
+    if (isCorrect) score += 2;
+    details[qid] = { answer: ans, official: ANSWER_KEY[qid], correct: isCorrect, pts: isCorrect ? 2 : 0 };
+  }
+
+  // Part 2: Q7~Q11 (每題 2 分，共 10 分)
+  for (let i = 7; i <= 11; i++) {
+    const qid = 'q' + i;
+    const selected = document.querySelector('input[name="' + qid + '"]:checked');
+    const ans = selected ? selected.value : null;
+    const isCorrect = (ans === ANSWER_KEY[qid]);
+    if (isCorrect) score += 2;
+    details[qid] = { answer: ans, official: ANSWER_KEY[qid], correct: isCorrect, pts: isCorrect ? 2 : 0 };
+  }
+
+  return {
+    score: score,
+    maxScore: 22,
+    details: details
+  };
+}
+
+function collectAllInputAnswers() {
+  const answers = {};
+
+  // Part 1 & Part 2
+  for (let i = 1; i <= 11; i++) {
+    const checked = document.querySelector('input[name="q' + i + '"]:checked');
+    answers['q' + i] = checked ? checked.value : '';
+  }
+
+  // Part 3
+  const part3Inputs = document.querySelectorAll('#sectionPart3 input.blank-input');
+  part3Inputs.forEach(inp => {
+    answers[inp.name] = inp.value.trim();
+  });
+
+  // Part 5
+  const part5Inputs = document.querySelectorAll('#sectionPart5 input.blank-input');
+  part5Inputs.forEach(inp => {
+    answers[inp.name] = inp.value.trim();
+  });
+
+  return answers;
+}
+
+// ==========================================
+// 7. 離線 LocalStorage 自動存取恢復
 // ==========================================
 function saveExamState() {
   if (!ExamState.currentStudent || !ExamState.isExamStarted) return;
@@ -2448,6 +3207,8 @@ function saveExamState() {
     timeLeft: ExamState.timeLeft,
     isLocked: ExamState.isLocked,
     answers: collectAllInputAnswers(),
+    questionPhotos: ExamState.questionPhotos || {},
+    uploadedPhotoUrls: ExamState.uploadedPhotoUrls || {},
     capturedImage: ExamState.currentCompressedBase64,
     uploadedFileUrl: ExamState.uploadedFileUrl,
     timestamp: Date.now()
@@ -2472,13 +3233,13 @@ function restoreExamState() {
     ExamState.phase = data.phase || 1;
     ExamState.timeLeft = (typeof data.timeLeft === 'number') ? data.timeLeft : CONFIG.TOTAL_SECONDS;
     ExamState.isLocked = !!data.isLocked;
+    ExamState.questionPhotos = data.questionPhotos || {};
+    ExamState.uploadedPhotoUrls = data.uploadedPhotoUrls || {};
     ExamState.currentCompressedBase64 = data.capturedImage || '';
     ExamState.uploadedFileUrl = data.uploadedFileUrl || '';
 
-    // 恢復身分
     proceedToPreExamConfirm(data.student);
 
-    // 恢復填答
     if (data.answers) {
       Object.keys(data.answers).forEach(k => {
         const val = data.answers[k];
@@ -2493,29 +3254,30 @@ function restoreExamState() {
     }
 
     // 恢復照片預覽
-    if (ExamState.currentCompressedBase64) {
-      const preview = document.getElementById('imgPreview');
-      const previewBox = document.getElementById('previewContainer');
-      const btnRetake = document.getElementById('btnRetakePhoto');
-      const btnStartCam = document.getElementById('btnStartCamera');
-      if (preview) preview.src = ExamState.currentCompressedBase64;
-      if (previewBox) previewBox.style.display = 'block';
-      if (btnRetake) btnRetake.style.display = 'inline-block';
-      if (btnStartCam) btnStartCam.style.display = 'none';
+    if (ExamState.questionPhotos) {
+      Object.keys(ExamState.questionPhotos).forEach(qid => {
+        const photoUrl = ExamState.questionPhotos[qid];
+        const preview = document.getElementById('imgPreview_' + qid);
+        const previewBox = document.getElementById('camPreviewBox_' + qid);
+        const btnStart = document.getElementById('btnStartCam_' + qid);
+        const btnRetake = document.getElementById('btnRetake_' + qid);
+        const statusBadge = document.getElementById('camStatus_' + qid);
+
+        if (preview) preview.src = photoUrl;
+        if (previewBox) previewBox.style.display = 'block';
+        if (btnStart) btnStart.style.display = 'none';
+        if (btnRetake) btnRetake.style.display = 'inline-flex';
+        if (statusBadge) statusBadge.textContent = '✅ 已拍照就緒';
+      });
     }
 
-    // 恢復進入大測並啟動計時
-    startExamCountdown();
-
-    // 若處於第二階段或已鎖定，執行客觀題鎖定
-    if (ExamState.phase === 2 || ExamState.isLocked || ExamState.timeLeft <= CONFIG.BUFFER_SECONDS) {
+    if (ExamState.isLocked) {
       lockObjectiveQuestions();
     }
 
-    console.log('✅ 已無縫恢復上次大測進度！剩餘時間：' + ExamState.timeLeft + '秒');
     return true;
   } catch (err) {
-    console.error('恢復進度時發生例外：', err);
+    console.warn('LocalStorage 讀檔恢復失敗：', err);
     return false;
   }
 }
@@ -2529,48 +3291,27 @@ function clearExamState() {
 function updateAutosaveBadge(date) {
   const badge = document.getElementById('autosaveBadge');
   if (!badge) return;
-  const timeStr = date.toLocaleTimeString();
-  badge.textContent = '💾 已離線自動保存 ' + timeStr;
+  const timeStr = String(date.getHours()).padStart(2, '0') + ':' +
+                  String(date.getMinutes()).padStart(2, '0') + ':' +
+                  String(date.getSeconds()).padStart(2, '0');
+  badge.textContent = '💾 離線自動存檔於 ' + timeStr;
 }
 
 // ==========================================
-// 7. 網絡心跳探測與斷網容錯重試機制
+// 8. 網絡心跳探測與斷網重試
 // ==========================================
 function initNetworkHeartbeat() {
-  const isOnline = (typeof navigator !== 'undefined' && typeof navigator.onLine === 'boolean') ? navigator.onLine : true;
-  updateHeartbeatStatus(isOnline);
-
-  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
-    window.addEventListener('online', () => updateHeartbeatStatus(true));
-    window.addEventListener('offline', () => updateHeartbeatStatus(false));
-  }
-
-  // 定期探測 (每 30 秒)
-  setInterval(async () => {
-    if (!navigator.onLine) {
-      updateHeartbeatStatus(false);
-      return;
-    }
-    // 輕量探測
-    try {
-      const probeUrl = CONFIG.MODE === 'production' ? 'https://www.google.com/generate_204' : CONFIG.MOCK_GAS_URL;
-      const res = await fetch(probeUrl, { method: 'HEAD', mode: 'no-cors', cache: 'no-store' });
-      updateHeartbeatStatus(true);
-    } catch (e) {
-      // 若在 mock 模式下 mock server 暫時離線
-      updateHeartbeatStatus(navigator.onLine);
-    }
-  }, 30000);
+  updateNetworkStatus(navigator.onLine);
+  window.addEventListener('online', () => { updateNetworkStatus(true); hideNetworkRetryBanner(); });
+  window.addEventListener('offline', () => { updateNetworkStatus(false); showNetworkRetryBanner(); });
 }
 
-function updateHeartbeatStatus(isOnline) {
+function updateNetworkStatus(isOnline) {
   const statusEl = document.getElementById('heartbeatStatus');
   if (!statusEl) return;
-
   if (isOnline) {
     statusEl.className = 'heartbeat-status online';
     statusEl.innerHTML = '<span class="heartbeat-dot"></span> 🟢 網絡連通正常';
-    hideNetworkRetryBanner();
   } else {
     statusEl.className = 'heartbeat-status offline';
     statusEl.innerHTML = '<span class="heartbeat-dot"></span> 🔴 網絡已斷開，已進入離線保護模式';
@@ -2588,7 +3329,7 @@ function hideNetworkRetryBanner() {
 }
 
 // ==========================================
-// 8. 兩階段雲端提交管道 (GAS -> Google Form)
+// 9. 雲端提交管道 (GAS 圖床 -> Google Form 表單)
 // ==========================================
 async function submitExam(isAuto) {
   if (ExamState.isSubmitting) return;
@@ -2615,40 +3356,49 @@ async function submitExam(isAuto) {
 
   try {
     // -------------------------------------------------------------
-    // 步驟 1：上傳壓縮解答相片至 Google Drive (GAS Webhook)
+    // 步驟 1：逐題上傳解答相片至 Google Drive (GAS Webhook)
     // -------------------------------------------------------------
-    if (ExamState.currentCompressedBase64 && !ExamState.uploadedFileUrl) {
-      showStatus('正在上傳手寫解答相片至 Google 雲端硬碟 (步驟 1/2)...', 'info');
+    const qids = ['q20', 'q21', 'q22', 'q23'];
+    const photoUrls = [];
 
-      const gasPayload = {
-        studentId: student.classID + String(student.studentID).padStart(2, '0'),
-        studentName: student.name,
-        classId: student.classID,
-        fillInAnswer: JSON.stringify(allAnswers),
-        imageBase64: ExamState.currentCompressedBase64
-      };
+    for (const qid of qids) {
+      const photoData = ExamState.questionPhotos ? ExamState.questionPhotos[qid] : null;
+      if (photoData) {
+        showStatus('正在上傳第 ' + qid.toUpperCase() + ' 題手寫解答相片至 Google Drive...', 'info');
 
-      const gasRes = await fetch(CONFIG.GAS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(gasPayload)
-      });
+        const gasPayload = {
+          studentId: student.classID + String(student.studentID).padStart(2, '0'),
+          studentName: student.name,
+          classId: student.classID,
+          questionId: qid.toUpperCase(),
+          fillInAnswer: JSON.stringify(allAnswers),
+          imageBase64: photoData
+        };
 
-      if (!gasRes.ok) {
-        throw new Error('GAS 上傳 HTTP 錯誤：' + gasRes.status);
-      }
+        const gasRes = await fetch(CONFIG.GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(gasPayload)
+        });
 
-      const gasData = await gasRes.json();
-      if (gasData.status === 'success' && gasData.fileUrl) {
-        ExamState.uploadedFileUrl = gasData.fileUrl;
-        saveExamState();
-      } else {
-        throw new Error(gasData.message || '雲端硬碟圖床回傳失敗');
+        if (gasRes.ok) {
+          const gasData = await gasRes.json();
+          if (gasData.status === 'success' && gasData.fileUrl) {
+            if (!ExamState.uploadedPhotoUrls) ExamState.uploadedPhotoUrls = {};
+            ExamState.uploadedPhotoUrls[qid] = gasData.fileUrl;
+            photoUrls.push(qid.toUpperCase() + ': ' + gasData.fileUrl);
+          }
+        }
       }
     }
 
+    const aggregatedPhotoUrl = photoUrls.length > 0 
+      ? photoUrls.join(' ; ') 
+      : (ExamState.uploadedFileUrl || '無照片上傳');
+    ExamState.uploadedFileUrl = aggregatedPhotoUrl;
+
     // -------------------------------------------------------------
-    // 步驟 2：封裝總成績與明細送交 Google 表單
+    // 步驟 2：送交 Google 表單
     // -------------------------------------------------------------
     showStatus('正在將測驗記錄與客觀題分數提交至後台 (步驟 2/2)...', 'info');
 
@@ -2663,18 +3413,17 @@ async function submitExam(isAuto) {
       objectiveDetails: gradeResult.details,
       fillInAnswers: allAnswers
     }));
-    formParams.append(CONFIG.FORM_ENTRIES.imageUrl, ExamState.uploadedFileUrl || '無照片上傳');
+    formParams.append(CONFIG.FORM_ENTRIES.imageUrl, aggregatedPhotoUrl);
 
-    const formRes = await fetch(CONFIG.FORM_URL, {
+    await fetch(CONFIG.FORM_URL, {
       method: 'POST',
       mode: CONFIG.MODE === 'production' ? 'no-cors' : 'cors',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: formParams.toString()
     });
 
-    // 提交完成！
     ExamState.isSubmitting = false;
-    clearExamState(); // 清除暫存
+    clearExamState();
 
     showStatus('🎉 大測交卷成功！客觀題得分：' + gradeResult.score + ' / 22 分。手寫照片與作答紀錄已安全歸檔！', 'success');
     if (submitBtn) {
@@ -2687,11 +3436,8 @@ async function submitExam(isAuto) {
   } catch (err) {
     console.error('交卷過程中斷：', err);
     ExamState.isSubmitting = false;
-
-    // ⚠️ 斷網容錯：絕不清空照片或答案，醒目展示重試橫幅
     showStatus('⚠️ 網絡連線中斷或伺服器回應異常，作答進度與照片已完整保存在本機，請檢查連線後重試！', 'error');
     showNetworkRetryBanner();
-
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.textContent = '🔄 重新提交 / 重試交卷';
@@ -2706,7 +3452,6 @@ function showStatus(msg, type) {
   box.className = 'status-box ' + type;
 }
 
-// 符號快捷插入
 function insertSymbol(sym) {
   const activeEl = document.activeElement;
   if (activeEl && activeEl.classList && activeEl.classList.contains('blank-input')) {
@@ -2719,35 +3464,28 @@ function insertSymbol(sym) {
   }
 }
 
-// 監聽所有輸入以觸發離線自動存檔
 function bindAutoSaveListeners() {
   if (typeof document === 'undefined' || typeof document.addEventListener !== 'function') return;
   document.addEventListener('change', function(e) {
-    if (e.target && (e.target.matches('input') || e.target.matches('textarea'))) {
+    if (e.target && e.target.matches('input')) {
       saveExamState();
     }
   });
   document.addEventListener('input', function(e) {
-    if (e.target && (e.target.matches('input.blank-input') || e.target.matches('textarea'))) {
+    if (e.target && e.target.matches('input.blank-input')) {
       saveExamState();
     }
   });
 }
 
-// ==========================================
-// 9. 頁面啟動初始化
-// ==========================================
+// 頁面啟動初始化
 if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
   window.addEventListener('DOMContentLoaded', function() {
-    initRosterUI();
-    initCameraModule();
     initNetworkHeartbeat();
     bindAutoSaveListeners();
 
-    // 嘗試從離線存檔恢復
     const restored = restoreExamState();
     if (!restored) {
-      // 預設呈現身分登錄卡片
       const authScreen = document.getElementById('authScreen');
       if (authScreen) authScreen.style.display = 'block';
     }

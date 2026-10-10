@@ -103,11 +103,12 @@ async function runVerificationSuite() {
     const requiredIds = [
       'heartbeatStatus', 'autosaveBadge', 'networkRetryBanner', 'btnRetrySubmit',
       'stickyTimer', 'timerPhaseBadge', 'timerCountdownDisplay', 'examStudentBadge',
-      'authScreen', 'selectClass', 'selectStudent', 'inputPassword', 'btnLogin', 'btnFaceLogin',
+      'authScreen', 'cardFaceFirstLogin', 'faceFirstVideo', 'btnFaceFirstStart', 'btnFaceFirstCapture', 'linkGoToManualPage',
+      'cardFirstTimeSelect', 'selectClass', 'selectStudent', 'inputPassword', 'btnLogin',
+      'modalPasswordAuth', 'inputAuthPassword', 'btnSubmitPasswordAuth',
       'screenPreExamConfirm', 'confirmClassDisplay', 'confirmIdDisplay', 'confirmNameDisplay', 'btnStartExamCountdown',
       'examContainer', 'objectiveLockBanner',
       'sectionPart1', 'sectionPart2', 'sectionPart3', 'sectionPart4', 'sectionPart5',
-      'videoPreview', 'canvasCompressed', 'imgPreview', 'btnStartCamera', 'btnCapturePhoto', 'btnRetakePhoto', 'fileFallback',
       'submitBtn', 'statusBox'
     ];
     for (const id of requiredIds) {
@@ -129,14 +130,25 @@ async function runVerificationSuite() {
     assert(htmlContent.includes('name="q17_1"') && htmlContent.includes('name="q17_2"'), '缺少填充題 Q17');
     assert(htmlContent.includes('name="q18_1"'), '缺少填充題 Q18');
     assert(htmlContent.includes('name="q19_1"'), '缺少填充題 Q19');
+    
+    // 第四部分解答題（Q20~Q23）：每題獨立相機拍照卡片，無文字框，嚴禁檔案上傳
     for (let i = 20; i <= 23; i++) {
-      assert(htmlContent.includes(`id="q${i}_notes"`), `缺少解答題 Q${i}`);
+      assert(htmlContent.includes(`id="camCard_q${i}"`), `缺少解答題 Q${i} 相機拍照卡片`);
+      assert(htmlContent.includes(`id="video_q${i}"`), `缺少解答題 Q${i} 視訊預覽`);
+      assert(htmlContent.includes(`id="btnCapture_q${i}"`), `缺少解答題 Q${i} 拍照按鈕`);
+      assert(!htmlContent.includes(`id="q${i}_notes"`), `解答題 Q${i} 不應存在文字備註框`);
     }
+    assert(!htmlContent.includes('type="file"'), '試卷中嚴格禁止出現任何檔案選擇上傳 (type="file")');
+
     for (let i = 24; i <= 27; i++) {
       assert(htmlContent.includes(`name="q${i}"`), `缺少附加題 Q${i}`);
     }
 
-    pass('Test 1: HTML 結構、DOM 元素與 JavaScript 語法零錯誤審查', `共檢查 ${scriptBlockCount} 個腳本區塊與 27 道題目組件`);
+    // 檢驗填空題與附加題的自然語言提示詞與選填特性
+    assert(htmlContent.includes('placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。"'), '填空題與附加題必須包含自然語言提示 placeholder');
+    assert(!htmlContent.includes('class="blank-input" required'), '填空題文字框必須為選填項目，嚴禁 required');
+
+    pass('Test 1: HTML 結構、DOM 元素與 JavaScript 語法零錯誤審查', `共檢查 ${scriptBlockCount} 個腳本區塊與 27 道題目組件 (含獨立拍照卡與自然語言提示)`);
   } catch (err) {
     fail('Test 1', err);
   }

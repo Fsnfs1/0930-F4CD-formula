@@ -48,20 +48,29 @@
 </div>
 
 <div id="dashboard">
-    <div style="text-align: right; margin-bottom: 20px;">
-        <button class="btn" onclick="fetchPapers()">重新整理未改考卷</button>
+    <div style="text-align: right; margin-bottom: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="btn" style="background-color: #7f8c8d;" onclick="configureGasUrl()">⚙️ 設定 GAS 網址</button>
+        <button class="btn" onclick="fetchPapers()">🔄 重新整理未改考卷</button>
     </div>
     <div id="loadingMsg">正在載入考卷資料...</div>
     <div id="papersContainer"></div>
 </div>
 
 <script>
-    // ==========================================
-    // 請將下方 URL 替換為您的 Google Apps Script 部署網址
-    // ==========================================
-    const GAS_WEB_APP_URL = "在此貼上您的 Google Apps Script 網址";
+    // 優先讀取 LocalStorage 中的 GAS 網址，若無則使用預設部署網址
+    let GAS_WEB_APP_URL = localStorage.getItem('TEACHER_GAS_URL') || "https://script.google.com/macros/s/AKfycbxjkXzqp4WOghvi__SF8qoVBGAcXcSKv96JoRsKN3hLU6xHwLjK4rHyaXODIv_fE9Ak/exec";
+
+    function configureGasUrl() {
+        const input = prompt("請輸入 Google Apps Script 部署網址 (Web App URL)：", GAS_WEB_APP_URL);
+        if (input && input.trim().startsWith("http")) {
+            GAS_WEB_APP_URL = input.trim();
+            localStorage.setItem("TEACHER_GAS_URL", GAS_WEB_APP_URL);
+            alert("✅ GAS 網址已儲存！即刻重新整理載入。");
+            fetchPapers();
+        }
+    }
     
-    // 簡單的密碼防護 (非高度安全，僅防學生誤入)
+    // 簡單的密碼防護 (預設密碼 teacher2026)
     const TEACHER_PWD = "teacher2026"; 
 
     function checkPassword() {
