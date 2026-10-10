@@ -106,7 +106,8 @@ function doPost(e) {
     const timestampStr = Utilities.formatDate(new Date(), 'Asia/Taipei', 'yyyyMMdd_HHmmss');
     const safeStudentName = studentName.toString().replace(/[\/\\:*?"<>|]/g, '_');
     const safeStudentId = studentId.toString().replace(/[\/\\:*?"<>|]/g, '_');
-    const filename = `數學大測解答_${safeStudentId}_${safeStudentName}_${timestampStr}.${fileExt}`;
+    const qId = (payload.questionId || 'Q20').toString().toUpperCase().replace(/[\/\\:*?"<>|]/g, '_');
+    const filename = `大測解答_${qId}_${safeStudentId}_${safeStudentName}.${fileExt}`;
 
     const blob = Utilities.newBlob(decodedBytes, mimeType, filename);
     const uploadedFile = targetFolder.createFile(blob);

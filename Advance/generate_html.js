@@ -151,6 +151,13 @@ function generateHtml() {
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
+  <!-- @vladmandic/face-api 與 FaceAuth 人臉識別活體檢測庫 -->
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
+  <script src="../js/roster.js"></script>
+  <script src="../js/admin_snapshot.js"></script>
+  <script src="../js/face_auth.js"></script>
+  <script src="../js/persistence.js"></script>
+
   <style>
 ${EXAM_CSS}
   </style>
@@ -173,7 +180,7 @@ ${EXAM_CSS}
       <strong>⚠️ 網絡連線中斷，請檢查連線</strong>
       <span style="font-size: 0.9rem; margin-left: 8px;">作答進度與照片已完整保存在本機，無需慌張！</span>
     </div>
-    <button type="button" id="btnRetrySubmit" class="btn-retry" onclick="submitExam(false)">
+    <button type="button" id="btnRetrySubmit" class="btn-retry" onclick="handleNetworkRetryClick()">
       🔄 重新提交 / 重試
     </button>
   </div>
@@ -442,6 +449,9 @@ ${renderPart2(QUESTIONS_DATA.part2)}
           <div class="section-title">第三部分：填充題</div>
           <div class="section-pts">第 12~19 題，共 19 空，每空 2 分，共 38 分</div>
         </div>
+        <div class="alert-box alert-success" style="margin-bottom: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem;">
+          💡 <strong>作答提示</strong>：填空題文本框為<strong>選填項目</strong>（不強制要求填寫）。若難以輸入數學符號時，<strong>可以使用自然語言描述答案</strong>。
+        </div>
 
         <!-- 符號快速插入工具列 -->
         <div class="symbol-bar">
@@ -481,6 +491,9 @@ ${renderPart4(QUESTIONS_DATA.part4)}
           <div class="section-title">第五部分：附加題（進階挑戰題）</div>
           <div class="section-pts">第 24~27 題，每題 5 分，共 20 分</div>
         </div>
+        <div class="alert-box alert-success" style="margin-bottom: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem;">
+          💡 <strong>作答提示</strong>：附加題為選填項目。若難以輸入數學符號時，<strong>可以使用自然語言描述答案</strong>。
+        </div>
 ${renderPart5(QUESTIONS_DATA.part5)}
       </div>
 
@@ -517,3 +530,20 @@ const finalHtml = generateHtml();
 const targetPath = path.join(__dirname, 'advance_test.html');
 fs.writeFileSync(targetPath, finalHtml, 'utf8');
 console.log('✅ advance_test.html generated successfully! File size: ' + fs.statSync(targetPath).size + ' bytes');
+
+// Dual directory compilation (R5)
+const twinPaths = [
+  path.resolve(__dirname, '..', 'math_platform', 'Advance'),
+  path.resolve(__dirname, '..', '..', 'advance')
+];
+for (const twinDir of twinPaths) {
+  if (fs.existsSync(twinDir)) {
+    const twinTarget = path.join(twinDir, 'advance_test.html');
+    if (path.resolve(twinTarget) !== path.resolve(targetPath)) {
+      fs.writeFileSync(twinTarget, finalHtml, 'utf8');
+      console.log('✅ Synchronized twin advance_test.html: ' + twinTarget);
+    }
+  }
+}
+
+module.exports = { generateHtml };

@@ -42,6 +42,9 @@ body {
 
 /* 頂部網絡心跳與離線保護指示條 */
 .heartbeat-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1001;
   background: #1e293b;
   color: #f8fafc;
   padding: 8px 16px;
@@ -130,7 +133,7 @@ body {
 /* 置頂計時器導覽列 */
 .sticky-timer-bar {
   position: sticky;
-  top: 0;
+  top: 38px;
   z-index: 1000;
   background: #ffffff;
   border-bottom: 2px solid var(--border-color);

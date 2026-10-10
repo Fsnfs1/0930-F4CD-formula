@@ -2,7 +2,7 @@
 // 1. 全局配置與客觀題標準答案
 // ==========================================
 const CONFIG = {
-  MODE: (typeof window !== 'undefined' && window.location && window.location.hostname === 'localhost') ? 'mock' : 'mock',
+  MODE: (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) ? 'mock' : 'production',
   MOCK_GAS_URL: 'http://localhost:3000/api/gas-upload',
   MOCK_FORM_URL: 'http://localhost:3000/api/form-submit',
   PROD_GAS_URL: 'https://script.google.com/macros/s/AKfycbxjkXzqp4WOghvi__SF8qoVBGAcXcSKv96JoRsKN3hLU6xHwLjK4rHyaXODIv_fE9Ak/exec',
@@ -37,6 +37,7 @@ var ExamState = {
   timerInterval: null,
   isLocked: false,
   isSubmitting: false,
+  pendingSubmission: false,
   isExamStarted: false,
   questionPhotos: {},     // { q20: dataUrl, q21: dataUrl, q22: dataUrl, q23: dataUrl }
   uploadedPhotoUrls: {},  // { q20: driveUrl, q21: driveUrl, q22: driveUrl, q23: driveUrl }
@@ -49,13 +50,23 @@ if (typeof window !== 'undefined') {
   window.ExamState = ExamState;
 }
 
-// 觸發 MathJax 3 數學公式顯影
+// 觸發 MathJax 3 數學公式顯影 (含非同步啟動守護)
 function triggerMathJaxTypeset() {
-  if (typeof window !== 'undefined' && window.MathJax && window.MathJax.typesetPromise) {
+  if (typeof window !== 'undefined' && window.MathJax) {
     try {
-      window.MathJax.typesetPromise().catch(function(err) {
-        console.warn('MathJax typeset error:', err);
-      });
+      if (window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise().catch(function(err) {
+          console.warn('MathJax typeset error:', err);
+        });
+      } else if (window.MathJax.startup && window.MathJax.startup.promise) {
+        window.MathJax.startup.promise.then(function() {
+          if (window.MathJax.typesetPromise) {
+            window.MathJax.typesetPromise().catch(function(err) {
+              console.warn('MathJax typeset error:', err);
+            });
+          }
+        });
+      }
     } catch (e) {
       console.warn('MathJax execution error:', e);
     }
@@ -165,19 +176,60 @@ function getAllStudentProfiles() {
   ['4C', '4D', '5B'].forEach(cls => {
     const list = getStudentsListForClass(cls);
     list.forEach(s => {
+      let desc = null;
+      if (typeof window !== 'undefined' && window.FaceAuthModule && window.FaceAuthModule.getDemoDescriptor) {
+        desc = window.FaceAuthModule.getDemoDescriptor(s.classID, s.studentID);
+      } else {
+        desc = generatePseudoDescriptor(s.classID + s.studentID);
+      }
       all.push({
         classID: s.classID,
         studentID: s.studentID,
         name: s.name,
         isTeacher: s.isTeacher,
-        descriptor: generatePseudoDescriptor(s.classID + s.studentID)
+        descriptor: desc
       });
     });
   });
   return all;
 }
 
-async function startFaceFirstCamera() {
+let faceFirstBlinkTracker = null;
+let isFaceFirstScanning = false;
+
+function startLivenessAnd1toN() {
+  const video = document.getElementById('faceFirstVideo');
+  if (!video) return;
+  if (faceFirstBlinkTracker) {
+    faceFirstBlinkTracker.stop();
+    faceFirstBlinkTracker = null;
+  }
+  if (typeof window !== 'undefined' && window.FaceAuthModule && window.FaceAuthModule.startBlinkDetection) {
+    faceFirstBlinkTracker = window.FaceAuthModule.startBlinkDetection(video, {
+      blinkThreshold: 0.20,
+      openThreshold: 0.25,
+      onBlink: function(blinkData) {
+        console.log('[FaceFirst] 活體眨眼檢測通過，觸發自動辨識：', blinkData);
+        if (!isFaceFirstScanning) {
+          captureFaceFirstAndVerify('liveness_blink');
+        }
+      },
+      onStatusUpdate: function(status) {
+        if (isFaceFirstScanning) return;
+        const overlay = document.getElementById('faceFirstOverlay');
+        if (overlay) {
+          if (status.isFaceDetected) {
+            overlay.textContent = '🟢 偵測到面孔 · 請眨眨眼完成活體驗證';
+          } else {
+            overlay.textContent = '🟡 請將面部置於引導線中央';
+          }
+        }
+      }
+    });
+  }
+}
+
+async function startFaceFirstCamera(isAuto) {
   const video = document.getElementById('faceFirstVideo');
   const btnStart = document.getElementById('btnFaceFirstStart');
   const btnCapture = document.getElementById('btnFaceFirstCapture');
@@ -187,89 +239,146 @@ async function startFaceFirstCamera() {
   if (alertBox) alertBox.style.display = 'none';
 
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
-      audio: false
-    });
+    let stream = null;
+    if (typeof window !== 'undefined' && window.FaceAuthModule && window.FaceAuthModule.startCamera && video) {
+      stream = await window.FaceAuthModule.startCamera(video);
+    } else if (typeof navigator !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false
+      });
+      if (video) {
+        video.srcObject = stream;
+        await video.play();
+      }
+    }
     faceFirstStream = stream;
-    if (video) {
-      video.srcObject = stream;
-      await video.play();
+    if (btnStart) btnStart.style.display = 'none';
+    if (btnCapture) btnCapture.style.display = 'inline-flex';
+    if (overlay) overlay.textContent = '🟢 正在檢測面孔... 請正對鏡頭並眨眨眼';
+    startLivenessAnd1toN();
+  } catch (err) {
+    console.warn('相機存取失敗或未配置鏡頭：', err);
+    if (typeof window !== 'undefined' && window.FaceAuthModule && window.FaceAuthModule.setDemoMode) {
+      window.FaceAuthModule.setDemoMode(true);
     }
     if (btnStart) btnStart.style.display = 'none';
     if (btnCapture) btnCapture.style.display = 'inline-flex';
-    if (overlay) overlay.textContent = '👀 請正對鏡頭並眨眨眼，點擊下方「拍照識別身分」';
-  } catch (err) {
-    console.warn('相機存取失敗：', err);
     if (alertBox) {
       alertBox.className = 'alert-box alert-warning';
       alertBox.style.display = 'block';
-      alertBox.textContent = '⚠️ 無法開啟前置鏡頭或權限受限，請點擊下方「前往身分選擇」進行手動登入。';
+      alertBox.textContent = '⚠️ 無法開啟相機或處於無鏡頭環境，已啟用測試模式；亦可點擊下方「前往身分選擇」進行手動登記。';
     }
-    if (overlay) overlay.textContent = '⚠️ 相機無法開啟，請使用手動登入';
+    if (overlay) overlay.textContent = '⚠️ 相機未就緒（測試模式中，點擊下方「拍照識別身分」）';
   }
 }
 
 function stopFaceFirstCamera() {
+  if (faceFirstBlinkTracker) {
+    faceFirstBlinkTracker.stop();
+    faceFirstBlinkTracker = null;
+  }
+  if (typeof window !== 'undefined' && window.FaceAuthModule && window.FaceAuthModule.stopCamera) {
+    window.FaceAuthModule.stopCamera();
+  }
   if (faceFirstStream) {
     faceFirstStream.getTracks().forEach(t => t.stop());
     faceFirstStream = null;
   }
 }
 
-async function captureFaceFirstAndVerify() {
+async function captureFaceFirstAndVerify(triggerSource) {
   const video = document.getElementById('faceFirstVideo');
   const btnCapture = document.getElementById('btnFaceFirstCapture');
   const overlay = document.getElementById('faceFirstOverlay');
   const alertBox = document.getElementById('faceFirstAlert');
 
-  if (!video) return;
+  if (isFaceFirstScanning) return;
+  isFaceFirstScanning = true;
+
+  if (faceFirstBlinkTracker) {
+    faceFirstBlinkTracker.stop();
+    faceFirstBlinkTracker = null;
+  }
 
   if (btnCapture) {
     btnCapture.disabled = true;
     btnCapture.innerHTML = '<span>⏳ 正在特徵提取比對...</span>';
   }
-  if (overlay) overlay.textContent = '⏳ 正在提取人臉 128D 特徵向量並檢索資料庫...';
+  if (overlay) overlay.textContent = '⏳ 正在提取人臉 128D 特徵向量並檢索特徵庫...';
 
-  // 擷取影像至 320x240 Canvas
-  const canvas = document.createElement('canvas');
-  canvas.width = 320;
-  canvas.height = 240;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, 320, 240);
+  try {
+    let snap = null;
+    if (typeof window !== 'undefined' && window.FaceAuthModule && window.FaceAuthModule.captureFace && video) {
+      snap = await window.FaceAuthModule.captureFace(video);
+    } else {
+      const canvas = document.createElement('canvas');
+      canvas.width = 320;
+      canvas.height = 240;
+      const ctx = canvas.getContext('2d');
+      if (video && video.videoWidth) ctx.drawImage(video, 0, 0, 320, 240);
+      const imgData = canvas.toDataURL('image/jpeg', 0.7);
+      const demoDesc = (typeof window !== 'undefined' && window.FaceAuthModule && window.FaceAuthModule.getDemoDescriptor)
+        ? window.FaceAuthModule.getDemoDescriptor('4C', 1)
+        : generatePseudoDescriptor('SAMPLE_' + Date.now());
+      snap = { descriptor: demoDesc, imageBase64: imgData, isDemo: true };
+    }
 
-  // 特徵提取與比對
-  const sampleDesc = generatePseudoDescriptor('SAMPLE_' + Date.now());
-  const profiles = getAllStudentProfiles();
-  const matchResult = identifyFace1toN(sampleDesc, profiles, 0.82);
+    ExamState.capturedSnapshot = snap;
 
-  // 判斷是否為相似衝突（Δ < 0.08 或無法唯一確認本人）
-  const isAmbiguous = matchResult.delta < 0.08 || !matchResult.isMatch;
+    // 檢索學生特徵清單 (優先自 PersistenceModule 讀取真實資料)
+    let profiles = (typeof window !== 'undefined' && window.PersistenceModule && window.PersistenceModule.getAllStudentProfiles)
+      ? window.PersistenceModule.getAllStudentProfiles()
+      : [];
 
-  if (isAmbiguous) {
+    if (!profiles || profiles.length === 0) {
+      profiles = getAllStudentProfiles();
+    }
+
+    // 進行 1:N 特徵向量識別
+    let matchResult = null;
+    if (typeof window !== 'undefined' && window.FaceAuthModule && window.FaceAuthModule.identifyFace1toN && snap.descriptor) {
+      matchResult = window.FaceAuthModule.identifyFace1toN(snap.descriptor, profiles, 0.82);
+    } else {
+      matchResult = identifyFace1toN(snap.descriptor, profiles, 0.82);
+    }
+
+    // R1 核心防護：無論唯一匹配或相似邊界，均強制彈出密碼輸入框進行二次身分驗證
     if (alertBox) {
       alertBox.className = 'alert-box alert-warning';
       alertBox.style.display = 'block';
-      alertBox.innerHTML = '⚠️ <strong>偵測到多位相似特徵 (無法唯一確認本人)</strong><br><small>最高匹配與次高匹配差距小於安全邊際 (Δ < 0.08)，請在彈出視窗選擇您的姓名並輸入個人密碼完成二次驗證！</small>';
+      if (matchResult && matchResult.bestMatch) {
+        alertBox.innerHTML = `🟢 <strong>偵測到相近面孔 (${matchResult.bestMatch.classID} 班 ${matchResult.bestMatch.name} 同學)</strong><br><small>依安全防冒用機制，請在彈出視窗輸入個人身分密碼以確認本人！</small>`;
+      } else {
+        alertBox.innerHTML = '⚠️ <strong>偵測到多位相似特徵 (無法唯一確認本人)</strong><br><small>差距小於安全邊際，請在彈出視窗確認姓名並輸入身分密碼完成二次驗證！</small>';
+      }
     }
-    if (overlay) overlay.textContent = '⚠️ 偵測到多位相似特徵 · 請輸入密碼二次驗證';
+
+    if (overlay) overlay.textContent = '🔒 比對完成 · 請輸入身分密碼二次驗證';
+
+    const candidateList = (matchResult && matchResult.candidates && matchResult.candidates.length > 0)
+      ? matchResult.candidates
+      : (matchResult && matchResult.bestMatch ? [{ profile: matchResult.bestMatch, percentage: matchResult.percentage || 94.6 }] : []);
+
+    if (candidateList.length === 0 && profiles.length > 0) {
+      candidateList.push({ profile: profiles[0], percentage: 85.0 });
+    }
+
+    showPasswordAuthModal(candidateList);
+  } catch (err) {
+    console.warn('人臉識別比對異常：', err);
+    if (alertBox) {
+      alertBox.className = 'alert-box alert-warning';
+      alertBox.style.display = 'block';
+      alertBox.textContent = '⚠️ 人臉識別比對異常，請點擊下方「前往身分選擇」進行身分確認。';
+    }
+  } finally {
+    isFaceFirstScanning = false;
     if (btnCapture) {
       btnCapture.disabled = false;
       btnCapture.innerHTML = '<span>🔍 拍照識別身分</span>';
     }
-
-    const candidateList = matchResult.candidates && matchResult.candidates.length > 0 
-      ? matchResult.candidates 
-      : [{ profile: profiles[0], percentage: 85.2 }, { profile: profiles[1], percentage: 83.1 }];
-
-    showPasswordAuthModal(candidateList);
-    return;
   }
-
-  // 唯一明確命中
-  stopFaceFirstCamera();
-  const student = matchResult.bestMatch;
-  proceedToPreExamConfirm(student);
 }
 
 function showPasswordAuthModal(candidates) {
@@ -364,15 +473,27 @@ function hidePasswordAuthModal() {
 }
 
 function verifyStudentCredentials(classID, studentID, password) {
-  if (!classID || !studentID) return false;
+  if (!classID || studentID === undefined || studentID === null) return false;
   const pwd = String(password !== undefined && password !== null ? password : '').trim();
-  // 教師測試員 (ID 99) 在所有班級均支援 1234 密碼直接旁路
-  if (parseInt(studentID, 10) === 99 && pwd === '1234') return true;
-  // 檢驗本機修改後的密碼
-  const customPwdKey = 'CUSTOM_PWD_' + classID + '_' + studentID;
-  const customPwd = (typeof localStorage !== 'undefined') ? localStorage.getItem(customPwdKey) : null;
-  if (customPwd) return pwd === customPwd;
-  // 系統預設密碼 1234
+  if (!pwd) return false;
+
+  // 優先使用 PersistenceModule 經 Salted SHA-256 密碼雜湊核驗 (比對 ADMIN_STUDENT_PASSWORDS 與 LocalStorage)
+  if (typeof PersistenceModule !== 'undefined' && PersistenceModule.verifyStudentPassword) {
+    return PersistenceModule.verifyStudentPassword(classID, studentID, pwd);
+  }
+  if (typeof window !== 'undefined' && window.PersistenceModule && window.PersistenceModule.verifyStudentPassword) {
+    return window.PersistenceModule.verifyStudentPassword(classID, studentID, pwd);
+  }
+
+  // 獨立單元測試沙盒回退相容 (若沙盒未載入 persistence.js)
+  const cid = String(classID).trim().toUpperCase();
+  const sid = parseInt(studentID, 10);
+  if (sid === 99 && pwd === '1234') return true;
+  const customPwdKey = 'CUSTOM_PWD_' + cid + '_' + sid;
+  if (typeof localStorage !== 'undefined') {
+    const customPwd = localStorage.getItem(customPwdKey);
+    if (customPwd) return pwd === customPwd;
+  }
   return pwd === '1234';
 }
 
@@ -436,10 +557,29 @@ function submitPasswordAuth() {
       }
       return;
     }
+
+    if (typeof PersistenceModule !== 'undefined' && PersistenceModule.updateStudentPassword) {
+      PersistenceModule.updateStudentPassword(cls, sid, pwd, np);
+    } else if (typeof window !== 'undefined' && window.PersistenceModule && window.PersistenceModule.updateStudentPassword) {
+      window.PersistenceModule.updateStudentPassword(cls, sid, pwd, np);
+    }
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem('CUSTOM_PWD_' + cls + '_' + sid, np);
     }
   }
+
+  // 特徵融合增強 (Vector Enhancement)
+  const snap = ExamState.capturedSnapshot;
+  if (snap && snap.descriptor) {
+    if (typeof PersistenceModule !== 'undefined' && PersistenceModule.enhanceStudentVector) {
+      PersistenceModule.enhanceStudentVector(cls, sid, snap.descriptor, 0.7);
+    } else if (typeof window !== 'undefined' && window.PersistenceModule && window.PersistenceModule.enhanceStudentVector) {
+      window.PersistenceModule.enhanceStudentVector(cls, sid, snap.descriptor, 0.7);
+    }
+  }
+
+  ExamState.isAuthenticated = true;
+  ExamState.currentStudent = selectedModalCandidate;
 
   hidePasswordAuthModal();
   stopFaceFirstCamera();
@@ -522,13 +662,23 @@ function handlePasswordLogin() {
   if (!verifyStudentCredentials(cls, sid, pwd)) {
     if (alertErr) {
       alertErr.style.display = 'block';
-      alertErr.textContent = '⚠️ 密碼錯誤，請輸入正確密碼 (預設 1234)！';
+      alertErr.textContent = '⚠️ 密碼驗證失敗，請輸入正確的個人身分密碼！';
     }
     return;
   }
 
   const list = getStudentsListForClass(cls);
   const student = list.find(s => String(s.studentID) === String(sid));
+  if (!student) {
+    if (alertErr) {
+      alertErr.style.display = 'block';
+      alertErr.textContent = '⚠️ 未找到對應學生資料！';
+    }
+    return;
+  }
+
+  ExamState.isAuthenticated = true;
+  ExamState.currentStudent = student;
   proceedToPreExamConfirm(student);
 }
 
@@ -566,6 +716,11 @@ function returnToLogin() {
 // 4. 測驗倒數計時與滿 40 分鐘客觀題鎖定機制
 // ==========================================
 function startExamCountdown() {
+  if (!ExamState.isAuthenticated || !ExamState.currentStudent) {
+    alert('⚠️ 測驗尚未完成身分與密碼安全核驗，試卷保持安全鎖定！');
+    return;
+  }
+
   const confirmScreen = document.getElementById('screenPreExamConfirm');
   const examContainer = document.getElementById('examContainer');
   const stickyTimer = document.getElementById('stickyTimer');
@@ -772,6 +927,7 @@ function retakeQuestionPhoto(qid) {
   if (ExamState.questionPhotos) {
     delete ExamState.questionPhotos[qid];
   }
+  saveExamState();
   startQuestionCamera(qid);
 }
 
@@ -844,6 +1000,7 @@ function saveExamState() {
     phase: ExamState.phase,
     timeLeft: ExamState.timeLeft,
     isLocked: ExamState.isLocked,
+    pendingSubmission: !!ExamState.pendingSubmission,
     answers: collectAllInputAnswers(),
     questionPhotos: ExamState.questionPhotos || {},
     uploadedPhotoUrls: ExamState.uploadedPhotoUrls || {},
@@ -871,6 +1028,7 @@ function restoreExamState() {
     ExamState.phase = data.phase || 1;
     ExamState.timeLeft = (typeof data.timeLeft === 'number') ? data.timeLeft : CONFIG.TOTAL_SECONDS;
     ExamState.isLocked = !!data.isLocked;
+    ExamState.pendingSubmission = !!data.pendingSubmission;
     ExamState.questionPhotos = data.questionPhotos || {};
     ExamState.uploadedPhotoUrls = data.uploadedPhotoUrls || {};
     ExamState.currentCompressedBase64 = data.capturedImage || '';
@@ -938,10 +1096,52 @@ function updateAutosaveBadge(date) {
 // ==========================================
 // 8. 網絡心跳探測與斷網重試
 // ==========================================
+var networkRetryInterval = null;
+var networkRetryCountdown = 60;
+function getNetworkRetryCountdown() { return networkRetryCountdown; }
+function setNetworkRetryCountdown(v) { networkRetryCountdown = v; }
+function getNetworkRetryInterval() { return networkRetryInterval; }
+function setNetworkRetryInterval(v) { networkRetryInterval = v; }
+
 function initNetworkHeartbeat() {
   updateNetworkStatus(navigator.onLine);
-  window.addEventListener('online', () => { updateNetworkStatus(true); hideNetworkRetryBanner(); });
-  window.addEventListener('offline', () => { updateNetworkStatus(false); showNetworkRetryBanner(); });
+  window.addEventListener('online', () => { 
+    onNetworkRestored();
+  });
+  window.addEventListener('offline', () => { 
+    updateNetworkStatus(false); 
+    showNetworkRetryBanner(); 
+  });
+
+  // 定期探測心跳（每 30 秒）
+  setInterval(async () => {
+    if (!navigator.onLine) {
+      updateNetworkStatus(false);
+      showNetworkRetryBanner();
+      return;
+    }
+    try {
+      const probeUrl = CONFIG.MODE === 'production' ? 'https://www.google.com/generate_204' : CONFIG.GAS_URL;
+      const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const tid = ctrl ? setTimeout(() => ctrl.abort(), 5000) : null;
+      await fetch(probeUrl, {
+        method: 'HEAD',
+        mode: 'no-cors',
+        cache: 'no-store',
+        signal: ctrl ? ctrl.signal : undefined
+      });
+      if (tid) clearTimeout(tid);
+
+      updateNetworkStatus(true);
+      hideNetworkRetryBanner();
+      if (ExamState.pendingSubmission) {
+        onNetworkRestored();
+      }
+    } catch (e) {
+      updateNetworkStatus(false);
+      showNetworkRetryBanner();
+    }
+  }, 30000);
 }
 
 function updateNetworkStatus(isOnline) {
@@ -958,12 +1158,94 @@ function updateNetworkStatus(isOnline) {
 
 function showNetworkRetryBanner() {
   const banner = document.getElementById('networkRetryBanner');
-  if (banner) banner.classList.add('visible');
+  if (!banner) return;
+  banner.classList.add('visible');
+  // 核心修復：若已有 60s 重試定時器在跑，切勿被 30s 心跳探測反覆重置秒數，防止死循環
+  if (!networkRetryInterval) {
+    startNetworkRetryCountdown();
+  }
 }
 
 function hideNetworkRetryBanner() {
   const banner = document.getElementById('networkRetryBanner');
   if (banner) banner.classList.remove('visible');
+  if (networkRetryInterval) {
+    clearInterval(networkRetryInterval);
+    networkRetryInterval = null;
+  }
+}
+
+function startNetworkRetryCountdown() {
+  if (networkRetryInterval) clearInterval(networkRetryInterval);
+  networkRetryCountdown = 60;
+  updateNetworkBannerCountdownUI();
+
+  networkRetryInterval = setInterval(async () => {
+    networkRetryCountdown--;
+    updateNetworkBannerCountdownUI();
+    if (networkRetryCountdown <= 0) {
+      clearInterval(networkRetryInterval);
+      networkRetryInterval = null;
+      // 1 分鐘倒數結束，自動排程重新探測連線
+      await retryNetworkConnectionNow();
+    }
+  }, 1000);
+}
+
+function updateNetworkBannerCountdownUI() {
+  const banner = document.getElementById('networkRetryBanner');
+  if (!banner) return;
+  const btn = document.getElementById('btnRetrySubmit');
+  const span = (banner && typeof banner.querySelector === 'function') ? banner.querySelector('span') : null;
+  if (span) {
+    span.innerHTML = `作答數據已保存在本機。系統已安排 <strong>1 分鐘</strong> 後自動重新連線（倒數 <strong>${networkRetryCountdown}</strong> 秒）`;
+  }
+  if (btn) {
+    btn.innerHTML = `🔄 立即重試連線 (${networkRetryCountdown}s)`;
+  }
+}
+
+function handleNetworkRetryClick() {
+  if (ExamState.pendingSubmission) {
+    submitExam(true);
+  } else {
+    retryNetworkConnectionNow();
+  }
+}
+
+async function retryNetworkConnectionNow() {
+  const btn = document.getElementById('btnRetrySubmit');
+  if (btn) btn.textContent = '🔄 探測連線中...';
+
+  if (navigator.onLine) {
+    try {
+      const probeUrl = CONFIG.MODE === 'production' ? 'https://www.google.com/generate_204' : CONFIG.GAS_URL;
+      const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const tid = ctrl ? setTimeout(() => ctrl.abort(), 5000) : null;
+      await fetch(probeUrl, {
+        method: 'HEAD',
+        mode: 'no-cors',
+        cache: 'no-store',
+        signal: ctrl ? ctrl.signal : undefined
+      });
+      if (tid) clearTimeout(tid);
+
+      onNetworkRestored();
+      return;
+    } catch (e) {}
+  }
+  startNetworkRetryCountdown();
+}
+
+function onNetworkRestored() {
+  updateNetworkStatus(true);
+  hideNetworkRetryBanner();
+
+  // 斷網重連動態同步：若斷線期間有未完成之交卷請求，自動重試提交
+  if (ExamState.pendingSubmission) {
+    showStatus('🌐 網絡已恢復連線！系統正在為您自動補交試卷...', 'info');
+    submitExam(true);
+  }
 }
 
 // ==========================================
@@ -1013,11 +1295,15 @@ async function submitExam(isAuto) {
           imageBase64: photoData
         };
 
+        const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const tid = ctrl ? setTimeout(() => ctrl.abort(), 15000) : null;
         const gasRes = await fetch(CONFIG.GAS_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(gasPayload)
+          body: JSON.stringify(gasPayload),
+          signal: ctrl ? ctrl.signal : undefined
         });
+        if (tid) clearTimeout(tid);
 
         if (gasRes.ok) {
           const gasData = await gasRes.json();
@@ -1053,14 +1339,19 @@ async function submitExam(isAuto) {
     }));
     formParams.append(CONFIG.FORM_ENTRIES.imageUrl, aggregatedPhotoUrl);
 
+    const ctrlForm = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const tidForm = ctrlForm ? setTimeout(() => ctrlForm.abort(), 10000) : null;
     await fetch(CONFIG.FORM_URL, {
       method: 'POST',
       mode: CONFIG.MODE === 'production' ? 'no-cors' : 'cors',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: formParams.toString()
+      body: formParams.toString(),
+      signal: ctrlForm ? ctrlForm.signal : undefined
     });
+    if (tidForm) clearTimeout(tidForm);
 
     ExamState.isSubmitting = false;
+    ExamState.pendingSubmission = false;
     clearExamState();
 
     showStatus('🎉 大測交卷成功！客觀題得分：' + gradeResult.score + ' / 22 分。手寫照片與作答紀錄已安全歸檔！', 'success');
@@ -1074,7 +1365,9 @@ async function submitExam(isAuto) {
   } catch (err) {
     console.error('交卷過程中斷：', err);
     ExamState.isSubmitting = false;
-    showStatus('⚠️ 網絡連線中斷或伺服器回應異常，作答進度與照片已完整保存在本機，請檢查連線後重試！', 'error');
+    ExamState.pendingSubmission = true;
+    saveExamState();
+    showStatus('⚠️ 網絡連線中斷或伺服器回應異常，作答進度與照片已完整保存在本機，系統已排程自動重試，您亦可手動重試！', 'error');
     showNetworkRetryBanner();
     if (submitBtn) {
       submitBtn.disabled = false;
@@ -1118,14 +1411,31 @@ function bindAutoSaveListeners() {
 
 // 頁面啟動初始化
 if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
-  window.addEventListener('DOMContentLoaded', function() {
+  window.addEventListener('DOMContentLoaded', async function() {
     initNetworkHeartbeat();
     bindAutoSaveListeners();
+
+    // 初始化 FaceApi 深度學習模型 (非同步預載入)
+    if (window.FaceAuthModule && window.FaceAuthModule.initFaceApi) {
+      window.FaceAuthModule.initFaceApi().catch(err => {
+        console.warn('[FaceAuth] 模型非同步預載入提示：', err);
+      });
+    }
 
     const restored = restoreExamState();
     if (!restored) {
       const authScreen = document.getElementById('authScreen');
       if (authScreen) authScreen.style.display = 'block';
+
+      // R1: 進入測驗系統時，自動啟動相機進行活體人臉檢測 (除非設定不自動啟動參數)
+      const urlParams = (typeof URLSearchParams !== 'undefined' && window.location) 
+        ? new URLSearchParams(window.location.search) 
+        : null;
+      const disableAutoCam = urlParams && urlParams.get('test_disable_autocamera') === '1';
+
+      if (!disableAutoCam) {
+        startFaceFirstCamera(true);
+      }
     }
   });
 }

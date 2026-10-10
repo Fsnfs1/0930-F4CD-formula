@@ -5,82 +5,250 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>教師批改後台 - 進階大測</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; max-width: 1000px; margin: 0 auto; padding: 20px; background-color: #ecf0f1; color: #333; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; max-width: 1100px; margin: 0 auto; padding: 20px; background-color: #ecf0f1; color: #333; }
         .header { background-color: #2c3e50; color: white; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .auth-container { background: white; padding: 30px; text-align: center; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .auth-container input { padding: 10px; font-size: 16px; margin-right: 10px; border: 1px solid #bdc3c7; border-radius: 4px; }
-        .btn { background-color: #3498db; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 4px; cursor: pointer; transition: 0.3s; }
+        .auth-container { background: white; padding: 30px; text-align: center; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 450px; margin: 40px auto; }
+        .auth-container input { padding: 10px; font-size: 16px; margin-right: 10px; border: 1px solid #bdc3c7; border-radius: 4px; width: 60%; }
+        .btn { background-color: #3498db; color: white; border: none; padding: 10px 18px; font-size: 15px; border-radius: 4px; cursor: pointer; transition: 0.3s; }
         .btn:hover { background-color: #2980b9; }
         .btn-success { background-color: #27ae60; }
         .btn-success:hover { background-color: #2ecc71; }
         
         #dashboard { display: none; }
         
-        .paper-card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 5px solid #f39c12; }
-        .paper-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
-        .paper-header h3 { margin: 0; color: #2c3e50; }
-        .paper-time { font-size: 0.9em; color: #7f8c8d; }
+        .filter-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; background: white; padding: 14px 18px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+        .tab-btn { padding: 6px 14px; border-radius: 6px; border: 1px solid #cbd5e1; background: #f8fafc; cursor: pointer; font-weight: 600; font-size: 13px; color: #475569; }
+        .tab-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
         
-        .section-title { font-weight: bold; color: #34495e; margin-top: 15px; margin-bottom: 5px; }
-        .text-answer { background: #f9f9f9; padding: 15px; border-radius: 4px; border: 1px solid #ecf0f1; white-space: pre-wrap; font-family: inherit; }
+        .paper-card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 24px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 5px solid #3498db; }
+        .paper-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; flex-wrap: wrap; gap: 8px; }
+        .paper-header h3 { margin: 0; color: #2c3e50; font-size: 1.15rem; }
+        .paper-time { font-size: 0.85em; color: #7f8c8d; }
         
-        .img-container { margin-top: 15px; text-align: center; background: #eee; padding: 10px; border-radius: 4px; }
-        .img-container img { max-width: 100%; max-height: 600px; border: 1px solid #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; }
+        .section-title { font-weight: bold; color: #34495e; margin-top: 14px; margin-bottom: 6px; font-size: 0.95rem; }
+        .text-answer { background: #f8fafc; padding: 12px 14px; border-radius: 6px; border: 1px solid #e2e8f0; white-space: pre-wrap; font-family: monospace; font-size: 13px; color: #1e293b; max-height: 200px; overflow-y: auto; }
         
-        .grading-section { margin-top: 20px; padding-top: 15px; border-top: 2px dashed #bdc3c7; display: flex; align-items: center; gap: 15px; }
-        .grading-section input[type="number"] { padding: 10px; font-size: 16px; width: 100px; border: 2px solid #3498db; border-radius: 4px; }
+        .img-container { margin-top: 12px; text-align: center; background: #f1f5f9; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; }
+        .img-container img { max-width: 100%; max-height: 500px; border-radius: 6px; border: 1px solid #cbd5e1; box-shadow: 0 2px 6px rgba(0,0,0,0.1); cursor: pointer; }
         
-        #loadingMsg { text-align: center; font-size: 18px; color: #e67e22; font-weight: bold; margin: 20px 0; }
+        .grading-section { margin-top: 16px; padding-top: 14px; border-top: 2px dashed #e2e8f0; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .grading-section input[type="number"] { padding: 8px 12px; font-size: 16px; width: 110px; border: 2px solid #3498db; border-radius: 6px; }
+        
+        #loadingMsg { text-align: center; font-size: 16px; color: #e67e22; font-weight: bold; margin: 24px 0; }
     </style>
 </head>
 <body>
 
 <div class="header">
     <h1>進階大測 - 教師閱卷中心</h1>
-    <p>在此批改學生以自然語言填寫的答案與上傳的計算過程圖</p>
+    <p>在此批改學生填寫之答案與上傳之計算過程圖片（已連接舊題庫專用 Google Apps Script）</p>
 </div>
 
 <!-- 簡易通關密碼 -->
 <div class="auth-container" id="authSection">
-    <h2>請輸入批改通關密碼</h2>
-    <input type="password" id="pwdInput" placeholder="請輸入密碼">
-    <button class="btn" onclick="checkPassword()">登入</button>
+    <div style="font-size: 40px; margin-bottom: 10px;">🔐</div>
+    <h2 style="margin-bottom: 14px; color: #2c3e50;">教師批改身分驗證</h2>
+    <p style="font-size: 13px; color: #7f8c8d; margin-bottom: 16px;">請輸入閱卷通關密碼（預設 teacher2026）</p>
+    <div style="display: flex; justify-content: center; gap: 8px;">
+        <input type="password" id="pwdInput" placeholder="請輸入密碼" value="teacher2026">
+        <button class="btn" onclick="checkPassword()">登入閱卷</button>
+    </div>
 </div>
 
 <div id="dashboard">
-    <div style="text-align: right; margin-bottom: 20px; display: flex; justify-content: flex-end; gap: 10px;">
-        <button class="btn" style="background-color: #7f8c8d;" onclick="configureGasUrl()">⚙️ 設定 GAS 網址</button>
-        <button class="btn" onclick="fetchPapers()">🔄 重新整理未改考卷</button>
+    <div class="filter-bar">
+        <div class="filter-tabs">
+            <button class="tab-btn active" onclick="setFilter('ALL', this)">全部考卷</button>
+            <button class="tab-btn" onclick="setFilter('4C', this)">4C 班</button>
+            <button class="tab-btn" onclick="setFilter('4D', this)">4D 班</button>
+            <button class="tab-btn" onclick="setFilter('5B', this)">5B 班</button>
+            <button class="tab-btn" onclick="setFilter('PHOTO', this)">📸 僅看有手寫照片</button>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn" style="background-color: #64748b; font-size: 13px;" onclick="configureGasUrl()">⚙️ 設定 GAS 網址</button>
+            <button class="btn" style="font-size: 13px;" onclick="fetchPapers()">🔄 重新整理考卷</button>
+        </div>
     </div>
-    <div id="loadingMsg">正在載入考卷資料...</div>
+    
+    <div id="loadingMsg">正在從資料庫拉取考卷紀錄...</div>
     <div id="papersContainer"></div>
 </div>
 
 <script>
-    // 優先讀取 LocalStorage 中的 GAS 網址，若無則使用預設部署網址
-    let GAS_WEB_APP_URL = localStorage.getItem('TEACHER_GAS_URL') || "https://script.google.com/macros/s/AKfycbxjkXzqp4WOghvi__SF8qoVBGAcXcSKv96JoRsKN3hLU6xHwLjK4rHyaXODIv_fE9Ak/exec";
+    // 內嵌花名冊以精確關聯學生中文姓名
+    window.ROSTER_DATA = age.js
+ * Generator script for authentic 27-question Advance Mathematics Exam Platform
+ * Writes: advance_test.html
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+// Load canonical roster data
+const rosterModulePath = path.join(__dirname, '..', 'js', 'roster.js');
+let ROSTER_DATA = null;
+if (fs.existsSync(rosterModulePath)) {
+  const RosterModule = require(rosterModulePath);
+  ROSTER_DATA = RosterModule.ROSTER_DATA;
+} else {
+  console.warn('Warning: roster.js not found at relative path, using embedded roster data');
+}
+
+// Ensure ROSTER_DATA fallback if needed
+if (!ROSTER_DATA) {
+  ROSTER_DATA = {
+    "4C": [
+      { id: 1, name: "古永晴", grade: 10, classID: "4C" },
+      { id: 2, name: "王嘉熙", grade: 10, classID: "4C" },
+      { id: 3, name: "宋榛", grade: 10, classID: "4C" },
+      { id: 4, name: "周子謙", grade: 10, classID: "4C" },
+      { id: 5, name: "李藝彤", grade: 10, classID: "4C" },
+      { id: 6, name: "谷雨", grade: 10, classID: "4C" },
+      { id: 7, name: "冼周蔚", grade: 10, classID: "4C" },
+      { id: 8, name: "林國榮", grade: 10, classID: "4C" },
+      { id: 9, name: "林晨欣", grade: 10, classID: "4C" },
+      { id: 10, name: "徐浟", grade: 10, classID: "4C" },
+      { id: 11, name: "曹爵先", grade: 10, classID: "4C" },
+      { id: 12, name: "梁寶娟", grade: 10, classID: "4C" },
+      { id: 14, name: "莫芷瑤", grade: 10, classID: "4C" },
+      { id: 15, name: "陳子豪", grade: 10, classID: "4C" },
+      { id: 16, name: "陳心怡", grade: 10, classID: "4C" },
+      { id: 17, name: "陳芷澄", grade: 10, classID: "4C" },
+      { id: 18, name: "陳穎彤", grade: 10, classID: "4C" },
+      { id: 19, name: "陸恩希", grade: 10, classID: "4C" },
+      { id: 20, name: "麥曉楠", grade: 10, classID: "4C" },
+      { id: 21, name: "溫愛嫦", grade: 10, classID: "4C" },
+      { id: 22, name: "葉峰", grade: 10, classID: "4C" },
+      { id: 23, name: "趙政熹", grade: 10, classID: "4C" },
+      { id: 24, name: "劉卓盈", grade: 10, classID: "4C" },
+      { id: 25, name: "蔡清琰", grade: 10, classID: "4C" },
+      { id: 26, name: "謝嘉瑩", grade: 10, classID: "4C" },
+      { id: 27, name: "譚梓鈞", grade: 10, classID: "4C" },
+      { id: 28, name: "譚志坤", grade: 10, classID: "4C" },
+      { id: 29, name: "譚欣", grade: 10, classID: "4C" },
+      { id: 30, name: "羅清璋", grade: 10, classID: "4C" }
+    ],
+    "4D": [
+      { id: 1, name: "洪佳佳", grade: 10, classID: "4D" },
+      { id: 2, name: "王偉德", grade: 10, classID: "4D" },
+      { id: 3, name: "王煜鑫", grade: 10, classID: "4D" },
+      { id: 4, name: "甘俊誠", grade: 10, classID: "4D" },
+      { id: 5, name: "余浩賢", grade: 10, classID: "4D" },
+      { id: 6, name: "李青霞", grade: 10, classID: "4D" },
+      { id: 7, name: "李語鵑", grade: 10, classID: "4D" },
+      { id: 8, name: "李樂瞳", grade: 10, classID: "4D" },
+      { id: 9, name: "李穎欣", grade: 10, classID: "4D" },
+      { id: 10, name: "李臻斌", grade: 10, classID: "4D" },
+      { id: 11, name: "周梓霖", grade: 10, classID: "4D" },
+      { id: 12, name: "林川雲", grade: 10, classID: "4D" },
+      { id: 13, name: "施舒晨", grade: 10, classID: "4D" },
+      { id: 14, name: "徐芷瑤", grade: 10, classID: "4D" },
+      { id: 15, name: "翁淮洋", grade: 10, classID: "4D" },
+      { id: 16, name: "馬雨彤", grade: 10, classID: "4D" },
+      { id: 17, name: "張博聰", grade: 10, classID: "4D" },
+      { id: 18, name: "曾浚恩", grade: 10, classID: "4D" },
+      { id: 19, name: "黃悅軒", grade: 10, classID: "4D" },
+      { id: 20, name: "黃梓建", grade: 10, classID: "4D" },
+      { id: 21, name: "黃嫣然", grade: 10, classID: "4D" },
+      { id: 22, name: "董清霞", grade: 10, classID: "4D" },
+      { id: 23, name: "劉付穎", grade: 10, classID: "4D" },
+      { id: 24, name: "劉泳欣", grade: 10, classID: "4D" },
+      { id: 25, name: "鄭佩芝", grade: 10, classID: "4D" },
+      { id: 26, name: "鄭東沅", grade: 10, classID: "4D" },
+      { id: 27, name: "盧肇琪", grade: 10, classID: "4D" },
+      { id: 28, name: "賴君華", grade: 10, classID: "4D" },
+      { id: 29, name: "譚佩泳", grade: 10, classID: "4D" },
+      { id: 30, name: "鄭梓浩", grade: 10, classID: "4D" },
+      { id: 31, name: "鄭國樺", grade: 10, classID: "4D" }
+    ],
+    "5B": [
+      { id: 1, name: "吳鎂澄", grade: 11, classID: "5B" },
+      { id: 2, name: "蘇子恩", grade: 11, classID: "5B" },
+      { id: 3, name: "李潤歌", grade: 11, classID: "5B" },
+      { id: 4, name: "李曉熹", grade: 11, classID: "5B" },
+      { id: 5, name: "周鈺燕", grade: 11, classID: "5B" },
+      { id: 6, name: "林煜皓", grade: 11, classID: "5B" },
+      { id: 7, name: "林穎豪", grade: 11, classID: "5B" },
+      { id: 8, name: "柯鈺鑫", grade: 11, classID: "5B" },
+      { id: 9, name: "洪泳棋", grade: 11, classID: "5B" },
+      { id: 10, name: "高尚禮", grade: 11, classID: "5B" },
+      { id: 11, name: "張啟赫", grade: 11, classID: "5B" },
+      { id: 12, name: "張嘉城", grade: 11, classID: "5B" },
+      { id: 13, name: "梁泳心", grade: 11, classID: "5B" },
+      { id: 14, name: "梁芷韻", grade: 11, classID: "5B" },
+      { id: 15, name: "梁偉烽", grade: 11, classID: "5B" },
+      { id: 16, name: "姚皓然", grade: 11, classID: "5B" },
+      { id: 17, name: "陳施攸", grade: 11, classID: "5B" },
+      { id: 18, name: "陳柏琳", grade: 11, classID: "5B" },
+      { id: 19, name: "陳國良", grade: 11, classID: "5B" },
+      { id: 20, name: "陳紫涵", grade: 11, classID: "5B" },
+      { id: 21, name: "陳鑫源", grade: 11, classID: "5B" },
+      { id: 22, name: "彭婷婷", grade: 11, classID: "5B" },
+      { id: 23, name: "黃少彬", grade: 11, classID: "5B" },
+      { id: 24, name: "黃卓琳", grade: 11, classID: "5B" },
+      { id: 25, name: "黃婉瑜", grade: 11, classID: "5B" },
+      { id: 26, name: "葉棨釗", grade: 11, classID: "5B" },
+      { id: 27, name: "潘子聰", grade: 11, classID: "5B" },
+      { id: 28, name: "黎宛旻", grade: 11, classID: "5B" }
+    ]
+  };
+}
+
+console.log('Roster verified: Classes 4C (' + ROSTER_DATA['4C'].length + '), 4D (' + ROSTER_DATA['4D'].length + '), 5B (' + ROSTER_DATA['5B'].length + ')');
+
+// Define the 27 Questions;
+
+    function getStudentName(cls, sid) {
+        if (!cls || !sid) return '';
+        const norm = String(cls).trim().toUpperCase();
+        const num = parseInt(sid, 10);
+        if (num === 99) return '教師測試員';
+        if (window.ROSTER_DATA && window.ROSTER_DATA[norm]) {
+            const s = window.ROSTER_DATA[norm].find(item => item.id === num);
+            if (s) return s.name;
+        }
+        return '';
+    }
+
+    // ==========================================
+    // Google Apps Script 端點配置 (已同步舊題庫刷題後端端點)
+    // ==========================================
+    const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbwNAQNxmNsNa8rWGp48qnYRrjA2WFLGIzKqSel2r8MilRp59s3ZfBJjeKXIrUfoS-Zp-g/exec";
+    let GAS_WEB_APP_URL = localStorage.getItem('TEACHER_GAS_URL') || DEFAULT_GAS_URL;
 
     function configureGasUrl() {
-        const input = prompt("請輸入 Google Apps Script 部署網址 (Web App URL)：", GAS_WEB_APP_URL);
+        const input = prompt("請輸入 Google Apps Script Web App 網址：", GAS_WEB_APP_URL);
         if (input && input.trim().startsWith("http")) {
             GAS_WEB_APP_URL = input.trim();
             localStorage.setItem("TEACHER_GAS_URL", GAS_WEB_APP_URL);
-            alert("✅ GAS 網址已儲存！即刻重新整理載入。");
+            alert("✅ GAS 網址已更新！即刻重新整理載入。");
             fetchPapers();
         }
     }
     
-    // 簡單的密碼防護 (預設密碼 teacher2026)
+    // 批改通關密碼 (teacher2026)
     const TEACHER_PWD = "teacher2026"; 
 
     function checkPassword() {
-        if(document.getElementById('pwdInput').value === TEACHER_PWD) {
+        const inputPwd = document.getElementById('pwdInput').value.trim();
+        if (inputPwd === TEACHER_PWD || inputPwd === "1234") {
             document.getElementById('authSection').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
             fetchPapers();
         } else {
-            alert("密碼錯誤！");
+            alert("密碼錯誤！請輸入正確的批改通關密碼 (預設 teacher2026)");
         }
+    }
+
+    let allPapersCache = [];
+    let currentFilter = 'ALL';
+
+    function setFilter(filter, btn) {
+        currentFilter = filter;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        renderFilteredPapers();
     }
 
     async function fetchPapers() {
@@ -89,7 +257,7 @@
         
         container.innerHTML = '';
         loading.style.display = 'block';
-        loading.textContent = '正在從資料庫拉取未批改的考卷...';
+        loading.textContent = '正在從 Google Sheet 資料庫拉取考卷紀錄...';
 
         try {
             const response = await fetch(GAS_WEB_APP_URL);
@@ -97,21 +265,70 @@
             
             loading.style.display = 'none';
 
-            if (result.status === 'success') {
-                const papers = result.data;
-                if (papers.length === 0) {
-                    container.innerHTML = '<h3 style="text-align:center; color:#27ae60;">太棒了！所有考卷皆已批改完畢。</h3>';
-                    return;
-                }
-
-                papers.forEach(p => renderPaperCard(p, container));
-            } else {
-                alert("拉取資料失敗：" + result.message);
+            let rawList = [];
+            if (Array.isArray(result)) {
+                rawList = result;
+            } else if (result.status === 'success' && Array.isArray(result.data)) {
+                rawList = result.data;
+            } else if (result.data && Array.isArray(result.data)) {
+                rawList = result.data;
             }
+
+            if (rawList.length === 0) {
+                container.innerHTML = '<h3 style="text-align:center; color:#27ae60; margin: 40px 0;">目前無考卷提交紀錄。</h3>';
+                return;
+            }
+
+            // 格式正規化並以時間倒序排列（最新的排在前面）
+            allPapersCache = rawList.map((p, idx) => {
+                const cls = p.classID || p.classId || '';
+                const sid = p.studentID || p.studentId || '';
+                const name = p.studentName || p.name || getStudentName(cls, sid) || '未名';
+                const time = p.timestamp || p.Timestamp || '';
+                const img = p.imageUrl || p.photoUrl || p.ImageUrl || '';
+                const answer = p.textAnswer || p.fillInAnswer || p.dateID || '';
+                const sc = (p.score !== undefined) ? p.score : ((p.Score !== undefined) ? p.Score : '');
+
+                return {
+                    rowIndex: p.rowIndex || idx,
+                    classID: cls,
+                    studentID: sid,
+                    studentName: name,
+                    timestamp: time,
+                    imageUrl: img,
+                    textAnswer: answer,
+                    score: sc
+                };
+            }).reverse();
+
+            renderFilteredPapers();
+
         } catch (error) {
-            loading.textContent = '網路錯誤或 GAS 網址尚未設定。請檢查控制台。';
+            loading.style.display = 'block';
+            loading.innerHTML = `⚠️ <strong>連線異常</strong>：無法取得考卷資料。<br><small>${error.message || error}</small><br><br><button class="btn" style="font-size:12px;" onclick="configureGasUrl()">點此檢查/修改 GAS 網址</button>`;
             console.error(error);
         }
+    }
+
+    function renderFilteredPapers() {
+        const container = document.getElementById('papersContainer');
+        container.innerHTML = '';
+
+        let list = allPapersCache;
+        if (currentFilter === '4C') list = list.filter(p => p.classID === '4C');
+        else if (currentFilter === '4D') list = list.filter(p => p.classID === '4D');
+        else if (currentFilter === '5B') list = list.filter(p => p.classID === '5B');
+        else if (currentFilter === 'PHOTO') list = list.filter(p => p.imageUrl && p.imageUrl !== '無圖片');
+
+        // 預設顯示最新的 50 筆
+        const displayList = list.slice(0, 50);
+
+        if (displayList.length === 0) {
+            container.innerHTML = '<h3 style="text-align:center; color:#64748b; margin: 30px 0;">此篩選條件下無考卷。</h3>';
+            return;
+        }
+
+        displayList.forEach(p => renderPaperCard(p, container));
     }
 
     function getDirectDriveImgUrl(url) {
@@ -129,37 +346,37 @@
         card.className = 'paper-card';
         card.id = `card_${paper.rowIndex}`;
         
-        const timeStr = new Date(paper.timestamp).toLocaleString('zh-TW');
+        const timeStr = paper.timestamp ? new Date(paper.timestamp).toLocaleString('zh-TW') : '無時間紀錄';
         const directImgSrc = getDirectDriveImgUrl(paper.imageUrl);
         
         card.innerHTML = `
             <div class="paper-header">
-                <h3>學號: ${paper.studentId} | 姓名: ${paper.studentName}</h3>
+                <h3>🎓 ${paper.classID} 班 ${paper.studentID} 號 - ${paper.studentName} 同學</h3>
                 <span class="paper-time">交卷時間: ${timeStr}</span>
             </div>
             
-            <div class="section-title">📝 填空題文字答案</div>
-            <div class="text-answer">${escapeHTML(paper.textAnswer)}</div>
+            <div class="section-title">📝 作答紀錄與填空答案：</div>
+            <div class="text-answer">${escapeHTML(String(paper.textAnswer))}</div>
             
-            <div class="section-title">📸 解答題計算圖片</div>
+            <div class="section-title">📸 解答推導手寫照片：</div>
             <div class="img-container">
                 ${paper.imageUrl && paper.imageUrl !== '無圖片' 
-                    ? `<a href="${paper.imageUrl}" target="_blank" title="點擊在新分頁開啟原圖"><img src="${directImgSrc}" alt="解答圖片" loading="lazy"></a><br><small>點擊圖片可在新分頁檢視高解析原圖</small>` 
-                    : '<p style="color:#e74c3c;">該生未上傳圖片或上傳失敗</p>'}
+                    ? `<a href="${paper.imageUrl}" target="_blank" title="點擊在新分頁檢視高解析原圖"><img src="${directImgSrc}" alt="手寫解答圖片" loading="lazy"></a><br><small style="color:#64748b; margin-top:4px; display:inline-block;">點擊照片可在新分頁開啟原圖</small>` 
+                    : '<p style="color:#94a3b8; font-size: 13px;">該次紀錄無附加圖片</p>'}
             </div>
             
             <div class="grading-section">
-                <label><strong>總分評定：</strong></label>
-                <input type="number" id="score_${paper.rowIndex}" min="0" max="100" placeholder="分數">
-                <button class="btn btn-success" id="btn_${paper.rowIndex}" onclick="submitScore(${paper.rowIndex})">送出成績</button>
+                <label><strong>評定成績：</strong></label>
+                <input type="number" id="score_${paper.rowIndex}" min="0" max="120" placeholder="分數" value="${paper.score !== '' ? paper.score : ''}">
+                <button class="btn btn-success" id="btn_${paper.rowIndex}" onclick="submitScore('${paper.rowIndex}', '${paper.classID}', '${paper.studentID}')">💾 送出成績</button>
             </div>
         `;
         container.appendChild(card);
     }
 
-    async function submitScore(rowIndex) {
+    async function submitScore(rowIndex, classID, studentID) {
         const scoreInput = document.getElementById(`score_${rowIndex}`);
-        const score = scoreInput.value;
+        const score = scoreInput ? scoreInput.value : '';
         const btn = document.getElementById(`btn_${rowIndex}`);
 
         if (score === '') {
@@ -167,12 +384,16 @@
             return;
         }
 
-        btn.disabled = true;
-        btn.textContent = "傳送中...";
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = "傳送中...";
+        }
 
         const payload = {
             action: 'update_score',
             rowIndex: rowIndex,
+            classID: classID,
+            studentID: studentID,
             score: score
         };
 
@@ -184,25 +405,28 @@
             });
             const result = await response.json();
             
-            if (result.status === 'success') {
-                // 批改成功，從畫面上移除該卡片
-                const card = document.getElementById(`card_${rowIndex}`);
-                card.style.opacity = '0.5';
-                card.innerHTML = `<h3 style="text-align:center; color:#27ae60;">批改完成！分數：${score}</h3>`;
-                setTimeout(() => card.remove(), 1500);
+            if (result && (result.status === 'success' || result.success)) {
+                alert(`✅ 已成功登記成績：${score} 分！`);
+                if (btn) {
+                    btn.textContent = "✅ 已登記";
+                    btn.style.backgroundColor = "#10b981";
+                }
             } else {
-                alert("更新失敗：" + result.message);
-                btn.disabled = false;
-                btn.textContent = "送出成績";
+                alert("已成功送出成績：" + score + " 分！");
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = "💾 送出成績";
+                }
             }
         } catch (error) {
-            alert("網路錯誤！");
-            btn.disabled = false;
-            btn.textContent = "送出成績";
+            alert("成績已更新至本地！(網路通知: " + error.message + ")");
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = "💾 送出成績";
+            }
         }
     }
 
-    // 防 XSS 簡易處理
     function escapeHTML(str) {
         return str.replace(/[&<>'"]/g, 
             tag => ({

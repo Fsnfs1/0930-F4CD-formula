@@ -34,7 +34,8 @@ function doPost(e) {
         const folder = DriveApp.getFolderById(FOLDER_ID);
         // Base64 通常帶有 data:image/png;base64, 前綴，需要將其移除
         const base64String = base64Data.split(',')[1]; 
-        const blob = Utilities.newBlob(Utilities.base64Decode(base64String), 'image/jpeg', `大測解答_${studentId}_${studentName}.jpg`);
+        const qId = (data.questionId || 'Q20').toString().toUpperCase().replace(/[\/\\:*?"<>|]/g, '_');
+        const blob = Utilities.newBlob(Utilities.base64Decode(base64String), 'image/jpeg', `大測解答_${qId}_${studentId}_${studentName}.jpg`);
         const file = folder.createFile(blob);
         // 設定圖片權限為知道連結的人皆可檢視，方便教師後台讀取
         file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);

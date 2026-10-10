@@ -148,6 +148,12 @@ async function runVerificationSuite() {
     assert(htmlContent.includes('placeholder="若難以輸入數學符號時，可以使用自然語言描述答案。"'), '填空題與附加題必須包含自然語言提示 placeholder');
     assert(!htmlContent.includes('class="blank-input" required'), '填空題文字框必須為選填項目，嚴禁 required');
 
+    // 檢驗 R1 與 R6 之關鍵腳本與樣式設定
+    assert(htmlContent.includes('../js/roster.js'), '缺少 roster.js 引入');
+    assert(htmlContent.includes('../js/admin_snapshot.js'), '缺少 admin_snapshot.js 引入');
+    assert(htmlContent.includes('position: sticky'), '缺少 position: sticky 樣式');
+    assert(htmlContent.includes('handleNetworkRetryClick'), '重試按鈕必須綁定 handleNetworkRetryClick()');
+
     pass('Test 1: HTML 結構、DOM 元素與 JavaScript 語法零錯誤審查', `共檢查 ${scriptBlockCount} 個腳本區塊與 27 道題目組件 (含獨立拍照卡與自然語言提示)`);
   } catch (err) {
     fail('Test 1', err);
@@ -439,7 +445,39 @@ async function runVerificationSuite() {
     assert(htmlContent.includes('網絡連線中斷，請檢查連線'), '缺少「網絡連線中斷，請檢查連線」警告橫幅');
     assert(htmlContent.includes('重新提交 / 重試'), '缺少「重新提交 / 重試」按鈕');
 
-    pass('Test 6: LocalStorage 離線暫存恢復、實時心跳指示燈與斷網重試機制', 'ADVANCE_MATH_EXAM_STATE 完整支援狀態保留與無損重試');
+    // 6.4 測試 60s 倒數計時器防死循環機制
+    if (typeof storageSandbox.setNetworkRetryCountdown === 'function') {
+      storageSandbox.setNetworkRetryCountdown(45);
+      storageSandbox.setNetworkRetryInterval(12345);
+    } else {
+      storageSandbox.networkRetryCountdown = 45;
+      storageSandbox.networkRetryInterval = 12345;
+    }
+    const mockBanner = { classList: { add: () => {} }, querySelector: () => ({ innerHTML: '' }) };
+    storageSandbox.document.getElementById = (id) => id === 'networkRetryBanner' ? mockBanner : null;
+    storageSandbox.showNetworkRetryBanner();
+    const currentCountdown = typeof storageSandbox.getNetworkRetryCountdown === 'function'
+      ? storageSandbox.getNetworkRetryCountdown()
+      : storageSandbox.networkRetryCountdown;
+    assert.strictEqual(currentCountdown, 45, '倒數計時器在運作中時不應被定時心跳重複重置回 60 秒！');
+
+    // 6.5 測試重試按鈕行為隔離
+    let submitCalled = false;
+    let probeCalled = false;
+    storageSandbox.submitExam = () => { submitCalled = true; };
+    storageSandbox.retryNetworkConnectionNow = () => { probeCalled = true; };
+    storageSandbox.ExamState.pendingSubmission = false;
+    storageSandbox.handleNetworkRetryClick();
+    assert.strictEqual(submitCalled, false, '非交卷狀態下點擊重試按鈕不應觸發交卷');
+    assert.strictEqual(probeCalled, true, '非交卷狀態下點擊重試按鈕應觸發連線探測');
+
+    submitCalled = false;
+    probeCalled = false;
+    storageSandbox.ExamState.pendingSubmission = true;
+    storageSandbox.handleNetworkRetryClick();
+    assert.strictEqual(submitCalled, true, '待補交狀態下點擊重試按鈕應觸發交卷重試');
+
+    pass('Test 6: LocalStorage 離線暫存恢復、實時心跳指示燈與斷網重試機制', 'ADVANCE_MATH_EXAM_STATE 完整支援狀態保留、60s防死循環與無損重試');
   } catch (err) {
     fail('Test 6', err);
   }
@@ -456,11 +494,12 @@ async function runVerificationSuite() {
     const getRes = await request(`${baseUrl}/advance_test.html`);
     assert.strictEqual(getRes.statusCode, 200, '無法透過 HTTP 取得 advance_test.html');
 
-    // 7.2 步驟 1：POST 壓縮圖片至 Mock GAS 端點
+    // 7.2 步驟 1：POST 壓縮圖片至 Mock GAS 端點 (標準化命名校驗)
     const mockImagePayload = {
       studentId: '4C15',
       studentName: '陳子豪',
       classId: '4C',
+      questionId: 'Q20',
       fillInAnswer: JSON.stringify({ q12_1: '確定性', q12_2: '互異性', q12_3: '無序性' }),
       imageBase64: 'data:image/jpeg;base64,' + Buffer.from('Fake JPEG Binary 1200px').toString('base64')
     };
@@ -474,6 +513,7 @@ async function runVerificationSuite() {
     const gasData = gasRes.json();
     assert.strictEqual(gasData.status, 'success');
     assert(gasData.fileUrl && gasData.fileUrl.includes('drive.google.com'), 'GAS 回傳之 Drive 網址無效');
+    assert(gasData.filename && gasData.filename.includes('大測解答_Q20_4C15_陳子豪'), `GAS 上傳檔名不符合標準規範: ${gasData.filename}`);
 
     // 7.3 步驟 2：POST 22 分客觀題成績與 Drive 圖片網址至 Mock Form 端點
     const formParams = new URLSearchParams({
@@ -499,12 +539,38 @@ async function runVerificationSuite() {
     const auditData = auditRes.json();
     assert(auditData.uploadCount >= 1, 'Mock GAS 未記錄到上傳');
     assert(auditData.formSubmissionCount >= 1, 'Mock Form 未記錄到提交');
+    const firstUpload = auditData.uploads[auditData.uploads.length - 1];
+    assert(firstUpload.filename.includes('大測解答_Q20_4C15_陳子豪'), `儲存檔案檔名規範不符: ${firstUpload.filename}`);
 
-    pass('Test 7: 兩階段雲端提交管道 (GAS 圖片上傳 -> Form 表單提交) 端對端驗證', `成功接收圖片與總分 22 分記錄`);
+    pass('Test 7: 兩階段雲端提交管道 (GAS 圖片上傳 -> Form 表單提交) 端對端驗證', `成功接收圖片標準檔名 (${gasData.filename}) 與總分 22 分記錄`);
   } catch (err) {
     fail('Test 7', err);
   } finally {
     server.close();
+  }
+
+  // -------------------------------------------------------------
+  // 測試 8：雙目錄構建同步與檔案同態校驗 (R5 Build Sync & Homomorphism)
+  // -------------------------------------------------------------
+  try {
+    const crypto = require('crypto');
+    const twinCandidates = [
+      path.resolve(__dirname, '..', 'math_platform', 'Advance'),
+      path.resolve(__dirname, '..', '..', 'advance')
+    ];
+    const twinDir = twinCandidates.find(d => fs.existsSync(d) && path.resolve(d) !== path.resolve(__dirname));
+    assert(twinDir && fs.existsSync(twinDir), `鏡像目錄不存在: ${twinCandidates.join(' or ')}`);
+
+    const twinHtml = path.join(twinDir, 'advance_test.html');
+    assert(fs.existsSync(twinHtml), `鏡像 advance_test.html 不存在: ${twinHtml}`);
+
+    const h1 = crypto.createHash('md5').update(fs.readFileSync(htmlPath)).digest('hex');
+    const h2 = crypto.createHash('md5').update(fs.readFileSync(twinHtml)).digest('hex');
+    assert.strictEqual(h1, h2, `兩目錄之 advance_test.html 內容哈希不一致 (${h1} !== ${h2})`);
+
+    pass('Test 8: 雙目錄構建同步與檔案同態校驗 (R5)', `MD5 一致: ${h1}`);
+  } catch (err) {
+    fail('Test 8', err);
   }
 
   console.log('\n================================================================');

@@ -148,8 +148,10 @@ function createServer() {
 
         const buffer = Buffer.from(base64Content, 'base64');
         const fileId = `mock_drive_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
-        const safeStudent = `${studentId}_${encodeURIComponent(studentName).replace(/%/g, '_')}`;
-        const filename = `大測解答_${safeStudent}_${Date.now()}.${ext}`;
+        const qId = (data.questionId || 'Q20').toString().toUpperCase().replace(/[\/\\:*?"<>|]/g, '_');
+        const safeStudentId = studentId.toString().replace(/[\/\\:*?"<>|]/g, '_');
+        const safeStudentName = studentName.toString().replace(/[\/\\:*?"<>|]/g, '_');
+        const filename = `大測解答_${qId}_${safeStudentId}_${safeStudentName}.${ext}`;
         const filePath = path.join(UPLOAD_DIR, filename);
 
         // Save image file
@@ -162,11 +164,13 @@ function createServer() {
         const uploadRecord = {
           fileId,
           filename,
+          fileName: filename,
           fileUrl,
           localDownloadUrl,
           bytes: buffer.length,
           studentId,
           studentName,
+          questionId: qId,
           timestamp: new Date().toISOString()
         };
         state.uploads.push(uploadRecord);
@@ -177,6 +181,7 @@ function createServer() {
           fileId,
           fileUrl,
           filename,
+          fileName: filename,
           localDownloadUrl,
           message: '圖片已成功上傳並儲存於 Google Drive'
         }));

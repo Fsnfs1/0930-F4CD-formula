@@ -269,7 +269,7 @@ const QUESTIONS_DATA = {
     {
       id: 'q21', num: 21, pts: 10,
       title: '不等式性質證明題',
-      text: '已知 $a>b>0$，$c<d<0$，$e<0$，求證：<div style="margin: 8px 0; text-align: center;">$$\\frac{e}{a-c} > \\frac{e}{b-d}$$</div>'
+      text: '已知 $a > b > 0$，$c < d < 0$，$e < 0$，求證：<div style="margin: 8px 0; text-align: center;">$$\\frac{e}{a-c} > \\frac{e}{b-d}$$</div>'
     },
     {
       id: 'q22', num: 22, pts: 10,
@@ -314,3 +314,8 @@ module.exports = {
   ROSTER_DATA,
   QUESTIONS_DATA
 };
+
+if (require.main === module) {
+  console.log('🚀 正在自動觸發建置 advance_test.html...');
+  require('./generate_html');
+}
