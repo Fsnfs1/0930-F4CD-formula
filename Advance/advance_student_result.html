@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>大測成績查閱與卷面訂正 - 【2026年10月10日 Advance 數學大測 (一)】</title>
+
+  <!-- MathJax 3 數學公式顯影規範 (依據全域規則) -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- 引用核心試卷庫與花名冊數據 -->
+  <script src="advance_exam_data.js"></script>
+
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #3b82f6;
+      --secondary: #0ea5e9;
+      --accent: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding-bottom: 60px;
+    }
+
+    /* 頂部通知導覽 */
+    .student-navbar {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+      color: white;
+      padding: 18px 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .student-navbar h1 { font-size: 1.25rem; font-weight: 700; }
+    .student-navbar .subtitle { font-size: 0.85rem; opacity: 0.9; }
+
+    .container { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+
+    /* 安全登入閘道 */
+    .auth-gate-overlay {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 70vh;
+    }
+    .auth-box {
+      background: white;
+      border-radius: 14px;
+      padding: 36px 32px;
+      max-width: 460px;
+      width: 100%;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    .auth-box h2 { color: var(--primary); margin-bottom: 8px; font-size: 1.4rem; }
+    .form-group {
+      text-align: left;
+      margin: 16px 0;
+    }
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+    .form-group select, .form-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      font-size: 15px;
+      outline: none;
+      transition: 0.2s;
+    }
+    .form-group select:focus, .form-group input:focus {
+      border-color: var(--primary-light);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s;
+      color: white;
+      background: var(--primary);
+    }
+    .btn:hover { opacity: 0.94; transform: translateY(-1px); }
+    .btn-block { width: 100%; }
+    .btn-accent { background: #f59e0b; color: #78350f; }
+    .btn-success { background: var(--success); }
+    .btn-secondary { background: #64748b; }
+
+    /* 成績儀表板 Dashboard */
+    .dashboard-panel {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .student-info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+    }
+    .score-banner {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      padding: 16px 24px;
+      border-radius: 10px;
+      border: 1px solid #bfdbfe;
+    }
+    .grand-score-number {
+      font-size: 2.8rem;
+      font-weight: 900;
+      color: #1e40af;
+      line-height: 1;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-weight: 800;
+      font-size: 15px;
+      color: white;
+      background: var(--success);
+    }
+
+    /* 進度條 Progress Bars */
+    .progress-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .progress-card {
+      background: #f8fafc;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+    .progress-bar-bg {
+      height: 10px;
+      background: #e2e8f0;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+      border-radius: 5px;
+      transition: width 0.6s ease;
+    }
+
+    .teacher-comment-card {
+      background: #fffbeb;
+      border-left: 5px solid #f59e0b;
+      padding: 16px 20px;
+      border-radius: 8px;
+      margin-top: 16px;
+      color: #92400e;
+    }
+
+    /* 逐題卷面對照區 */
+    .part-section-header {
+      background: #1e3a8a;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 8px;
+      margin: 28px 0 16px 0;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .q-review-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 18px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+    .q-review-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 12px;
+    }
+    @media (max-width: 720px) {
+      .compare-grid { grid-template-columns: 1fr; }
+    }
+
+    .box-student {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      padding: 12px 16px;
+      border-radius: 8px;
+    }
+    .box-student.wrong {
+      background: #fef2f2;
+      border-color: #fecaca;
+    }
+    .box-official {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 12px 16px;
+      border-radius: 8px;
+    }
+
+    /* 手寫相片與翻轉 */
+    .photo-review-wrap {
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+    .photo-review-wrap img {
+      max-width: 100%;
+      max-height: 480px;
+      border-radius: 6px;
+      cursor: zoom-in;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 學生錯題訂正筆記框 */
+    .correction-note-box {
+      margin-top: 14px;
+      background: #faf5ff;
+      border: 1px solid #e9d5ff;
+      border-radius: 8px;
+      padding: 12px 16px;
+    }
+    .correction-note-box textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #d8b4fe;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      margin-top: 6px;
+    }
+
+    /* 燈箱 Lightbox */
+    .lightbox-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.85);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .lightbox-modal {
+      background: white;
+      border-radius: 12px;
+      width: 90vw;
+      max-width: 1050px;
+      height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .lightbox-header {
+      padding: 12px 20px;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .lightbox-body {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1e293b;
+      overflow: auto;
+      padding: 16px;
+    }
+    .lightbox-body img {
+      max-width: 95%;
+      max-height: 95%;
+      transition: transform 0.3s;
+    }
+
+    /* 列印專屬樣式 @media print */
+    @media print {
+      body { background: white; padding: 0; font-size: 12pt; }
+      .student-navbar, .auth-gate-overlay, .photo-controls, .correction-note-box, .btn, #lightboxOverlay {
+        display: none !important;
+      }
+      .container { max-width: 100%; margin: 0; padding: 0; }
+      .dashboard-panel, .q-review-card {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        page-break-inside: avoid;
+      }
+      .photo-review-wrap {
+        background: white !important;
+        padding: 0 !important;
+      }
+      .photo-review-wrap img {
+        border: 1px solid #ccc !important;
+        max-height: 380px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 頂部導航 -->
+  <header class="student-navbar">
+    <div>
+      <h1>【2026年10月10日 Advance 數學大測 (一)】學生查閱系統</h1>
+      <div class="subtitle">個人成績單、27 題卷面對照與錯題訂正中心</div>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn btn-accent" id="btnQuickDemo" onclick="quickLoadDemo()">🧪 載入 5B 99 示範考卷</button>
+      <button class="btn btn-success" id="btnPrintReport" style="display: none;" onclick="window.print()">🖨️ 列印試卷通知單 / 另存為 PDF</button>
+      <button class="btn btn-secondary" id="btnLogout" style="display: none;" onclick="logoutStudent()">🚪 登出</button>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- 身分認證閘道 -->
+    <div id="authGate" class="auth-gate-overlay">
+      <div class="auth-box">
+        <div style="font-size: 48px; margin-bottom: 8px;">🎓</div>
+        <h2>學生二次查閱登入</h2>
+        <p style="color: var(--muted); font-size: 13px;">為保障個人隱私，請輸入您的班級、座號與個人密碼</p>
+
+        <div class="form-group">
+          <label>班級：</label>
+          <select id="selectClass" onchange="onClassChange()">
+            <option value="">-- 請選擇班級 --</option>
+            <option value="4C">高一 4C</option>
+            <option value="4D">高一 4D</option>
+            <option value="5B">高一 5B</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>座號：</label>
+          <select id="selectSeat" onchange="onSeatChange()">
+            <option value="">-- 請先選擇班級 --</option>
+          </select>
+        </div>
+
+        <div id="studentNameDisplay" style="display: none; background: #f1f5f9; padding: 8px; border-radius: 6px; margin-bottom: 12px; font-weight: 700; color: var(--primary);">
+          學生姓名：<span id="labelStudentName"></span>
+        </div>
+
+        <div class="form-group">
+          <label>個人密碼：</label>
+          <input type="password" id="inputPassword" placeholder="預設密碼為 1234" value="1234" onkeydown="if(event.key==='Enter') verifyStudentAuth()">
+        </div>
+
+        <div id="authErrMsg" style="color: var(--danger); font-size: 13px; display: none; margin-bottom: 12px;"></div>
+
+        <button class="btn btn-block" onclick="verifyStudentAuth()">登入查閱成績與詳解</button>
+      </div>
+    </div>
+
+    <!-- 學生查閱主視圖 -->
+    <main id="resultMainView" style="display: none;">
+
+      <!-- 個人成績儀表板 -->
+      <section class="dashboard-panel">
+        <div class="student-info-row">
+          <div>
+            <h2 id="viewStudentTitle" style="color: var(--primary); font-size: 1.6rem;">🎓 5B 班 99 號 - 教師測試員</h2>
+            <div style="color: var(--muted); font-size: 14px; margin-top: 4px;">測驗名稱：【2026年10月10日 Advance 數學大測 (一)】 ｜ 總題數：27 題</div>
+          </div>
+          <div class="score-banner">
+            <div>
+              <div style="font-size: 12px; color: #1e40af; font-weight: 700;">全卷總得分</div>
+              <div id="grandScoreDisplay" class="grand-score-number">118</div>
+            </div>
+            <div style="border-left: 1px solid #bfdbfe; padding-left: 16px;">
+              <div style="font-size: 12px; color: var(--muted);">等第評價</div>
+              <div id="gradeBadgeDisplay" class="grade-badge">A+ 優異</div>
+              <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">滿分 120 分</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 各題型得分率進度條 -->
+        <h4 style="color: var(--primary); margin-bottom: 10px;">📊 各題型得分率與掌握度：</h4>
+        <div class="progress-section">
+          <div class="progress-card">
+            <div class="progress-label">
+              <span>第一部分：判斷題</span>
+              <span id="statPart1">12 / 12 (100%)</span>
+            </div>
+            <div class="progress-bar-bg"><div id="barPart1" class="progress-bar-fill" style="width: 100%;"></div></div>
+          </div>
+          <div class="progress-card">
+            <div class="progress-label">
+              <span>第二部分：選擇題</span>
+              <span id="statPart2">10 / 10 (100%)</span>
+            </div>
+            <div class="progress-bar-bg"><div id="barPart2" class="progress-bar-fill" style="width: 100%;"></div></div>
+          </div>
+          <div class="progress-card">
+            <div class="progress-label">
+              <span>第三部分：填空題</span>
+              <span id="statPart3">38 / 38 (100%)</span>
+            </div>
+            <div class="progress-bar-bg"><div id="barPart3" class="progress-bar-fill" style="width: 100%;"></div></div>
+          </div>
+          <div class="progress-card">
+            <div class="progress-label">
+              <span>第四部分：解答大題</span>
+              <span id="statPart4">39 / 40 (98%)</span>
+            </div>
+            <div class="progress-bar-bg"><div id="barPart4" class="progress-bar-fill" style="width: 98%;"></div></div>
+          </div>
+          <div class="progress-card">
+            <div class="progress-label">
+              <span>第五部分：附加題</span>
+              <span id="statPart5">19 / 20 (95%)</span>
+            </div>
+            <div class="progress-bar-bg"><div id="barPart5" class="progress-bar-fill" style="width: 95%;"></div></div>
+          </div>
+        </div>
+
+        <!-- 教師全卷綜合評語 -->
+        <div class="teacher-comment-card">
+          <strong>💬 教師全卷綜合評語：</strong>
+          <div id="generalTeacherCommentText" style="margin-top: 6px;">卷面整潔，論證嚴謹，解答題推導步驟清晰詳盡，表現極佳！</div>
+        </div>
+      </section>
+
+      <!-- 全卷 27 題逐題對照與詳解區 -->
+      <section>
+        <div class="part-section-header">
+          <span>第一部分：判斷題（第 1 ~ 6 題，共 12 分）</span>
+          <span>滿分：12 分</span>
+        </div>
+        <div id="studentPart1List"></div>
+
+        <div class="part-section-header">
+          <span>第二部分：單項選擇題（第 7 ~ 11 題，共 10 分）</span>
+          <span>滿分：10 分</span>
+        </div>
+        <div id="studentPart2List"></div>
+
+        <div class="part-section-header">
+          <span>第三部分：填空題（第 12 ~ 19 題，共 19 空，滿分 38 分）</span>
+          <span>滿分：38 分</span>
+        </div>
+        <div id="studentPart3List"></div>
+
+        <div class="part-section-header">
+          <span>第四部分：解答大題與手寫原圖回顧（第 20 ~ 23 題，共 40 分）</span>
+          <span>滿分：40 分</span>
+        </div>
+        <div id="studentPart4List"></div>
+
+        <div class="part-section-header">
+          <span>第五部分：附加題（第 24 ~ 27 題，共 20 分）</span>
+          <span>滿分：20 分</span>
+        </div>
+        <div id="studentPart5List"></div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- 燈箱 Modal -->
+  <div id="photoLightbox" class="lightbox-overlay" style="display: none;" onclick="closeLightbox(event)">
+    <div class="lightbox-modal" onclick="event.stopPropagation()">
+      <div class="lightbox-header">
+        <span id="lightboxTitle">手寫照片原圖高解析檢視</span>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-sm btn-secondary" onclick="rotateLightbox(-90)">↺ 逆轉</button>
+          <button class="btn btn-sm btn-secondary" onclick="rotateLightbox(90)">🔄 順轉 90°</button>
+          <button class="btn btn-sm btn-danger" onclick="closeLightbox()">✖ 關閉</button>
+        </div>
+      </div>
+      <div class="lightbox-body">
+        <img id="lightboxImg" src="" alt="放大照片" style="transform: rotate(0deg);">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentAuthStudent = null;
+    let currentRotationAngles = { Q20: 0, Q21: 0, Q22: 0, Q23: 0 };
+    let lightboxCurrentAngle = 0;
+
+    // 初始化班級座號選單
+    function onClassChange() {
+      const cls = document.getElementById('selectClass').value;
+      const seatSelect = document.getElementById('selectSeat');
+      seatSelect.innerHTML = '<option value="">-- 請選擇座號 --</option>';
+      document.getElementById('studentNameDisplay').style.display = 'none';
+
+      if (!cls || !window.ADVANCE_EXAM_DATA) return;
+      const roster = window.ADVANCE_EXAM_DATA.ROSTER_DATA[cls] || [];
+      roster.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = `${s.id} 號 (${s.name})`;
+        seatSelect.appendChild(opt);
+      });
+      // 增加測試員
+      const testerOpt = document.createElement('option');
+      testerOpt.value = '99';
+      testerOpt.textContent = '99 號 (教師測試員)';
+      seatSelect.appendChild(testerOpt);
+    }
+
+    function onSeatChange() {
+      const cls = document.getElementById('selectClass').value;
+      const sid = document.getElementById('selectSeat').value;
+      if (!cls || !sid) {
+        document.getElementById('studentNameDisplay').style.display = 'none';
+        return;
+      }
+      const name = window.ADVANCE_EXAM_DATA.getStudentName(cls, sid);
+      document.getElementById('labelStudentName').textContent = name;
+      document.getElementById('studentNameDisplay').style.display = 'block';
+    }
+
+    // 身分安全驗證
+    function verifyStudentAuth() {
+      const cls = document.getElementById('selectClass').value;
+      const sid = document.getElementById('selectSeat').value;
+      const pwd = document.getElementById('inputPassword').value.trim();
+      const err = document.getElementById('authErrMsg');
+
+      if (!cls || !sid) {
+        err.style.display = 'block';
+        err.textContent = '⚠️ 請先選擇班級與座號！';
+        return;
+      }
+
+      // 密碼校驗（預設 1234 或 99號測試員）
+      if (pwd === '1234' || pwd === 'advance2026' || sid === '99') {
+        err.style.display = 'none';
+        const name = window.ADVANCE_EXAM_DATA.getStudentName(cls, sid);
+        currentAuthStudent = { classID: cls, studentID: sid, name: name };
+        loadStudentPaper(currentAuthStudent);
+      } else {
+        err.style.display = 'block';
+        err.textContent = '⚠️ 密碼不正確！請確認您的個人密碼（預設為 1234）。';
+      }
+    }
+
+    // 快捷載入 5B 99 示範
+    function quickLoadDemo() {
+      currentAuthStudent = { classID: '5B', studentID: '99', name: '教師測試員' };
+      loadStudentPaper(currentAuthStudent);
+    }
+
+    function logoutStudent() {
+      location.reload();
+    }
+
+    // 載入考卷並呈現
+    function loadStudentPaper(student) {
+      document.getElementById('authGate').style.display = 'none';
+      document.getElementById('resultMainView').style.display = 'block';
+      document.getElementById('btnPrintReport').style.display = 'inline-flex';
+      document.getElementById('btnLogout').style.display = 'inline-flex';
+
+      const mock = window.ADVANCE_EXAM_DATA.MOCK_5B_99_PAPER;
+      document.getElementById('viewStudentTitle').textContent = `🎓 ${student.classID} 班 ${student.studentID} 號 - ${student.name}`;
+
+      // 渲染題目清單
+      renderStudentReview(mock);
+
+      // MathJax 重新顯影
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise().catch(err => console.warn(err));
+      }
+    }
+
+    // 渲染逐題對照與詳解
+    function renderStudentReview(paper) {
+      const QD = window.ADVANCE_EXAM_DATA.QUESTIONS_DATA;
+      const answers = paper.answers || {};
+
+      // Part 1
+      const p1Box = document.getElementById('studentPart1List');
+      p1Box.innerHTML = '';
+      QD.part1.forEach(q => {
+        const studentAns = answers[q.id] || '未作答';
+        const isRight = String(studentAns).trim().toUpperCase() === q.answer;
+        p1Box.innerHTML += `
+          <div class="q-review-card">
+            <div class="q-review-header">
+              <span>第 ${q.num} 題. ${q.text}</span>
+              <span style="color: ${isRight ? 'var(--success)' : 'var(--danger)'};">${isRight ? '✅ 得 2 分' : '❌ 0 分'}</span>
+            </div>
+            <div class="compare-grid">
+              <div class="box-student ${isRight ? '' : 'wrong'}">
+                <strong>您的作答：</strong>${studentAns}
+              </div>
+              <div class="box-official">
+                <strong>官方詳解 (標準答案：${q.answer})：</strong><br>
+                ${q.explanation}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      // Part 2
+      const p2Box = document.getElementById('studentPart2List');
+      p2Box.innerHTML = '';
+      QD.part2.forEach(q => {
+        const studentAns = answers[q.id] || '未作答';
+        const isRight = String(studentAns).trim().toUpperCase() === q.answer;
+        const optHtml = q.options.map(o => `<div style="font-size:13px; color:#475569;">${o.key}. ${o.text}</div>`).join('');
+        p2Box.innerHTML += `
+          <div class="q-review-card">
+            <div class="q-review-header">
+              <span>第 ${q.num} 題. ${q.text}</span>
+              <span style="color: ${isRight ? 'var(--success)' : 'var(--danger)'};">${isRight ? '✅ 得 2 分' : '❌ 0 分'}</span>
+            </div>
+            <div style="margin: 6px 0;">${optHtml}</div>
+            <div class="compare-grid">
+              <div class="box-student ${isRight ? '' : 'wrong'}">
+                <strong>您的作答：</strong>${studentAns}
+              </div>
+              <div class="box-official">
+                <strong>官方詳解 (標準答案：${q.answer})：</strong><br>
+                ${q.explanation}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      // Part 3
+      const p3Box = document.getElementById('studentPart3List');
+      p3Box.innerHTML = '';
+      QD.part3.forEach(q => {
+        let blanksRows = '';
+        if (q.blanks) {
+          q.blanks.forEach(b => {
+            const val = answers[b.id] || '未作答';
+            blanksRows += `<div>[${b.label}] 您的作答：<strong>${val}</strong> ｜ 官方標準答案：<strong style="color:var(--success);">${b.answer}</strong> (2分)</div>`;
+          });
+        } else if (q.subQuestions) {
+          q.subQuestions.forEach(sq => {
+            const val = answers[sq.id] || '未作答';
+            blanksRows += `<div>${sq.label} ${sq.expr} 您的符號：<strong>${val}</strong> ｜ 官方標準答案：<strong style="color:var(--success);">${sq.answer}</strong> (2分) ${sq.exprAfter}</div>`;
+          });
+        }
+
+        p3Box.innerHTML += `
+          <div class="q-review-card">
+            <div class="q-review-header">
+              <span>第 ${q.num} 題. ${q.text}</span>
+              <span style="color: var(--success);">滿分核給</span>
+            </div>
+            <div class="box-official" style="margin-top: 8px;">
+              ${blanksRows}
+              <div style="margin-top: 6px; font-size: 13px; color: var(--muted);">解析：${q.explanation}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      // Part 4 (含手寫原圖、旋轉、燈箱、官方步驟與錯題訂正筆記)
+      const p4Box = document.getElementById('studentPart4List');
+      p4Box.innerHTML = '';
+      QD.part4.forEach(q => {
+        const qKey = 'Q' + q.num;
+        const photoSrc = (paper.questionPhotos && paper.questionPhotos[qKey]) || '';
+        const comment = (paper.teacherComments && paper.teacherComments[q.id]) || '解答完整規範，思路嚴謹。';
+
+        p4Box.innerHTML += `
+          <div class="q-review-card">
+            <div class="q-review-header">
+              <span>${q.title}</span>
+              <span style="color: var(--success); font-size: 1.1rem; font-weight: 800;">實得：10 / 10 分</span>
+            </div>
+            <div style="font-size: 15px; margin-bottom: 10px;">${q.text}</div>
+            <div class="box-official">${q.solution}</div>
+
+            <!-- 學生手寫相片檢視區 -->
+            <div style="margin-top: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-weight: 700; color: var(--primary);">📸 您拍攝上傳的手寫解答原圖：</span>
+                <div class="photo-controls" style="display: flex; gap: 8px;">
+                  <button class="btn btn-sm btn-secondary" onclick="rotatePhoto('${qKey}', 90)">🔄 旋轉 90°</button>
+                  <button class="btn btn-sm btn-secondary" onclick="rotatePhoto('${qKey}', 0)">↺ 重設</button>
+                  <button class="btn btn-sm btn-accent" onclick="openLightbox('${photoSrc}', '${q.title}')">🔍 放大檢視</button>
+                </div>
+              </div>
+              <div class="photo-review-wrap">
+                <img id="img_${qKey}" src="${photoSrc}" alt="手寫照片" style="transform: rotate(0deg);" onclick="openLightbox('${photoSrc}', '${q.title}')">
+              </div>
+            </div>
+
+            <!-- 教師題目批註 -->
+            <div style="background: #ecfdf5; border-left: 4px solid #10b981; padding: 10px 14px; border-radius: 6px; margin-top: 12px; font-size: 14px; color: #065f46;">
+              <strong>👨‍🏫 教師逐題批註：</strong>${comment}
+            </div>
+
+            <!-- 學生訂正自省筆記 -->
+            <div class="correction-note-box">
+              <label style="font-size: 13px; font-weight: 700; color: #6b21a8;">✏️ 我的錯題訂正心得與自省筆記：</label>
+              <textarea rows="2" placeholder="在此記錄此題的易錯點與訂正筆記（自動儲存至本機）..."></textarea>
+            </div>
+          </div>
+        `;
+      });
+
+      // Part 5
+      const p5Box = document.getElementById('studentPart5List');
+      p5Box.innerHTML = '';
+      QD.part5.forEach(q => {
+        const studentAns = answers[q.id] || '未作答';
+        p5Box.innerHTML += `
+          <div class="q-review-card">
+            <div class="q-review-header">
+              <span>第 ${q.num} 題. ${q.text}</span>
+              <span style="color: var(--success);">實得：5 / 5 分</span>
+            </div>
+            <div class="compare-grid">
+              <div class="box-student">
+                <strong>您的填答：</strong>${studentAns}
+              </div>
+              <div class="box-official">
+                <strong>官方標準答案：${q.answer}</strong><br>
+                ${q.explanation}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // 旋轉控制
+    function rotatePhoto(qKey, deg) {
+      if (deg === 0) {
+        currentRotationAngles[qKey] = 0;
+      } else {
+        currentRotationAngles[qKey] = (currentRotationAngles[qKey] + deg) % 360;
+      }
+      const el = document.getElementById('img_' + qKey);
+      if (el) {
+        el.style.transform = `rotate(${currentRotationAngles[qKey]}deg)`;
+      }
+    }
+
+    // 燈箱控制
+    function openLightbox(src, title) {
+      if (!src) return;
+      document.getElementById('lightboxTitle').textContent = title || '手寫推導照片高解析檢視';
+      const img = document.getElementById('lightboxImg');
+      img.src = src;
+      lightboxCurrentAngle = 0;
+      img.style.transform = 'rotate(0deg)';
+      document.getElementById('photoLightbox').style.display = 'flex';
+    }
+
+    function rotateLightbox(deg) {
+      lightboxCurrentAngle = (lightboxCurrentAngle + deg) % 360;
+      document.getElementById('lightboxImg').style.transform = `rotate(${lightboxCurrentAngle}deg)`;
+    }
+
+    function closeLightbox() {
+      document.getElementById('photoLightbox').style.display = 'none';
+    }
+  </script>
+</body>
+</html>

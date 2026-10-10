@@ -2384,18 +2384,16 @@ const CONFIG = {
   MOCK_GAS_URL: 'http://localhost:3000/api/gas-upload',
   MOCK_FORM_URL: 'http://localhost:3000/api/form-submit',
   PROD_GAS_URL: 'https://script.google.com/macros/s/AKfycbxjkXzqp4WOghvi__SF8qoVBGAcXcSKv96JoRsKN3hLU6xHwLjK4rHyaXODIv_fE9Ak/exec',
-  PROD_FORM_URL: 'https://docs.google.com/forms/d/e/1FAIpQLSc_EXAMPLE/formResponse',
+  PROD_FORM_URL: 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSeLZ6E4kLjJ26aWrKRPRPtDdthkxRHqOPX5AOwAq8_TYiT-OQ/formResponse',
   STORAGE_KEY: 'ADVANCE_MATH_EXAM_STATE',
   TOTAL_SECONDS: 3000,    // 50 分鐘總時長 (3000 秒)
   PHASE1_SECONDS: 2400,   // 40 分鐘第一階段 (2400 秒)
   BUFFER_SECONDS: 600,    // 10 分鐘緩衝時間 (600 秒)
   FORM_ENTRIES: {
-    studentId: 'entry.1000001',
-    studentName: 'entry.1000002',
-    classId: 'entry.1000003',
-    score: 'entry.1000004',
-    details: 'entry.1000005',
-    imageUrl: 'entry.1000006'
+    classId: 'entry.543502435',
+    studentId: 'entry.1745113091',
+    dateID: 'entry.1972335137',
+    score: 'entry.2095507383'
   },
   get GAS_URL() { return this.MODE === 'production' ? this.PROD_GAS_URL : this.MOCK_GAS_URL; },
   get FORM_URL() { return this.MODE === 'production' ? this.PROD_FORM_URL : this.MOCK_FORM_URL; }
@@ -3685,10 +3683,11 @@ async function submitExam(isAuto) {
 
         if (gasRes.ok) {
           const gasData = await gasRes.json();
-          if (gasData.status === 'success' && gasData.fileUrl) {
+          const uploadedUrl = gasData.fileUrl || gasData.url || (gasData.data && gasData.data.fileUrl);
+          if (uploadedUrl) {
             if (!ExamState.uploadedPhotoUrls) ExamState.uploadedPhotoUrls = {};
-            ExamState.uploadedPhotoUrls[qid] = gasData.fileUrl;
-            photoUrls.push(qid.toUpperCase() + ': ' + gasData.fileUrl);
+            ExamState.uploadedPhotoUrls[qid] = uploadedUrl;
+            photoUrls.push(qid.toUpperCase() + ': ' + uploadedUrl);
           }
         }
       }
@@ -3700,22 +3699,24 @@ async function submitExam(isAuto) {
     ExamState.uploadedFileUrl = aggregatedPhotoUrl;
 
     // -------------------------------------------------------------
-    // 步驟 2：送交 Google 表單
+    // 步驟 2：送交 Google 表單與遠端存檔
     // -------------------------------------------------------------
     showStatus('正在將測驗記錄與客觀題分數提交至後台 (步驟 2/2)...', 'info');
 
     const formParams = new URLSearchParams();
-    formParams.append(CONFIG.FORM_ENTRIES.studentId, student.classID + String(student.studentID).padStart(2, '0'));
-    formParams.append(CONFIG.FORM_ENTRIES.studentName, student.name);
     formParams.append(CONFIG.FORM_ENTRIES.classId, student.classID);
+    formParams.append(CONFIG.FORM_ENTRIES.studentId, String(student.studentID));
+    
+    const examSummary = {
+      test: 'ADVANCE_TEST_OCT10',
+      objScore: gradeResult.score,
+      maxScore: 22,
+      answers: allAnswers,
+      photos: ExamState.uploadedPhotoUrls || {},
+      aggregatedPhotoUrl: aggregatedPhotoUrl
+    };
+    formParams.append(CONFIG.FORM_ENTRIES.dateID, 'ADVANCE_EXAM::' + JSON.stringify(examSummary));
     formParams.append(CONFIG.FORM_ENTRIES.score, String(gradeResult.score));
-    formParams.append(CONFIG.FORM_ENTRIES.details, JSON.stringify({
-      objectiveScore: gradeResult.score,
-      maxScore: gradeResult.maxScore,
-      objectiveDetails: gradeResult.details,
-      fillInAnswers: allAnswers
-    }));
-    formParams.append(CONFIG.FORM_ENTRIES.imageUrl, aggregatedPhotoUrl);
 
     const ctrlForm = typeof AbortController !== 'undefined' ? new AbortController() : null;
     const tidForm = ctrlForm ? setTimeout(() => ctrlForm.abort(), 10000) : null;
@@ -3727,6 +3728,39 @@ async function submitExam(isAuto) {
       signal: ctrlForm ? ctrlForm.signal : undefined
     });
     if (tidForm) clearTimeout(tidForm);
+
+    // 歸檔完整作答紀錄至本地 LocalStorage (供教師批改端即時調閱與持久儲存)
+    const submissionRecord = {
+      testTitle: '10月10日 Advance 數學大測(一)',
+      testCategory: '2026-2027學年上學期 高一（理）數學大測卷(一)',
+      classID: student.classID,
+      studentID: student.studentID,
+      studentName: student.name,
+      timestamp: Date.now(),
+      objectiveScore: gradeResult.score,
+      maxObjectiveScore: 22,
+      objectiveDetails: gradeResult.details,
+      answers: allAnswers,
+      questionPhotos: ExamState.questionPhotos || {},
+      uploadedPhotoUrls: ExamState.uploadedPhotoUrls || {},
+      aggregatedPhotoUrl: aggregatedPhotoUrl,
+      status: 'submitted'
+    };
+
+    try {
+      localStorage.setItem('ADVANCE_LAST_SUBMISSION', JSON.stringify(submissionRecord));
+      let archive = [];
+      try {
+        const rawArchive = localStorage.getItem('ADVANCE_SUBMISSION_ARCHIVE');
+        if (rawArchive) archive = JSON.parse(rawArchive);
+      } catch (e) {}
+      if (!Array.isArray(archive)) archive = [];
+      archive = archive.filter(item => !(item.classID === student.classID && String(item.studentID) === String(student.studentID)));
+      archive.unshift(submissionRecord);
+      localStorage.setItem('ADVANCE_SUBMISSION_ARCHIVE', JSON.stringify(archive));
+    } catch (archErr) {
+      console.warn('LocalStorage 歸檔試卷失敗：', archErr);
+    }
 
     ExamState.isSubmitting = false;
     ExamState.pendingSubmission = false;
