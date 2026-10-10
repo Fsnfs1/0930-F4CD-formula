@@ -51,9 +51,10 @@
     <h2 style="margin-bottom: 14px; color: #2c3e50;">教師批改身分驗證</h2>
     <p style="font-size: 13px; color: #7f8c8d; margin-bottom: 16px;">請輸入閱卷通關密碼（預設 teacher2026）</p>
     <div style="display: flex; justify-content: center; gap: 8px;">
-        <input type="password" id="pwdInput" placeholder="請輸入密碼" value="teacher2026">
-        <button class="btn" onclick="checkPassword()">登入閱卷</button>
+        <input type="password" id="pwdInput" placeholder="請輸入密碼" value="teacher2026" onkeydown="if(event.key==='Enter') checkPassword()">
+        <button class="btn" id="btnLoginTeacher" onclick="checkPassword()">登入閱卷</button>
     </div>
+    <div id="authErrorMsg" style="color: #e74c3c; font-size: 13px; margin-top: 10px; display: none;"></div>
 </div>
 
 <div id="dashboard">
@@ -68,6 +69,7 @@
         <div style="display: flex; gap: 8px;">
             <button class="btn" style="background-color: #64748b; font-size: 13px;" onclick="configureGasUrl()">⚙️ 設定 GAS 網址</button>
             <button class="btn" style="font-size: 13px;" onclick="fetchPapers()">🔄 重新整理考卷</button>
+            <button class="btn" style="background-color: #ef4444; font-size: 13px;" onclick="logoutTeacher()">🚪 登出</button>
         </div>
     </div>
     
@@ -77,127 +79,103 @@
 
 <script>
     // 內嵌花名冊以精確關聯學生中文姓名
-    window.ROSTER_DATA = age.js
- * Generator script for authentic 27-question Advance Mathematics Exam Platform
- * Writes: advance_test.html
- */
-
-const fs = require('fs');
-const path = require('path');
-
-// Load canonical roster data
-const rosterModulePath = path.join(__dirname, '..', 'js', 'roster.js');
-let ROSTER_DATA = null;
-if (fs.existsSync(rosterModulePath)) {
-  const RosterModule = require(rosterModulePath);
-  ROSTER_DATA = RosterModule.ROSTER_DATA;
-} else {
-  console.warn('Warning: roster.js not found at relative path, using embedded roster data');
-}
-
-// Ensure ROSTER_DATA fallback if needed
-if (!ROSTER_DATA) {
-  ROSTER_DATA = {
-    "4C": [
-      { id: 1, name: "古永晴", grade: 10, classID: "4C" },
-      { id: 2, name: "王嘉熙", grade: 10, classID: "4C" },
-      { id: 3, name: "宋榛", grade: 10, classID: "4C" },
-      { id: 4, name: "周子謙", grade: 10, classID: "4C" },
-      { id: 5, name: "李藝彤", grade: 10, classID: "4C" },
-      { id: 6, name: "谷雨", grade: 10, classID: "4C" },
-      { id: 7, name: "冼周蔚", grade: 10, classID: "4C" },
-      { id: 8, name: "林國榮", grade: 10, classID: "4C" },
-      { id: 9, name: "林晨欣", grade: 10, classID: "4C" },
-      { id: 10, name: "徐浟", grade: 10, classID: "4C" },
-      { id: 11, name: "曹爵先", grade: 10, classID: "4C" },
-      { id: 12, name: "梁寶娟", grade: 10, classID: "4C" },
-      { id: 14, name: "莫芷瑤", grade: 10, classID: "4C" },
-      { id: 15, name: "陳子豪", grade: 10, classID: "4C" },
-      { id: 16, name: "陳心怡", grade: 10, classID: "4C" },
-      { id: 17, name: "陳芷澄", grade: 10, classID: "4C" },
-      { id: 18, name: "陳穎彤", grade: 10, classID: "4C" },
-      { id: 19, name: "陸恩希", grade: 10, classID: "4C" },
-      { id: 20, name: "麥曉楠", grade: 10, classID: "4C" },
-      { id: 21, name: "溫愛嫦", grade: 10, classID: "4C" },
-      { id: 22, name: "葉峰", grade: 10, classID: "4C" },
-      { id: 23, name: "趙政熹", grade: 10, classID: "4C" },
-      { id: 24, name: "劉卓盈", grade: 10, classID: "4C" },
-      { id: 25, name: "蔡清琰", grade: 10, classID: "4C" },
-      { id: 26, name: "謝嘉瑩", grade: 10, classID: "4C" },
-      { id: 27, name: "譚梓鈞", grade: 10, classID: "4C" },
-      { id: 28, name: "譚志坤", grade: 10, classID: "4C" },
-      { id: 29, name: "譚欣", grade: 10, classID: "4C" },
-      { id: 30, name: "羅清璋", grade: 10, classID: "4C" }
-    ],
-    "4D": [
-      { id: 1, name: "洪佳佳", grade: 10, classID: "4D" },
-      { id: 2, name: "王偉德", grade: 10, classID: "4D" },
-      { id: 3, name: "王煜鑫", grade: 10, classID: "4D" },
-      { id: 4, name: "甘俊誠", grade: 10, classID: "4D" },
-      { id: 5, name: "余浩賢", grade: 10, classID: "4D" },
-      { id: 6, name: "李青霞", grade: 10, classID: "4D" },
-      { id: 7, name: "李語鵑", grade: 10, classID: "4D" },
-      { id: 8, name: "李樂瞳", grade: 10, classID: "4D" },
-      { id: 9, name: "李穎欣", grade: 10, classID: "4D" },
-      { id: 10, name: "李臻斌", grade: 10, classID: "4D" },
-      { id: 11, name: "周梓霖", grade: 10, classID: "4D" },
-      { id: 12, name: "林川雲", grade: 10, classID: "4D" },
-      { id: 13, name: "施舒晨", grade: 10, classID: "4D" },
-      { id: 14, name: "徐芷瑤", grade: 10, classID: "4D" },
-      { id: 15, name: "翁淮洋", grade: 10, classID: "4D" },
-      { id: 16, name: "馬雨彤", grade: 10, classID: "4D" },
-      { id: 17, name: "張博聰", grade: 10, classID: "4D" },
-      { id: 18, name: "曾浚恩", grade: 10, classID: "4D" },
-      { id: 19, name: "黃悅軒", grade: 10, classID: "4D" },
-      { id: 20, name: "黃梓建", grade: 10, classID: "4D" },
-      { id: 21, name: "黃嫣然", grade: 10, classID: "4D" },
-      { id: 22, name: "董清霞", grade: 10, classID: "4D" },
-      { id: 23, name: "劉付穎", grade: 10, classID: "4D" },
-      { id: 24, name: "劉泳欣", grade: 10, classID: "4D" },
-      { id: 25, name: "鄭佩芝", grade: 10, classID: "4D" },
-      { id: 26, name: "鄭東沅", grade: 10, classID: "4D" },
-      { id: 27, name: "盧肇琪", grade: 10, classID: "4D" },
-      { id: 28, name: "賴君華", grade: 10, classID: "4D" },
-      { id: 29, name: "譚佩泳", grade: 10, classID: "4D" },
-      { id: 30, name: "鄭梓浩", grade: 10, classID: "4D" },
-      { id: 31, name: "鄭國樺", grade: 10, classID: "4D" }
-    ],
-    "5B": [
-      { id: 1, name: "吳鎂澄", grade: 11, classID: "5B" },
-      { id: 2, name: "蘇子恩", grade: 11, classID: "5B" },
-      { id: 3, name: "李潤歌", grade: 11, classID: "5B" },
-      { id: 4, name: "李曉熹", grade: 11, classID: "5B" },
-      { id: 5, name: "周鈺燕", grade: 11, classID: "5B" },
-      { id: 6, name: "林煜皓", grade: 11, classID: "5B" },
-      { id: 7, name: "林穎豪", grade: 11, classID: "5B" },
-      { id: 8, name: "柯鈺鑫", grade: 11, classID: "5B" },
-      { id: 9, name: "洪泳棋", grade: 11, classID: "5B" },
-      { id: 10, name: "高尚禮", grade: 11, classID: "5B" },
-      { id: 11, name: "張啟赫", grade: 11, classID: "5B" },
-      { id: 12, name: "張嘉城", grade: 11, classID: "5B" },
-      { id: 13, name: "梁泳心", grade: 11, classID: "5B" },
-      { id: 14, name: "梁芷韻", grade: 11, classID: "5B" },
-      { id: 15, name: "梁偉烽", grade: 11, classID: "5B" },
-      { id: 16, name: "姚皓然", grade: 11, classID: "5B" },
-      { id: 17, name: "陳施攸", grade: 11, classID: "5B" },
-      { id: 18, name: "陳柏琳", grade: 11, classID: "5B" },
-      { id: 19, name: "陳國良", grade: 11, classID: "5B" },
-      { id: 20, name: "陳紫涵", grade: 11, classID: "5B" },
-      { id: 21, name: "陳鑫源", grade: 11, classID: "5B" },
-      { id: 22, name: "彭婷婷", grade: 11, classID: "5B" },
-      { id: 23, name: "黃少彬", grade: 11, classID: "5B" },
-      { id: 24, name: "黃卓琳", grade: 11, classID: "5B" },
-      { id: 25, name: "黃婉瑜", grade: 11, classID: "5B" },
-      { id: 26, name: "葉棨釗", grade: 11, classID: "5B" },
-      { id: 27, name: "潘子聰", grade: 11, classID: "5B" },
-      { id: 28, name: "黎宛旻", grade: 11, classID: "5B" }
-    ]
-  };
-}
-
-console.log('Roster verified: Classes 4C (' + ROSTER_DATA['4C'].length + '), 4D (' + ROSTER_DATA['4D'].length + '), 5B (' + ROSTER_DATA['5B'].length + ')');
-
-// Define the 27 Questions;
+    const EMBEDDED_ROSTER = {
+        "4C": [
+            { id: 1, name: "古永晴", grade: 10, classID: "4C" },
+            { id: 2, name: "王嘉熙", grade: 10, classID: "4C" },
+            { id: 3, name: "宋榛", grade: 10, classID: "4C" },
+            { id: 4, name: "周子謙", grade: 10, classID: "4C" },
+            { id: 5, name: "李藝彤", grade: 10, classID: "4C" },
+            { id: 6, name: "谷雨", grade: 10, classID: "4C" },
+            { id: 7, name: "冼周蔚", grade: 10, classID: "4C" },
+            { id: 8, name: "林國榮", grade: 10, classID: "4C" },
+            { id: 9, name: "林晨欣", grade: 10, classID: "4C" },
+            { id: 10, name: "徐浟", grade: 10, classID: "4C" },
+            { id: 11, name: "曹爵先", grade: 10, classID: "4C" },
+            { id: 12, name: "梁寶娟", grade: 10, classID: "4C" },
+            { id: 14, name: "莫芷瑤", grade: 10, classID: "4C" },
+            { id: 15, name: "陳子豪", grade: 10, classID: "4C" },
+            { id: 16, name: "陳心怡", grade: 10, classID: "4C" },
+            { id: 17, name: "陳芷澄", grade: 10, classID: "4C" },
+            { id: 18, name: "陳穎彤", grade: 10, classID: "4C" },
+            { id: 19, name: "陸恩希", grade: 10, classID: "4C" },
+            { id: 20, name: "麥曉楠", grade: 10, classID: "4C" },
+            { id: 21, name: "溫愛嫦", grade: 10, classID: "4C" },
+            { id: 22, name: "葉峰", grade: 10, classID: "4C" },
+            { id: 23, name: "趙政熹", grade: 10, classID: "4C" },
+            { id: 24, name: "劉卓盈", grade: 10, classID: "4C" },
+            { id: 25, name: "蔡清琰", grade: 10, classID: "4C" },
+            { id: 26, name: "謝嘉瑩", grade: 10, classID: "4C" },
+            { id: 27, name: "譚梓鈞", grade: 10, classID: "4C" },
+            { id: 28, name: "譚志坤", grade: 10, classID: "4C" },
+            { id: 29, name: "譚欣", grade: 10, classID: "4C" },
+            { id: 30, name: "羅清璋", grade: 10, classID: "4C" }
+        ],
+        "4D": [
+            { id: 1, name: "洪佳佳", grade: 10, classID: "4D" },
+            { id: 2, name: "王偉德", grade: 10, classID: "4D" },
+            { id: 3, name: "王煜鑫", grade: 10, classID: "4D" },
+            { id: 4, name: "甘俊誠", grade: 10, classID: "4D" },
+            { id: 5, name: "余浩賢", grade: 10, classID: "4D" },
+            { id: 6, name: "李青霞", grade: 10, classID: "4D" },
+            { id: 7, name: "李語鵑", grade: 10, classID: "4D" },
+            { id: 8, name: "李樂瞳", grade: 10, classID: "4D" },
+            { id: 9, name: "李穎欣", grade: 10, classID: "4D" },
+            { id: 10, name: "李臻斌", grade: 10, classID: "4D" },
+            { id: 11, name: "周梓霖", grade: 10, classID: "4D" },
+            { id: 12, name: "林川雲", grade: 10, classID: "4D" },
+            { id: 13, name: "施舒晨", grade: 10, classID: "4D" },
+            { id: 14, name: "徐芷瑤", grade: 10, classID: "4D" },
+            { id: 15, name: "翁淮洋", grade: 10, classID: "4D" },
+            { id: 16, name: "馬雨彤", grade: 10, classID: "4D" },
+            { id: 17, name: "張博聰", grade: 10, classID: "4D" },
+            { id: 18, name: "曾浚恩", grade: 10, classID: "4D" },
+            { id: 19, name: "黃悅軒", grade: 10, classID: "4D" },
+            { id: 20, name: "黃梓建", grade: 10, classID: "4D" },
+            { id: 21, name: "黃嫣然", grade: 10, classID: "4D" },
+            { id: 22, name: "董清霞", grade: 10, classID: "4D" },
+            { id: 23, name: "劉付穎", grade: 10, classID: "4D" },
+            { id: 24, name: "劉泳欣", grade: 10, classID: "4D" },
+            { id: 25, name: "鄭佩芝", grade: 10, classID: "4D" },
+            { id: 26, name: "鄭東沅", grade: 10, classID: "4D" },
+            { id: 27, name: "盧肇琪", grade: 10, classID: "4D" },
+            { id: 28, name: "賴君華", grade: 10, classID: "4D" },
+            { id: 29, name: "譚佩泳", grade: 10, classID: "4D" },
+            { id: 30, name: "鄭梓浩", grade: 10, classID: "4D" },
+            { id: 31, name: "鄭國樺", grade: 10, classID: "4D" }
+        ],
+        "5B": [
+            { id: 1, name: "吳鎂澄", grade: 11, classID: "5B" },
+            { id: 2, name: "蘇子恩", grade: 11, classID: "5B" },
+            { id: 3, name: "李潤歌", grade: 11, classID: "5B" },
+            { id: 4, name: "李曉熹", grade: 11, classID: "5B" },
+            { id: 5, name: "周鈺燕", grade: 11, classID: "5B" },
+            { id: 6, name: "林煜皓", grade: 11, classID: "5B" },
+            { id: 7, name: "林穎豪", grade: 11, classID: "5B" },
+            { id: 8, name: "柯鈺鑫", grade: 11, classID: "5B" },
+            { id: 9, name: "洪泳棋", grade: 11, classID: "5B" },
+            { id: 10, name: "高尚禮", grade: 11, classID: "5B" },
+            { id: 11, name: "張啟赫", grade: 11, classID: "5B" },
+            { id: 12, name: "張嘉城", grade: 11, classID: "5B" },
+            { id: 13, name: "梁泳心", grade: 11, classID: "5B" },
+            { id: 14, name: "梁芷韻", grade: 11, classID: "5B" },
+            { id: 15, name: "梁偉烽", grade: 11, classID: "5B" },
+            { id: 16, name: "姚皓然", grade: 11, classID: "5B" },
+            { id: 17, name: "陳施攸", grade: 11, classID: "5B" },
+            { id: 18, name: "陳柏琳", grade: 11, classID: "5B" },
+            { id: 19, name: "陳國良", grade: 11, classID: "5B" },
+            { id: 20, name: "陳紫涵", grade: 11, classID: "5B" },
+            { id: 21, name: "陳鑫源", grade: 11, classID: "5B" },
+            { id: 22, name: "彭婷婷", grade: 11, classID: "5B" },
+            { id: 23, name: "黃少彬", grade: 11, classID: "5B" },
+            { id: 24, name: "黃卓琳", grade: 11, classID: "5B" },
+            { id: 25, name: "黃婉瑜", grade: 11, classID: "5B" },
+            { id: 26, name: "葉棨釗", grade: 11, classID: "5B" },
+            { id: 27, name: "潘子聰", grade: 11, classID: "5B" },
+            { id: 28, name: "黎宛旻", grade: 11, classID: "5B" }
+        ]
+    };
+    window.ROSTER_DATA = window.ROSTER_DATA || EMBEDDED_ROSTER;
 
     function getStudentName(cls, sid) {
         if (!cls || !sid) return '';
@@ -231,15 +209,43 @@ console.log('Roster verified: Classes 4C (' + ROSTER_DATA['4C'].length + '), 4D 
     const TEACHER_PWD = "teacher2026"; 
 
     function checkPassword() {
-        const inputPwd = document.getElementById('pwdInput').value.trim();
+        const inputElem = document.getElementById('pwdInput');
+        const errElem = document.getElementById('authErrorMsg');
+        const inputPwd = inputElem ? inputElem.value.trim() : '';
+        
         if (inputPwd === TEACHER_PWD || inputPwd === "1234") {
+            if (errElem) errElem.style.display = 'none';
+            try { sessionStorage.setItem('TEACHER_LOGGED_IN', 'true'); } catch (e) {}
             document.getElementById('authSection').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
             fetchPapers();
         } else {
+            if (errElem) {
+                errElem.style.display = 'block';
+                errElem.textContent = "⚠️ 密碼錯誤！請輸入正確的批改通關密碼 (預設 teacher2026)";
+            }
             alert("密碼錯誤！請輸入正確的批改通關密碼 (預設 teacher2026)");
         }
     }
+
+    function logoutTeacher() {
+        try { sessionStorage.removeItem('TEACHER_LOGGED_IN'); } catch (e) {}
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('authSection').style.display = 'block';
+        const inputElem = document.getElementById('pwdInput');
+        if (inputElem) inputElem.value = '';
+    }
+
+    // 頁面載入時檢查是否保持登入
+    window.addEventListener('DOMContentLoaded', () => {
+        try {
+            if (sessionStorage.getItem('TEACHER_LOGGED_IN') === 'true') {
+                document.getElementById('authSection').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                fetchPapers();
+            }
+        } catch (e) {}
+    });
 
     let allPapersCache = [];
     let currentFilter = 'ALL';
