@@ -368,18 +368,28 @@
     ]
   };
 
-  // 3. 雜訊過濾引擎 (100% 準確率過濾 128 維特徵向量、密碼雜湊與舊刷題代碼)
+    // 3. 雜訊過濾引擎 (100% 準確率過濾 128 維特徵向量、密碼雜湊與舊刷題代碼)
   function isNoiseRecord(row) {
     if (!row) return true;
-    
-    // 檢查字串或欄位中是否包含 128 維人臉向量、密碼雜湊或防作弊紀錄
     const did = String(row.dateID || row.textAnswer || '').trim();
-    
-    // 1. 排除人臉 128 維浮點特徵向量 (包含 |TS:、|V: 或長度超過 30 個浮點數)
-    if (did.includes('|TS:') || did.includes('|V:') || (did.includes(',') && did.split(',').length > 30)) {
+    if (!did) return true;
+
+    // 若明確為 Advance 大測提交 (以 ADVANCE_EXAM:: 開頭)，絕對不是雜訊！
+    if (did.startsWith('ADVANCE_EXAM::')) {
+      if (did.includes('|TS:') && !did.includes('ADVANCE_TEST')) {
+        return true;
+      }
+      return false; // 正式大測答卷！
+    }
+
+    // 1. 排除人臉 128 維浮點特徵向量 (包含 |TS:、|V: 或連續浮點數)
+    if (did.includes('|TS:') || did.includes('|V:')) {
       return true;
     }
-    if (/^-?0\.\d{3,},-?0\.\d{3,}/.test(did)) {
+    if (/^-?0.d{2,},-?0.d{2,}/.test(did)) {
+      return true;
+    }
+    if (did.includes(',') && did.split(',').length > 5 && did.split(',').slice(0, 5).every(part => !isNaN(parseFloat(part.trim())))) {
       return true;
     }
     
@@ -394,7 +404,7 @@
     }
     
     // 4. 排除舊題庫單題刷題紀錄 (G10_Qxx, G11_Qxx)
-    if (/^G(10|11)_Q\d+/i.test(did)) {
+    if (/^G(10|11)_Qd+/i.test(did)) {
       return true;
     }
     
@@ -405,18 +415,10 @@
 
     // 若為客戶端本地已解析之考卷物件 (含 answers 或 questionPhotos 或 Advance 考卷標題)
     if (row.answers || row.questionPhotos || (row.testTitle && row.testTitle.includes('Advance'))) {
-      const raw = JSON.stringify(row);
-      // 確保內部無 128 維人臉特徵向量滲漏
-      if (raw.includes('|TS:') || raw.includes('|V:') || (raw.includes(',') && raw.split(',').length > 30 && /-?0\.\d{3,}/.test(raw))) {
-        return true;
-      }
       return false;
     }
-
-    // 若非本地考卷結構，且亦無 dateID/textAnswer，則視為空紀錄/雜訊
-    if (!did) return true;
     
-    return false;
+    return true;
   }
 
   function isValidAdvanceExamPaper(row) {
@@ -430,11 +432,9 @@
     const hasMarker = did.startsWith('ADVANCE_EXAM::') ||
                       did.includes('ADVANCE_TEST') ||
                       did.includes('大測') ||
-                      title.includes('Advance') ||
-                      title.includes('大測') ||
+                      title.includes('Advance 數學大測') ||
                       rawStr.includes('q12_') ||
-                      rawStr.includes('q20') ||
-                      Boolean(row.answers && (row.answers.q1 !== undefined || row.answers.q12_1 !== undefined || row.answers.q20 !== undefined));
+                      rawStr.includes('q20');
                       
     const cid = String(row.classID || '').trim().toUpperCase();
     const sid = parseInt(row.studentID, 10);

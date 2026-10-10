@@ -658,7 +658,6 @@
         data.forEach(row => {
           if (!row || !row.dateID || typeof row.dateID !== 'string') return;
           if (!row.dateID.startsWith('ADVANCE_EXAM::')) return;
-          if (window.ADVANCE_EXAM_DATA && window.ADVANCE_EXAM_DATA.isNoiseRecord(row)) return;
 
           try {
             const payloadStr = row.dateID.substring('ADVANCE_EXAM::'.length);
@@ -715,6 +714,12 @@
         });
 
         renderPapersList();
+
+        // 自動將雲端最新答卷緩存至本機，確保離線與跨設備即時調閱
+        try {
+          const studentPapers = allValidPapers.filter(p => !p.isDemo);
+          localStorage.setItem('ADVANCE_SUBMISSION_ARCHIVE', JSON.stringify(studentPapers));
+        } catch (e) {}
 
         const studentCount = allValidPapers.filter(p => p.isStudentSubmit).length;
         if (statusEl) statusEl.textContent = '✅ 雲端已同步（共 ' + studentCount + ' 份學生交卷）';
@@ -871,7 +876,7 @@
             <div class="paper-item-header">
               <div>
                 <span class="student-badge">${p.classID} 班 ${p.studentID} 號 - ${p.studentName}</span>
-                ${p.isDemo ? '<span class="type-pill demo">系統示範卷</span>' : '<span class="type-pill student">學生交卷</span>'}
+                ${p.isDemo ? '<span class="type-pill demo">系統示範卷</span>' : (p.fromCloud ? '<span class="type-pill student" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd;">☁️ 雲端同步交卷</span>' : '<span class="type-pill student">學生交卷</span>')}
               </div>
               <span style="font-size: 12px; color: var(--muted);">${timeFormatted}</span>
             </div>
