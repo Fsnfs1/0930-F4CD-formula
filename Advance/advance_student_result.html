@@ -769,16 +769,23 @@
 
             <!-- 學生手寫相片檢視區 -->
             <div style="margin-top: 14px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
                 <span style="font-weight: 700; color: var(--primary);">📸 您拍攝上傳的手寫解答原圖：</span>
-                <div class="photo-controls" style="display: flex; gap: 8px;">
+                <div class="photo-controls" style="display: flex; gap: 8px; align-items: center;">
                   <button class="btn btn-sm btn-secondary" onclick="rotatePhoto('${qKey}', 90)">🔄 旋轉 90°</button>
                   <button class="btn btn-sm btn-secondary" onclick="rotatePhoto('${qKey}', 0)">↺ 重設</button>
-                  <button class="btn btn-sm btn-accent" onclick="openLightbox('${photoSrc}', '${q.title}')">🔍 放大檢視</button>
+                  <button class="btn btn-sm btn-accent" onclick="openLightbox('${displayImgSrc}', '${q.title}')">🔍 放大檢視</button>
+                  ${originalDriveUrl ? `<a href="${originalDriveUrl}" target="_blank" class="btn btn-sm btn-secondary" style="font-size: 12px; text-decoration: none;">☁️ 開啟 Drive 原圖 ↗</a>` : ''}
                 </div>
               </div>
               <div class="photo-review-wrap">
-                <img id="img_${qKey}" src="${photoSrc}" alt="手寫照片" style="transform: rotate(0deg);" onclick="openLightbox('${photoSrc}', '${q.title}')">
+                <img id="img_${qKey}" src="${displayImgSrc}" referrerpolicy="no-referrer" alt="手寫照片" style="transform: rotate(0deg);" 
+                     onerror="this.style.display='none'; document.getElementById('studentDriveFailTip_${qKey}').style.display='block';"
+                     onclick="openLightbox('${displayImgSrc}', '${q.title}')">
+                <div id="studentDriveFailTip_${qKey}" style="display:none; padding:14px; background:#fff7ed; border:1px solid #ffedd5; border-radius:6px; color:#c2410c; font-size:13px; text-align:center;">
+                  ⚠️ 圖片直鏈載入受限（瀏覽器第三方跨站隱私防護）。<br>
+                  ${originalDriveUrl ? `<a href="${originalDriveUrl}" target="_blank" class="btn btn-sm btn-accent" style="margin-top:6px; display:inline-block; font-weight:700;">🔗 點此在 Google Drive 中檢視原圖 ↗</a>` : ''}
+                </div>
               </div>
             </div>
 

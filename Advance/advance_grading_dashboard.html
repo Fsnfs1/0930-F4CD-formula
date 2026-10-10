@@ -547,14 +547,19 @@
       </div>
       <div style="padding: 24px; background: white; font-size: 14px; line-height: 1.8; color: #334155;">
         <h3 style="color: var(--primary); margin-bottom: 12px;">如何讓所有學生的手寫照片在閱卷端 100% 直連秒開？</h3>
-        <p>目前學生拍攝上傳的照片均安全儲存在您的 Google 雲端硬碟 <code>WEB+</code> 資料夾中。</p>
+        <p><strong>問：為什麼我自己帳號登入了 Google Drive，批改端依然顯示圖片受限？</strong></p>
+        <div style="background: #f8fafc; padding: 12px 14px; border-radius: 6px; border-left: 4px solid #64748b; font-size: 13px; color: #475569; margin: 10px 0;">
+          💡 <strong>根本原因：現代瀏覽器的「第三方 Cookie 跨站阻擋」安全機制</strong><br>
+          批改平臺屬於第三方網站，現代 iPhone Safari、Android Chrome 為防跨站追蹤，<strong>強制全面封鎖第三方 Cookie</strong>。這意味著瀏覽器不會將您的 Google 登入憑證傳送給跨站圖片！在 Google 伺服器眼裡，該圖片請求完全是「未登入的匿名訪客」，因此若檔案權限為「已限制（私有）」，Google 就會阻擋顯示。
+        </div>
         <div style="background: #eff6ff; padding: 14px; border-radius: 8px; border-left: 4px solid var(--secondary); margin: 14px 0;">
-          <strong>📱 手機 Google Drive App 3 步驟設定（僅需操作一次）：</strong><br>
+          <strong>📱 最根本解法：手機 Google Drive App 3 步驟設定（僅需操作一次，永久生效）：</strong><br>
           1. 打開手機的 <strong>Google 雲端硬碟 (Google Drive) App</strong>。<br>
           2. 回到【我的雲端硬碟】，找到 <strong>WEB+</strong> 資料夾，點擊右側的 <strong>···</strong>。<br>
           3. 點選【共用】(或【管理存取權】) ➔ 將「一般存取權」從【已限制】改為 <strong>【知道連結的任何人】(檢視者)</strong>。
         </div>
-        <p>💡 一旦設為「知道連結的任何人」，所有學生提交的照片皆能立刻在閱卷端直連高解析度渲染；未公開前，系統會自動切換為 Google Drive 內嵌檢視器或提供一鍵開啟按鈕。</p>
+        <p>💡 一旦設為「知道連結的任何人」，Google CDN 便切換為免驗證模式，所有照片立刻秒開！<br>
+        同時，在未公開前，您亦可隨時點擊每題卡片上的 <strong>「🔗 Drive 原圖」</strong> 或 <strong>「📂 一鍵開啟全卷 Drive 照片」</strong>，在新分頁直接檢視原圖！</p>
         <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
           <button class="btn btn-primary" onclick="closeDriveGuideModal()">我已知悉</button>
         </div>
@@ -670,6 +675,31 @@
         wrap.style.display = 'block';
         wrap.innerHTML = '<iframe src="https://drive.google.com/file/d/' + fileId + '/preview" width="100%" height="480" style="border:none; border-radius:8px; width:100%; height:480px; background:#fff;" allow="autoplay"></iframe>';
       }
+    }
+
+    // 一鍵在新分頁開啟全卷 Google Drive 手寫照片 (已登入 Google Drive 的教師可直接瀏覽全部原圖)
+    function openAllDrivePhotos() {
+      if (!currentPaper) return;
+      const urls = [];
+      const keys = ['q20', 'q21', 'q22', 'q23', 'Q20', 'Q21', 'Q22', 'Q23'];
+      keys.forEach(k => {
+        let u = (currentPaper.uploadedPhotoUrls && currentPaper.uploadedPhotoUrls[k]) ||
+                (currentPaper.questionPhotos && currentPaper.questionPhotos[k]);
+        if (u && typeof u === 'string' && u.includes('drive.google.com') && !urls.includes(u)) {
+          urls.push(u);
+        }
+      });
+      if (urls.length === 0 && currentPaper.aggregatedPhotoUrl && typeof currentPaper.aggregatedPhotoUrl === 'string') {
+        const matches = currentPaper.aggregatedPhotoUrl.match(new RegExp('https://drive\\.google\\.com/[^\\s;]+', 'g'));
+        if (matches) {
+          matches.forEach(m => { if (!urls.includes(m)) urls.push(m); });
+        }
+      }
+      if (urls.length === 0) {
+        alert('ℹ️ 此份試卷未包含 Google Drive 雲端照片連結。');
+        return;
+      }
+      urls.forEach(u => window.open(u, '_blank'));
     }
 
     const CLOUD_SHEET_API = 'https://script.google.com/macros/s/AKfycbwNAQNxmNsNa8rWGp48qnYRrjA2WFLGIzKqSel2r8MilRp59s3ZfBJjeKXIrUfoS-Zp-g/exec';
@@ -1088,7 +1118,18 @@
 
       // Part 4: 解答題 (步驟解析 + 手寫原圖 90° 翻轉/燈箱 + 0~10分評分)
       const p4Box = document.getElementById('part4Container');
-      p4Box.innerHTML = '';
+      p4Box.innerHTML = `
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <span style="font-weight: 700; color: #1e40af;">📸 學生手寫解答照片批改引導：</span>
+            <span style="font-size: 13px; color: #3b82f6;">若受瀏覽器跨站第三方 Cookie 限制，已登入 Drive 的教師可直接點擊一鍵開啟：</span>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-sm btn-accent" onclick="openAllDrivePhotos()">📂 一鍵開啟全卷 Drive 照片 ↗</button>
+            <button class="btn btn-sm btn-secondary" onclick="showDrivePermissionModal()">ℹ️ 權限說明</button>
+          </div>
+        </div>
+      `;
       QD.part4.forEach(q => {
         const qKey = 'Q' + q.num;
         const qid = q.id; // 'q20'
@@ -1117,12 +1158,13 @@
         // 若為 Google Drive 連結，轉譯為可直接在 <img> 渲染之直鏈縮圖 API
         let displayImgSrc = photoSrc;
         let isDriveLink = false;
+        let fileId = '';
         if (photoSrc.includes('drive.google.com')) {
           isDriveLink = true;
           originalDriveUrl = photoSrc;
           const m1 = photoSrc.match(new RegExp('/file/d/([a-zA-Z0-9_-]+)'));
           const m2 = photoSrc.match(new RegExp('[?&]id=([a-zA-Z0-9_-]+)'));
-          let fileId = (m1 && m1[1]) || (m2 && m2[1]) || '';
+          fileId = (m1 && m1[1]) || (m2 && m2[1]) || '';
           if (fileId) {
             displayImgSrc = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1600';
           }
@@ -1138,18 +1180,27 @@
             <div style="margin: 12px 0;">${q.solution}</div>
 
             <div class="photo-inspect-card">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
                 <span style="font-weight: 600; color: #1e3a8a;">📸 學生手寫解答拍照推導：</span>
-                ${isDriveLink ? '<span style="font-size:12px; color:#0284c7; background:#e0f2fe; padding:2px 8px; border-radius:12px;">☁️ 已同步 Google 雲端硬碟</span>' : (displayImgSrc ? '<span style="font-size:12px; color:#059669; background:#d1fae5; padding:2px 8px; border-radius:12px;">📷 本機高解析原圖</span>' : '')}
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  ${isDriveLink ? '<span style="font-size:12px; color:#0284c7; background:#e0f2fe; padding:2px 8px; border-radius:12px;">☁️ 已同步 Google 雲端硬碟</span>' : (displayImgSrc ? '<span style="font-size:12px; color:#059669; background:#d1fae5; padding:2px 8px; border-radius:12px;">📷 本機高解析原圖</span>' : '')}
+                  ${originalDriveUrl ? `<a href="${originalDriveUrl}" target="_blank" class="btn btn-sm btn-accent" style="font-size:12px; padding:3px 10px; text-decoration:none;">🔗 Drive 原圖 ↗</a>` : ''}
+                </div>
               </div>
               <div class="photo-wrapper">
                 ${displayImgSrc ? `
                   <img id="img_${qKey}" class="handwriting-img" src="${displayImgSrc}" alt="手寫相片" style="transform: rotate(0deg);" 
-                       onerror="handleImgError(this, '${qKey}')"
+                       referrerpolicy="no-referrer"
+                       onerror="handleImgError(this, '${qKey}', '${fileId}', '${originalDriveUrl}')"
                        onclick="openLightbox('${displayImgSrc}', '${q.title}')">
-                  <div id="driveFailTip_${qKey}" style="display:none; padding:20px; color:#ef4444; font-size:13px; text-align:center;">
-                    ⚠️ 圖片直鏈載入受限（可能是 Google 雲端硬碟檔案權限未設定為「知道連結的使用者均可檢視」）。<br>
-                    ${originalDriveUrl ? `<a href="${originalDriveUrl}" target="_blank" class="btn btn-sm btn-accent" style="margin-top:8px;">🔗 點此在 Google Drive 中檢視原圖</a>` : ''}
+                  <div id="driveIframeWrap_${qKey}" style="display:none; width:100%; margin-top:8px;"></div>
+                  <div id="driveFailTip_${qKey}" style="display:none; padding:16px; background:#fff7ed; border:1px solid #ffedd5; border-radius:8px; color:#c2410c; font-size:13px; text-align:center; margin-top:8px;">
+                    <div style="font-weight:700; margin-bottom:4px;">⚠️ 圖片直鏈受限（現代瀏覽器第三方 Cookie 隔離保護）</div>
+                    <div style="font-size:12px; color:#64748b; margin-bottom:10px;">
+                      現代手機與電腦瀏覽器為防追蹤，禁止跨網站傳送您的 Google 登入憑證。<br>
+                      若您已在手機/電腦登入 Google 帳號，請點擊下方按鈕<strong>直接在 Drive 中檢視原圖</strong>：
+                    </div>
+                    ${originalDriveUrl ? `<a href="${originalDriveUrl}" target="_blank" class="btn btn-sm btn-accent" style="margin-top:4px; font-weight:700; padding:6px 14px; text-decoration:none;">🔗 直接在 Google Drive 中檢視原圖 (已登入可秒開) ↗</a>` : ''}
                   </div>
                 ` : '<p style="color:#94a3b8; padding:30px;">未附帶手寫解答照片</p>'}
               </div>
