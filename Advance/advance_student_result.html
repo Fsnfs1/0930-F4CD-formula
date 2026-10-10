@@ -800,7 +800,41 @@
       p4Box.innerHTML = '';
       QD.part4.forEach(q => {
         const qKey = 'Q' + q.num;
-        const photoSrc = (paper.questionPhotos && paper.questionPhotos[qKey]) || '';
+        const qid = q.id;
+
+        // 智能解析多來源相片：優先本地 Base64 原圖，次選 Drive 雲端連結
+        let photoSrc = '';
+        let originalDriveUrl = '';
+
+        if (paper.questionPhotos) {
+          photoSrc = paper.questionPhotos[qKey] || paper.questionPhotos[qid] || paper.questionPhotos[qid.toUpperCase()] || '';
+        }
+        if (!photoSrc && paper.uploadedPhotoUrls) {
+          photoSrc = paper.uploadedPhotoUrls[qKey] || paper.uploadedPhotoUrls[qid] || paper.uploadedPhotoUrls[qid.toUpperCase()] || '';
+        }
+        if (!photoSrc && paper.aggregatedPhotoUrl && typeof paper.aggregatedPhotoUrl === 'string') {
+          const parts = paper.aggregatedPhotoUrl.split(';');
+          for (const part of parts) {
+            if (part.toUpperCase().includes(qKey + ':')) {
+              photoSrc = part.split(/:\s*/)[1] || '';
+              break;
+            }
+          }
+        }
+        photoSrc = (photoSrc || '').trim();
+
+        let displayImgSrc = photoSrc;
+        let isDriveLink = false;
+        if (photoSrc.includes('drive.google.com')) {
+          isDriveLink = true;
+          originalDriveUrl = photoSrc;
+          const match = photoSrc.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || photoSrc.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+          if (match && match[1]) {
+            const fileId = match[1];
+            displayImgSrc = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1600';
+          }
+        }
+
         const qEarned = itemScores[q.id] !== undefined ? Number(itemScores[q.id]) : (paper.isDemo || String(paper.studentID) === '99' ? (q.id === 'q23' ? 9 : 10) : 0);
         p4Score += qEarned;
         const comment = itemComments[q.id] || (paper.teacherComments && paper.teacherComments[q.id]) || '解答規範，步驟清晰。';
@@ -821,12 +855,19 @@
                 <div class="photo-controls" style="display: flex; gap: 8px;">
                   <button class="btn btn-sm btn-secondary" onclick="rotatePhoto('${qKey}', 90)">🔄 旋轉 90°</button>
                   <button class="btn btn-sm btn-secondary" onclick="rotatePhoto('${qKey}', 0)">↺ 重設</button>
-                  ${photoSrc ? `<button class="btn btn-sm btn-accent" onclick="openLightbox('${photoSrc}', '${q.title}')">🔍 放大檢視</button>` : ''}
+                  ${displayImgSrc ? `<button class="btn btn-sm btn-accent" onclick="openLightbox('${displayImgSrc}', '${q.title}')">🔍 放大檢視</button>` : ''}
+                  ${originalDriveUrl ? `<a href="${originalDriveUrl}" target="_blank" class="btn btn-sm btn-secondary" style="margin-left:auto;">☁️ 雲端原圖 ↗</a>` : ''}
                 </div>
               </div>
               <div class="photo-review-wrap">
-                ${photoSrc 
-                  ? `<img id="img_${qKey}" src="${photoSrc}" alt="手寫照片" style="transform: rotate(0deg);" onclick="openLightbox('${photoSrc}', '${q.title}')">`
+                ${displayImgSrc 
+                  ? `<img id="img_${qKey}" src="${displayImgSrc}" alt="手寫照片" style="transform: rotate(0deg);" 
+                          onerror="if (this.src.includes('thumbnail')) { this.src = 'https://lh3.googleusercontent.com/d/' + (this.src.match(/id=([a-zA-Z0-9_-]+)/)||[])[1]; } else { this.style.display='none'; const tip = document.getElementById('driveFailTip_student_${qKey}'); if(tip) tip.style.display='block'; }"
+                          onclick="openLightbox('${displayImgSrc}', '${q.title}')">
+                     <div id="driveFailTip_student_${qKey}" style="display:none; padding:15px; color:#ef4444; font-size:13px; text-align:center;">
+                       ⚠️ 圖片直鏈載入受限（可能是 Google 雲端硬碟權限受限）。<br>
+                       ${originalDriveUrl ? `<a href="${originalDriveUrl}" target="_blank" class="btn btn-sm btn-accent" style="margin-top:6px;">🔗 點此在 Google Drive 中檢視原圖</a>` : ''}
+                     </div>`
                   : `<div style="padding: 24px; text-align: center; color: var(--muted); font-size: 14px;">📭 該題考試時未上傳手寫原圖</div>`
                 }
               </div>

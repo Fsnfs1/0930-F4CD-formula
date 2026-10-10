@@ -693,6 +693,29 @@
       renderPapersList();
     }
 
+    function hasPhotos(p) {
+      if (!p) return false;
+      const qids = ['q20', 'q21', 'q22', 'q23'];
+      for (const id of qids) {
+        if (p.questionPhotos && (p.questionPhotos[id] || p.questionPhotos[id.toUpperCase()])) return true;
+        if (p.uploadedPhotoUrls && (p.uploadedPhotoUrls[id] || p.uploadedPhotoUrls[id.toUpperCase()])) return true;
+      }
+      return false;
+    }
+
+    function countPhotos(p) {
+      if (!p) return 0;
+      let cnt = 0;
+      const qids = ['q20', 'q21', 'q22', 'q23'];
+      for (const id of qids) {
+        if ((p.questionPhotos && (p.questionPhotos[id] || p.questionPhotos[id.toUpperCase()])) ||
+            (p.uploadedPhotoUrls && (p.uploadedPhotoUrls[id] || p.uploadedPhotoUrls[id.toUpperCase()]))) {
+          cnt++;
+        }
+      }
+      return cnt;
+    }
+
     // 渲染考卷清單網格
     function renderPapersList() {
       const container = document.getElementById('papersListContainer');
@@ -704,7 +727,7 @@
       else if (currentFilter === '4C') list = list.filter(p => p.classID === '4C');
       else if (currentFilter === '4D') list = list.filter(p => p.classID === '4D');
       else if (currentFilter === '5B') list = list.filter(p => p.classID === '5B');
-      else if (currentFilter === 'PHOTO') list = list.filter(p => p.questionPhotos && Object.keys(p.questionPhotos).length > 0);
+      else if (currentFilter === 'PHOTO') list = list.filter(p => hasPhotos(p));
 
       countSummary.innerHTML = `共找到 <strong style="color:var(--primary); font-size:1.1rem;">${list.length}</strong> 份試卷（點擊卡片中的「✍️ 開始批改此卷」進入同構閱卷介面）`;
 
@@ -718,7 +741,7 @@
         card.className = 'paper-item' + (p.isDemo ? ' is-demo' : ' is-student');
         
         const timeFormatted = p.timestamp ? new Date(p.timestamp).toLocaleString('zh-TW', { hour12: false }) : '無交卷時間';
-        const photoCount = p.questionPhotos ? Object.keys(p.questionPhotos).length : 0;
+        const photoCount = countPhotos(p);
         
         // 檢查本地是否已有已評定快照
         const snapshotKey = `ADVANCE_SNAPSHOT_${p.classID}_${p.studentID}`;
@@ -763,7 +786,7 @@
       else if (currentFilter === '4C') list = list.filter(p => p.classID === '4C');
       else if (currentFilter === '4D') list = list.filter(p => p.classID === '4D');
       else if (currentFilter === '5B') list = list.filter(p => p.classID === '5B');
-      else if (currentFilter === 'PHOTO') list = list.filter(p => p.questionPhotos && Object.keys(p.questionPhotos).length > 0);
+      else if (currentFilter === 'PHOTO') list = list.filter(p => hasPhotos(p));
 
       const paper = list[index];
       if (!paper) return;
@@ -915,7 +938,42 @@
       p4Box.innerHTML = '';
       QD.part4.forEach(q => {
         const qKey = 'Q' + q.num;
-        const photoSrc = (paper.questionPhotos && paper.questionPhotos[qKey]) || '';
+        const qid = q.id; // 'q20'
+
+        // 智能解析多來源相片：優先取本地 Base64 拍照原圖（不需要 Google Drive 任何權限），次選 Drive 雲端連結
+        let photoSrc = '';
+        let originalDriveUrl = '';
+
+        if (paper.questionPhotos) {
+          photoSrc = paper.questionPhotos[qKey] || paper.questionPhotos[qid] || paper.questionPhotos[qid.toUpperCase()] || '';
+        }
+        if (!photoSrc && paper.uploadedPhotoUrls) {
+          photoSrc = paper.uploadedPhotoUrls[qKey] || paper.uploadedPhotoUrls[qid] || paper.uploadedPhotoUrls[qid.toUpperCase()] || '';
+        }
+        if (!photoSrc && paper.aggregatedPhotoUrl && typeof paper.aggregatedPhotoUrl === 'string') {
+          const parts = paper.aggregatedPhotoUrl.split(';');
+          for (const part of parts) {
+            if (part.toUpperCase().includes(qKey + ':')) {
+              photoSrc = part.split(/:s*/)[1] || '';
+              break;
+            }
+          }
+        }
+        photoSrc = (photoSrc || '').trim();
+
+        // 若為 Google Drive 連結，轉譯為可直接在 <img> 渲染之直鏈縮圖 API
+        let displayImgSrc = photoSrc;
+        let isDriveLink = false;
+        if (photoSrc.includes('drive.google.com')) {
+          isDriveLink = true;
+          originalDriveUrl = photoSrc;
+          const match = photoSrc.match(//file/d/([a-zA-Z0-9_-]+)/) || photoSrc.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+          if (match && match[1]) {
+            const fileId = match[1];
+            displayImgSrc = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1600';
+          }
+        }
+
         const existingScore = (paper.scores && paper.scores.part4 && paper.scores.part4[q.id]) !== undefined ? paper.scores.part4[q.id] : 10;
         const existingComment = (paper.teacherComments && paper.teacherComments[q.id]) || '';
 
@@ -926,15 +984,27 @@
             <div style="margin: 12px 0;">${q.solution}</div>
 
             <div class="photo-inspect-card">
-              <div style="font-weight: 600; color: #1e3a8a; margin-bottom: 6px;">📸 學生手寫解答拍照推導：</div>
-              <div class="photo-wrapper">
-                ${photoSrc ? `<img id="img_${qKey}" class="handwriting-img" src="${photoSrc}" alt="手寫相片" style="transform: rotate(0deg);" onclick="openLightbox('${photoSrc}', '${q.title}')">` : '<p style="color:#94a3b8; padding:30px;">未附帶手寫解答照片</p>'}
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-weight: 600; color: #1e3a8a;">📸 學生手寫解答拍照推導：</span>
+                ${isDriveLink ? '<span style="font-size:12px; color:#0284c7; background:#e0f2fe; padding:2px 8px; border-radius:12px;">☁️ 已同步 Google 雲端硬碟</span>' : (displayImgSrc ? '<span style="font-size:12px; color:#059669; background:#d1fae5; padding:2px 8px; border-radius:12px;">📷 本機高解析原圖</span>' : '')}
               </div>
-              ${photoSrc ? `
-              <div class="photo-controls">
+              <div class="photo-wrapper">
+                ${displayImgSrc ? `
+                  <img id="img_${qKey}" class="handwriting-img" src="${displayImgSrc}" alt="手寫相片" style="transform: rotate(0deg);" 
+                       onerror="if (this.src.includes('thumbnail')) { this.src = 'https://lh3.googleusercontent.com/d/' + (this.src.match(/id=([a-zA-Z0-9_-]+)/)||[])[1]; } else { this.style.display='none'; const tip = document.getElementById('driveFailTip_${qKey}'); if(tip) tip.style.display='block'; }"
+                       onclick="openLightbox('${displayImgSrc}', '${q.title}')">
+                  <div id="driveFailTip_${qKey}" style="display:none; padding:20px; color:#ef4444; font-size:13px; text-align:center;">
+                    ⚠️ 圖片直鏈載入受限（可能是 Google 雲端硬碟檔案權限未設定為「知道連結的使用者均可檢視」）。<br>
+                    ${originalDriveUrl ? `<a href="${originalDriveUrl}" target="_blank" class="btn btn-sm btn-accent" style="margin-top:8px;">🔗 點此在 Google Drive 中檢視原圖</a>` : ''}
+                  </div>
+                ` : '<p style="color:#94a3b8; padding:30px;">未附帶手寫解答照片</p>'}
+              </div>
+              ${displayImgSrc ? `
+              <div class="photo-controls" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
                 <button class="btn btn-secondary" onclick="rotatePhoto('${qKey}', 90)">🔄 旋轉 90°</button>
                 <button class="btn btn-secondary" onclick="rotatePhoto('${qKey}', 0)">↺ 重設方向</button>
-                <button class="btn btn-accent" onclick="openLightbox('${photoSrc}', '${q.title}')">🔍 高解析放大燈箱</button>
+                <button class="btn btn-accent" onclick="openLightbox('${displayImgSrc}', '${q.title}')">🔍 高解析放大燈箱</button>
+                ${originalDriveUrl ? `<a href="${originalDriveUrl}" target="_blank" class="btn btn-secondary" style="font-size:12px; margin-left:auto;">☁️ 開啟雲端硬碟原檔 ↗</a>` : ''}
               </div>
               ` : ''}
             </div>

@@ -906,9 +906,10 @@ function captureQuestionPhoto(qid) {
   // JPEG 0.7 壓縮
   const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
 
-  // 存入 ExamState
+  // 存入 ExamState (同時儲存小寫 q20 與大寫 Q20 確保跨模組 100% 相容)
   if (!ExamState.questionPhotos) ExamState.questionPhotos = {};
-  ExamState.questionPhotos[qid] = dataUrl;
+  ExamState.questionPhotos[qid.toLowerCase()] = dataUrl;
+  ExamState.questionPhotos[qid.toUpperCase()] = dataUrl;
   ExamState.currentCompressedBase64 = dataUrl; // 向後相容
 
   stopQuestionCamera();
@@ -923,7 +924,8 @@ function captureQuestionPhoto(qid) {
 
 function retakeQuestionPhoto(qid) {
   if (ExamState.questionPhotos) {
-    delete ExamState.questionPhotos[qid];
+    delete ExamState.questionPhotos[qid.toLowerCase()];
+    delete ExamState.questionPhotos[qid.toUpperCase()];
   }
   saveExamState();
   startQuestionCamera(qid);
@@ -1352,6 +1354,22 @@ async function submitExam(isAuto) {
     });
     if (tidForm) clearTimeout(tidForm);
 
+    // 統一規範化手寫照片與雲端硬碟 URL (雙向注入大寫 Q20 與小寫 q20 鍵值)
+    const normalizedPhotos = {};
+    if (ExamState.questionPhotos) {
+      Object.keys(ExamState.questionPhotos).forEach(k => {
+        normalizedPhotos[k.toLowerCase()] = ExamState.questionPhotos[k];
+        normalizedPhotos[k.toUpperCase()] = ExamState.questionPhotos[k];
+      });
+    }
+    const normalizedDriveUrls = {};
+    if (ExamState.uploadedPhotoUrls) {
+      Object.keys(ExamState.uploadedPhotoUrls).forEach(k => {
+        normalizedDriveUrls[k.toLowerCase()] = ExamState.uploadedPhotoUrls[k];
+        normalizedDriveUrls[k.toUpperCase()] = ExamState.uploadedPhotoUrls[k];
+      });
+    }
+
     // 歸檔完整作答紀錄至本地 LocalStorage (供教師批改端即時調閱與持久儲存)
     const submissionRecord = {
       testTitle: '【2026年10月10日 Advance 數學大測 (一)】',
@@ -1365,8 +1383,8 @@ async function submitExam(isAuto) {
       maxObjectiveScore: 22,
       objectiveDetails: gradeResult.details,
       answers: allAnswers,
-      questionPhotos: ExamState.questionPhotos || {},
-      uploadedPhotoUrls: ExamState.uploadedPhotoUrls || {},
+      questionPhotos: normalizedPhotos,
+      uploadedPhotoUrls: normalizedDriveUrls,
       aggregatedPhotoUrl: aggregatedPhotoUrl,
       status: 'submitted',
       isStudentSubmit: true
