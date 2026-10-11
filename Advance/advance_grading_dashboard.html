@@ -445,6 +445,7 @@
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button class="btn btn-secondary" onclick="refreshAllPapers()">🔄 重新整理試卷清單</button>
           <button id="btnSyncCloud" class="btn btn-secondary" onclick="syncPapersFromCloud(false)">☁️ 從雲端同步最新交卷</button>
+          <button id="btnSyncLocalGradings" class="btn btn-success" onclick="manualSyncLocalGradings()">📤 一鍵同步本機批改至雲端</button>
           <button id="btnDriveGuide" class="btn btn-accent" onclick="showDrivePermissionModal()">📁 Drive 照片權限設定說明</button>
           <span id="cloudSyncStatus" style="font-size: 13px; color: var(--muted); align-self: center;"></span>
           <button class="btn btn-accent" onclick="showImportModal()">📥 貼上 / 匯入考卷 JSON</button>
@@ -644,6 +645,7 @@
       showPapersListView();
       loadAllSubmittedPapers();
       syncPapersFromCloud(true);
+      autoSyncAllLocalSnapshotsToCloud();
     }
 
     // 視圖切換：顯示試卷清單
@@ -1414,6 +1416,94 @@
       } catch (e) {
         alert('批改成功：總分 ' + grandTotal + ' 分');
       }
+    }
+
+    // 本機批改快照自動/手動雲端補傳機制 (Auto Sync Local Graded Snapshots to Cloud)
+    async function autoSyncAllLocalSnapshotsToCloud() {
+      if (typeof localStorage === 'undefined') return;
+      const formUrl = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSeLZ6E4kLjJ26aWrKRPRPtDdthkxRHqOPX5AOwAq8_TYiT-OQ/formResponse';
+      let pendingSnapshots = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('ADVANCE_SNAPSHOT_')) {
+          try {
+            const snap = JSON.parse(localStorage.getItem(key));
+            if (snap && snap.classID && snap.studentID && snap.totalScore !== undefined) {
+              pendingSnapshots.push(snap);
+            }
+          } catch (e) {}
+        }
+      }
+
+      if (pendingSnapshots.length === 0) return;
+
+      for (const snap of pendingSnapshots) {
+        try {
+          const formParams = new URLSearchParams();
+          formParams.append('entry.543502435', String(snap.classID));
+          formParams.append('entry.1745113091', String(snap.studentID));
+          formParams.append('entry.1972335137', 'ADVANCE_GRADED::' + JSON.stringify(snap));
+          formParams.append('entry.2095507383', String(snap.totalScore));
+          fetch(formUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formParams
+          }).catch(() => {});
+        } catch (e) {}
+      }
+    }
+
+    async function manualSyncLocalGradings() {
+      if (typeof localStorage === 'undefined') {
+        alert('此設備無本機快取');
+        return;
+      }
+      const formUrl = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSeLZ6E4kLjJ26aWrKRPRPtDdthkxRHqOPX5AOwAq8_TYiT-OQ/formResponse';
+      let foundList = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('ADVANCE_SNAPSHOT_')) {
+          try {
+            const snap = JSON.parse(localStorage.getItem(key));
+            if (snap && snap.classID && snap.studentID && snap.totalScore !== undefined) {
+              foundList.push(snap);
+            }
+          } catch (e) {}
+        }
+      }
+
+      if (foundList.length === 0) {
+        alert('ℹ️ 此設備目前沒有儲存在本地的已批改快照。\n若您昨天是在手機上進行閱卷，請使用該部手機打開此批改工作台點擊此按鈕進行同步！');
+        return;
+      }
+
+      const statusEl = document.getElementById('cloudSyncStatus');
+      if (statusEl) statusEl.textContent = `☁️ 正在將本機 ${foundList.length} 份批改紀錄上傳至雲端...`;
+
+      let successCount = 0;
+      for (const snap of foundList) {
+        try {
+          const formParams = new URLSearchParams();
+          formParams.append('entry.543502435', String(snap.classID));
+          formParams.append('entry.1745113091', String(snap.studentID));
+          formParams.append('entry.1972335137', 'ADVANCE_GRADED::' + JSON.stringify(snap));
+          formParams.append('entry.2095507383', String(snap.totalScore));
+          await fetch(formUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formParams
+          });
+          successCount++;
+        } catch (e) {
+          console.warn('Sync error:', e);
+        }
+      }
+
+      if (statusEl) statusEl.textContent = `✅ 已成功同步 ${successCount} 份批改成績至雲端！`;
+      alert(`🎉 同步成功！\n已將本機儲存的 ${successCount} 份批改紀錄（含各題得分與評語）完整上傳至 Google 雲端！\n學生現在無論在任何設備登入二次查閱端，皆可即時看到每題得分與評語。`);
+      syncPapersFromCloud(true);
     }
 
     // 匯入考卷 JSON
