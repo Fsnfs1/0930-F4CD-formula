@@ -434,6 +434,10 @@
 
       <!-- 個人成績儀表板 -->
       <section class="dashboard-panel">
+        <div id="studentSyncStatus" style="font-size:13px; color:#1e40af; background:#eff6ff; border:1px solid #bfdbfe; padding:10px 14px; border-radius:8px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <span id="studentSyncStatusText">⏳ 正在連線雲端資料庫檢索最新批改與交卷數據...</span>
+          <button class="btn btn-sm btn-secondary" onclick="reloadStudentData()">🔄 重新整理</button>
+        </div>
         <div class="student-info-row">
           <div>
             <h2 id="viewStudentTitle" style="color: var(--primary); font-size: 1.6rem;">🎓 5B 班 99 號 - 教師測試員</h2>
@@ -627,41 +631,176 @@
       location.reload();
     }
 
-    // 載入考卷並呈現
-    function loadStudentPaper(student) {
+    const CLOUD_SHEET_API = 'https://script.google.com/macros/s/AKfycbwNAQNxmNsNa8rWGp48qnYRrjA2WFLGIzKqSel2r8MilRp59s3ZfBJjeKXIrUfoS-Zp-g/exec';
+
+    let currentLoadedPaper = null;
+    let currentLoadedGraded = null;
+
+    function reloadStudentData() {
+      if (currentAuthStudent) {
+        loadStudentPaper(currentAuthStudent);
+      }
+    }
+
+    // 載入考卷並呈現 (整合本地快照 + 雲端即時同步)
+    async function loadStudentPaper(student) {
       document.getElementById('authGate').style.display = 'none';
       document.getElementById('resultMainView').style.display = 'block';
       document.getElementById('btnPrintReport').style.display = 'inline-flex';
       document.getElementById('btnLogout').style.display = 'inline-flex';
 
-      const mock = window.ADVANCE_EXAM_DATA.MOCK_5B_99_PAPER;
       document.getElementById('viewStudentTitle').textContent = `🎓 ${student.classID} 班 ${student.studentID} 號 - ${student.name}`;
 
-      // 渲染題目清單
-      renderStudentReview(mock);
+      // 1. 本地儲存優先快照恢復 (Local First)
+      const snapKey = 'ADVANCE_SNAPSHOT_' + student.classID + '_' + student.studentID;
+      const subKey = 'ADVANCE_MATH_SUBMISSION_' + student.classID + '_' + student.studentID;
+      let localSnap = null;
+      let localSub = null;
+      try { localSnap = JSON.parse(localStorage.getItem(snapKey)); } catch (e) {}
+      try { localSub = JSON.parse(localStorage.getItem(subKey)); } catch (e) {}
+
+      // 如果是 5B 99 測試員，具備完整示範資料
+      let isTester = (String(student.studentID) === '99');
+      let basePaper = localSub || (isTester ? window.ADVANCE_EXAM_DATA.MOCK_5B_99_PAPER : null);
+      let baseGraded = localSnap || (isTester ? {
+        totalScore: 118,
+        comment: '卷面整潔，論證嚴謹，解答題推導步驟清晰詳盡，表現極佳！',
+        itemScores: {
+          q12_1: 2, q12_2: 2, q12_3: 2, q13_1: 2, q14_1: 2,
+          q15_1: 2, q15_2: 2, q15_3: 2, q15_4: 2,
+          q16_1: 2, q16_2: 2, q16_3: 2, q16_4: 2, q16_5: 2, q16_6: 2,
+          q17_1: 2, q17_2: 2, q18_1: 2, q19_1: 2,
+          q20: 10, q21: 10, q22: 10, q23: 10,
+          q24: 5, q25: 5, q26: 5, q27: 3
+        },
+        itemComments: {
+          q20: '運算準確，區間端點開閉符號標註完美。',
+          q21: '步驟規範，負數反轉不等號論述完備。',
+          q22: '配湊項恰當，等號成立條件驗算完整。',
+          q23: '空集邊界考慮周全，分類討論無遺漏。'
+        }
+      } : null);
+
+      currentLoadedPaper = basePaper || {
+        classID: student.classID,
+        studentID: student.studentID,
+        studentName: student.name,
+        answers: {},
+        questionPhotos: {},
+        uploadedPhotoUrls: {}
+      };
+      currentLoadedGraded = baseGraded;
+
+      renderStudentReview(currentLoadedPaper, currentLoadedGraded);
 
       // MathJax 重新顯影
       if (window.MathJax && window.MathJax.typesetPromise) {
         window.MathJax.typesetPromise().catch(err => console.warn(err));
       }
+
+      // 2. 非同步向雲端資料庫拉取最新提交紀錄與教師批改成績
+      fetchCloudStudentData(student);
     }
 
-    // 渲染逐題對照與詳解
-    function renderStudentReview(paper) {
-      const QD = window.ADVANCE_EXAM_DATA.QUESTIONS_DATA;
-      const answers = paper.answers || {};
+    // 非同步向雲端 Google Sheets 獲取最新作答與評定紀錄
+    async function fetchCloudStudentData(student) {
+      const statusEl = document.getElementById('studentSyncStatusText');
+      if (statusEl) statusEl.textContent = '☁️ 正在連線雲端資料庫檢索最新批改與交卷數據...';
 
-      // Part 1
+      try {
+        const resp = await fetch(CLOUD_SHEET_API, { method: 'GET', cache: 'no-cache' });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const rows = await resp.json();
+        if (!Array.isArray(rows)) throw new Error('雲端資料格式錯誤');
+
+        let foundSubmission = null;
+        let foundGraded = null;
+
+        rows.forEach(r => {
+          if (!r || !r.classID || !r.studentID || !r.dateID) return;
+          const cid = String(r.classID).trim().toUpperCase();
+          const sid = String(parseInt(r.studentID, 10));
+          if (cid !== student.classID || sid !== String(parseInt(student.studentID, 10))) return;
+
+          // 學生交卷記錄
+          if (r.dateID.startsWith('ADVANCE_EXAM::')) {
+            try {
+              const pStr = r.dateID.substring('ADVANCE_EXAM::'.length);
+              const pObj = JSON.parse(pStr);
+              foundSubmission = {
+                classID: cid,
+                studentID: sid,
+                studentName: student.name,
+                answers: pObj.answers || {},
+                questionPhotos: pObj.photos || {},
+                uploadedPhotoUrls: pObj.photos || {},
+                aggregatedPhotoUrl: pObj.aggregatedPhotoUrl || '',
+                timestamp: r.Timestamp
+              };
+            } catch (e) {}
+          }
+
+          // 教師批改記錄
+          if (r.dateID.startsWith('ADVANCE_GRADED::')) {
+            try {
+              const gStr = r.dateID.substring('ADVANCE_GRADED::'.length);
+              foundGraded = JSON.parse(gStr);
+            } catch (e) {}
+          }
+        });
+
+        if (foundSubmission) {
+          currentLoadedPaper = foundSubmission;
+        }
+        if (foundGraded) {
+          currentLoadedGraded = foundGraded;
+          const snapKey = 'ADVANCE_SNAPSHOT_' + student.classID + '_' + student.studentID;
+          try { localStorage.setItem(snapKey, JSON.stringify(foundGraded)); } catch (e) {}
+        }
+
+        renderStudentReview(currentLoadedPaper, currentLoadedGraded);
+
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          window.MathJax.typesetPromise().catch(err => console.warn(err));
+        }
+
+        if (statusEl) {
+          if (currentLoadedGraded) {
+            statusEl.innerHTML = '<strong style="color:#059669;">✅ 已成功同步教師最新批改成績與每題實得分數！</strong>';
+          } else if (foundSubmission) {
+            statusEl.innerHTML = '<strong style="color:#d97706;">⏳ 您的作答已成功上傳雲端，客觀題已核算，解答題教師正在審閱批改中...</strong>';
+          } else {
+            statusEl.innerHTML = '<span style="color:#64748b;">ℹ️ 已載入本地或示範模式。如已交卷，可點擊「重新整理」重新檢索。</span>';
+          }
+        }
+      } catch (err) {
+        console.warn('Student cloud fetch failed:', err);
+        if (statusEl) {
+          statusEl.innerHTML = '<span style="color:#64748b;">ℹ️ 目前使用本機離線快照呈現（雲端暫時離線）。</span>';
+        }
+      }
+    }
+
+    // 渲染逐題對照、每題得分與官方詳解
+    function renderStudentReview(paper, gradedSnapshot) {
+      const QD = window.ADVANCE_EXAM_DATA.QUESTIONS_DATA;
+      const answers = (paper && paper.answers) || {};
+      const isGraded = !!(gradedSnapshot && gradedSnapshot.itemScores);
+
+      // Part 1: 判斷題 (12分)
+      let p1Score = 0;
       const p1Box = document.getElementById('studentPart1List');
       p1Box.innerHTML = '';
       QD.part1.forEach(q => {
-        const studentAns = answers[q.id] || '未作答';
+        const studentAns = answers[q.id] || answers[q.id.toUpperCase()] || '未作答';
         const isRight = String(studentAns).trim().toUpperCase() === q.answer;
+        const qScore = isRight ? 2 : 0;
+        p1Score += qScore;
         p1Box.innerHTML += `
           <div class="q-review-card">
             <div class="q-review-header">
               <span>第 ${q.num} 題. ${q.text}</span>
-              <span style="color: ${isRight ? 'var(--success)' : 'var(--danger)'};">${isRight ? '✅ 得 2 分' : '❌ 0 分'}</span>
+              <span style="color: ${isRight ? 'var(--success)' : 'var(--danger)'}; font-weight: 700;">${isRight ? '✅ 得 2 分' : '❌ 0 分'}</span>
             </div>
             <div class="compare-grid">
               <div class="box-student ${isRight ? '' : 'wrong'}">
@@ -676,18 +815,21 @@
         `;
       });
 
-      // Part 2
+      // Part 2: 單選題 (10分)
+      let p2Score = 0;
       const p2Box = document.getElementById('studentPart2List');
       p2Box.innerHTML = '';
       QD.part2.forEach(q => {
-        const studentAns = answers[q.id] || '未作答';
+        const studentAns = answers[q.id] || answers[q.id.toUpperCase()] || '未作答';
         const isRight = String(studentAns).trim().toUpperCase() === q.answer;
+        const qScore = isRight ? 2 : 0;
+        p2Score += qScore;
         const optHtml = q.options.map(o => `<div style="font-size:13px; color:#475569;">${o.key}. ${o.text}</div>`).join('');
         p2Box.innerHTML += `
           <div class="q-review-card">
             <div class="q-review-header">
               <span>第 ${q.num} 題. ${q.text}</span>
-              <span style="color: ${isRight ? 'var(--success)' : 'var(--danger)'};">${isRight ? '✅ 得 2 分' : '❌ 0 分'}</span>
+              <span style="color: ${isRight ? 'var(--success)' : 'var(--danger)'}; font-weight: 700;">${isRight ? '✅ 得 2 分' : '❌ 0 分'}</span>
             </div>
             <div style="margin: 6px 0;">${optHtml}</div>
             <div class="compare-grid">
@@ -703,20 +845,38 @@
         `;
       });
 
-      // Part 3
+      // Part 3: 填空題 (38分)
+      let p3Score = 0;
       const p3Box = document.getElementById('studentPart3List');
       p3Box.innerHTML = '';
       QD.part3.forEach(q => {
         let blanksRows = '';
+        let qSubTotal = 0;
         if (q.blanks) {
           q.blanks.forEach(b => {
             const val = answers[b.id] || '未作答';
-            blanksRows += `<div>[${b.label}] 您的作答：<strong>${val}</strong> ｜ 官方標準答案：<strong style="color:var(--success);">${b.answer}</strong> (2分)</div>`;
+            let blankScore = 0;
+            if (isGraded && gradedSnapshot.itemScores[b.id] !== undefined) {
+              blankScore = gradedSnapshot.itemScores[b.id];
+            } else if (!isGraded && paper.isDemo) {
+              blankScore = 2;
+            }
+            qSubTotal += blankScore;
+            p3Score += blankScore;
+            blanksRows += `<div style="margin: 4px 0;">[${b.label}] 您的填答：<strong>${val}</strong> ｜ 官方答案：<strong style="color:var(--success);">${b.answer}</strong> ｜ 實得：<strong style="color:${blankScore > 0 ? 'var(--success)' : (isGraded ? 'var(--danger)' : '#d97706')};">${isGraded || paper.isDemo ? blankScore + ' / 2 分' : '待教師批閱 (滿分2分)'}</strong></div>`;
           });
         } else if (q.subQuestions) {
           q.subQuestions.forEach(sq => {
             const val = answers[sq.id] || '未作答';
-            blanksRows += `<div>${sq.label} ${sq.expr} 您的符號：<strong>${val}</strong> ｜ 官方標準答案：<strong style="color:var(--success);">${sq.answer}</strong> (2分) ${sq.exprAfter}</div>`;
+            let blankScore = 0;
+            if (isGraded && gradedSnapshot.itemScores[sq.id] !== undefined) {
+              blankScore = gradedSnapshot.itemScores[sq.id];
+            } else if (!isGraded && paper.isDemo) {
+              blankScore = 2;
+            }
+            qSubTotal += blankScore;
+            p3Score += blankScore;
+            blanksRows += `<div style="margin: 4px 0;">${sq.label} ${sq.expr} [您：<strong>${val}</strong> ｜ 官方：<strong style="color:var(--success);">${sq.answer}</strong>] ${sq.exprAfter} ｜ 實得：<strong style="color:${blankScore > 0 ? 'var(--success)' : (isGraded ? 'var(--danger)' : '#d97706')};">${isGraded || paper.isDemo ? blankScore + ' / 2 分' : '待教師批閱 (滿分2分)'}</strong></div>`;
           });
         }
 
@@ -724,7 +884,7 @@
           <div class="q-review-card">
             <div class="q-review-header">
               <span>第 ${q.num} 題. ${q.text}</span>
-              <span style="color: var(--success);">滿分核給</span>
+              <span style="color: ${qSubTotal > 0 ? 'var(--success)' : '#d97706'}; font-weight: 700;">${isGraded || paper.isDemo ? '本題實得：' + qSubTotal + ' / ' + q.pts + ' 分' : '教師評閱中 (滿分' + q.pts + '分)'}</span>
             </div>
             <div class="box-official" style="margin-top: 8px;">
               ${blanksRows}
@@ -734,11 +894,20 @@
         `;
       });
 
-      // Part 4 (含手寫原圖、旋轉、燈箱、官方步驟與錯題訂正筆記)
+      // Part 4: 解答題 (40分)
+      let p4Score = 0;
       const p4Box = document.getElementById('studentPart4List');
       p4Box.innerHTML = '';
       QD.part4.forEach(q => {
         const qKey = 'Q' + q.num;
+        let qPts = 0;
+        if (isGraded && gradedSnapshot.itemScores[q.id] !== undefined) {
+          qPts = gradedSnapshot.itemScores[q.id];
+        } else if (!isGraded && paper.isDemo) {
+          qPts = 10;
+        }
+        p4Score += qPts;
+
         let photoSrc = '';
         if (paper.questionPhotos) {
           photoSrc = paper.questionPhotos[qKey] || paper.questionPhotos[q.id] || paper.questionPhotos[qKey.toLowerCase()] || '';
@@ -756,13 +925,16 @@
           fileId = (m1 && m1[1]) || (m2 && m2[1]) || '';
           if (fileId) displayImgSrc = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1600';
         }
-        const comment = (paper.teacherComments && paper.teacherComments[q.id]) || '解答完整規範，思路嚴謹。';
+
+        const comment = (gradedSnapshot && gradedSnapshot.itemComments && gradedSnapshot.itemComments[q.id]) ||
+                        (paper.teacherComments && paper.teacherComments[q.id]) ||
+                        (isGraded ? '解答規範，推導步驟完整。' : '等待教師批改評閱中...');
 
         p4Box.innerHTML += `
           <div class="q-review-card">
             <div class="q-review-header">
               <span>${q.title}</span>
-              <span style="color: var(--success); font-size: 1.1rem; font-weight: 800;">實得：10 / 10 分</span>
+              <span style="color: ${qPts > 0 ? 'var(--success)' : '#d97706'}; font-size: 1.1rem; font-weight: 800;">${isGraded || paper.isDemo ? '實得：' + qPts + ' / 10 分' : '⏳ 評閱中 (滿分 10 分)'}</span>
             </div>
             <div style="font-size: 15px; margin-bottom: 10px;">${q.text}</div>
             <div class="box-official">${q.solution}</div>
@@ -771,21 +943,25 @@
             <div style="margin-top: 14px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
                 <span style="font-weight: 700; color: var(--primary);">📸 您拍攝上傳的手寫解答原圖：</span>
+                ${displayImgSrc ? `
                 <div class="photo-controls" style="display: flex; gap: 8px; align-items: center;">
                   <button class="btn btn-sm btn-secondary" onclick="rotatePhoto('${qKey}', 90)">🔄 旋轉 90°</button>
                   <button class="btn btn-sm btn-secondary" onclick="rotatePhoto('${qKey}', 0)">↺ 重設</button>
                   <button class="btn btn-sm btn-accent" onclick="openLightbox('${displayImgSrc}', '${q.title}')">🔍 放大檢視</button>
                   ${originalDriveUrl ? `<a href="${originalDriveUrl}" target="_blank" class="btn btn-sm btn-secondary" style="font-size: 12px; text-decoration: none;">☁️ 開啟 Drive 原圖 ↗</a>` : ''}
                 </div>
+                ` : ''}
               </div>
               <div class="photo-review-wrap">
-                <img id="img_${qKey}" src="${displayImgSrc}" referrerpolicy="no-referrer" alt="手寫照片" style="transform: rotate(0deg);" 
-                     onerror="this.style.display='none'; document.getElementById('studentDriveFailTip_${qKey}').style.display='block';"
-                     onclick="openLightbox('${displayImgSrc}', '${q.title}')">
-                <div id="studentDriveFailTip_${qKey}" style="display:none; padding:14px; background:#fff7ed; border:1px solid #ffedd5; border-radius:6px; color:#c2410c; font-size:13px; text-align:center;">
-                  ⚠️ 圖片直鏈載入受限（瀏覽器第三方跨站隱私防護）。<br>
-                  ${originalDriveUrl ? `<a href="${originalDriveUrl}" target="_blank" class="btn btn-sm btn-accent" style="margin-top:6px; display:inline-block; font-weight:700;">🔗 點此在 Google Drive 中檢視原圖 ↗</a>` : ''}
-                </div>
+                ${displayImgSrc ? `
+                  <img id="img_${qKey}" src="${displayImgSrc}" referrerpolicy="no-referrer" alt="手寫照片" style="transform: rotate(0deg);" 
+                       onerror="this.style.display='none'; document.getElementById('studentDriveFailTip_${qKey}').style.display='block';"
+                       onclick="openLightbox('${displayImgSrc}', '${q.title}')">
+                  <div id="studentDriveFailTip_${qKey}" style="display:none; padding:14px; background:#fff7ed; border:1px solid #ffedd5; border-radius:6px; color:#c2410c; font-size:13px; text-align:center;">
+                    ⚠️ 圖片直鏈載入受限（瀏覽器第三方跨站隱私防護）。<br>
+                    ${originalDriveUrl ? `<a href="${originalDriveUrl}" target="_blank" class="btn btn-sm btn-accent" style="margin-top:6px; display:inline-block; font-weight:700;">🔗 點此在 Google Drive 中檢視原圖 ↗</a>` : ''}
+                  </div>
+                ` : '<p style="color:#94a3b8; padding:20px; text-align:center;">未附帶手寫解答照片</p>'}
               </div>
             </div>
 
@@ -803,16 +979,24 @@
         `;
       });
 
-      // Part 5
+      // Part 5: 附加題 (20分)
+      let p5Score = 0;
       const p5Box = document.getElementById('studentPart5List');
       p5Box.innerHTML = '';
       QD.part5.forEach(q => {
-        const studentAns = answers[q.id] || '未作答';
+        const studentAns = answers[q.id] || answers[q.id.toUpperCase()] || '未作答';
+        let qPts = 0;
+        if (isGraded && gradedSnapshot.itemScores[q.id] !== undefined) {
+          qPts = gradedSnapshot.itemScores[q.id];
+        } else if (!isGraded && paper.isDemo) {
+          qPts = (q.id === 'q27' ? 3 : 5);
+        }
+        p5Score += qPts;
         p5Box.innerHTML += `
           <div class="q-review-card">
             <div class="q-review-header">
               <span>第 ${q.num} 題. ${q.text}</span>
-              <span style="color: var(--success);">實得：5 / 5 分</span>
+              <span style="color: ${qPts > 0 ? 'var(--success)' : '#d97706'}; font-weight: 700;">${isGraded || paper.isDemo ? '實得：' + qPts + ' / 5 分' : '教師評閱中 (滿分5分)'}</span>
             </div>
             <div class="compare-grid">
               <div class="box-student">
@@ -826,6 +1010,45 @@
           </div>
         `;
       });
+
+      // 總成績與評語更新
+      const grandTotal = isGraded
+        ? gradedSnapshot.totalScore
+        : (paper.isDemo ? 118 : (p1Score + p2Score + p3Score + p4Score + p5Score));
+
+      document.getElementById('grandScoreDisplay').textContent = grandTotal;
+
+      const badge = document.getElementById('gradeBadgeDisplay');
+      if (grandTotal >= 108) {
+        badge.textContent = 'A+ 優異'; badge.style.background = '#10b981';
+      } else if (grandTotal >= 96) {
+        badge.textContent = 'A 良好'; badge.style.background = '#0ea5e9';
+      } else if (grandTotal >= 72) {
+        badge.textContent = 'B 及格'; badge.style.background = '#f59e0b';
+      } else {
+        badge.textContent = 'C 待加強'; badge.style.background = '#ef4444';
+      }
+
+      const generalComment = (gradedSnapshot && gradedSnapshot.comment) ||
+                             (paper.teacherComments && paper.teacherComments.general) ||
+                             (isGraded ? '全卷批改完畢，認真作答！' : '考卷已提交，主觀大題等待教師評閱中...');
+      document.getElementById('generalTeacherCommentText').textContent = generalComment;
+
+      // 5 大題型進度條
+      document.getElementById('statPart1').textContent = `${p1Score} / 12 (${Math.round(p1Score / 12 * 100)}%)`;
+      document.getElementById('barPart1').style.width = `${Math.min(100, Math.round(p1Score / 12 * 100))}%`;
+
+      document.getElementById('statPart2').textContent = `${p2Score} / 10 (${Math.round(p2Score / 10 * 100)}%)`;
+      document.getElementById('barPart2').style.width = `${Math.min(100, Math.round(p2Score / 10 * 100))}%`;
+
+      document.getElementById('statPart3').textContent = `${p3Score} / 38 (${Math.round(p3Score / 38 * 100)}%)`;
+      document.getElementById('barPart3').style.width = `${Math.min(100, Math.round(p3Score / 38 * 100))}%`;
+
+      document.getElementById('statPart4').textContent = `${p4Score} / 40 (${Math.round(p4Score / 40 * 100)}%)`;
+      document.getElementById('barPart4').style.width = `${Math.min(100, Math.round(p4Score / 40 * 100))}%`;
+
+      document.getElementById('statPart5').textContent = `${p5Score} / 20 (${Math.round(p5Score / 20 * 100)}%)`;
+      document.getElementById('barPart5').style.width = `${Math.min(100, Math.round(p5Score / 20 * 100))}%`;
     }
 
     // 旋轉控制

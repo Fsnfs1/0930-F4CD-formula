@@ -721,6 +721,28 @@
 
         data.forEach(row => {
           if (!row || !row.dateID || typeof row.dateID !== 'string') return;
+          
+          // 雲端批改結果同步至本地快照
+          if (row.dateID.startsWith('ADVANCE_GRADED::')) {
+            try {
+              const gradedStr = row.dateID.substring('ADVANCE_GRADED::'.length);
+              const gradedObj = JSON.parse(gradedStr);
+              const snapKey = 'ADVANCE_SNAPSHOT_' + gradedObj.classID + '_' + gradedObj.studentID;
+              const existing = localStorage.getItem(snapKey);
+              if (!existing) {
+                localStorage.setItem(snapKey, JSON.stringify(gradedObj));
+              } else {
+                try {
+                  const exObj = JSON.parse(existing);
+                  if (new Date(gradedObj.gradedAt) > new Date(exObj.gradedAt)) {
+                    localStorage.setItem(snapKey, JSON.stringify(gradedObj));
+                  }
+                } catch (e) {}
+              }
+            } catch (ge) {}
+            return;
+          }
+
           if (!row.dateID.startsWith('ADVANCE_EXAM::')) return;
 
           try {
@@ -1367,7 +1389,27 @@
 
       try {
         localStorage.setItem(snapshotKey, JSON.stringify(snapshotData));
-        alert(`✅ 批改結果已成功登記！\n學生：${currentPaper.classID} ${currentPaper.studentName}\n總分：${grandTotal} / 120 分`);
+
+        // ☁️ 同步送交至雲端 Google Form / Google Sheets，供學生跨設備二次登入即時查閱
+        try {
+          const formUrl = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSeLZ6E4kLjJ26aWrKRPRPtDdthkxRHqOPX5AOwAq8_TYiT-OQ/formResponse';
+          const formParams = new URLSearchParams();
+          formParams.append('entry.543502435', String(currentPaper.classID));
+          formParams.append('entry.1745113091', String(currentPaper.studentID));
+          formParams.append('entry.1972335137', 'ADVANCE_GRADED::' + JSON.stringify(snapshotData));
+          formParams.append('entry.2095507383', String(grandTotal));
+
+          fetch(formUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formParams
+          }).catch(err => console.warn('Cloud sync error:', err));
+        } catch (cloudErr) {
+          console.warn('Cloud post error:', cloudErr);
+        }
+
+        alert(`✅ 批改結果已成功登記並同步雲端！\n學生：${currentPaper.classID} ${currentPaper.studentName}\n總分：${grandTotal} / 120 分\n學生二次登入查閱端已可同步檢視每題得分與評語。`);
         renderPapersList();
       } catch (e) {
         alert('批改成功：總分 ' + grandTotal + ' 分');
