@@ -69,51 +69,107 @@
   }
 
   // 3. Facial Verification & 1:N Centered Cosine Flow
-  async function initFaceAuth() {
+  let faceFirstBlinkTracker = null;
+  let isFaceFirstScanning = false;
+  let faceFirstCameraSeq = 0;
+
+  async function startFaceFirstCamera(isAutoStart) {
     const video = document.getElementById('faceFirstVideo');
     const btnStart = document.getElementById('btnFaceFirstStart');
     const btnCapture = document.getElementById('btnFaceFirstCapture');
     const alertBox = document.getElementById('faceFirstAlert');
     const overlay = document.getElementById('faceFirstOverlay');
-    if (btnStart) {
-      btnStart.addEventListener('click', async function() {
-        btnStart.disabled = true;
-        btnStart.innerHTML = '<span>⏳ 啟動鏡頭中...</span>';
-        try {
-          if (window.startCamera) {
-            await window.startCamera(video);
+
+    if (isAutoStart) {
+      try {
+        if (window.location && window.location.search) {
+          const urlParams = new URLSearchParams(window.location.search);
+          if (urlParams.get('test_bypass_probe') === '1' || urlParams.get('test_disable_autocamera') === '1') {
+            return;
           }
-          btnStart.style.display = 'none';
-          if (btnCapture) btnCapture.style.display = 'inline-flex';
-          if (overlay) overlay.textContent = '📷 面孔置於框內，點擊拍照辨識身分';
-        } catch (err) {
-          console.warn('Camera start failed:', err);
-          if (alertBox) {
-            alertBox.style.display = 'block';
-            alertBox.className = 'alert-box alert-warning';
-            alertBox.innerHTML = '⚠️ 無法啟動相機，請允許相機權限或使用下方「不方便刷臉，用密碼登錄」。';
-          }
-        } finally {
-          btnStart.disabled = false;
         }
-      });
+      } catch (e) {}
     }
 
-    if (btnCapture) {
-      btnCapture.addEventListener('click', async function() {
-        await executeFaceScan();
+    const currentSeq = ++faceFirstCameraSeq;
+    if (btnStart && !isAutoStart) {
+      btnStart.disabled = true;
+      btnStart.innerHTML = "<span>⏳ 正在開啟前置鏡頭...</span>";
+    }
+    if (overlay) overlay.textContent = "📷 正在連接鏡頭，請正面面向鏡頭...";
+
+    try {
+      if (window.startCamera && video) {
+        await window.startCamera(video);
+        if (currentSeq !== faceFirstCameraSeq) return;
+        if (video.srcObject && (!window.isCameraRunning || window.isCameraRunning())) {
+          if (overlay) overlay.textContent = "🟢 相機運作中 · 請面向鏡頭並眨眼以進行活體檢測";
+          if (btnStart) btnStart.style.display = "none";
+          if (btnCapture) btnCapture.style.display = "inline-flex";
+          startLivenessAnd1toN();
+        } else {
+          if (overlay) overlay.textContent = "⚠️ 請允許相機權限以進行身分驗證";
+          if (btnStart) {
+            btnStart.style.display = "inline-flex";
+            btnStart.disabled = false;
+            btnStart.innerHTML = "<span>📷 啟動相機識別</span>";
+          }
+        }
+      }
+    } catch (err) {
+      if (currentSeq !== faceFirstCameraSeq) return;
+      if (overlay) overlay.textContent = "⚠️ 請允許相機權限以進行身分驗證";
+      if (btnStart) {
+        btnStart.style.display = "inline-flex";
+        btnStart.disabled = false;
+        btnStart.innerHTML = "<span>📷 啟動相機識別</span>";
+      }
+    }
+  }
+
+  function startLivenessAnd1toN() {
+    const video = document.getElementById('faceFirstVideo');
+    const overlay = document.getElementById('faceFirstOverlay');
+    if (window.startBlinkDetection && video) {
+      if (faceFirstBlinkTracker) faceFirstBlinkTracker.stop();
+      faceFirstBlinkTracker = window.startBlinkDetection(video, {
+        onBlink: function (blinkData) {
+          console.log("[FaceFirst] Blink detected! Liveness passed:", blinkData);
+          if (!isFaceFirstScanning) {
+            executeFaceScan('liveness_loop');
+          }
+        },
+        onStatusUpdate: function (status) {
+          if (isFaceFirstScanning) return;
+          if (overlay) {
+            if (status.isFaceDetected) {
+              overlay.textContent = "🟢 偵測到面孔 · 請眨眨眼完成活體驗證";
+            } else {
+              overlay.textContent = "🟡 請將面部置於引導線中央";
+            }
+          }
+        }
       });
     }
   }
 
-  async function executeFaceScan() {
+  async function executeFaceScan(triggerSource) {
+    if (isFaceFirstScanning && triggerSource !== 'liveness_loop') {
+      isFaceFirstScanning = false;
+    }
+    if (isFaceFirstScanning) return;
+    isFaceFirstScanning = true;
+
     const video = document.getElementById('faceFirstVideo');
     const btnCapture = document.getElementById('btnFaceFirstCapture');
     const alertBox = document.getElementById('faceFirstAlert');
     const overlay = document.getElementById('faceFirstOverlay');
 
-    if (btnCapture) btnCapture.disabled = true;
-    if (overlay) overlay.textContent = '⏳ 特徵提取與 1:N 中心化比對中...';
+    if (btnCapture) {
+      btnCapture.disabled = true;
+      btnCapture.innerHTML = "<span>⏳ 正在特徵比對中...</span>";
+    }
+    if (overlay) overlay.textContent = "⏳ 正在提取人臉特徵並比對資料庫...";
 
     try {
       let snap = null;
@@ -121,14 +177,35 @@
         snap = await window.captureFace(video);
       }
 
-      if (!snap || !snap.descriptor) {
-        alert('未能提取有效人臉特徵，請對準鏡頭重試。');
-        return;
+      // Check if real physical face was captured (avoid mock fallbacks from kicking user)
+      if (!snap || snap.isDemo || !snap.descriptor) {
+        if (triggerSource === 'liveness_loop') {
+          // If in automatic background loop, do not show error popup; resume listening for blink
+          isFaceFirstScanning = false;
+          if (btnCapture) {
+            btnCapture.disabled = false;
+            btnCapture.innerHTML = "<span>🔍 拍照識別身分</span>";
+          }
+          return;
+        } else {
+          // Manual button click: give helpful feedback without navigating away
+          if (alertBox) {
+            alertBox.style.display = "block";
+            alertBox.className = "alert-box alert-warning";
+            alertBox.innerHTML = "⚠️ 未能清晰捕捉人臉特徵，請正面面向鏡頭並眨眼重試。";
+          }
+          isFaceFirstScanning = false;
+          if (btnCapture) {
+            btnCapture.disabled = false;
+            btnCapture.innerHTML = "<span>🔍 拍照識別身分</span>";
+          }
+          return;
+        }
       }
 
       AppState.capturedSnapshot = snap;
 
-      // 1:N Centered Cosine Similarity Match
+      // 1:N Centered Cosine Similarity Match against 68 registered students
       const profiles = window.getAllStudentProfiles ? window.getAllStudentProfiles() : [];
       const matchResult = window.identifyFace1toN ? window.identifyFace1toN(snap.descriptor, profiles, 0.82) : { isMatch: false };
 
@@ -139,6 +216,12 @@
       if (isAmbiguous) {
         // RULE: Ambiguous match (Delta < 0.08) -> Password Modal (#modalPasswordAuth)
         AppState.isAmbiguousScan = true;
+        if (faceFirstBlinkTracker) {
+          faceFirstBlinkTracker.stop();
+          faceFirstBlinkTracker = null;
+        }
+        if (window.stopCamera && video) window.stopCamera(video);
+
         const candidates = (matchResult.candidates && matchResult.candidates.length > 0)
           ? matchResult.candidates
           : [
@@ -146,24 +229,69 @@
               { profile: matchResult.secondMatch, centeredSim: matchResult.secondSimilarity, percentage: Math.round((matchResult.secondSimilarity || 0.78) * 1000) / 10 }
             ].filter(Boolean);
         openPasswordAuthModal(candidates, snap);
+        isFaceFirstScanning = false;
       } else if (matchResult.isMatch && matchResult.bestMatch) {
         // RULE: Single Unambiguous Match (Delta >= 0.08, Sim1 >= 0.82) -> Password-free direct entry!
         AppState.isAmbiguousScan = false;
-        onAuthenticationSuccess(matchResult.bestMatch, matchResult.percentage);
+        if (faceFirstBlinkTracker) {
+          faceFirstBlinkTracker.stop();
+          faceFirstBlinkTracker = null;
+        }
+        if (window.stopCamera && video) window.stopCamera(video);
+
+        if (alertBox) {
+          alertBox.style.display = 'block';
+          alertBox.className = 'alert-box alert-success';
+          alertBox.innerHTML = `✅ <strong>識別成功！</strong> ${matchResult.bestMatch.classID} 班 ${matchResult.bestMatch.studentID} 號 ${matchResult.bestMatch.name} 同學 (相似度: ${matchResult.percentage}%)`;
+        }
+        if (overlay) overlay.textContent = `🟢 驗證通過 · 歡迎 ${matchResult.bestMatch.name} 同學`;
+
+        setTimeout(function() {
+          onAuthenticationSuccess(matchResult.bestMatch, matchResult.percentage, false);
+          isFaceFirstScanning = false;
+        }, 400);
       } else {
-        // Unrecognized -> fallback to manual selection
+        // Unrecognized -> show notification on camera page and allow student to retry or click password login
         if (alertBox) {
           alertBox.style.display = 'block';
           alertBox.className = 'alert-box alert-info';
-          alertBox.innerHTML = '未比對到既有人臉特徵，請在下方手動選擇身分。';
+          alertBox.innerHTML = '📸 未比對到登記特徵。若為初次登記或無法識別，請點擊下方「不方便刷臉，用密碼登錄」。';
         }
-        showManualSelectView();
+        if (overlay) overlay.textContent = '🟡 未比對到特徵 · 請調整光線面向鏡頭重試';
+        isFaceFirstScanning = false;
+        if (btnCapture) {
+          btnCapture.disabled = false;
+          btnCapture.innerHTML = "<span>🔍 拍照識別身分</span>";
+        }
       }
     } catch (e) {
       console.error('Face scan error:', e);
-    } finally {
-      if (btnCapture) btnCapture.disabled = false;
+      isFaceFirstScanning = false;
+      if (btnCapture) {
+        btnCapture.disabled = false;
+        btnCapture.innerHTML = "<span>🔍 拍照識別身分</span>";
+      }
     }
+  }
+
+  function initFaceAuth() {
+    const btnStart = document.getElementById('btnFaceFirstStart');
+    const btnCapture = document.getElementById('btnFaceFirstCapture');
+
+    if (btnStart) {
+      btnStart.addEventListener('click', function() {
+        startFaceFirstCamera(false);
+      });
+    }
+
+    if (btnCapture) {
+      btnCapture.addEventListener('click', function() {
+        executeFaceScan('manual_click');
+      });
+    }
+
+    // Auto start camera on entrance
+    startFaceFirstCamera(true);
   }
 
   function onAuthenticationSuccess(student, percentage, isPasswordOnly) {
@@ -1132,6 +1260,14 @@
 
   // 7. Event Wiring on DOM Load
   document.addEventListener('DOMContentLoaded', function() {
+    // 1. Immediately seed preloaded face profiles into LocalStorage
+    try {
+      if (window.loadPreloadedProfiles) {
+        window.loadPreloadedProfiles(true);
+      }
+    } catch (e) {}
+
+    // 2. Initialize face auth and camera
     initFaceAuth();
 
     try {
@@ -1158,6 +1294,10 @@
       linkGoManual.addEventListener('click', function() {
         const video = document.getElementById('faceFirstVideo');
         if (video && window.stopCamera) window.stopCamera(video);
+        if (faceFirstBlinkTracker) {
+          faceFirstBlinkTracker.stop();
+          faceFirstBlinkTracker = null;
+        }
         showManualSelectView();
       });
     }
@@ -1167,7 +1307,7 @@
     if (btnBackFace) {
       btnBackFace.addEventListener('click', function() {
         showScreen('screen1-roster');
-        initFaceAuth();
+        startFaceFirstCamera(true);
       });
     }
 
@@ -1186,120 +1326,90 @@
       });
     }
 
-    const btnConfirmNotMe = document.getElementById('btnConfirmNotMe');
-    if (btnConfirmNotMe) {
-      btnConfirmNotMe.addEventListener('click', function() {
-        showScreen('screen1-roster');
-      });
-    }
-
-    const btnStartPractice = document.getElementById('btnStartPractice');
-    if (btnStartPractice) {
-      btnStartPractice.addEventListener('click', function() {
-        startQuizSession();
-      });
-    }
-
-    const btnReviewWrong = document.getElementById('btnReviewWrong');
-    if (btnReviewWrong) {
-      btnReviewWrong.addEventListener('click', function() {
-        renderWrongReviewScreen();
-        showScreen('screen9-wrong-review');
-      });
-    }
-
-    const btnBackFromWrongReview = document.getElementById('btnBackFromWrongReview');
-    if (btnBackFromWrongReview) {
-      btnBackFromWrongReview.addEventListener('click', function() {
-        showScreen('screen4-dashboard');
-      });
-    }
-
-    const btnStartWrongRetest = document.getElementById('btnStartWrongRetest');
-    if (btnStartWrongRetest) {
-      btnStartWrongRetest.addEventListener('click', function() {
-        if (AppState.wrongQuestions.length === 0) {
-          alert('目前沒有錯題需要重測！');
-          return;
-        }
-        const missedPool = AppState.wrongQuestions.map(w => w.question);
-        AppState.wrongQuestions = [];
-        startQuizSession(missedPool);
-      });
-    }
-
     const btnLogout = document.getElementById('btnLogout');
     if (btnLogout) {
       btnLogout.addEventListener('click', function() {
-        AppState.currentUser = null;
-        try {
-          localStorage.removeItem('MATH_ACTIVE_QUIZ_PROGRESS');
-        } catch (e) {}
-        showScreen('screen1-roster');
-      });
-    }
-
-    const btnGlobalRefresh = document.getElementById('btnGlobalRefresh');
-    if (btnGlobalRefresh) {
-      btnGlobalRefresh.addEventListener('click', function() {
         location.reload();
       });
     }
 
-    // 8. Restore active quiz session on reload (F5 resume / restoreExamSession)
-    function restoreExamSession() {
-      try {
-        const savedProgressRaw = localStorage.getItem('MATH_ACTIVE_QUIZ_PROGRESS');
-        if (!savedProgressRaw) return false;
-        const savedData = JSON.parse(savedProgressRaw);
-        if (savedData && savedData.isQuizActive && savedData.exam && !savedData.exam.completed && Array.isArray(savedData.exam.questions) && savedData.exam.questions.length > 0) {
-          AppState.currentUser = savedData.currentUser || null;
-          AppState.practiceElapsedSeconds = savedData.practiceElapsedSeconds || 0;
-          AppState.antiCheatElapsedSeconds = savedData.antiCheatElapsedSeconds || 0;
-          AppState.wrongQuestions = savedData.wrongQuestions || [];
-          AppState.exam = savedData.exam;
-          AppState.isPasswordOnlyLogin = !!savedData.isPasswordOnlyLogin;
-          AppState.draftUploaded = !!savedData.draftUploaded;
-          AppState.draftFileName = savedData.draftFileName || '';
-          AppState.draftFolderId = savedData.draftFolderId || '1oY52JyAqLLQQiETq8A-hre9jZ_goLHiY';
+    const btnForceReturn = document.getElementById('btnForceReturnLogin');
+    if (btnForceReturn) {
+      btnForceReturn.addEventListener('click', function() {
+        location.reload();
+      });
+    }
 
-          const dashBanner = document.getElementById('dashBannerPasswordOnly');
-          const quizBanner = document.getElementById('quizBannerPasswordOnly');
-          if (dashBanner) dashBanner.style.display = AppState.isPasswordOnlyLogin ? 'block' : 'none';
-          if (quizBanner) quizBanner.style.display = AppState.isPasswordOnlyLogin ? 'block' : 'none';
+    // Modal Password Auth
+    const btnModalCancel = document.getElementById('btnModalPasswordCancel');
+    if (btnModalCancel) {
+      btnModalCancel.addEventListener('click', function() {
+        const modal = document.getElementById('modalPasswordAuth');
+        if (modal) modal.style.display = 'none';
+        showManualSelectView();
+      });
+    }
 
-          showScreen('screen5-quiz');
-          startAntiCheatTimer(true);
-          renderQuestionInDOM();
+    const btnModalConfirm = document.getElementById('btnModalPasswordConfirm');
+    if (btnModalConfirm) {
+      btnModalConfirm.addEventListener('click', function() {
+        const select = document.getElementById('modalPasswordStudentSelect');
+        const input = document.getElementById('modalPasswordInput');
+        const alertBox = document.getElementById('modalPasswordAlert');
 
-          // If anti-cheat interval exceeded, trigger freeze screen immediately
-          if (AppState.antiCheatElapsedSeconds >= ANTI_CHEAT_INTERVAL_SECONDS) {
-            triggerFreezeLockout();
+        if (!select || !input) return;
+        const val = select.value;
+        const enteredPwd = input.value.trim();
+
+        if (!val) {
+          if (alertBox) {
+            alertBox.style.display = 'block';
+            alertBox.textContent = '請選擇您的姓名！';
           }
-          return true;
+          return;
         }
-      } catch (err) {
-        console.warn('Failed to restore active quiz session:', err);
-      }
-      return false;
-    }
 
-    const resumedActiveSession = restoreExamSession();
-    if (!resumedActiveSession) {
-      showScreen('screen1-roster');
+        const parts = val.split('_');
+        const cls = parts[0];
+        const sid = parseInt(parts[1], 10);
+        const students = window.getStudentsByClass ? window.getStudentsByClass(cls) : [];
+        const student = students.find(s => s.id === sid);
+
+        // Strict 1234 interception
+        const pwdRec = window.getStudentPasswordRecord ? window.getStudentPasswordRecord(cls, sid) : null;
+        if (!pwdRec || !pwdRec.passwordChanged || enteredPwd === '1234') {
+          if (alertBox) {
+            alertBox.style.display = 'block';
+            alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
+            alertBox.style.color = '#fca5a5';
+            alertBox.innerHTML = '⚠️ 請聯繫科代表更新初始登錄密碼 (请联系科代表更新初始登录密码)';
+          }
+          return;
+        }
+
+        const isValid = window.verifyStudentPassword ? window.verifyStudentPassword(cls, sid, enteredPwd) : false;
+        if (isValid) {
+          const modal = document.getElementById('modalPasswordAuth');
+          if (modal) modal.style.display = 'none';
+          onAuthenticationSuccess({ classID: cls, studentID: sid, name: student ? student.name : '同學' }, 92, true);
+        } else {
+          if (alertBox) {
+            alertBox.style.display = 'block';
+            alertBox.textContent = '密碼錯誤，請重新輸入！';
+          }
+        }
+      });
     }
-    triggerMathJax();
   });
 
-  // Expose global controller helpers for testing and external hooks
-  window.AppState = AppState;
+  // Expose necessary global functions
   window.showScreen = showScreen;
-  window.renderQuestionInDOM = renderQuestionInDOM;
-  window.startQuizSession = startQuizSession;
-  window.finishQuizSession = finishQuizSession;
+  window.triggerMathJax = triggerMathJax;
+  window.initFaceAuth = initFaceAuth;
+  window.startFaceFirstCamera = startFaceFirstCamera;
+  window.executeFaceScan = executeFaceScan;
+  window.onAuthenticationSuccess = onAuthenticationSuccess;
   window.showManualSelectView = showManualSelectView;
   window.openDraftUploadModal = openDraftUploadModal;
-  window.generateDraftFileName = generateDraftFileName;
-
+  window.finishQuizSession = finishQuizSession;
 })();
-

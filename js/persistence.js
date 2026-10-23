@@ -343,95 +343,117 @@
     try {
       if (typeof localStorage !== 'undefined') {
         const raw = localStorage.getItem(key);
-        if (!raw) return null;
-        let parsed = JSON.parse(raw);
-        if (!parsed) return null;
+        if (raw) {
+          let parsed = JSON.parse(raw);
+          if (parsed) {
+            // Candidate version array to sort by timestamp descending
+            let candidates = [];
 
-        // Candidate version array to sort by timestamp descending
-        let candidates = [];
-
-        if (Array.isArray(parsed)) {
-          // If stored as an array of versions
-          parsed.forEach(function (itm) {
-            const norm = itm && normalizeVector(itm.vector);
-            if (norm) {
-              candidates.push(Object.assign({}, itm, { vector: norm }));
-            }
-          });
-        } else if (parsed && typeof parsed === 'object') {
-          // Top-level item
-          const topNorm = normalizeVector(parsed.vector);
-          if (topNorm) {
-            candidates.push(Object.assign({}, parsed, { vector: topNorm }));
-          }
-          // History items
-          if (Array.isArray(parsed.history)) {
-            parsed.history.forEach(function (h) {
-              const hNorm = h && normalizeVector(h.vector);
-              if (hNorm) {
-                candidates.push(Object.assign({}, h, {
-                  classID: parsed.classID,
-                  studentID: parsed.studentID,
-                  name: parsed.name,
-                  vector: hNorm
-                }));
+            if (Array.isArray(parsed)) {
+              // If stored as an array of versions
+              parsed.forEach(function (itm) {
+                const norm = itm && normalizeVector(itm.vector);
+                if (norm) {
+                  candidates.push(Object.assign({}, itm, { vector: norm }));
+                }
+              });
+            } else if (parsed && typeof parsed === 'object') {
+              // Top-level item
+              const topNorm = normalizeVector(parsed.vector);
+              if (topNorm) {
+                candidates.push(Object.assign({}, parsed, { vector: topNorm }));
               }
-            });
-          }
-        }
-
-        if (candidates.length === 0) {
-          if (parsed && !Array.isArray(parsed) && parsed.classID) {
-            const fallbackNorm = normalizeVector(parsed.vector);
-            if (fallbackNorm) {
-              parsed.vector = new Float32Array(fallbackNorm);
+              // History items
+              if (Array.isArray(parsed.history)) {
+                parsed.history.forEach(function (h) {
+                  const hNorm = h && normalizeVector(h.vector);
+                  if (hNorm) {
+                    candidates.push(Object.assign({}, h, {
+                      classID: parsed.classID,
+                      studentID: parsed.studentID,
+                      name: parsed.name,
+                      vector: hNorm
+                    }));
+                  }
+                });
+              }
             }
-            return parsed;
+
+            if (candidates.length > 0) {
+              // Sort descending: candidate with maximum timestamp comes first, tie-break by version
+              candidates.sort(function (a, b) {
+                const tA = extractTimestamp(a);
+                const tB = extractTimestamp(b);
+                if (tB !== tA) return tB - tA;
+                return (b.version || 0) - (a.version || 0);
+              });
+
+              const latestRecord = candidates[0];
+              const latestTime = extractTimestamp(latestRecord);
+
+              // Filter history to exclude the active version
+              const cleanHistory = (Array.isArray(parsed.history) ? parsed.history : []).filter(function (h) {
+                return h && (h.version || 0) !== (latestRecord.version || 1);
+              });
+
+              // Construct standard profile object with latest vector
+              const result = {
+                classID: String(latestRecord.classID || parsed.classID).trim().toUpperCase(),
+                studentID: parseInt(latestRecord.studentID || parsed.studentID, 10),
+                name: latestRecord.name || parsed.name || "",
+                vector: new Float32Array(latestRecord.vector),
+                photoJpgBase64: latestRecord.photoJpgBase64 || parsed.photoJpgBase64 || "",
+                registeredAt: parsed.registeredAt || latestRecord.registeredAt || new Date().toISOString(),
+                updatedAt: latestTime,
+                timestamp: latestTime,
+                version: latestRecord.version || parsed.version || 1,
+                history: cleanHistory
+              };
+
+              return result;
+            } else if (parsed && !Array.isArray(parsed) && parsed.classID) {
+              const fallbackNorm = normalizeVector(parsed.vector);
+              if (fallbackNorm) {
+                parsed.vector = new Float32Array(fallbackNorm);
+                return parsed;
+              }
+            }
           }
-          return null;
         }
-
-        // Sort descending: candidate with maximum timestamp comes first, tie-break by version
-        candidates.sort(function (a, b) {
-          const tA = extractTimestamp(a);
-          const tB = extractTimestamp(b);
-          if (tB !== tA) return tB - tA;
-          return (b.version || 0) - (a.version || 0);
-        });
-
-        const latestRecord = candidates[0];
-        const latestTime = extractTimestamp(latestRecord);
-
-        // Filter history to exclude the active version
-        const cleanHistory = (Array.isArray(parsed.history) ? parsed.history : []).filter(function (h) {
-          return h && (h.version || 0) !== (latestRecord.version || 1);
-        });
-
-        // Construct standard profile object with latest vector
-        const result = {
-          classID: String(latestRecord.classID || parsed.classID).trim().toUpperCase(),
-          studentID: parseInt(latestRecord.studentID || parsed.studentID, 10),
-          name: latestRecord.name || parsed.name || "",
-          vector: new Float32Array(latestRecord.vector),
-          photoJpgBase64: latestRecord.photoJpgBase64 || parsed.photoJpgBase64 || "",
-          registeredAt: parsed.registeredAt || latestRecord.registeredAt || new Date().toISOString(),
-          updatedAt: latestTime,
-          timestamp: latestTime,
-          version: latestRecord.version || parsed.version || 1,
-          history: cleanHistory
-        };
-
-        return result;
       }
-      return null;
     } catch (e) {
-      console.warn("[Persistence] Failed to read student profile:", e);
-      return null;
+      console.warn("[Persistence] Failed to read student profile from localStorage:", e);
     }
+
+    // Direct memory fallback: PRELOADED_STUDENT_FACES
+    const preloaded = (typeof window !== 'undefined' && window.PRELOADED_STUDENT_FACES) ||
+                      (typeof globalThis !== 'undefined' && globalThis.PRELOADED_STUDENT_FACES);
+    if (preloaded) {
+      const pItem = preloaded[`${cid}_${sid}`];
+      if (pItem && pItem.vector) {
+        const norm = normalizeVector(pItem.vector);
+        if (norm && norm.length === 128) {
+          const sName = pItem.name || (typeof window !== 'undefined' && window.getStudentName ? window.getStudentName(cid, sid) : (typeof globalThis !== 'undefined' && globalThis.getStudentName ? globalThis.getStudentName(cid, sid) : `學生 ${sid}`));
+          return {
+            classID: cid,
+            studentID: parseInt(sid, 10),
+            name: sName,
+            vector: new Float32Array(norm),
+            photoJpgBase64: "",
+            registeredAt: new Date(pItem.ts || Date.now()).toISOString(),
+            updatedAt: pItem.ts || 0,
+            timestamp: pItem.ts || 0,
+            version: 1,
+            history: []
+          };
+        }
+      }
+    }
+    return null;
   }
 
   /**
-   * Check if student profile exists and is locked
+   * Determine whether a student currently has a valid face profile saved
    * @param {string} classID 
    * @param {number|string} studentID 
    * @returns {boolean}
@@ -507,29 +529,64 @@
    * @returns {Array<Object>}
    */
   function getAllStudentProfiles() {
-    const profiles = [];
-    if (typeof localStorage === 'undefined') return profiles;
-    const prefix = PERSISTENCE_CONFIG.profilePrefix;
-    try {
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.indexOf(prefix) === 0) {
-          const rest = key.substring(prefix.length); // e.g. "4C_1"
-          const parts = rest.split("_");
-          if (parts.length >= 2) {
-            const cls = parts[0];
-            const sid = parts[1];
-            const p = getStudentProfile(cls, sid);
-            if (p && !p.isAbnormal && !p.abnormal && p.vector && (p.vector.length === 128 || (Array.isArray(p.vector) && p.vector.length === 128))) {
-              profiles.push(p);
+    const profileMap = {};
+    
+    // 1. Base: load all profiles directly from PRELOADED_STUDENT_FACES in memory
+    const preloaded = (typeof window !== 'undefined' && window.PRELOADED_STUDENT_FACES) ||
+                      (typeof globalThis !== 'undefined' && globalThis.PRELOADED_STUDENT_FACES);
+    if (preloaded && typeof preloaded === 'object') {
+      for (const k in preloaded) {
+        const item = preloaded[k];
+        if (!item || !item.classID || !item.studentID || !item.vector) continue;
+        const norm = normalizeVector(item.vector);
+        if (norm && norm.length === 128) {
+          const cid = String(item.classID).trim().toUpperCase();
+          const sid = parseInt(item.studentID, 10);
+          const sName = item.name || (typeof window !== 'undefined' && window.getStudentName ? window.getStudentName(cid, sid) : `學生 ${sid}`);
+          profileMap[`${cid}_${sid}`] = {
+            classID: cid,
+            studentID: sid,
+            name: sName,
+            vector: new Float32Array(norm),
+            photoJpgBase64: "",
+            registeredAt: new Date(item.ts || Date.now()).toISOString(),
+            updatedAt: item.ts || 0,
+            timestamp: item.ts || 0,
+            version: 1,
+            history: []
+          };
+        }
+      }
+    }
+
+    // 2. Overlay: load newer or locally registered profiles from LocalStorage
+    if (typeof localStorage !== 'undefined') {
+      const prefix = PERSISTENCE_CONFIG.profilePrefix;
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.indexOf(prefix) === 0) {
+            const rest = key.substring(prefix.length); // e.g. "4C_1"
+            const parts = rest.split("_");
+            if (parts.length >= 2) {
+              const cls = parts[0];
+              const sid = parts[1];
+              const p = getStudentProfile(cls, sid);
+              if (p && !p.isAbnormal && !p.abnormal && p.vector && (p.vector.length === 128 || (Array.isArray(p.vector) && p.vector.length === 128))) {
+                const k = `${String(cls).toUpperCase()}_${parseInt(sid, 10)}`;
+                if (!profileMap[k] || (p.timestamp || p.updatedAt || 0) >= (profileMap[k].timestamp || 0)) {
+                  profileMap[k] = p;
+                }
+              }
             }
           }
         }
+      } catch (e) {
+        console.warn("[Persistence] Error getting all student profiles:", e);
       }
-    } catch (e) {
-      console.warn("[Persistence] Error getting all student profiles:", e);
     }
-    return profiles;
+
+    return Object.values(profileMap);
   }
 
   /**
@@ -1588,7 +1645,7 @@
    * Load and cache preloaded student face profiles (e.g. from 1010 platform)
    * Ensures instant offline recognition without network roundtrips
    */
-  function loadPreloadedProfiles() {
+  function loadPreloadedProfiles(forceAll) {
     const preloaded = (typeof window !== 'undefined' && window.PRELOADED_STUDENT_FACES) ||
                       (typeof globalThis !== 'undefined' && globalThis.PRELOADED_STUDENT_FACES);
     if (!preloaded) return 0;
@@ -1596,13 +1653,25 @@
     for (const k in preloaded) {
       const item = preloaded[k];
       if (!item || !item.classID || !item.studentID || !item.vector) continue;
-      const existing = getStudentProfile(item.classID, item.studentID);
+      const cid = String(item.classID).trim().toUpperCase();
+      const sid = parseInt(item.studentID, 10);
+      const key = PERSISTENCE_CONFIG.profilePrefix + cid + "_" + sid;
+      let existing = null;
+      if (typeof localStorage !== 'undefined') {
+        try {
+          const raw = localStorage.getItem(key);
+          if (raw) existing = JSON.parse(raw);
+        } catch (e) {}
+      }
       const existingTime = existing ? extractTimestamp(existing) : 0;
-      if (!existing || (item.ts && item.ts > existingTime)) {
+      const hasValidVec = existing && existing.vector && (existing.vector.length === 128 || (Array.isArray(existing.vector) && existing.vector.length === 128));
+
+      if (!existing || !hasValidVec || forceAll || (item.ts && item.ts >= existingTime)) {
+        const studentName = item.name || (typeof window !== 'undefined' && window.getStudentName ? window.getStudentName(cid, sid) : `學生 ${sid}`);
         saveStudentProfile({
-          classID: item.classID,
-          studentID: item.studentID,
-          name: item.name || '',
+          classID: cid,
+          studentID: sid,
+          name: studentName,
           vector: item.vector,
           registeredAt: new Date(item.ts || Date.now()).toISOString(),
           updatedAt: item.ts || Date.now(),
