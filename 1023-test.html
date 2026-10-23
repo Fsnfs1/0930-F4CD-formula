@@ -367,13 +367,22 @@
           </div>
         </div>
 
-        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
-          系統已為您備妥 25 題自適應題庫，點擊下方按鈕即可開始答題。
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+          身分核驗成功！請選擇您要前往的學習功能：
         </p>
 
-        <button id="btnEnterQuiz" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 16px; margin-bottom: 10px;">
-          <span>🚀 確認身分，直接進入答題</span>
-        </button>
+        <!-- 3 Quick Options in Confirmation Card -->
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; text-align: left;">
+          <button id="btnEnterQuiz" class="btn btn-primary" style="width: 100%; padding: 13px; font-size: 15px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #38bdf8);">
+            <span>🚀 1. 開始答題 (1023 自適應題庫)</span>
+          </button>
+          <a id="btnConfirmNav1010" href="index1010.html" class="btn btn-secondary" style="width: 100%; padding: 11px; font-size: 14px; text-decoration: none; text-align: center; color: #a5b4fc; box-sizing: border-box;">
+            <span>📚 2. 重溫 10 月 10 日的大測一題庫</span>
+          </a>
+          <button id="btnConfirmViewScore" class="btn btn-secondary" style="width: 100%; padding: 11px; font-size: 14px; color: #34d399; border-color: rgba(16, 185, 129, 0.4);">
+            <span>📊 3. 查看 10 月 23 日小測成績</span>
+          </button>
+        </div>
 
         <button id="btnManualSelectSelf" class="btn btn-outline" style="width: 100%; padding: 12px; font-size: 14px; margin-bottom: 10px; border: 1px solid #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.08);">
           <span id="btnNotMe">👤 不是本人？手動選擇身分</span>
@@ -429,6 +438,7 @@
     </section>
 
     <!-- SCREEN 4: Dashboard -->
+        <!-- SCREEN 4: Navigation Portal (Dashboard) -->
     <section id="screen4-dashboard" class="screen-container">
       <div class="card" style="padding: 20px;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
@@ -446,38 +456,94 @@
           <div style="font-size: 12px; color: #fbbf24; margin-top: 4px;">(由于您选择了不方便刷脸，作答完成后，需要拍照上传全部答题草稿，待草稿上传完毕后，才能完成提交。)</div>
         </div>
 
-        <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid #334155; border-radius: 12px; padding: 14px; margin-bottom: 16px;">
-          <h3 id="dashTopicTitle" style="font-size: 15px; font-weight: 600; color: #38bdf8; margin-bottom: 6px;">1023專題 · 一元二次不等式與函數概念</h3>
-          <p style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
-            • 多選題題型：每題 8 個選項 (A-H)，2至8個正確答案。<br>
-            • 動態題量機制：基礎 25 題，系統會根據答題掌握度自適應提供獎勵與鞏固題目，助你衝刺高分，加油！<br>
-            • 定時人臉核驗：答題每滿 15 分鐘觸發本人身分鎖定核驗。
-          </p>
-        </div>
+        <!-- 3-Option Navigation Portal Grid -->
+        <div style="margin-bottom: 16px;">
+          <h3 style="font-size: 15px; font-weight: 700; color: #38bdf8; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <span>🧭 請選擇您要進行的學習功能：</span>
+          </h3>
 
-        <!-- Question Bank Switch Card: allows re-drilling 1010 -->
-        <div style="background: rgba(15, 23, 42, 0.75); border: 1px dashed rgba(56, 189, 248, 0.4); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
-          <div>
-            <div style="font-size: 13px; font-weight: 600; color: #f8fafc;">
-              <span style="background: #2563eb; color: #fff; font-size: 10px; padding: 1px 5px; border-radius: 4px; margin-right: 4px;">二刷通道</span>
-              欲繼續溫習 1010 舊題庫？
+          <div class="portal-options-grid" style="display: flex; flex-direction: column; gap: 14px;">
+            
+            <!-- Option 1: 開始答題 -->
+            <div id="cardOptionStartQuiz" class="portal-card" style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.4), rgba(15, 23, 42, 0.8)); border: 1.5px solid rgba(56, 189, 248, 0.5); border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 14px rgba(0,0,0,0.25);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                  <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(56, 189, 248, 0.15); display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1px solid rgba(56, 189, 248, 0.3);">
+                    🚀
+                  </div>
+                  <div>
+                    <div style="font-size: 16px; font-weight: 800; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+                      <span>1. 開始答題 (1023 自適應題庫)</span>
+                      <span style="font-size: 11px; font-weight: 600; background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 8px; border-radius: 10px; border: 1px solid rgba(16, 185, 129, 0.4);">在線答題可獲小測加分！</span>
+                    </div>
+                    <div style="font-size: 12.5px; color: #94a3b8; margin-top: 4px; line-height: 1.4;">
+                      一元二次不等式與函數自適應出題（50% 4選1 ➔ 20% 6選1 ➔ 30% 8選多），正確率超 80% 享小測獎勵加分！
+                    </div>
+                  </div>
+                </div>
+                <button id="btnStartPractice" class="btn btn-primary" style="padding: 10px 18px; font-size: 14px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #38bdf8); white-space: nowrap;">
+                  <span>進入答題 ➔</span>
+                </button>
+              </div>
             </div>
-            <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">集合、邏輯用語與不等式 (支援舊題庫二刷與錯題訂正)</div>
+
+            <!-- Option 2: 重溫10月10日大測一題庫 -->
+            <div id="cardOptionReview1010" class="portal-card" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.8)); border: 1px solid #334155; border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.2s ease;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                  <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(99, 102, 241, 0.15); display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1px solid rgba(99, 102, 241, 0.3);">
+                    📚
+                  </div>
+                  <div>
+                    <div style="font-size: 16px; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+                      <span>2. 重溫 10 月 10 日的大測一題庫</span>
+                      <span style="font-size: 11px; font-weight: 600; background: rgba(99, 102, 241, 0.2); color: #a5b4fc; padding: 2px 8px; border-radius: 10px;">二刷 1010</span>
+                    </div>
+                    <div style="font-size: 12.5px; color: #94a3b8; margin-top: 4px; line-height: 1.4;">
+                      集合、常用邏輯用語、基本不等式大測一題庫溫習與錯題訂正
+                    </div>
+                  </div>
+                </div>
+                <a id="btnNavReview1010" href="index1010.html" class="btn btn-secondary" style="padding: 10px 16px; font-size: 13.5px; text-decoration: none; white-space: nowrap; color: #a5b4fc; border-color: rgba(99, 102, 241, 0.4);">
+                  <span>前往重溫 ➔</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Option 3: 查看10月23日小測成績 -->
+            <div id="cardOptionView1023Score" class="portal-card" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(15, 23, 42, 0.8)); border: 1.5px solid rgba(16, 185, 129, 0.4); border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.2s ease;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                  <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                    📊
+                  </div>
+                  <div>
+                    <div style="font-size: 16px; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+                      <span>3. 查看 10 月 23 日小測成績</span>
+                      <span id="badgeScoreStatus" style="font-size: 11px; font-weight: 600; background: rgba(56, 189, 248, 0.2); color: #38bdf8; padding: 2px 8px; border-radius: 10px; border: 1px solid rgba(56, 189, 248, 0.4);">新規則已重算</span>
+                    </div>
+                    <div style="font-size: 12.5px; color: #94a3b8; margin-top: 4px; line-height: 1.4;">
+                      調取 20 題詳細作答（全對5分、漏選3分、多選0分），並展示在線刷題獎勵加分！
+                    </div>
+                  </div>
+                </div>
+                <button id="btnViewQuiz1023Score" class="btn btn-secondary" style="padding: 10px 16px; font-size: 13.5px; font-weight: 700; color: #34d399; border-color: rgba(16, 185, 129, 0.5); white-space: nowrap;">
+                  <span>查看成績 ➔</span>
+                </button>
+              </div>
+            </div>
+
           </div>
-          <a href="index1010.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; text-decoration: none; white-space: nowrap; color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);">
-            🔄 二刷 1010
-          </a>
         </div>
 
-        <div style="display: flex; gap: 10px; margin-bottom: 16px;">
-          <button id="btnStartPractice" class="btn btn-primary" style="flex: 2; padding: 14px; font-size: 15px; font-weight: 600;">
-            <span>🚀 開始自適應練習 (25題)</span>
-          </button>
-          <button id="btnReviewWrong" class="btn btn-secondary" style="flex: 1; padding: 14px; font-size: 13px; position: relative;">
-            <span>📖 錯題溫習</span>
+        <!-- Quick wrong review button -->
+        <div style="display: flex; justify-content: flex-end;">
+          <button id="btnReviewWrong" class="btn btn-secondary" style="padding: 8px 16px; font-size: 13px; position: relative;">
+            <span>📖 錯題記錄溫習</span>
             <span id="dashWrongCountBadge" style="display: none; position: absolute; top: -6px; right: -6px; background: #ef4444; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: 700;">0</span>
           </button>
         </div>
+
       </div>
     </section>
 
@@ -667,6 +733,111 @@
 
       </div>
     </section>
+
+    <!-- SCREEN 10: 1023 Quiz Score Details & Bonus Breakdown (#screen10-quiz1023-score) -->
+    <section id="screen10-quiz1023-score" class="screen-container">
+      <div class="card" style="padding: 20px; border-radius: 12px; background: #0f172a; border: 1px solid #334155;">
+        
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #334155; padding-bottom: 12px;">
+          <div>
+            <h2 style="font-size: 20px; font-weight: 800; color: #f8fafc; margin: 0; display: flex; align-items: center; gap: 8px;">
+              <span>📊 10 月 23 日數學小測成績詳情報告</span>
+            </h2>
+            <p style="font-size: 13px; color: var(--text-muted); margin: 4px 0 0 0;">
+              考生姓名：<strong id="scoreStudentName" style="color: #38bdf8;">--</strong> | 班級學號：<strong id="scoreStudentClassId" style="color: #cbd5e1;">--</strong>
+            </p>
+          </div>
+          <button id="btnBackFromScoreView" class="btn btn-secondary" style="font-size: 13px; padding: 6px 14px; border-radius: 6px; cursor: pointer;">
+            ✕ 返回功能門戶
+          </button>
+        </div>
+
+        <!-- KPI Score Summary Card -->
+        <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95)); border: 1.5px solid rgba(56, 189, 248, 0.4); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
+            
+            <!-- Left: Final Combined Score (Capped at 80) -->
+            <div style="display: flex; align-items: center; gap: 20px;">
+              <div style="text-align: center; min-width: 120px;">
+                <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; font-weight: 600;">加分後最終總評</div>
+                <div id="scoreFinalCombined" style="font-size: 44px; font-weight: 900; line-height: 1.1; color: #34d399; text-shadow: 0 2px 12px rgba(52, 211, 153, 0.35);">
+                  0 分
+                </div>
+                <div id="scoreCapNote" style="font-size: 11px; color: #fbbf24; font-weight: 600; margin-top: 4px;">(最高 80 分封頂)</div>
+              </div>
+              <div style="height: 60px; width: 1px; background: #334155;"></div>
+              
+              <!-- Middle: Base Score & Bonus Breakdown -->
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px; font-size: 14.5px;">
+                  <span style="color: #cbd5e1; font-weight: 600;">📝 新規則基礎得分：</span>
+                  <strong id="scoreBaseNewTotal" style="color: #38bdf8; font-size: 17px;">0</strong>
+                  <span style="font-size: 12px; color: #94a3b8;">/ 100分 (原舊得分: <span id="scoreBaseOldTotal">0</span>分)</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; font-size: 14px;">
+                  <span style="color: #f59e0b; font-weight: 700;">🎁 在線刷題獎勵加分：</span>
+                  <strong id="scoreBonusTotal" style="color: #fbbf24; font-size: 17px;">+0 分</strong>
+                  <span id="scoreBonusRoundsCount" style="font-size: 11.5px; color: #a5b4fc; background: rgba(99, 102, 241, 0.15); padding: 2px 8px; border-radius: 4px;">已累計 0 輪獎勵</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Practice CTA Button -->
+            <div>
+              <button id="btnStartPracticeFromScore" class="btn btn-primary" style="padding: 12px 20px; font-size: 14.5px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #38bdf8); border: none; border-radius: 8px; box-shadow: 0 4px 14px rgba(37,99,235,0.35); cursor: pointer;">
+                <span>🚀 立即在線答題衝刺加分 ➔</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Rules Notice Box -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; font-size: 13px; line-height: 1.6; color: #cbd5e1;">
+          <div style="color: #a5b4fc; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+            <span>💡 1023 小測新計分規則與獎勵加分機制說明：</span>
+          </div>
+          <div>1. <strong>計分規則重算</strong>：本小測共 20 題多選題。舊規則為全對 5 分、少選 0.5 分、錯選多選 0 分；現全面按<strong>【新計分規則】</strong>計算：<strong>全部答對得 5 分，漏選得 3 分，多選錯選得 0 分</strong>。</div>
+          <div>2. <strong>在線刷題加分獎勵</strong>：每次在線答題正確率 \(n > 80\%\)（\(n > 80\)），可獲得 <strong>\(n - 80\)</strong> 的小測加分獎勵！可以多次在線刷題累計加分，基礎分加上累計加分後，<strong>小測最終成績以 80 分封頂</strong>！</div>
+        </div>
+
+        <!-- 20 Questions Breakdown Table -->
+        <div style="margin-bottom: 20px;">
+          <h3 style="font-size: 15px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+            <span>📋 小測 20 道多選題逐題作答明細：</span>
+          </h3>
+          <div style="overflow-x: auto; background: #1e293b; border-radius: 8px; border: 1px solid #334155;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: center;">
+              <thead>
+                <tr style="background: rgba(15, 23, 42, 0.8); color: #94a3b8; border-bottom: 1px solid #334155;">
+                  <th style="padding: 10px 8px;">題號</th>
+                  <th style="padding: 10px 8px;">題型</th>
+                  <th style="padding: 10px 8px;">原小測得分</th>
+                  <th style="padding: 10px 8px;">新規則得分</th>
+                  <th style="padding: 10px 8px;">作答判定與掌握狀態</th>
+                </tr>
+              </thead>
+              <tbody id="scoreQuestionsTableBody">
+                <!-- Dynamically populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Bottom Action -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid #334155;">
+          <button id="btnBottomBackPortal" class="btn btn-secondary" style="padding: 10px 18px; font-size: 13.5px; cursor: pointer;">
+            <span>✕ 返回功能門戶</span>
+          </button>
+          <button id="btnBottomGoQuiz" class="btn btn-primary" style="padding: 10px 22px; font-size: 14px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #38bdf8); cursor: pointer;">
+            <span>🚀 前往在線自適應練習 ➔</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
 
     <!-- MODAL: Password Auth for Ambiguous Matches (Delta < 0.08) -->
     <div id="modalPasswordAuth" class="auth-modal-overlay" style="display: none;">
@@ -20330,7 +20501,7623 @@ window.ADMIN_STUDENT_PASSWORDS = {
       listContainer.appendChild(card);
     });
 
+    
+    // 4. Online Practice Bonus Reward: n > 80 gives n - 80 bonus points for 1023 quiz
+    if (accuracyRate > 80) {
+      const bonusDelta = accuracyRate - 80;
+      const student = AppState.currentStudent || AppState.currentUser || {};
+      const studentKey = (student.classID && student.studentID) ? (student.classID + '_' + student.studentID) : 'DEFAULT_STUDENT';
+      
+      let bonusData = { accumulatedBonus: 0, rounds: [] };
+      try {
+        const raw = localStorage.getItem('MATH_1023_BONUS_' + studentKey);
+        if (raw) bonusData = JSON.parse(raw);
+      } catch (e) {}
+
+      bonusData.accumulatedBonus = (bonusData.accumulatedBonus || 0) + bonusDelta;
+      bonusData.rounds.push({
+        timestamp: Date.now(),
+        accuracy: accuracyRate,
+        bonusDelta: bonusDelta
+      });
+
+      try {
+        localStorage.setItem('MATH_1023_BONUS_' + studentKey, JSON.stringify(bonusData));
+      } catch (e) {}
+
+      const quoteEl = document.getElementById('settlementFeedbackQuote');
+      if (quoteEl) {
+        quoteEl.innerHTML = `🎁 <strong>榮獲小測獎勵加分 +${bonusDelta} 分！</strong> (正確率 ${accuracyRate}% > 80%)，已累計加分 <strong>+${bonusData.accumulatedBonus} 分</strong> (80分封頂)，已同步至成績詳情頁！`;
+        quoteEl.style.color = '#34d399';
+        quoteEl.style.background = 'rgba(16, 185, 129, 0.15)';
+        quoteEl.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+      }
+    }
+
     triggerMathJax(listContainer);
+  }
+
+    // 8. 1023 Quiz Score Details & Bonus Reward System
+  window.QUIZ_1023_DATA = [
+  {
+    "name": "谷雨",
+    "candId": "10341905",
+    "class": "C班",
+    "origTotal": 18.0,
+    "newTotal": 33,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 5.0,
+        "newScore": 5,
+        "status": "full"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 5.0,
+        "newScore": 5,
+        "status": "full"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 9,
+        "origScore": 5.0,
+        "newScore": 5,
+        "status": "full"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "洪佳佳",
+    "candId": "10113106",
+    "class": "D班",
+    "origTotal": 17.0,
+    "newTotal": 27,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 5.0,
+        "newScore": 5,
+        "status": "full"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 5.0,
+        "newScore": 5,
+        "status": "full"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 5.0,
+        "newScore": 5,
+        "status": "full"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "翁淮洋",
+    "candId": "10113369",
+    "class": "D班",
+    "origTotal": 12.5,
+    "newTotal": 50,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 5.0,
+        "newScore": 5,
+        "status": "full"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "劉卓盈",
+    "candId": "10112911",
+    "class": "C班",
+    "origTotal": 11.0,
+    "newTotal": 41,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 5.0,
+        "newScore": 5,
+        "status": "full"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "余浩賢",
+    "candId": "10341443",
+    "class": "D班",
+    "origTotal": 10.5,
+    "newTotal": 38,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 5.0,
+        "newScore": 5,
+        "status": "full"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "盧肇琪",
+    "candId": "10113368",
+    "class": "D班",
+    "origTotal": 9.0,
+    "newTotal": 29,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 5.0,
+        "newScore": 5,
+        "status": "full"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "周梓霖",
+    "candId": "10113556",
+    "class": "D班",
+    "origTotal": 9.0,
+    "newTotal": 29,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 5.0,
+        "newScore": 5,
+        "status": "full"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "賴君華",
+    "candId": "10177863",
+    "class": "D班",
+    "origTotal": 9.0,
+    "newTotal": 29,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 5.0,
+        "newScore": 5,
+        "status": "full"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "鄭國樺",
+    "candId": "10341446",
+    "class": "D班",
+    "origTotal": 8.5,
+    "newTotal": 51,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "張博聰",
+    "candId": "10113569",
+    "class": "D班",
+    "origTotal": 8.0,
+    "newTotal": 48,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "王煜鑫",
+    "candId": "10341442",
+    "class": "D班",
+    "origTotal": 8.0,
+    "newTotal": 48,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "黃嫣然",
+    "candId": "10200033",
+    "class": "D班",
+    "origTotal": 8.0,
+    "newTotal": 23,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 5.0,
+        "newScore": 5,
+        "status": "full"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "陳心怡",
+    "candId": "10113564",
+    "class": "C班",
+    "origTotal": 7.5,
+    "newTotal": 20,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 5.0,
+        "newScore": 5,
+        "status": "full"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "甘俊誠",
+    "candId": "10113325",
+    "class": "D班",
+    "origTotal": 7.0,
+    "newTotal": 17,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 5.0,
+        "newScore": 5,
+        "status": "full"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "林國榮",
+    "candId": "10086489",
+    "class": "C班",
+    "origTotal": 7.0,
+    "newTotal": 42,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "曹爵先",
+    "candId": "10114006",
+    "class": "C班",
+    "origTotal": 6.5,
+    "newTotal": 39,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "譚欣",
+    "candId": "10236824",
+    "class": "C班",
+    "origTotal": 6.5,
+    "newTotal": 39,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "譚佩泳",
+    "candId": "10112914",
+    "class": "D班",
+    "origTotal": 6.0,
+    "newTotal": 36,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "王偉德",
+    "candId": "10113092",
+    "class": "D班",
+    "origTotal": 6.0,
+    "newTotal": 36,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "林晨欣",
+    "candId": "10113103",
+    "class": "C班",
+    "origTotal": 6.0,
+    "newTotal": 36,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "陸恩希",
+    "candId": "10112895",
+    "class": "C班",
+    "origTotal": 6.0,
+    "newTotal": 36,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "陳子豪",
+    "candId": "10113348",
+    "class": "C班",
+    "origTotal": 6.0,
+    "newTotal": 36,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "施舒晨",
+    "candId": "10114748",
+    "class": "D班",
+    "origTotal": 6.0,
+    "newTotal": 11,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 5.0,
+        "newScore": 5,
+        "status": "full"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "羅清璋",
+    "candId": "10355526",
+    "class": "C班",
+    "origTotal": 5.5,
+    "newTotal": 33,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "溫愛嫦",
+    "candId": "10113570",
+    "class": "C班",
+    "origTotal": 5.0,
+    "newTotal": 30,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "徐芷瑤",
+    "candId": "10341444",
+    "class": "D班",
+    "origTotal": 5.0,
+    "newTotal": 30,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "麥曉楠",
+    "candId": "10113119",
+    "class": "C班",
+    "origTotal": 5.0,
+    "newTotal": 30,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "謝嘉瑩",
+    "candId": "10113366",
+    "class": "C班",
+    "origTotal": 5.0,
+    "newTotal": 30,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "王嘉熙",
+    "candId": "10128603",
+    "class": "C班",
+    "origTotal": 5.0,
+    "newTotal": 30,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "冼周蔚",
+    "candId": "10113102",
+    "class": "C班",
+    "origTotal": 5.0,
+    "newTotal": 30,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "董清霞",
+    "candId": "10112916",
+    "class": "D班",
+    "origTotal": 4.5,
+    "newTotal": 27,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "李樂瞳",
+    "candId": "10113330",
+    "class": "D班",
+    "origTotal": 4.5,
+    "newTotal": 27,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "陳穎彤",
+    "candId": "10112904",
+    "class": "C班",
+    "origTotal": 4.5,
+    "newTotal": 27,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "蔡清琰",
+    "candId": "10113117",
+    "class": "C班",
+    "origTotal": 4.5,
+    "newTotal": 27,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "馬雨彤",
+    "candId": "10113109",
+    "class": "D班",
+    "origTotal": 4.5,
+    "newTotal": 27,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "趙政熹",
+    "candId": "10177232",
+    "class": "C班",
+    "origTotal": 4.5,
+    "newTotal": 27,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "徐浟",
+    "candId": "10113362",
+    "class": "C班",
+    "origTotal": 4.0,
+    "newTotal": 24,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "鄭佩芝",
+    "candId": "10112912",
+    "class": "D班",
+    "origTotal": 3.5,
+    "newTotal": 21,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "梁寶娟",
+    "candId": "10086498",
+    "class": "C班",
+    "origTotal": 3.5,
+    "newTotal": 21,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "古永晴",
+    "candId": "10113547",
+    "class": "C班",
+    "origTotal": 3.5,
+    "newTotal": 21,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "李穎欣",
+    "candId": "10112894",
+    "class": "D班",
+    "origTotal": 3.5,
+    "newTotal": 21,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "周子謙",
+    "candId": "10341904",
+    "class": "C班",
+    "origTotal": 3.5,
+    "newTotal": 21,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "林川雲",
+    "candId": "10113337",
+    "class": "D班",
+    "origTotal": 3.5,
+    "newTotal": 21,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "劉泳欣",
+    "candId": "10234912",
+    "class": "D班",
+    "origTotal": 3.0,
+    "newTotal": 18,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "黃悅軒",
+    "candId": "10113116",
+    "class": "D班",
+    "origTotal": 2.5,
+    "newTotal": 15,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "陳芷澄",
+    "candId": "10112900",
+    "class": "C班",
+    "origTotal": 2.0,
+    "newTotal": 12,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "李藝彤",
+    "candId": "10113554",
+    "class": "C班",
+    "origTotal": 2.0,
+    "newTotal": 12,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "譚志坤",
+    "candId": "10112913",
+    "class": "C班",
+    "origTotal": 1.5,
+    "newTotal": 9,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "李臻斌",
+    "candId": "10113333",
+    "class": "D班",
+    "origTotal": 1.5,
+    "newTotal": 9,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "譚梓鈞",
+    "candId": "10341908",
+    "class": "C班",
+    "origTotal": 1.5,
+    "newTotal": 9,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "李青霞",
+    "candId": "10113552",
+    "class": "D班",
+    "origTotal": 1.5,
+    "newTotal": 9,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "莫芷瑶",
+    "candId": "10113327",
+    "class": "C班",
+    "origTotal": 1.0,
+    "newTotal": 6,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "黃梓建",
+    "candId": "10176373",
+    "class": "D班",
+    "origTotal": 1.0,
+    "newTotal": 6,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "葉峰",
+    "candId": "10084893",
+    "class": "C班",
+    "origTotal": 1.0,
+    "newTotal": 6,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "宋榛",
+    "candId": "10113334",
+    "class": "C班",
+    "origTotal": 1.0,
+    "newTotal": 6,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "李語鵑",
+    "candId": "10176601",
+    "class": "D班",
+    "origTotal": 0.5,
+    "newTotal": 3,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.5,
+        "newScore": 3,
+        "status": "partial"
+      }
+    ]
+  },
+  {
+    "name": "劉付穎",
+    "candId": "10113571",
+    "class": "D班",
+    "origTotal": 0.0,
+    "newTotal": 0,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  },
+  {
+    "name": "曾浚恩",
+    "candId": "10084887",
+    "class": "D班",
+    "origTotal": 0.0,
+    "newTotal": 0,
+    "details": [
+      {
+        "qNum": 1,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 2,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 3,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 4,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 5,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 6,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 7,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 8,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 9,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 10,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 11,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 12,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 13,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 14,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 15,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 16,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 17,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 18,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 19,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      },
+      {
+        "qNum": 20,
+        "origScore": 0.0,
+        "newScore": 0,
+        "status": "wrong"
+      }
+    ]
+  }
+];
+
+  function getStudentQuiz1023Record(student) {
+    if (!window.QUIZ_1023_DATA || !student) return null;
+    const sName = (student.name || '').trim();
+    const sClass = (student.classID || '').trim();
+    const aliasMap = { '莫芷瑤': '莫芷瑶', '莫芷瑶': '莫芷瑤' };
+    const altName = aliasMap[sName] || sName;
+
+    // Exact name match
+    let match = window.QUIZ_1023_DATA.find(r => r.name === sName || r.name === altName);
+    if (!match && student.studentID) {
+      match = window.QUIZ_1023_DATA.find(r => (r.class.includes(sClass) || sClass.includes(r.class[0])) && (r.name.includes(sName) || sName.includes(r.name)));
+    }
+    return match;
+  }
+
+  function getStudentAccumulatedBonus(student) {
+    const studentKey = (student && student.classID && student.studentID) ? (student.classID + '_' + student.studentID) : 'DEFAULT_STUDENT';
+    try {
+      const raw = localStorage.getItem('MATH_1023_BONUS_' + studentKey);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        return parsed.accumulatedBonus || 0;
+      }
+    } catch (e) {}
+    return 0;
+  }
+
+  function renderScoreDetailsScreen() {
+    const student = AppState.currentStudent || AppState.currentUser || { name: '古永晴', classID: '4C', studentID: 1 };
+    const record = getStudentQuiz1023Record(student);
+
+    // Populate Student Meta
+    const nameEl = document.getElementById('scoreStudentName');
+    const classIdEl = document.getElementById('scoreStudentClassId');
+    if (nameEl) nameEl.textContent = student.name || '同學';
+    if (classIdEl) classIdEl.textContent = `${student.classID || '4C'} 班 ${student.studentID || '1'} 號`;
+
+    // Populate Scores
+    const baseNew = record ? record.newTotal : 0;
+    const baseOld = record ? record.origTotal : 0;
+    const bonus = getStudentAccumulatedBonus(student);
+    const finalScore = Math.min(80, baseNew + bonus);
+
+    const baseNewEl = document.getElementById('scoreBaseNewTotal');
+    const baseOldEl = document.getElementById('scoreBaseOldTotal');
+    const bonusEl = document.getElementById('scoreBonusTotal');
+    const finalEl = document.getElementById('scoreFinalCombined');
+    const capNoteEl = document.getElementById('scoreCapNote');
+
+    if (baseNewEl) baseNewEl.textContent = String(baseNew);
+    if (baseOldEl) baseOldEl.textContent = String(baseOld);
+    if (bonusEl) bonusEl.textContent = `+${bonus} 分`;
+    if (finalEl) finalEl.textContent = `${finalScore} 分`;
+    if (capNoteEl) {
+      if (baseNew + bonus >= 80) {
+        capNoteEl.textContent = '🏆 (已達 80 分封頂卓越水平！)';
+        capNoteEl.style.color = '#34d399';
+      } else {
+        capNoteEl.textContent = '(小測折算後最高 80 分封頂)';
+        capNoteEl.style.color = '#fbbf24';
+      }
+    }
+
+    // Populate 20 Questions Table Body
+    const tbody = document.getElementById('scoreQuestionsTableBody');
+    if (tbody) {
+      tbody.innerHTML = '';
+      const details = record ? record.details : [];
+      if (details.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="padding: 18px; color: #94a3b8;">暫無該學生的小測記錄</td></tr>';
+      } else {
+        details.forEach(d => {
+          const tr = document.createElement('tr');
+          tr.style.borderBottom = '1px solid #334155';
+
+          let badge = '';
+          if (d.status === 'full') {
+            badge = '<span style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 8px; border-radius: 4px; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.4);">✓ 全部答對 (+5分)</span>';
+          } else if (d.status === 'partial') {
+            badge = '<span style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; padding: 2px 8px; border-radius: 4px; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.4);">⚠️ 漏選正確項 (+3分)</span>';
+          } else {
+            badge = '<span style="background: rgba(239, 68, 68, 0.2); color: #f87171; padding: 2px 8px; border-radius: 4px; font-weight: 600; border: 1px solid rgba(239, 68, 68, 0.4);">✕ 錯誤多選 (0分)</span>';
+          }
+
+          tr.innerHTML = `
+            <td style="padding: 10px 8px; font-weight: 700; color: #f8fafc;">第 ${d.qNum} 題</td>
+            <td style="padding: 10px 8px; color: #94a3b8;">多選題</td>
+            <td style="padding: 10px 8px; color: #94a3b8;">${d.origScore} 分</td>
+            <td style="padding: 10px 8px; font-weight: 700; color: ${d.newScore === 5 ? '#34d399' : (d.newScore === 3 ? '#fbbf24' : '#f87171')};">${d.newScore} 分</td>
+            <td style="padding: 10px 8px;">${badge}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    }
   }
 
   // 7. Event Wiring on DOM Load
@@ -20463,6 +28250,61 @@ window.ADMIN_STUDENT_PASSWORDS = {
       });
     }
 
+    
+    // Portal & Score Details View Wiring
+    const btnViewScore = document.getElementById('btnViewQuiz1023Score');
+    if (btnViewScore) {
+      btnViewScore.addEventListener('click', function() {
+        renderScoreDetailsScreen();
+        showScreen('screen10-quiz1023-score');
+      });
+    }
+
+    const btnConfirmScore = document.getElementById('btnConfirmViewScore');
+    if (btnConfirmScore) {
+      btnConfirmScore.addEventListener('click', function() {
+        renderScoreDetailsScreen();
+        showScreen('screen10-quiz1023-score');
+      });
+    }
+
+    const cardScore = document.getElementById('cardOptionView1023Score');
+    if (cardScore) {
+      cardScore.addEventListener('click', function(e) {
+        if (e.target.id !== 'btnViewQuiz1023Score') {
+          renderScoreDetailsScreen();
+          showScreen('screen10-quiz1023-score');
+        }
+      });
+    }
+
+    ['btnBackFromScoreView', 'btnBottomBackPortal'].forEach(function(id) {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.addEventListener('click', function() {
+          showScreen('screen4-dashboard');
+        });
+      }
+    });
+
+    ['btnStartPracticeFromScore', 'btnBottomGoQuiz', 'btnStartPractice'].forEach(function(id) {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.addEventListener('click', function() {
+          startQuizSession();
+        });
+      }
+    });
+
+    const cardQuiz = document.getElementById('cardOptionStartQuiz');
+    if (cardQuiz) {
+      cardQuiz.addEventListener('click', function(e) {
+        if (e.target.id !== 'btnStartPractice') {
+          startQuizSession();
+        }
+      });
+    }
+
     const btnEnterQuiz = document.getElementById('btnEnterQuiz');
     if (btnEnterQuiz) {
       btnEnterQuiz.addEventListener('click', function() {
@@ -20567,6 +28409,10 @@ window.ADMIN_STUDENT_PASSWORDS = {
   window.openDraftUploadModal = openDraftUploadModal;
   window.finishQuizSession = finishQuizSession;
   window.renderWrongReviewScreen = renderWrongReviewScreen;
+  window.renderScoreDetailsScreen = renderScoreDetailsScreen;
+  window.getStudentQuiz1023Record = getStudentQuiz1023Record;
+  window.getStudentAccumulatedBonus = getStudentAccumulatedBonus;
+
   window.restart1023QuizSession = restart1023QuizSession;
   window.saveAndRenderHistoryCurve = saveAndRenderHistoryCurve;
   window.renderHistoryCurveSVG = renderHistoryCurveSVG;
