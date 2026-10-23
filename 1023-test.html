@@ -193,6 +193,17 @@
       border: 1px solid rgba(239, 68, 68, 0.4);
       color: #f87171;
     }
+  
+    /* Internal developer caption record: visible set to 0 */
+    .internal-caption-record, .internal-source-caption {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      width: 0 !important;
+      overflow: hidden !important;
+      pointer-events: none !important;
+    }
   </style>
 
   <!-- Font Awesome Icons -->
@@ -19460,7 +19471,8 @@ window.ADMIN_STUDENT_PASSWORDS = {
     container.innerHTML = `
       <div class="quiz-stem-card">
         <div style="font-size: 12px; color: var(--text-highlight); margin-bottom: 6px; font-weight: 700;">
-          ${typeBadge} 題目來源: ${q.source || '1023專用題庫'}
+          <span>${typeBadge}</span>
+          <span class="internal-caption-record" style="display: none; visibility: hidden; opacity: 0; height: 0; width: 0; overflow: hidden;" data-source="${q.source || ''}">題目來源: ${q.source || '1023專用題庫'}</span>
         </div>
         <div class="stem-text math-scroll-wrapper">${q.stem}</div>
       </div>
