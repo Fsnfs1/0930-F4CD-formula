@@ -508,47 +508,117 @@
       </div>
     </section>
 
-    <!-- SCREEN 9: Wrong Questions Review (3-State Badges) -->
+        <!-- SCREEN 9: Quiz Settlement, Wrong Review & Retest (#screen9-wrong-review) -->
     <section id="screen9-wrong-review" class="screen-container">
-      <div class="card" style="padding: 16px;">
-        <div class="review-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid #334155; padding-bottom: 10px;">
+      <div class="card" style="padding: 18px; border-radius: 12px; background: #0f172a; border: 1px solid #334155;">
+        
+        <!-- Header -->
+        <div class="review-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #334155; padding-bottom: 12px;">
           <div>
-            <h2 style="font-size: 18px; font-weight: 700; color: var(--text-highlight); margin: 0;">
-              📖 上一輪錯題溫習 (錯題回顧)
+            <h2 style="font-size: 20px; font-weight: 800; color: var(--text-highlight); margin: 0; display: flex; align-items: center; gap: 8px;">
+              <span>📊 本輪測驗結算與成績報告</span>
             </h2>
-            <p id="reviewSubtitleText" style="font-size: 12px; color: var(--text-muted); margin: 4px 0 0 0;">
-              共計 <span id="summaryTotalWrong">0</span> 道錯題待掌握
+            <p id="reviewSubtitleText" style="font-size: 13px; color: var(--text-muted); margin: 4px 0 0 0;">
+              作答結束！本輪共完成 <span id="summaryTotalAnswered" style="font-weight: 700; color: #38bdf8;">25</span> 題，掌握情況如下：
             </p>
           </div>
-          <button id="btnBackFromWrongReview" class="btn-text-action" style="font-size: 14px; color: var(--text-muted); cursor: pointer; background: none; border: none;">
-            ✕ 返回
+          <button id="btnBackFromWrongReview" class="btn-text-action" style="font-size: 14px; color: var(--text-muted); cursor: pointer; background: rgba(255,255,255,0.06); padding: 6px 14px; border-radius: 6px; border: 1px solid #475569;">
+            ✕ 結束回首頁
           </button>
         </div>
 
-        <!-- Actions Toolbar -->
-        <div id="wrongActionsToolbar" style="display: flex; gap: 8px; margin-bottom: 14px;">
-          <button id="btnStartWrongRetest" class="btn btn-primary" style="flex: 1; padding: 10px 14px; font-size: 14px;">
+        <!-- 1. KPI & Accuracy Card -->
+        <div id="quizSettlementKpiCard" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95)); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 18px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
+            <!-- Left: Big Accuracy Gauge Display -->
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div style="text-align: center; min-width: 100px;">
+                <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; font-weight: 600;">本輪正確率</div>
+                <div id="settlementAccuracyRate" style="font-size: 42px; font-weight: 900; line-height: 1.1; color: #38bdf8; text-shadow: 0 2px 10px rgba(56, 189, 248, 0.3);">
+                  0%
+                </div>
+              </div>
+              <div style="height: 48px; width: 1px; background: #334155;"></div>
+              <!-- Metrics Badges -->
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; align-items: center; gap: 10px; font-size: 14px;">
+                  <span style="color: #4ade80; font-weight: 700;">✓ 答對題數：<span id="settlementCorrectCount">0</span> 題</span>
+                  <span style="color: #94a3b8;">/</span>
+                  <span style="color: #f8fafc; font-weight: 600;">總作答：<span id="settlementTotalAnswered">0</span> 題</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; font-size: 13.5px;">
+                  <span style="color: #f87171; font-weight: 700;">⚠️ 錯題溫習：<span id="settlementWrongCount">0</span> 題</span>
+                  <span id="settlementDosageType" style="color: #a5b4fc; font-size: 12px; background: rgba(99, 102, 241, 0.15); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(99, 102, 241, 0.3);">自適應 25 題</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Encouragement Quote & Re-Quiz CTA -->
+            <div style="flex: 1; min-width: 260px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+              <div id="settlementFeedbackQuote" style="font-size: 13.5px; font-weight: 600; color: #fbbf24; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25); padding: 8px 14px; border-radius: 8px; width: 100%; text-align: center;">
+                🌟 保持專注，每一道練習都是思維的躍升！
+              </div>
+              <div style="display: flex; gap: 10px; width: 100%;">
+                <button id="btnRestart1023QuizTop" class="btn btn-primary" style="flex: 1; padding: 12px 16px; font-size: 15px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #0284c7); border: none; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); border-radius: 8px; cursor: pointer;">
+                  <span>🔄 重新作答 (開始新一輪 1023 二刷)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Recent Quiz History Accuracy Trend Curve Card -->
+        <div id="quizHistoryTrendCard" style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="font-size: 14.5px; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+              <span>📈 最近作答歷史成績曲線 (最近 10 輪趨勢)</span>
+            </div>
+            <span id="historyRoundsSummary" style="font-size: 12px; color: #94a3b8;">已記錄 1 輪作答</span>
+          </div>
+          <!-- SVG Container -->
+          <div id="historyChartContainer" style="width: 100%; overflow-x: auto; background: rgba(15, 23, 42, 0.6); border-radius: 8px; padding: 8px; border: 1px solid rgba(51, 65, 85, 0.5);">
+            <!-- Dynamic SVG injected via JS -->
+          </div>
+        </div>
+
+        <!-- 3. Actions Toolbar (Wrong Retest & Clean) -->
+        <div id="wrongActionsToolbar" style="display: flex; gap: 10px; margin-bottom: 16px;">
+          <button id="btnStartWrongRetest" class="btn btn-primary" style="flex: 1; padding: 11px 14px; font-size: 14px; background: #0284c7;">
             <span>🎯 開始錯題專項重測</span>
           </button>
-          <button id="btnClearMasteredWrong" class="btn btn-secondary" style="padding: 10px 12px; font-size: 13px;">
+          <button id="btnRestart1023QuizToolbar" class="btn btn-primary" style="flex: 1; padding: 11px 14px; font-size: 14px; background: linear-gradient(135deg, #10b981, #059669);">
+            <span>🔄 重新作答 (二刷適應性題庫)</span>
+          </button>
+          <button id="btnClearMasteredWrong" class="btn btn-secondary" style="padding: 11px 14px; font-size: 13.5px;">
             <span>🧹 清除已掌握</span>
           </button>
         </div>
 
-        <!-- Empty State -->
-        <div id="wrongEmptyState" class="placeholder-banner" style="display: none; padding: 32px 16px; text-align: center;">
-          <div class="placeholder-icon">🎉</div>
-          <h3 style="font-size: 16px; color: var(--success-color); margin-bottom: 6px;">太棒了！目前沒有錯題記錄</h3>
-          <p class="placeholder-text" style="font-size: 13px; color: var(--text-muted);">本輪測驗無回答錯誤題目，或錯題已全數溫習掌握！</p>
-          <button id="btnEmptyStartNew" class="btn btn-primary" style="margin-top: 14px; max-width: 220px;">
-            <span>🚀 開始隨機數學練習</span>
+        <!-- 4. Empty State (No wrong questions) -->
+        <div id="wrongEmptyState" class="placeholder-banner" style="display: none; padding: 36px 16px; text-align: center; background: rgba(16, 185, 129, 0.08); border: 1px dashed rgba(16, 185, 129, 0.3); border-radius: 12px;">
+          <div class="placeholder-icon" style="font-size: 40px; margin-bottom: 10px;">🎉</div>
+          <h3 style="font-size: 17px; color: #34d399; margin-bottom: 8px; font-weight: 700;">太棒了！本輪作答無錯題記錄 (100% 正確)</h3>
+          <p class="placeholder-text" style="font-size: 13.5px; color: #cbd5e1; max-width: 500px; margin: 0 auto 16px auto;">所有題目均精準解答！建議開啟新一輪二刷，持續鞏固一元二次函數與不等式解法！</p>
+          <button id="btnEmptyStartNew" class="btn btn-primary" style="margin: 0 auto; max-width: 260px; padding: 12px 20px; font-size: 14.5px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #38bdf8);">
+            <span>🚀 開始新一輪 1023 二刷</span>
           </button>
         </div>
 
-        <!-- Dynamic Wrong Questions Container -->
+        <!-- 5. Dynamic Wrong Questions Container -->
         <div id="wrongQuestionsListContainer">
+          <div style="font-size: 14px; font-weight: 700; color: #f87171; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+            <span>🔍 錯題深度解析與溫習：</span>
+          </div>
           <div id="wrongQuestionsList" style="display: flex; flex-direction: column; gap: 16px;"></div>
+          
+          <!-- Bottom Re-Quiz Button -->
+          <div style="text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #334155;">
+            <button id="btnRestart1023QuizBottom" class="btn btn-primary" style="padding: 12px 28px; font-size: 15px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #0284c7); border-radius: 8px; box-shadow: 0 4px 14px rgba(37,99,235,0.3);">
+              <span>🔄 錯題已溫習完畢，開始新一輪 1023 二刷！</span>
+            </button>
+          </div>
         </div>
+
       </div>
     </section>
 
@@ -19359,7 +19429,7 @@ window.ADMIN_STUDENT_PASSWORDS = {
     };
 
     persistProgress();
-    showScreen('screen5-quiz');
+    (window.showScreen || showScreen)('screen5-quiz');
     startAntiCheatTimer(false);
     renderQuestionInDOM();
   }
@@ -19905,33 +19975,229 @@ window.ADMIN_STUDENT_PASSWORDS = {
     } catch (e) {}
 
     renderWrongReviewScreen();
-    showScreen('screen9-wrong-review');
+    (window.showScreen || showScreen)('screen9-wrong-review');
   }
 
-  // 6. Wrong Questions Review (#screen9-wrong-review)
+    // 6. Wrong Questions Review & Performance Settlement (#screen9-wrong-review)
+  function saveAndRenderHistoryCurve(accuracyRate, totalAnswered, correctCount, wrongCount) {
+    const student = AppState.currentStudent || {};
+    const studentKey = (student.classID && student.studentID) ? (student.classID + '_' + student.studentID) : 'DEFAULT_STUDENT';
+    const historyKey = 'MATH_1023_QUIZ_HISTORY_' + studentKey;
+
+    let history = [];
+    try {
+      const raw = localStorage.getItem(historyKey);
+      if (raw) history = JSON.parse(raw);
+      if (!Array.isArray(history)) history = [];
+    } catch (e) {
+      history = [];
+    }
+
+    const now = new Date();
+    const timeStr = (now.getHours() < 10 ? '0' : '') + now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+
+    history.push({
+      attempt: history.length + 1,
+      timestamp: Date.now(),
+      timeStr: timeStr,
+      accuracy: accuracyRate,
+      correct: correctCount,
+      total: totalAnswered,
+      wrong: wrongCount
+    });
+
+    if (history.length > 10) {
+      history = history.slice(history.length - 10);
+    }
+
+    try {
+      localStorage.setItem(historyKey, JSON.stringify(history));
+    } catch (e) {}
+
+    renderHistoryCurveSVG(history);
+  }
+
+  function renderHistoryCurveSVG(history) {
+    const container = document.getElementById('historyChartContainer');
+    const summaryEl = document.getElementById('historyRoundsSummary');
+    if (summaryEl) {
+      summaryEl.textContent = `已累積記錄 ${history.length} 輪作答 (最近 10 輪趨勢)`;
+    }
+    if (!container) return;
+
+    if (!history || history.length === 0) {
+      container.innerHTML = '<div style="color: #94a3b8; font-size: 13px; text-align: center; padding: 20px;">暫無作答歷史記錄</div>';
+      return;
+    }
+
+    const width = 560;
+    const height = 150;
+    const padding = { top: 25, right: 35, bottom: 30, left: 45 };
+    const plotWidth = width - padding.left - padding.right;
+    const plotHeight = height - padding.top - padding.bottom;
+
+    const getY = (val) => padding.top + plotHeight - (val / 100) * plotHeight;
+    const getX = (idx, total) => {
+      if (total <= 1) return padding.left + plotWidth / 2;
+      return padding.left + (idx / (total - 1)) * plotWidth;
+    };
+
+    let gridLines = '';
+    [0, 25, 50, 75, 100].forEach(val => {
+      const y = getY(val);
+      gridLines += `
+        <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="#334155" stroke-dasharray="3,3" stroke-width="1"/>
+        <text x="${padding.left - 8}" y="${y + 4}" fill="#64748b" font-size="10" text-anchor="end">${val}%</text>
+      `;
+    });
+
+    const pts = history.map((item, idx) => ({
+      x: getX(idx, history.length),
+      y: getY(item.accuracy),
+      val: item.accuracy,
+      attempt: item.attempt || (idx + 1),
+      timeStr: item.timeStr
+    }));
+
+    let pathD = '';
+    let areaD = '';
+    let dotsHtml = '';
+
+    if (pts.length === 1) {
+      const p = pts[0];
+      dotsHtml += `
+        <circle cx="${p.x}" cy="${p.y}" r="6" fill="#38bdf8" stroke="#ffffff" stroke-width="2"/>
+        <text x="${p.x}" y="${p.y - 10}" fill="#38bdf8" font-size="12" font-weight="bold" text-anchor="middle">${p.val}%</text>
+        <text x="${p.x}" y="${height - 8}" fill="#94a3b8" font-size="11" text-anchor="middle">第${p.attempt}輪</text>
+      `;
+    } else {
+      pathD = `M ${pts[0].x} ${pts[0].y}`;
+      for (let i = 1; i < pts.length; i++) {
+        pathD += ` L ${pts[i].x} ${pts[i].y}`;
+      }
+
+      areaD = `${pathD} L ${pts[pts.length - 1].x} ${getY(0)} L ${pts[0].x} ${getY(0)} Z`;
+
+      pts.forEach((p, idx) => {
+        dotsHtml += `
+          <circle cx="${p.x}" cy="${p.y}" r="5" fill="#38bdf8" stroke="#0f172a" stroke-width="2"/>
+          <text x="${p.x}" y="${p.y - 8}" fill="#f8fafc" font-size="11" font-weight="700" text-anchor="middle">${p.val}%</text>
+          <text x="${p.x}" y="${height - 8}" fill="#94a3b8" font-size="10.5" text-anchor="middle">R${idx + 1}</text>
+        `;
+      });
+    }
+
+    const svgHtml = `
+      <svg viewBox="0 0 ${width} ${height}" style="width: 100%; height: auto; display: block;" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="curveGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0"/>
+          </linearGradient>
+        </defs>
+        ${gridLines}
+        ${areaD ? `<path d="${areaD}" fill="url(#curveGradient)"/>` : ''}
+        ${pathD ? `<path d="${pathD}" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
+        ${dotsHtml}
+      </svg>
+    `;
+
+    container.innerHTML = svgHtml;
+  }
+
+  function restart1023QuizSession() {
+    try {
+      localStorage.removeItem('MATH_ACTIVE_QUIZ_PROGRESS');
+    } catch (e) {}
+
+    AppState.wrongQuestions = [];
+    AppState.selectedOptions.clear();
+    AppState.isQuestionSubmitted = false;
+
+    // Start brand new randomized adaptive 1023 quiz session (50% 4-opt -> 20% 6-opt -> 30% 8-opt)
+    startQuizSession();
+  }
+
   function renderWrongReviewScreen() {
     const listContainer = document.getElementById('wrongQuestionsList');
     const emptyState = document.getElementById('wrongEmptyState');
     const totalWrongEl = document.getElementById('summaryTotalWrong');
-    const wrongList = AppState.wrongQuestions;
+    const wrongList = AppState.wrongQuestions || [];
 
-    if (totalWrongEl) totalWrongEl.textContent = String(wrongList.length);
+    // Calculate this round's stats
+    const exam = AppState.exam || {};
+    const answers = exam.answers || {};
+    let totalAnswered = Object.keys(answers).length;
+    if (!totalAnswered || totalAnswered === 0) {
+      totalAnswered = (exam.currentIndex !== undefined && exam.currentIndex > 0) ? exam.currentIndex : (exam.targetQuota || 25);
+    }
+    const wrongCount = wrongList.length;
+    const correctCount = Math.max(0, totalAnswered - wrongCount);
+    const accuracyRate = totalAnswered > 0 ? Math.round((correctCount / totalAnswered) * 100) : 0;
 
-    if (!listContainer) return;
-    listContainer.innerHTML = '';
+    // 1. Update KPI elements
+    const accEl = document.getElementById('settlementAccuracyRate');
+    if (accEl) accEl.textContent = accuracyRate + '%';
+    const corrEl = document.getElementById('settlementCorrectCount');
+    if (corrEl) corrEl.textContent = String(correctCount);
+    const totalEl = document.getElementById('settlementTotalAnswered');
+    if (totalEl) totalEl.textContent = String(totalAnswered);
+    const wrongEl = document.getElementById('settlementWrongCount');
+    if (wrongEl) wrongEl.textContent = String(wrongCount);
+    const summaryAnsEl = document.getElementById('summaryTotalAnswered');
+    if (summaryAnsEl) summaryAnsEl.textContent = String(totalAnswered);
+    if (totalWrongEl) totalWrongEl.textContent = String(wrongCount);
 
+    // Dosage badge text
+    const dosageTypeEl = document.getElementById('settlementDosageType');
+    if (dosageTypeEl) {
+      if (exam.maliciousPenaltyActive) {
+        dosageTypeEl.textContent = '進階挑戰配額: 60題 (加油！)';
+      } else if (exam.targetQuota > 25) {
+        dosageTypeEl.textContent = `自適應擴充配額: ${exam.targetQuota}題`;
+      } else {
+        dosageTypeEl.textContent = '標準適應性配額: 25題';
+      }
+    }
+
+    // Positive feedback quote
+    const quoteEl = document.getElementById('settlementFeedbackQuote');
+    if (quoteEl) {
+      if (accuracyRate === 100) {
+        quoteEl.textContent = '🏆 完美發揮！100% 全部答對，數學思維卓越！';
+      } else if (accuracyRate >= 85) {
+        quoteEl.textContent = '🌟 表現優異！答題準確率極高，繼續保持衝刺！';
+      } else if (accuracyRate >= 70) {
+        quoteEl.textContent = '💪 發揮穩定！及時溫習錯題，向滿分發起挑戰！';
+      } else if (accuracyRate >= 50) {
+        quoteEl.textContent = '📖 勤能補拙！梳理好本輪錯題解析，二刷定能取得更大進步！';
+      } else {
+        quoteEl.textContent = '🔥 加油！不要氣餒，認真看每題步驟推理，二刷再來突破！';
+      }
+    }
+
+    // 2. Persist history and render trend curve
+    saveAndRenderHistoryCurve(accuracyRate, totalAnswered, correctCount, wrongCount);
+
+    // 3. Render wrong questions or empty state
+    const wrongListWrapper = document.getElementById('wrongQuestionsListContainer');
     if (wrongList.length === 0) {
       if (emptyState) emptyState.style.display = 'block';
+      if (wrongListWrapper) wrongListWrapper.style.display = 'none';
       return;
     }
 
     if (emptyState) emptyState.style.display = 'none';
+    if (wrongListWrapper) wrongListWrapper.style.display = 'block';
+
+    if (!listContainer) return;
+    listContainer.innerHTML = '';
 
     wrongList.forEach(function(item, idx) {
       const q = item.question;
       const card = document.createElement('div');
       card.className = 'card';
-      card.style.cssText = 'padding: 16px; margin-bottom: 14px; background: #1e293b; border: 1px solid #334155;';
+      card.style.cssText = 'padding: 16px; margin-bottom: 14px; background: #1e293b; border: 1px solid #334155; border-radius: 8px;';
 
       let optsHtml = '';
       (q.options || []).forEach(function(opt) {
@@ -19978,6 +20244,39 @@ window.ADMIN_STUDENT_PASSWORDS = {
 
   // 7. Event Wiring on DOM Load
   document.addEventListener('DOMContentLoaded', function() {
+    // Restore active quiz progress from LocalStorage if present (R3 Global Refresh Recovery)
+    try {
+      const savedRaw = localStorage.getItem('MATH_ACTIVE_QUIZ_PROGRESS');
+      if (savedRaw) {
+        const snap = JSON.parse(savedRaw);
+        if (snap && snap.isQuizActive && snap.exam && snap.exam.questions && snap.exam.questions.length > 0) {
+          AppState.exam = snap.exam;
+          AppState.currentUser = snap.currentUser || AppState.currentUser;
+          AppState.currentStudent = snap.currentUser || snap.currentStudent || AppState.currentStudent;
+          AppState.isPasswordOnlyLogin = !!snap.isPasswordOnlyLogin;
+          AppState.draftUploaded = !!snap.draftUploaded;
+          AppState.draftFileName = snap.draftFileName || '';
+          AppState.draftFolderId = snap.draftFolderId || '1oY52JyAqLLQQiETq8A-hre9jZ_goLHiY';
+          AppState.practiceElapsedSeconds = snap.practiceElapsedSeconds || 0;
+          AppState.antiCheatElapsedSeconds = snap.antiCheatElapsedSeconds || 0;
+          AppState.wrongQuestions = snap.wrongQuestions || [];
+          AppState.selectedOptions = new Set(snap.selectedOptions || []);
+          AppState.isQuestionSubmitted = !!snap.isQuestionSubmitted;
+
+          if (AppState.isPasswordOnlyLogin) {
+            const banner = document.getElementById('quizBannerPasswordOnly');
+            if (banner) banner.style.display = 'block';
+          }
+
+          (window.showScreen || showScreen)('screen5-quiz');
+          startAntiCheatTimer(false);
+          renderQuestionInDOM();
+        }
+      }
+    } catch (e) {
+      console.warn('[App] Error recovering quiz progress snapshot:', e);
+    }
+
     // 1. Immediately seed preloaded face profiles into LocalStorage
     try {
       if (window.loadPreloadedProfiles) {
@@ -20030,6 +20329,53 @@ window.ADMIN_STUDENT_PASSWORDS = {
     }
 
     // Screen navigation buttons
+        // Screen 9 settlement & wrong review button bindings
+    ['btnRestart1023QuizTop', 'btnRestart1023QuizToolbar', 'btnRestart1023QuizBottom', 'btnEmptyStartNew'].forEach(function(id) {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.addEventListener('click', function() {
+          restart1023QuizSession();
+        });
+      }
+    });
+
+    const btnStartWrongRetest = document.getElementById('btnStartWrongRetest');
+    if (btnStartWrongRetest) {
+      btnStartWrongRetest.addEventListener('click', function() {
+        if (!AppState.wrongQuestions || AppState.wrongQuestions.length === 0) {
+          alert('目前沒有錯題記錄，請點擊重新作答開始新一輪二刷！');
+          return;
+        }
+        const missedPool = AppState.wrongQuestions.map(w => w.question);
+        AppState.wrongQuestions = [];
+        startQuizSession(missedPool);
+      });
+    }
+
+    const btnClearMastered = document.getElementById('btnClearMasteredWrong');
+    if (btnClearMastered) {
+      btnClearMastered.addEventListener('click', function() {
+        AppState.wrongQuestions = [];
+        const totalWrongEl = document.getElementById('summaryTotalWrong');
+        if (totalWrongEl) totalWrongEl.textContent = '0';
+        const wrongCountEl = document.getElementById('settlementWrongCount');
+        if (wrongCountEl) wrongCountEl.textContent = '0';
+        const listContainer = document.getElementById('wrongQuestionsList');
+        if (listContainer) listContainer.innerHTML = '';
+        const listWrapper = document.getElementById('wrongQuestionsListContainer');
+        if (listWrapper) listWrapper.style.display = 'none';
+        const emptyState = document.getElementById('wrongEmptyState');
+        if (emptyState) emptyState.style.display = 'block';
+      });
+    }
+
+    const btnBackWrong = document.getElementById('btnBackFromWrongReview');
+    if (btnBackWrong) {
+      btnBackWrong.addEventListener('click', function() {
+        showScreen('screen1-roster');
+      });
+    }
+
     const btnEnterQuiz = document.getElementById('btnEnterQuiz');
     if (btnEnterQuiz) {
       btnEnterQuiz.addEventListener('click', function() {
@@ -20121,6 +20467,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
   });
 
   // Expose necessary global functions
+  window.AppState = AppState;
+  window.generateDraftFileName = generateDraftFileName;
+  window.startQuizSession = startQuizSession;
   window.showScreen = showScreen;
   window.triggerMathJax = triggerMathJax;
   window.initFaceAuth = initFaceAuth;
@@ -20130,6 +20479,10 @@ window.ADMIN_STUDENT_PASSWORDS = {
   window.showManualSelectView = showManualSelectView;
   window.openDraftUploadModal = openDraftUploadModal;
   window.finishQuizSession = finishQuizSession;
+  window.renderWrongReviewScreen = renderWrongReviewScreen;
+  window.restart1023QuizSession = restart1023QuizSession;
+  window.saveAndRenderHistoryCurve = saveAndRenderHistoryCurve;
+  window.renderHistoryCurveSVG = renderHistoryCurveSVG;
 })();
 
 </script>
