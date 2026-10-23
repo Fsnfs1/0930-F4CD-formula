@@ -16737,7 +16737,7 @@ window.ADMIN_STUDENT_PASSWORDS = {
       "E",
       "F"
     ],
-    "explanation": "1. **方程根與分類討論的本質**:\n     - 方程 $(x - a)(x - a^2) = 0$ 的根為 $x_1 = a, x_2 = a^2$。A 正確。\n     - 二次項係數為 1（展開為 $x^2 - (a + a^2)x + a^3 < 0$），開口向上，小於號取兩根之間。核心在於判斷兩根 $a$ 與 $a^2$ 誰大誰小。\n     - 作差法：$a^2 - a = a(a - 1)$。臨界點為 $a = 0$ 和 $a = 1$。B 正確。\n  2. **三種參數情形分類討論**:\n     - **情形一**: 當 $a(a - 1) > 0$，即 $a > 1$ 或 $a < 0$ 時，$a^2 > a$。較小根為 $a$，較大根為 $a^2$。解集為 $(a, a^2)$。C 正確。\n       - 例如 $a = -2$ 屬於此類，$a = -2, a^2 = 4$，不等式為 $(x + 2)(x - 4) < 0$，解集為 $(-2, 4)$。F 正確。\n     - **情形二**: 當 $a(a - 1) < 0$，即 $0 < a < 1$ 時，$a^2 < a$。較小根為 $a^2$，較大根為 $a$。解集為 $(a^2, a)$。D 正確。\n       - 例如 $a = \\frac{1}{2}$ 時，$a^2 = \\frac{1}{4} < \\frac{1}{2}$，解集應為 $(\\frac{1}{4}, \\frac{1}{2})$，而 G 選項將小數寫在左端點，違反區間「左小右大」規範，G 錯誤。\n     - **情形三**: 當 $a = 0$ 時，不等式為 $x^2 < 0$，無解；當 $a = 1$ 時，不等式為 $(x - 1)^2 < 0$，無解。解集均為 $\\varnothing$。E 正確。\n  3. **極限與綜合性質**:\n     - 當 $a = 0$ 或 $a = 1$ 時解集為空集，長度為 0，並非恆大於 0，H 錯誤。",
+    "explanation": "1. **方程根與分類討論的本質**:\n     - 方程 $(x - a)(x - a^2) = 0$ 的根為 $x_1 = a, x_2 = a^2$。A 正確。\n     - 二次項係數為 1（展開為 $x^2 - (a + a^2)x + a^3 < 0$），開口向上，小於號取兩根之間。核心在於判斷兩根 $a$ 與 $a^2$ 誰大誰小。\n     - 作差法：$a^2 - a = a(a - 1)$。臨界點為 $a = 0$ 和 $a = 1$。B 正確。\n  2. **三種參數情形分類討論**:\n     - **情形一**: 當 $a(a - 1) > 0$，即 $a > 1$ 或 $a < 0$ 時，$a^2 > a$。較小根為 $a$，較大根為 $a^2$。解集為 $(a, a^2)$。C 正確。\n       - 例如 $a = -2$ 屬於此類，$a = -2, a^2 = 4$，不等式為 $(x + 2)(x - 4) < 0$，解集為 $(-2, 4)$。F 正確。\n     - **情形二**: 當 $a(a - 1) < 0$，即 $0 < a < 1$ 時，$a^2 < a$。較小根為 $a^2$，較大根為 $a$。解集為 $(a^2, a)$。D 正確。\n       - 例如 $a = \\frac{1}{2}$ 時，$a^2 = \\frac{1}{4} < \\frac{1}{2}$，解集應為 $(\\frac{1}{4}, \\frac{1}{2})$，而 G 選項將小數寫在左端點，違反區間「左小右大」規範，G 錯誤。\n     - **情形三**: 當 $a = 0$ 時，不等式為 $x^2 < 0$，無解；當 $a = 1$ 時，不等式為 $(x - 1)^2 < 0$，無解。解集均為 $\\varnothing$。E 正確。\n  3. **邊界與綜合性質**:\n     - 當 $a = 0$ 或 $a = 1$ 時解集為空集，長度為 0，並非恆大於 0，H 錯誤。",
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 G、H 任何一項者得 0 分。"
   },
   {
@@ -16853,45 +16853,45 @@ window.ADMIN_STUDENT_PASSWORDS = {
   {
     "id": "4CD_1023_Q73",
     "q_num": 73,
-    "topic": "一元二次不等式 · 深度綜合辨析",
-    "source": "Synthesis Hard: 分段函數全局單調性與端點接合條件",
+    "topic": "二次函數 · 頂點對稱軸與閉區間最值綜合分析",
+    "source": "4CD 課堂練習：二次函數綜合性質與最值",
     "difficulty": "Synthesis Hard",
     "isVerbatimArchive": false,
-    "stem": "已知分段函數 $f(x) = \\begin{cases} (a - 1)x + 2, & x < 2 \\\\ x^2 - 2ax + 4, & x \\ge 2 \\end{cases}$。若 $f(x)$ 在 $\\mathbb{R}$ 上是嚴格單調遞增函數，下列關於實數 $a$ 的取值範圍及性質分析中，正確的有：",
+    "stem": "已知二次函數 $f(x) = x^2 - 4x + 3$，分析其圖象開口、頂點坐標、對稱軸、與坐標軸交點及在閉區間 $[0, 5]$ 上的性質，下列說法正確的有：",
     "diagram_spec": "分段對接單調曲線圖（$x < 2$ 射線對接 $x \\ge 2$ 拋物線，標註 $a \\le \\frac{4}{3}$ 臨界接合點以保證全局單調增）",
     "diagram_filename": "q17_diagram.png",
     "options": [
       {
         "key": "A",
-        "text": "當 $x < 2$ 時，一次函數單調遞增的充要條件是斜率 $a - 1 > 0 \\implies a > 1$"
+        "text": "拋物線開口向上，因為二次項係數 $a = 1 > 0$"
       },
       {
         "key": "B",
-        "text": "當 $x \\ge 2$ 時，二次函數開口向上，其對稱軸 $x = a$ 必須滿足 $a \\le 2$"
+        "text": "拋物線的對稱軸方程為直線 $x = 2$"
       },
       {
         "key": "C",
-        "text": "分段對接點 $x = 2$ 處必須滿足左側極限不大於右側函數值，即 $\\lim_{x \\to 2^-} f(x) \\le f(2)$，以防出現向下的「斷崖跌落」"
+        "text": "拋物線的頂點坐標為 $(2, -1)$"
       },
       {
         "key": "D",
-        "text": "對接點不等式為 $2(a - 1) + 2 \\le 2^2 - 2a(2) + 4$，化簡得 $2a \\le 8 - 4a \\implies 6a \\le 8 \\implies a \\le \\frac{4}{3}$"
+        "text": "函數在 $\\mathbb{R}$ 上的最小值為 $-1$"
       },
       {
         "key": "E",
-        "text": "綜合上述所有條件，實數 $a$ 的取值範圍是左開右閉區間 $(1, \\frac{4}{3}]$"
+        "text": "圖象與 $y$ 軸的交點坐標為 $(0, 3)$"
       },
       {
         "key": "F",
-        "text": "實數 $a = \\frac{4}{3}$ 時，分段函數在 $x = 2$ 處連續且在 $\\mathbb{R}$ 上單調遞增"
+        "text": "圖象與 $x$ 軸的交點坐標為 $(1, 0)$ 和 $(3, 0)$"
       },
       {
         "key": "G",
-        "text": "實數 $a = 1.5$ 滿足函數在 $\\mathbb{R}$ 上單調遞增"
+        "text": "當 $x \\in [0, 5]$ 時，函數的最大值為 $f(5) = 8$"
       },
       {
         "key": "H",
-        "text": "若將第一段改為 $x \\le 2$，第二段改為 $x > 2$，單調增的 $a$ 的取值範圍會發生實質改變"
+        "text": "函數在區間 $(-\\infty, 2]$ 上單調遞減，在 $[2, +\\infty)$ 上單調遞增"
       }
     ],
     "correctKeys": [
@@ -16900,10 +16900,22 @@ window.ADMIN_STUDENT_PASSWORDS = {
       "C",
       "D",
       "E",
-      "F"
+      "F",
+      "G",
+      "H"
     ],
-    "explanation": "1. **分段函數全局單調性的「三大立足支柱」**:\n     - **支柱一（左段單調增）**: 對於 $x \\in (-\\infty, 2)$，$f(x) = (a - 1)x + 2$ 為一次函數，單調增必須且只需斜率大於 0：$a - 1 > 0 \\implies a > 1$。A 正確。\n     - **支柱二（右段單調增）**: 對於 $x \\in [2, +\\infty)$，$f(x) = x^2 - 2ax + 4$ 為二次函數，開口向上，對稱軸為 $x = a$。要保證在 $[2, +\\infty)$ 上單調遞增，對稱軸必須位於區間左端點的左側或剛好在端點上，即 $a \\le 2$。B 正確。\n     - **支柱三（交接點防跌落）**: 很多學生僅注意各自分段單調，而忽略交接處的銜接。若左段終點高於右段起點，會產生突發暴跌，破壞全局單調增。因此必須保證：左側在 $x \\to 2^-$ 趨近值不大於右側在 $x = 2$ 處的值。C 正確。\n       - 代入計算：$2(a - 1) + 2 \\le 2^2 - 2a(2) + 4 \\iff 2a - 2 + 2 \\le 4 - 4a + 4 \\iff 2a \\le 8 - 4a \\iff 6a \\le 8 \\iff a \\le \\frac{4}{3}$。D 正確。\n  2. **聯立求交集與邊界檢驗**:\n     - 聯立三大條件：$\\begin{cases} a > 1 \\\\ a \\le 2 \\\\ a \\le \\frac{4}{3} \\end{cases} \\implies 1 < a \\le \\frac{4}{3}$。取值範圍為 $(1, \\frac{4}{3}]$。E 正確。\n     - 當 $a = \\frac{4}{3}$ 時：左側趨近值為 $(\\frac{4}{3} - 1)(2) + 2 = \\frac{2}{3} + 2 = \\frac{8}{3}$；右側值為 $4 - 2(\\frac{4}{3})(2) + 4 = 8 - \\frac{16}{3} = \\frac{8}{3}$。左右值精確吻合，函數在 $x = 2$ 連續，且在 $\\mathbb{R}$ 上平滑銜接單調遞增。F 正確。\n     - 若 $a = 1.5 = \\frac{3}{2} > \\frac{4}{3}$，此時左側極限為 $0.5(2) + 2 = 3$，而右側值為 $4 - 2(1.5)(2) + 4 = 2$。從 $x < 2$ 到 $x = 2$ 函數值從 3 突然跌落至 2，不滿足單調增，G 錯誤。\n     - 分段端點閉於左或閉於右不改變數值極限大小約束，取值範圍完全一致，H 錯誤。",
-    "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 G、H 任何一項者得 0 分。"
+    "explanation": "解析：\\n1. 開口方向：二次項係數 a = 1 > 0，拋物線開口向上，A 正確。\\n2. 對稱軸：x = -b/(2a) = -(-4)/2 = 2，B 正確。\\n3. 配方求頂點：f(x) = (x - 2)^2 - 1，頂點為 (2, -1)，C 正確。\\n4. 最小值：因為 a > 0，在頂點處取得最小值 f(2) = -1，D 正確。\\n5. 與 y 軸交點：令 x = 0，得 y = 3，交點為 (0, 3)，E 正確。\\n6. 與 x 軸交點：令 x^2 - 4x + 3 = 0，解得 x = 1 或 x = 3，交點為 (1, 0) 和 (3, 0)，F 正確。\\n7. 區間 [0, 5] 最值：對稱軸 x = 2 在區間內，離對稱軸最遠的端點為 x = 5，f(5) = 25 - 20 + 3 = 8，最大值為 8，G 正確。\\n8. 單調性：拋物線開口向上，對稱軸 x = 2，因此在 (-∞, 2] 上單調遞減，在 [2, +∞) 上單調遞增，H 正確。\\n綜上，全部選項 A, B, C, D, E, F, G, H 均正確。",
+    "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 G、H 任何一項者得 0 分。",
+    "answer": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "G",
+      "H"
+    ]
   },
   {
     "id": "4CD_1023_Q74",
@@ -16964,11 +16976,11 @@ window.ADMIN_STUDENT_PASSWORDS = {
   {
     "id": "4CD_1023_Q75",
     "q_num": 75,
-    "topic": "澳門情境 · 澳門旅遊塔（Macau Tower）高空蹦極跳極限安全高度模型",
+    "topic": "澳門情境 · 澳門旅遊塔（Macau Tower）高空蹦極跳極致安全高度模型",
     "source": "Macau Context: 澳門旅遊塔蹦極跳二次位移與不等式安全窗口",
     "difficulty": "Macau / Creative Context",
     "isVerbatimArchive": false,
-    "stem": "澳門旅遊塔（Macau Tower）總高 338 米，主觀光層蹦極跳（Bungy Jump）平台高 233 米。遊客體驗蹦極下落時，在緩衝主繩完全拉直前的自由落體階段，體驗者對地高度 $h(t)$（單位：米）與下落時間 $t$（單位：秒）滿足二次函數模型：$h(t) = 233 - 5t^2$（$t \\ge 0$）。國際極限運動安全規範規定，在離地高度不低於 53 米處必須完成主繩張力釋放與制動對接（即安全高度要求 $h(t) \\ge 53$）。下列關於該運動模型與不等式求解的敘述中，正確的有：",
+    "stem": "澳門旅遊塔（Macau Tower）總高 338 米，主觀光層蹦極跳（Bungy Jump）平台高 233 米。遊客體驗蹦極下落時，在緩衝主繩完全拉直前的自由落體階段，體驗者對地高度 $h(t)$（單位：米）與下落時間 $t$（單位：秒）滿足二次函數模型：$h(t) = 233 - 5t^2$（$t \\ge 0$）。國際邊界運動安全規範規定，在離地高度不低於 53 米處必須完成主繩張力釋放與制動對接（即安全高度要求 $h(t) \\ge 53$）。下列關於該運動模型與不等式求解的敘述中，正確的有：",
     "diagram_spec": "自由下落二次拋物線高度-時間圖（開口向下拋物線 $h(t) = 233 - 5t^2$，水平安全基準線 $h = 53$，標註安全時間窗口 $[0, 6]$）",
     "diagram_filename": "q19_diagram.png",
     "options": [
@@ -17069,7 +17081,7 @@ window.ADMIN_STUDENT_PASSWORDS = {
       "F",
       "G"
     ],
-    "explanation": "1. **物理模型與頂點特徵**:\n     - 賽車制動位移 $s(t) = -5t^2 + 60t = -5(t - 6)^2 + 180$。\n     - 對稱軸為 $t = 6$ 秒，此時位移達到最大值 180 米，賽車完全停止。滑行階段的有效物理時間為 $[0, 6]$ 秒。A、B、C 正確。\n  2. **一元二次不等式推導與求解**:\n     - 安全防撞限制：$s(t) \\le 160 \\iff 60t - 5t^2 \\le 160$。\n     - 兩邊移項：$5t^2 - 60t + 160 \\ge 0$，同除以 5 得 $t^2 - 12t + 32 \\ge 0$。D 正確。\n     - 因式分解：$(t - 4)(t - 8) \\ge 0$，兩根為 $t_1 = 4, t_2 = 8$。E 正確。\n     - 解集為 $t \\le 4$ 或 $t \\ge 8$。\n     - 結合有效滑行時間 $[0, 6]$ 秒取交集：$[0, 6] \\cap ((-\\infty, 4] \\cup [8, +\\infty)) = [0, 4]$ 秒。說明在第 4 秒末賽車已達到 160 米警戒線。F 正確。\n  3. **數值驗證**:\n     - 當 $t = 4$ 秒時：$s(4) = 60(4) - 5(16) = 240 - 80 = 160$ 米，剛好達到警戒極限。G 正確。\n     - 當 $t = 5$ 秒時：$s(5) = 60(5) - 5(25) = 300 - 125 = 175$ 米，大於 160 米，已突破安全防撞線，H 錯誤。",
+    "explanation": "1. **物理模型與頂點特徵**:\n     - 賽車制動位移 $s(t) = -5t^2 + 60t = -5(t - 6)^2 + 180$。\n     - 對稱軸為 $t = 6$ 秒，此時位移達到最大值 180 米，賽車完全停止。滑行階段的有效物理時間為 $[0, 6]$ 秒。A、B、C 正確。\n  2. **一元二次不等式推導與求解**:\n     - 安全防撞限制：$s(t) \\le 160 \\iff 60t - 5t^2 \\le 160$。\n     - 兩邊移項：$5t^2 - 60t + 160 \\ge 0$，同除以 5 得 $t^2 - 12t + 32 \\ge 0$。D 正確。\n     - 因式分解：$(t - 4)(t - 8) \\ge 0$，兩根為 $t_1 = 4, t_2 = 8$。E 正確。\n     - 解集為 $t \\le 4$ 或 $t \\ge 8$。\n     - 結合有效滑行時間 $[0, 6]$ 秒取交集：$[0, 6] \\cap ((-\\infty, 4] \\cup [8, +\\infty)) = [0, 4]$ 秒。說明在第 4 秒末賽車已達到 160 米警戒線。F 正確。\n  3. **數值驗證**:\n     - 當 $t = 4$ 秒時：$s(4) = 60(4) - 5(16) = 240 - 80 = 160$ 米，剛好達到警戒邊界。G 正確。\n     - 當 $t = 5$ 秒時：$s(5) = 60(5) - 5(25) = 300 - 125 = 175$ 米，大於 160 米，已突破安全防撞線，H 錯誤。",
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 H 錯誤選項者得 0 分。"
   },
   {
@@ -19249,7 +19261,7 @@ window.ADMIN_STUDENT_PASSWORDS = {
     }, 1000);
   }
 
-// 5. Adaptive Quiz Engine for 4CD 1023 (50% / 20% / 30% Dynamic Dosage)
+// 5. Adaptive Quiz Engine for 4CD 1023 (Strict Sequential Order: 50% 4-opt -> 20% 6-opt -> 30% 8-opt)
   function expandExamQuotaTo(exam, newQuota) {
     newQuota = Math.min(60, Math.max(exam.targetQuota, newQuota));
 
@@ -19265,9 +19277,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     const answeredIds = new Set(answeredQs.map(q => q.id));
     const allPool = exam.pool || window.QUESTIONS_4CD1023 || [];
 
-    const rem4 = allPool.filter(q => (q.options || []).length === 4 && !answeredIds.has(q.id));
-    const rem6 = allPool.filter(q => (q.options || []).length === 6 && !answeredIds.has(q.id));
-    const rem8 = allPool.filter(q => (q.options || []).length === 8 && !answeredIds.has(q.id));
+    const rem4 = allPool.filter(q => (q.options || []).length === 4 && !answeredIds.has(q.id)).sort(() => 0.5 - Math.random());
+    const rem6 = allPool.filter(q => (q.options || []).length === 6 && !answeredIds.has(q.id)).sort(() => 0.5 - Math.random());
+    const rem8 = allPool.filter(q => (q.options || []).length === 8 && !answeredIds.has(q.id)).sort(() => 0.5 - Math.random());
 
     const needed4 = Math.max(0, targetC4 - ans4);
     const needed6 = Math.max(0, targetC6 - ans6);
@@ -19277,8 +19289,8 @@ window.ADMIN_STUDENT_PASSWORDS = {
     const pick6 = rem6.slice(0, needed6);
     const pick8 = rem8.slice(0, needed8);
 
-    const remainingToAnswer = [].concat(pick4, pick6, pick8).sort(() => 0.5 - Math.random());
-    exam.questions = answeredQs.concat(remainingToAnswer);
+    // Strictly ordered by tier: 4-opt first, then 6-opt, then 8-opt!
+    exam.questions = answeredQs.concat(pick4, pick6, pick8);
 
     if (exam.questions.length > 60) {
       exam.questions = exam.questions.slice(0, 60);
@@ -19302,6 +19314,7 @@ window.ADMIN_STUDENT_PASSWORDS = {
       return copy;
     });
 
+    // Shuffle within each tier
     const t4 = pool.filter(q => (q.options || []).length === 4).sort(() => 0.5 - Math.random());
     const t6 = pool.filter(q => (q.options || []).length === 6).sort(() => 0.5 - Math.random());
     const t8 = pool.filter(q => (q.options || []).length === 8).sort(() => 0.5 - Math.random());
@@ -19311,7 +19324,8 @@ window.ADMIN_STUDENT_PASSWORDS = {
     const draw6 = t6.slice(0, 5);
     const draw8 = t8.slice(0, 7);
 
-    const initial25 = [].concat(draw4, draw6, draw8).sort(() => 0.5 - Math.random());
+    // Strictly ordered sequence: 4-opt (0..12) -> 6-opt (13..17) -> 8-opt (18..24)
+    const initial25 = [].concat(draw4, draw6, draw8);
 
     AppState.practiceElapsedSeconds = 0;
     AppState.antiCheatElapsedSeconds = 0;

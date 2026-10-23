@@ -139,7 +139,7 @@
     const draw4 = t4.slice(0, 13);
     const draw6 = t6.slice(0, 5);
     const draw8 = t8.slice(0, 7);
-    state.questions = [].concat(draw4, draw6, draw8).sort(() => 0.5 - Math.random());
+    state.questions = [].concat(draw4, draw6, draw8); // Sequential: 4-opt -> 6-opt -> 8-opt
     state.currentIndex = 0;
     state.targetDosage = 25;
     state.hastyGuessCount = 0;
