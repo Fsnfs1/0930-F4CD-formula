@@ -13826,10 +13826,10 @@ window.ADMIN_STUDENT_PASSWORDS = {
 
 /* Inlined from questions_4cd1023.js */
 /**
- * questions_4cd1023.js - 4CD 1023 High School Mathematics Multi-Select Question Pool
- * Total Questions: 52
- * Format: 8 options (A-H), 2 to 8 correct options, full step-by-step explanations
- * Topics: Quadratic Inequalities, Function Concept, Domain, Range, Monotonicity, Macau Contexts
+ * questions_4cd1023.js - 4CD 1023 High School Mathematics Question Pool (80 Questions)
+ * Tier 1: 40 Questions (50%), 4 Options (A-D), Single Choice (1 correctKey)
+ * Tier 2: 16 Questions (20%), 6 Options (A-F), Single Choice (1 correctKey)
+ * Tier 3: 24 Questions (30%), 8 Options (A-H), Multi-Select (>= 2 correctKeys)
  */
 
 (function (root) {
@@ -13839,6 +13839,2150 @@ window.ADMIN_STUDENT_PASSWORDS = {
   {
     "id": "4CD_1023_Q01",
     "q_num": 1,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 拋物線開口方向與係數符號",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": true,
+    "source": "Verbatim Archive: 1021@F4CD.pptx",
+    "stem": "二次函數 $y = 2x^2 - 3x + 1$ 的圖象開口方向是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "向上"
+      },
+      {
+        "key": "B",
+        "text": "向下"
+      },
+      {
+        "key": "C",
+        "text": "向左"
+      },
+      {
+        "key": "D",
+        "text": "向右"
+      }
+    ],
+    "correctKeys": [
+      "A"
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "因為二次項係數 $a = 2 > 0$，所以二次函數圖象開口向上。"
+  },
+  {
+    "id": "4CD_1023_Q02",
+    "q_num": 2,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 拋物線開口方向與係數符號",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": true,
+    "source": "Verbatim Archive: 1020@4CD.pptx",
+    "stem": "二次函數 $y = -x^2 + 4x - 5$ 的圖象開口方向及最值類型為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "開口向上，函數有最小值"
+      },
+      {
+        "key": "B",
+        "text": "開口向下，函數有最大值"
+      },
+      {
+        "key": "C",
+        "text": "開口向下，函數有最小值"
+      },
+      {
+        "key": "D",
+        "text": "開口向上，函數有最大值"
+      }
+    ],
+    "correctKeys": [
+      "B"
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "二次項係數 $a = -1 < 0$，圖象開口向下，拋物線在頂點處取得最大值。"
+  },
+  {
+    "id": "4CD_1023_Q03",
+    "q_num": 3,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 拋物線開口方向與係數符號",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "若二次函數 $y = ax^2 + bx + c$ 的圖象開口向下，則係數 $a$ 必須滿足？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$a > 0$"
+      },
+      {
+        "key": "B",
+        "text": "$a = 0$"
+      },
+      {
+        "key": "C",
+        "text": "$a < 0$"
+      },
+      {
+        "key": "D",
+        "text": "$a \\ge 0$"
+      }
+    ],
+    "correctKeys": [
+      "C"
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "二次函數拋物線開口方向完全由二次項係數 $a$ 的正負符號決定，$a < 0$ 時開口向下。"
+  },
+  {
+    "id": "4CD_1023_Q04",
+    "q_num": 4,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 拋物線開口方向與係數符號",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "二次函數 $y = -\\frac{1}{2}x^2 + 3x - 1$ 的圖象開口方向是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "向上"
+      },
+      {
+        "key": "B",
+        "text": "向左"
+      },
+      {
+        "key": "C",
+        "text": "向右"
+      },
+      {
+        "key": "D",
+        "text": "向下"
+      }
+    ],
+    "correctKeys": [
+      "D"
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "二次項係數 $a = -\\frac{1}{2} < 0$，圖象開口向下。"
+  },
+  {
+    "id": "4CD_1023_Q05",
+    "q_num": 5,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 拋物線開口方向與係數符號",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "二次函數 $y = 3(x - 2)^2 + 4$ 的圖象開口方向是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "向上"
+      },
+      {
+        "key": "B",
+        "text": "向下"
+      },
+      {
+        "key": "C",
+        "text": "水平向左"
+      },
+      {
+        "key": "D",
+        "text": "水平向右"
+      }
+    ],
+    "correctKeys": [
+      "A"
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "頂點式 $y = a(x - h)^2 + k$ 中，$a = 3 > 0$，圖象開口向上。"
+  },
+  {
+    "id": "4CD_1023_Q06",
+    "q_num": 6,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 拋物線開口方向與係數符號",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "若二次函數 $f(x) = (m - 1)x^2 + 2x + 1$ 的圖象開口向上，則實數 $m$ 的取值範圍是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$m < 1$"
+      },
+      {
+        "key": "B",
+        "text": "$m > 1$"
+      },
+      {
+        "key": "C",
+        "text": "$m \\ge 1$"
+      },
+      {
+        "key": "D",
+        "text": "$m \\ne 1$"
+      }
+    ],
+    "correctKeys": [
+      "B"
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "拋物線開口向上要求二次項係數大於零，即 $m - 1 > 0 \\implies m > 1$。"
+  },
+  {
+    "id": "4CD_1023_Q07",
+    "q_num": 7,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 拋物線開口方向與係數符號",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "函數 $y = -3(x + 1)^2 - 2$ 的頂點座標所對應的函數值是該函數的？",
+    "options": [
+      {
+        "key": "A",
+        "text": "最小值，值為 $-2$"
+      },
+      {
+        "key": "B",
+        "text": "最大值，值為 $2$"
+      },
+      {
+        "key": "C",
+        "text": "最大值，值為 $-2$"
+      },
+      {
+        "key": "D",
+        "text": "最小值，值為 $1$"
+      }
+    ],
+    "correctKeys": [
+      "C"
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "因為 $a = -3 < 0$，當 $x = -1$ 時取得最大值 $y_{\\max} = -2$。"
+  },
+  {
+    "id": "4CD_1023_Q08",
+    "q_num": 8,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 拋物線開口方向與係數符號",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "下列二次函數中，圖象開口向下且頂點在 $y$ 軸上的是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$y = 2x^2 + 3$"
+      },
+      {
+        "key": "B",
+        "text": "$y = -(x - 1)^2$"
+      },
+      {
+        "key": "C",
+        "text": "$y = -2x^2 + 4x$"
+      },
+      {
+        "key": "D",
+        "text": "$y = -2x^2 + 3$"
+      }
+    ],
+    "correctKeys": [
+      "D"
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "$y = -2x^2 + 3$ 中 $a = -2 < 0$ 開口向下，一次項係數 $b = 0$，對稱軸為 $y$ 軸（$x = 0$），頂點在 $y$ 軸上。"
+  },
+  {
+    "id": "4CD_1023_Q09",
+    "q_num": 9,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 因式分解型基礎解法",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": true,
+    "source": "Verbatim Archive: F4CD一元二次不等式.pptx",
+    "stem": "一元二次不等式 $(x - 1)(x - 4) < 0$ 的解集是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$(1, 4)$"
+      },
+      {
+        "key": "B",
+        "text": "$(-\\infty, 1) \\cup (4, +\\infty)$"
+      },
+      {
+        "key": "C",
+        "text": "$[-1, 4]$"
+      },
+      {
+        "key": "D",
+        "text": "$(4, +\\infty)$"
+      }
+    ],
+    "correctKeys": [
+      "A"
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "對應方程的兩根為 $x_1 = 1, x_2 = 4$。根據「小於取中間」口訣，解集為 $(1, 4)$。"
+  },
+  {
+    "id": "4CD_1023_Q10",
+    "q_num": 10,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 因式分解型基礎解法",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": true,
+    "source": "Verbatim Archive: F4CD一元二次不等式.pptx",
+    "stem": "一元二次不等式 $(x - 2)(x - 5) > 0$ 的解集是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$(2, 5)$"
+      },
+      {
+        "key": "B",
+        "text": "$(-\\infty, 2) \\cup (5, +\\infty)$"
+      },
+      {
+        "key": "C",
+        "text": "$[2, 5]$"
+      },
+      {
+        "key": "D",
+        "text": "$(-\\infty, 2]$"
+      }
+    ],
+    "correctKeys": [
+      "B"
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "對應方程兩根為 $2$ 和 $5$。根據「大於取兩邊」口訣，解集為 $(-\\infty, 2) \\cup (5, +\\infty)$。"
+  },
+  {
+    "id": "4CD_1023_Q11",
+    "q_num": 11,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 因式分解型基礎解法",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": true,
+    "source": "Verbatim Archive: 1014@F4CD",
+    "stem": "一元二次不等式 $(x + 3)(x - 1) \\le 0$ 的解集是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$(-3, 1)$"
+      },
+      {
+        "key": "B",
+        "text": "$(-\\infty, -3] \\cup [1, +\\infty)$"
+      },
+      {
+        "key": "C",
+        "text": "$[-3, 1]$"
+      },
+      {
+        "key": "D",
+        "text": "$[-1, 3]$"
+      }
+    ],
+    "correctKeys": [
+      "C"
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "方程 $(x + 3)(x - 1) = 0$ 兩根為 $x = -3$ 和 $x = 1$。帶等號的小於取中間閉區間 $[-3, 1]$。"
+  },
+  {
+    "id": "4CD_1023_Q12",
+    "q_num": 12,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 因式分解型基礎解法",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "一元二次不等式 $(x + 2)(x + 6) \\ge 0$ 的解集是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$[-6, -2]$"
+      },
+      {
+        "key": "B",
+        "text": "$(-6, -2)$"
+      },
+      {
+        "key": "C",
+        "text": "$(-\\infty, 2] \\cup [6, +\\infty)$"
+      },
+      {
+        "key": "D",
+        "text": "$(-\\infty, -6] \\cup [-2, +\\infty)$"
+      }
+    ],
+    "correctKeys": [
+      "D"
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "兩根為 $-6$ 和 $-2$。大於等於取兩端閉區間 $(-\\infty, -6] \\cup [-2, +\\infty)$。"
+  },
+  {
+    "id": "4CD_1023_Q13",
+    "q_num": 13,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 因式分解型基礎解法",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": true,
+    "source": "Verbatim Archive: 1013@4CSEN",
+    "stem": "不等式 $x(x - 3) < 0$ 的解集是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$(0, 3)$"
+      },
+      {
+        "key": "B",
+        "text": "$(-\\infty, 0) \\cup (3, +\\infty)$"
+      },
+      {
+        "key": "C",
+        "text": "$[0, 3]$"
+      },
+      {
+        "key": "D",
+        "text": "$(3, +\\infty)$"
+      }
+    ],
+    "correctKeys": [
+      "A"
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "因式分解型兩根為 $0$ 與 $3$，小於取中間，解集為 $(0, 3)$。"
+  },
+  {
+    "id": "4CD_1023_Q14",
+    "q_num": 14,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 因式分解型基礎解法",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "不等式 $(2x - 1)(x - 3) < 0$ 的解集是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$(-\\infty, \\frac{1}{2}) \\cup (3, +\\infty)$"
+      },
+      {
+        "key": "B",
+        "text": "$(\\frac{1}{2}, 3)$"
+      },
+      {
+        "key": "C",
+        "text": "$(1, 3)$"
+      },
+      {
+        "key": "D",
+        "text": "$(-\\infty, 3)$"
+      }
+    ],
+    "correctKeys": [
+      "B"
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "令各因式為零得兩根 $x_1 = \\frac{1}{2}, x_2 = 3$。二次項係數 $2 > 0$，小於取中間，解集為 $(\\frac{1}{2}, 3)$。"
+  },
+  {
+    "id": "4CD_1023_Q15",
+    "q_num": 15,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 因式分解型基礎解法",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "方程 $(x - 3)(x + 5) = 0$ 的兩根中較小者為 $x_1$，較大者為 $x_2$，則不等式 $(x - 3)(x + 5) > 0$ 的解集為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$(-5, 3)$"
+      },
+      {
+        "key": "B",
+        "text": "$[-5, 3]$"
+      },
+      {
+        "key": "C",
+        "text": "$(-\\infty, -5) \\cup (3, +\\infty)$"
+      },
+      {
+        "key": "D",
+        "text": "$(3, +\\infty)$"
+      }
+    ],
+    "correctKeys": [
+      "C"
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "兩根分別為 $-5$ 和 $3$。大於取兩邊，解集為 $(-\\infty, -5) \\cup (3, +\\infty)$。"
+  },
+  {
+    "id": "4CD_1023_Q16",
+    "q_num": 16,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 因式分解型基礎解法",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "不等式 $(x - 4)(x + 1) \\le 0$ 的整數解共有多少個？",
+    "options": [
+      {
+        "key": "A",
+        "text": "5個"
+      },
+      {
+        "key": "B",
+        "text": "4個"
+      },
+      {
+        "key": "C",
+        "text": "7個"
+      },
+      {
+        "key": "D",
+        "text": "6個"
+      }
+    ],
+    "correctKeys": [
+      "D"
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "不等式解集為閉區間 $[-1, 4]$。其中的整數解為 $-1, 0, 1, 2, 3, 4$，共 6 個整數。"
+  },
+  {
+    "id": "4CD_1023_Q17",
+    "q_num": 17,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 判別式計算與零點判定",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "一元二次方程 $x^2 - 6x + 9 = 0$ 的判別式 $\\Delta = b^2 - 4ac$ 的值是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$0$"
+      },
+      {
+        "key": "B",
+        "text": "$36$"
+      },
+      {
+        "key": "C",
+        "text": "$-36$"
+      },
+      {
+        "key": "D",
+        "text": "$72$"
+      }
+    ],
+    "correctKeys": [
+      "A"
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "$\\Delta = (-6)^2 - 4 \\times 1 \\times 9 = 36 - 36 = 0$。"
+  },
+  {
+    "id": "4CD_1023_Q18",
+    "q_num": 18,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 判別式計算與零點判定",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "二次函數 $y = x^2 - 4x + 5$ 的判別式 $\\Delta$ 及其圖象與 $x$ 軸交點情況是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$\\Delta = 4 > 0$，與 $x$ 軸有兩個交點"
+      },
+      {
+        "key": "B",
+        "text": "$\\Delta = -4 < 0$，與 $x$ 軸無交點"
+      },
+      {
+        "key": "C",
+        "text": "$\\Delta = 0$，與 $x$ 軸切於一點"
+      },
+      {
+        "key": "D",
+        "text": "$\\Delta = -4 < 0$，與 $x$ 軸有兩個交點"
+      }
+    ],
+    "correctKeys": [
+      "B"
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "$\\Delta = (-4)^2 - 4 \\times 1 \\times 5 = 16 - 20 = -4 < 0$，判別式小於零說明方程無實根，圖象與 $x$ 軸無交點。"
+  },
+  {
+    "id": "4CD_1023_Q19",
+    "q_num": 19,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 判別式計算與零點判定",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "二次方程 $2x^2 + 5x - 3 = 0$ 的判別式 $\\Delta$ 的值為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$1$"
+      },
+      {
+        "key": "B",
+        "text": "$-1$"
+      },
+      {
+        "key": "C",
+        "text": "$49$"
+      },
+      {
+        "key": "D",
+        "text": "$25$"
+      }
+    ],
+    "correctKeys": [
+      "C"
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "$\\Delta = b^2 - 4ac = 5^2 - 4 \\times 2 \\times (-3) = 25 + 24 = 49$。"
+  },
+  {
+    "id": "4CD_1023_Q20",
+    "q_num": 20,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 判別式計算與零點判定",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "若二次函數 $y = x^2 - 2x + c$ 的圖象與 $x$ 軸只有一個交點（切點），則常數 $c$ 的值為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$-1$"
+      },
+      {
+        "key": "B",
+        "text": "$0$"
+      },
+      {
+        "key": "C",
+        "text": "$4$"
+      },
+      {
+        "key": "D",
+        "text": "$1$"
+      }
+    ],
+    "correctKeys": [
+      "D"
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "圖象與 $x$ 軸只有一個交點等價於 $\\Delta = 0$，即 $(-2)^2 - 4 \\times 1 \\times c = 0 \\implies 4 - 4c = 0 \\implies c = 1$。"
+  },
+  {
+    "id": "4CD_1023_Q21",
+    "q_num": 21,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 判別式計算與零點判定",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "當判別式 $\\Delta = b^2 - 4ac < 0$ 且二次項係數 $a > 0$ 時，不等式 $ax^2 + bx + c > 0$ 的解集為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$\\mathbb{R}$"
+      },
+      {
+        "key": "B",
+        "text": "$\\emptyset$"
+      },
+      {
+        "key": "C",
+        "text": "$(0, +\\infty)$"
+      },
+      {
+        "key": "D",
+        "text": "$(-\\infty, 0)$"
+      }
+    ],
+    "correctKeys": [
+      "A"
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "因為拋物線開口向上 ($a > 0$) 且與 $x$ 軸沒有交點 ($\\Delta < 0$)，整個圖象位於 $x$ 軸上方，故對任意實數 $x$ 函數值均大於零，解集為 $\\mathbb{R}$。"
+  },
+  {
+    "id": "4CD_1023_Q22",
+    "q_num": 22,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 判別式計算與零點判定",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "二次方程 $x^2 + 2x + 3 = 0$ 在實數範圍內的解的情況是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "有兩個不相等的正實數解"
+      },
+      {
+        "key": "B",
+        "text": "無實數解"
+      },
+      {
+        "key": "C",
+        "text": "有兩個不相等的負實數解"
+      },
+      {
+        "key": "D",
+        "text": "有兩個相等的實數解"
+      }
+    ],
+    "correctKeys": [
+      "B"
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "$\\Delta = 2^2 - 4 \\times 1 \\times 3 = 4 - 12 = -8 < 0$，故方程無實數解。"
+  },
+  {
+    "id": "4CD_1023_Q23",
+    "q_num": 23,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 判別式計算與零點判定",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "拋物線 $y = -x^2 + 2x - 1$ 與 $x$ 軸交點的個數為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "2個"
+      },
+      {
+        "key": "B",
+        "text": "0個"
+      },
+      {
+        "key": "C",
+        "text": "1個"
+      },
+      {
+        "key": "D",
+        "text": "無數個"
+      }
+    ],
+    "correctKeys": [
+      "C"
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "$\\Delta = 2^2 - 4 \\times (-1) \\times (-1) = 4 - 4 = 0$，故拋物線與 $x$ 軸恰有 1 個交點（頂點在 $x$ 軸上）。"
+  },
+  {
+    "id": "4CD_1023_Q24",
+    "q_num": 24,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 判別式計算與零點判定",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "方程 $3x^2 - 2x - 1 = 0$ 的判別式 $\\Delta$ 的值為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$-8$"
+      },
+      {
+        "key": "B",
+        "text": "$4$"
+      },
+      {
+        "key": "C",
+        "text": "$12$"
+      },
+      {
+        "key": "D",
+        "text": "$16$"
+      }
+    ],
+    "correctKeys": [
+      "D"
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "$\\Delta = (-2)^2 - 4 \\times 3 \\times (-1) = 4 + 12 = 16$。"
+  },
+  {
+    "id": "4CD_1023_Q25",
+    "q_num": 25,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 基礎區間表示法與集合",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "不等式 $x > 2$ 用區間表示法表示為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$(2, +\\infty)$"
+      },
+      {
+        "key": "B",
+        "text": "$[2, +\\infty)$"
+      },
+      {
+        "key": "C",
+        "text": "$(-\\infty, 2)$"
+      },
+      {
+        "key": "D",
+        "text": "$(-\\infty, 2]$"
+      }
+    ],
+    "correctKeys": [
+      "A"
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "大於 2 且不包含 2，用圓括號表示開區間 $(2, +\\infty)$。"
+  },
+  {
+    "id": "4CD_1023_Q26",
+    "q_num": 26,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 基礎區間表示法與集合",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "不等式組 $-1 \\le x \\le 3$ 用區間表示法表示為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$(-1, 3)$"
+      },
+      {
+        "key": "B",
+        "text": "$[-1, 3]$"
+      },
+      {
+        "key": "C",
+        "text": "$[-1, 3)$"
+      },
+      {
+        "key": "D",
+        "text": "$(-1, 3]$"
+      }
+    ],
+    "correctKeys": [
+      "B"
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "兩端均包含等號，用方括號表示閉區間 $[-1, 3]$。"
+  },
+  {
+    "id": "4CD_1023_Q27",
+    "q_num": 27,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 基礎區間表示法與集合",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "集合 $\\{x \\mid x < 0 \\text{ 或 } x \\ge 4\\}$ 用區間表示法表示為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$[0, 4]$"
+      },
+      {
+        "key": "B",
+        "text": "$(0, 4]$"
+      },
+      {
+        "key": "C",
+        "text": "$(-\\infty, 0) \\cup [4, +\\infty)$"
+      },
+      {
+        "key": "D",
+        "text": "$(-\\infty, 0] \\cup (4, +\\infty)$"
+      }
+    ],
+    "correctKeys": [
+      "C"
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "$x < 0$ 對應 $(-\\infty, 0)$，$x \\ge 4$ 對應 $[4, +\\infty)$，兩者取並集為 $(-\\infty, 0) \\cup [4, +\\infty)$。"
+  },
+  {
+    "id": "4CD_1023_Q28",
+    "q_num": 28,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 基礎區間表示法與集合",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "區間 $[2, 5)$ 在數軸上的表示含義是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "不包含端點 2，但包含端點 5"
+      },
+      {
+        "key": "B",
+        "text": "同時包含端點 2 和 5"
+      },
+      {
+        "key": "C",
+        "text": "不包含端點 2 和 5"
+      },
+      {
+        "key": "D",
+        "text": "包含端點 2，但不包含端點 5"
+      }
+    ],
+    "correctKeys": [
+      "D"
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "左方括號代表左閉（包含端點 2），右圓括號代表右開（不包含端點 5）。"
+  },
+  {
+    "id": "4CD_1023_Q29",
+    "q_num": 29,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 基礎區間表示法與集合",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "設集合 $A = (-2, 3)$，集合 $B = [1, 4]$，則交集 $A \\cap B$ 為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$[1, 3)$"
+      },
+      {
+        "key": "B",
+        "text": "$(-2, 4]$"
+      },
+      {
+        "key": "C",
+        "text": "$[-2, 3]$"
+      },
+      {
+        "key": "D",
+        "text": "$(1, 3)$"
+      }
+    ],
+    "correctKeys": [
+      "A"
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "$A$ 與 $B$ 的公共部分為大於等於 1 且小於 3 的實數，即 $[1, 3)$。"
+  },
+  {
+    "id": "4CD_1023_Q30",
+    "q_num": 30,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 基礎區間表示法與集合",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "設集合 $A = (-\\infty, 2]$，集合 $B = (0, +\\infty)$，則並集 $A \\cup B$ 為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$(0, 2]$"
+      },
+      {
+        "key": "B",
+        "text": "$(-\\infty, +\\infty)$ 即 $\\mathbb{R}$"
+      },
+      {
+        "key": "C",
+        "text": "$[0, 2)$"
+      },
+      {
+        "key": "D",
+        "text": "$\\emptyset$"
+      }
+    ],
+    "correctKeys": [
+      "B"
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "$(-\\infty, 2]$ 與 $(0, +\\infty)$ 在區間 $(0, 2]$ 處重疊，並集覆蓋整個實數軸，即 $\\mathbb{R}$。"
+  },
+  {
+    "id": "4CD_1023_Q31",
+    "q_num": 31,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 基礎區間表示法與集合",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "不等式 $-3 < x \\le 1$ 所對應的區間是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$[-3, 1)$"
+      },
+      {
+        "key": "B",
+        "text": "$(-3, 1)$"
+      },
+      {
+        "key": "C",
+        "text": "$(-3, 1]$"
+      },
+      {
+        "key": "D",
+        "text": "$[-3, 1]$"
+      }
+    ],
+    "correctKeys": [
+      "C"
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "左端點不含等號用圓括號，右端點含等號用方括號，表示為左開右閉區間 $(-3, 1]$。"
+  },
+  {
+    "id": "4CD_1023_Q32",
+    "q_num": 32,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 基礎區間表示法與集合",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "設全集 $U = \\mathbb{R}$，集合 $A = [2, +\\infty)$，則補集 $\\complement_U A$ 為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$(-\\infty, 2]$"
+      },
+      {
+        "key": "B",
+        "text": "$(2, +\\infty)$"
+      },
+      {
+        "key": "C",
+        "text": "$\\emptyset$"
+      },
+      {
+        "key": "D",
+        "text": "$(-\\infty, 2)$"
+      }
+    ],
+    "correctKeys": [
+      "D"
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "全集中扣除大於等於 2 的數，剩餘小於 2 的實數，即 $(-\\infty, 2)$。"
+  },
+  {
+    "id": "4CD_1023_Q33",
+    "q_num": 33,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 負首項變號與特殊解集",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "解一元二次不等式 $-x^2 + 4x - 3 > 0$，兩邊同乘以 $-1$ 後轉化為的標準形式是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$x^2 - 4x + 3 < 0$"
+      },
+      {
+        "key": "B",
+        "text": "$x^2 - 4x + 3 > 0$"
+      },
+      {
+        "key": "C",
+        "text": "$x^2 + 4x - 3 < 0$"
+      },
+      {
+        "key": "D",
+        "text": "$-x^2 - 4x + 3 < 0$"
+      }
+    ],
+    "correctKeys": [
+      "A"
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "不等式兩邊同乘以負數，不等號方向必須改變，大於號變為小於號，即 $x^2 - 4x + 3 < 0$。"
+  },
+  {
+    "id": "4CD_1023_Q34",
+    "q_num": 34,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 負首項變號與特殊解集",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "不等式 $x^2 + 4 > 0$ 在實數範圍內的解集為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$\\emptyset$"
+      },
+      {
+        "key": "B",
+        "text": "$\\mathbb{R}$"
+      },
+      {
+        "key": "C",
+        "text": "$(-2, 2)$"
+      },
+      {
+        "key": "D",
+        "text": "$(-\\infty, -2) \\cup (2, +\\infty)$"
+      }
+    ],
+    "correctKeys": [
+      "B"
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "對任意實數 $x$，均有 $x^2 \\ge 0$，所以 $x^2 + 4 \\ge 4 > 0$ 恆成立，解集為全體實數 $\\mathbb{R}$。"
+  },
+  {
+    "id": "4CD_1023_Q35",
+    "q_num": 35,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 負首項變號與特殊解集",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "不等式 $x^2 + 9 \\le 0$ 在實數範圍內的解集為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$\\mathbb{R}$"
+      },
+      {
+        "key": "B",
+        "text": "$\\{-3, 3\\}$"
+      },
+      {
+        "key": "C",
+        "text": "$\\emptyset$"
+      },
+      {
+        "key": "D",
+        "text": "$[-3, 3]$"
+      }
+    ],
+    "correctKeys": [
+      "C"
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "因為 $x^2 \\ge 0$，所以 $x^2 + 9 \\ge 9 > 0$ 恆成立，不可能小於等於零，解集為空集 $\\emptyset$。"
+  },
+  {
+    "id": "4CD_1023_Q36",
+    "q_num": 36,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 負首項變號與特殊解集",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "不等式 $(x - 3)^2 \\le 0$ 的解集為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$\\emptyset$"
+      },
+      {
+        "key": "B",
+        "text": "$\\mathbb{R}$"
+      },
+      {
+        "key": "C",
+        "text": "$(-\\infty, 3]$"
+      },
+      {
+        "key": "D",
+        "text": "$\\{3\\}$"
+      }
+    ],
+    "correctKeys": [
+      "D"
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "完全平方數 $(x - 3)^2 \\ge 0$ 恆成立。若 $(x - 3)^2 \\le 0$，只能取等號 $(x - 3)^2 = 0 \\implies x = 3$，解集為單元素集 $\\{3\\}$。"
+  },
+  {
+    "id": "4CD_1023_Q37",
+    "q_num": 37,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 負首項變號與特殊解集",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "不等式 $(x + 2)^2 > 0$ 的解集為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$\\{x \\mid x \\ne -2\\}$"
+      },
+      {
+        "key": "B",
+        "text": "$\\mathbb{R}$"
+      },
+      {
+        "key": "C",
+        "text": "$\\emptyset$"
+      },
+      {
+        "key": "D",
+        "text": "$(-2, +\\infty)$"
+      }
+    ],
+    "correctKeys": [
+      "A"
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "當 $x = -2$ 時 $(x + 2)^2 = 0$ 不滿足大於零；當 $x \\ne -2$ 時平方恆大於零，故解集為 $\\{x \\mid x \\ne -2\\}$。"
+  },
+  {
+    "id": "4CD_1023_Q38",
+    "q_num": 38,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 負首項變號與特殊解集",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "解不等式 $-2x^2 + 6x \\le 0$，兩邊同除以 $-2$ 後等價於？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$x^2 - 3x \\le 0$"
+      },
+      {
+        "key": "B",
+        "text": "$x^2 - 3x \\ge 0$"
+      },
+      {
+        "key": "C",
+        "text": "$x^2 + 3x \\ge 0$"
+      },
+      {
+        "key": "D",
+        "text": "$2x^2 - 6x \\le 0$"
+      }
+    ],
+    "correctKeys": [
+      "B"
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "兩邊同除以負數 $-2$，小於等於號轉為大於等於號，得到 $x^2 - 3x \\ge 0$。"
+  },
+  {
+    "id": "4CD_1023_Q39",
+    "q_num": 39,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 負首項變號與特殊解集",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "不等式 $-(x - 1)(x - 5) \\ge 0$ 的解集為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$(-\\infty, 1] \\cup [5, +\\infty)$"
+      },
+      {
+        "key": "B",
+        "text": "$(1, 5)$"
+      },
+      {
+        "key": "C",
+        "text": "$[1, 5]$"
+      },
+      {
+        "key": "D",
+        "text": "$\\emptyset$"
+      }
+    ],
+    "correctKeys": [
+      "C"
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "兩邊乘以 $-1$ 得 $(x - 1)(x - 5) \\le 0$。兩根為 $1$ 和 $5$，小於等於取中間閉區間 $[1, 5]$。"
+  },
+  {
+    "id": "4CD_1023_Q40",
+    "q_num": 40,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 負首項變號與特殊解集",
+    "type": "single_choice",
+    "difficulty": "Basic",
+    "isVerbatimArchive": false,
+    "source": "1023基礎題庫",
+    "stem": "不等式 $x^2 - 2x + 1 < 0$ 的解集為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$\\{1\\}$"
+      },
+      {
+        "key": "B",
+        "text": "$\\mathbb{R}$"
+      },
+      {
+        "key": "C",
+        "text": "$(-1, 1)$"
+      },
+      {
+        "key": "D",
+        "text": "$\\emptyset$"
+      }
+    ],
+    "correctKeys": [
+      "D"
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "左邊配方為 $(x - 1)^2$。因為任何實數的平方都不可能嚴格小於 0，故解集為空集 $\\emptyset$。"
+  },
+  {
+    "id": "4CD_1023_Q41",
+    "q_num": 41,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 頂點式與最值判定",
+    "type": "single_choice",
+    "difficulty": "Intermediate",
+    "isVerbatimArchive": false,
+    "source": "1023進階題庫",
+    "stem": "將二次函數 $f(x) = x^2 - 4x + 7$ 配方為頂點式，其頂點座標與函數最值分別為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "頂點為 $(2, 3)$，最小值為 $3$"
+      },
+      {
+        "key": "B",
+        "text": "頂點為 $(-2, 3)$，最小值為 $3$"
+      },
+      {
+        "key": "C",
+        "text": "頂點為 $(2, 7)$，最小值為 $7$"
+      },
+      {
+        "key": "D",
+        "text": "頂點為 $(2, 3)$，最大值為 $3$"
+      },
+      {
+        "key": "E",
+        "text": "頂點為 $(4, 7)$，最大值為 $7$"
+      },
+      {
+        "key": "F",
+        "text": "頂點為 $(2, -3)$，最小值為 $-3$"
+      }
+    ],
+    "correctKeys": [
+      "A"
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "配方過程：$f(x) = (x^2 - 4x + 4) - 4 + 7 = (x - 2)^2 + 3$。二次項係數 $1 > 0$，當 $x = 2$ 時取得最小值 $3$，頂點座標為 $(2, 3)$。"
+  },
+  {
+    "id": "4CD_1023_Q42",
+    "q_num": 42,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 頂點式與最值判定",
+    "type": "single_choice",
+    "difficulty": "Intermediate",
+    "isVerbatimArchive": false,
+    "source": "1023進階題庫",
+    "stem": "二次函數 $y = -2x^2 + 8x - 5$ 配方後的頂點座標及最大值為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "頂點為 $(2, 3)$，最小值為 $3$"
+      },
+      {
+        "key": "B",
+        "text": "頂點為 $(2, 3)$，最大值為 $3$"
+      },
+      {
+        "key": "C",
+        "text": "頂點為 $(-2, 3)$，最大值為 $3$"
+      },
+      {
+        "key": "D",
+        "text": "頂點為 $(2, -5)$，最大值為 $-5$"
+      },
+      {
+        "key": "E",
+        "text": "頂點為 $(4, 3)$，最大值為 $3$"
+      },
+      {
+        "key": "F",
+        "text": "頂點為 $(-2, -5)$，最小值為 $-5$"
+      }
+    ],
+    "correctKeys": [
+      "B"
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "提取負二次項係數並配方：$y = -2(x^2 - 4x) - 5 = -2(x - 2)^2 + 8 - 5 = -2(x - 2)^2 + 3$。由於 $a = -2 < 0$，當 $x = 2$ 時取得最大值 $3$，頂點為 $(2, 3)$。"
+  },
+  {
+    "id": "4CD_1023_Q43",
+    "q_num": 43,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 頂點式與最值判定",
+    "type": "single_choice",
+    "difficulty": "Intermediate",
+    "isVerbatimArchive": false,
+    "source": "1023進階題庫",
+    "stem": "已知二次函數 $y = a(x - 1)^2 + 4$ 的圖象經過點 $(0, 2)$，則係數 $a$ 的值與該函數的最值分別為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$a = 2$，最小值為 $4$"
+      },
+      {
+        "key": "B",
+        "text": "$a = -2$，最小值為 $4$"
+      },
+      {
+        "key": "C",
+        "text": "$a = -2$，最大值為 $4$"
+      },
+      {
+        "key": "D",
+        "text": "$a = -1$，最大值為 $4$"
+      },
+      {
+        "key": "E",
+        "text": "$a = 1$，最小值為 $2$"
+      },
+      {
+        "key": "F",
+        "text": "$a = -4$，最大值為 $2$"
+      }
+    ],
+    "correctKeys": [
+      "C"
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "將 $(0, 2)$ 代入函數式：$2 = a(0 - 1)^2 + 4 = a + 4 \\implies a = -2$。因為 $a = -2 < 0$，函數開口向下，當 $x = 1$ 時取得最大值 $4$。"
+  },
+  {
+    "id": "4CD_1023_Q44",
+    "q_num": 44,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 頂點式與最值判定",
+    "type": "single_choice",
+    "difficulty": "Intermediate",
+    "isVerbatimArchive": false,
+    "source": "1023進階題庫",
+    "stem": "二次函數 $f(x) = 3(x + 2)^2 - 5$ 在閉區間 $[-4, 0]$ 上的最小值和最大值分別為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "最小值為 $-5$，最大值為 $-2$"
+      },
+      {
+        "key": "B",
+        "text": "最小值為 $-2$，最大值為 $7$"
+      },
+      {
+        "key": "C",
+        "text": "最小值為 $-5$，最大值為 $12$"
+      },
+      {
+        "key": "D",
+        "text": "最小值為 $-5$，最大值為 $7$"
+      },
+      {
+        "key": "E",
+        "text": "最小值為 $7$，最大值為 $12$"
+      },
+      {
+        "key": "F",
+        "text": "最小值為 $-5$，最大值為 $0$"
+      }
+    ],
+    "correctKeys": [
+      "D"
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "對稱軸為 $x = -2$，位於給定區間 $[-4, 0]$ 內部。開口向上，故最小值在頂點處取得：$f(-2) = -5$。計算端點值：$f(-4) = 3(-4+2)^2 - 5 = 12 - 5 = 7$；$f(0) = 3(0+2)^2 - 5 = 12 - 5 = 7$。因此最大值為 $7$。"
+  },
+  {
+    "id": "4CD_1023_Q45",
+    "q_num": 45,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 對稱軸與代數對稱性",
+    "type": "single_choice",
+    "difficulty": "Intermediate",
+    "isVerbatimArchive": false,
+    "source": "1023進階題庫",
+    "stem": "拋物線 $y = 3x^2 - 12x + 5$ 的對稱軸方程為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$x = -2$"
+      },
+      {
+        "key": "B",
+        "text": "$x = 4$"
+      },
+      {
+        "key": "C",
+        "text": "$x = -4$"
+      },
+      {
+        "key": "D",
+        "text": "$x = \\frac{1}{2}$"
+      },
+      {
+        "key": "E",
+        "text": "$x = 2$"
+      },
+      {
+        "key": "F",
+        "text": "$x = 1$"
+      }
+    ],
+    "correctKeys": [
+      "E"
+    ],
+    "answer": [
+      "E"
+    ],
+    "explanation": "由二次函數對稱軸公式 $x = -\\frac{b}{2a}$，代入 $a = 3, b = -12$ 得 $x = -\\frac{-12}{2 \\times 3} = \\frac{12}{6} = 2$。"
+  },
+  {
+    "id": "4CD_1023_Q46",
+    "q_num": 46,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 對稱軸與代數對稱性",
+    "type": "single_choice",
+    "difficulty": "Intermediate",
+    "isVerbatimArchive": false,
+    "source": "1023進階題庫",
+    "stem": "已知二次函數 $f(x)$ 滿足 $f(1) = f(7)$，則該二次函數圖象的對稱軸直線方程為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$x = 3$"
+      },
+      {
+        "key": "B",
+        "text": "$x = 3.5$"
+      },
+      {
+        "key": "C",
+        "text": "$x = 5$"
+      },
+      {
+        "key": "D",
+        "text": "$x = 6$"
+      },
+      {
+        "key": "E",
+        "text": "$x = 2$"
+      },
+      {
+        "key": "F",
+        "text": "$x = 4$"
+      }
+    ],
+    "correctKeys": [
+      "F"
+    ],
+    "answer": [
+      "F"
+    ],
+    "explanation": "若二次函數在兩點處函數值相等，則對稱軸必為這兩點橫座標的垂直平分線：$x = \\frac{1 + 7}{2} = 4$。"
+  },
+  {
+    "id": "4CD_1023_Q47",
+    "q_num": 47,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 對稱軸與代數對稱性",
+    "type": "single_choice",
+    "difficulty": "Intermediate",
+    "isVerbatimArchive": false,
+    "source": "1023進階題庫",
+    "stem": "已知拋物線 $y = -(x - 3)^2 + 2$，點 $A(1, y_1)$ 與點 $B(5, y_2)$ 均在拋物線上，則 $y_1$ 與 $y_2$ 的大小關係及數值為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$y_1 = y_2 = -2$"
+      },
+      {
+        "key": "B",
+        "text": "$y_1 > y_2$"
+      },
+      {
+        "key": "C",
+        "text": "$y_1 < y_2$"
+      },
+      {
+        "key": "D",
+        "text": "$y_1 = y_2 = 2$"
+      },
+      {
+        "key": "E",
+        "text": "$y_1 = y_2 = 0$"
+      },
+      {
+        "key": "F",
+        "text": "$y_1 = -2, y_2 = 2$"
+      }
+    ],
+    "correctKeys": [
+      "A"
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "對稱軸為 $x = 3$。點 $A$ 橫座標 1 與點 $B$ 橫座標 5 關於對稱軸對稱（$\\frac{1+5}{2} = 3$）。代入得 $y_1 = -(1 - 3)^2 + 2 = -4 + 2 = -2$，$y_2 = -(5 - 3)^2 + 2 = -2$。故 $y_1 = y_2 = -2$。"
+  },
+  {
+    "id": "4CD_1023_Q48",
+    "q_num": 48,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 對稱軸與代數對稱性",
+    "type": "single_choice",
+    "difficulty": "Intermediate",
+    "isVerbatimArchive": false,
+    "source": "1023進階題庫",
+    "stem": "若二次函數 $y = ax^2 + bx + c$ 的圖象開口向上，對稱軸為直線 $x = 1$，則函數值 $f(-1), f(1), f(2)$ 的大小關係是？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$f(1) < f(-1) < f(2)$"
+      },
+      {
+        "key": "B",
+        "text": "$f(1) < f(2) < f(-1)$"
+      },
+      {
+        "key": "C",
+        "text": "$f(-1) < f(2) < f(1)$"
+      },
+      {
+        "key": "D",
+        "text": "$f(2) < f(1) < f(-1)$"
+      },
+      {
+        "key": "E",
+        "text": "$f(1) = f(2) < f(-1)$"
+      },
+      {
+        "key": "F",
+        "text": "$f(-1) = f(2) > f(1)$"
+      }
+    ],
+    "correctKeys": [
+      "B"
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "拋物線開口向上，頂點 $x = 1$ 處函數值最小，且離對稱軸越遠函數值越大。點 $x = 1$ 到對稱軸距離為 0；點 $x = 2$ 到對稱軸距離為 1；點 $x = -1$ 到對稱軸距離為 2。因此 $f(1) < f(2) < f(-1)$。"
+  },
+  {
+    "id": "4CD_1023_Q49",
+    "q_num": 49,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 定義域限制與根式分母非負",
+    "type": "single_choice",
+    "difficulty": "Intermediate",
+    "isVerbatimArchive": false,
+    "source": "1023進階題庫",
+    "stem": "函數 $f(x) = \\frac{1}{x^2 - 9}$ 的定義域用區間表示為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$[-3, 3]$"
+      },
+      {
+        "key": "B",
+        "text": "$(-3, 3)$"
+      },
+      {
+        "key": "C",
+        "text": "$(-\\infty, -3) \\cup (-3, 3) \\cup (3, +\\infty)$"
+      },
+      {
+        "key": "D",
+        "text": "$(-\\infty, -3] \\cup [3, +\\infty)$"
+      },
+      {
+        "key": "E",
+        "text": "$\\{x \\mid x \\ne 3\\}$"
+      },
+      {
+        "key": "F",
+        "text": "$\\mathbb{R}$"
+      }
+    ],
+    "correctKeys": [
+      "C"
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "分式有意義要求分母不為零，即 $x^2 - 9 \\ne 0 \\implies x \\ne \\pm 3$。寫成區間並集為 $(-\\infty, -3) \\cup (-3, 3) \\cup (3, +\\infty)$。"
+  },
+  {
+    "id": "4CD_1023_Q50",
+    "q_num": 50,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 定義域限制與根式分母非負",
+    "type": "single_choice",
+    "difficulty": "Intermediate",
+    "isVerbatimArchive": false,
+    "source": "1023進階題庫",
+    "stem": "函數 $f(x) = \\sqrt{x^2 - 4}$ 的定義域為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$[-2, 2]$"
+      },
+      {
+        "key": "B",
+        "text": "$(-2, 2)$"
+      },
+      {
+        "key": "C",
+        "text": "$[2, +\\infty)$"
+      },
+      {
+        "key": "D",
+        "text": "$(-\\infty, -2] \\cup [2, +\\infty)$"
+      },
+      {
+        "key": "E",
+        "text": "$(-\\infty, -2]$"
+      },
+      {
+        "key": "F",
+        "text": "$(-2, +\\infty)$"
+      }
+    ],
+    "correctKeys": [
+      "D"
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "二次根式有意義要求被開方數非負：$x^2 - 4 \\ge 0 \\implies (x - 2)(x + 2) \\ge 0$。大於等於取兩端閉區間，定義域為 $(-\\infty, -2] \\cup [2, +\\infty)$。"
+  },
+  {
+    "id": "4CD_1023_Q51",
+    "q_num": 51,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 定義域限制與根式分母非負",
+    "type": "single_choice",
+    "difficulty": "Intermediate",
+    "isVerbatimArchive": false,
+    "source": "1023進階題庫",
+    "stem": "函數 $f(x) = \\frac{1}{\\sqrt{x^2 - 3x + 2}}$ 的定義域用區間表示為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$[1, 2]$"
+      },
+      {
+        "key": "B",
+        "text": "$(1, 2)$"
+      },
+      {
+        "key": "C",
+        "text": "$(-\\infty, 1] \\cup [2, +\\infty)$"
+      },
+      {
+        "key": "D",
+        "text": "$(-\\infty, 2)$"
+      },
+      {
+        "key": "E",
+        "text": "$(-\\infty, 1) \\cup (2, +\\infty)$"
+      },
+      {
+        "key": "F",
+        "text": "$(1, +\\infty)$"
+      }
+    ],
+    "correctKeys": [
+      "E"
+    ],
+    "answer": [
+      "E"
+    ],
+    "explanation": "被開方數在分母位置，必須嚴格大於零：$x^2 - 3x + 2 > 0 \\implies (x - 1)(x - 2) > 0$。大於取兩邊開區間，定義域為 $(-\\infty, 1) \\cup (2, +\\infty)$。"
+  },
+  {
+    "id": "4CD_1023_Q52",
+    "q_num": 52,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "二次函數 · 定義域限制與根式分母非負",
+    "type": "single_choice",
+    "difficulty": "Intermediate",
+    "isVerbatimArchive": false,
+    "source": "1023進階題庫",
+    "stem": "函數 $f(x) = \\sqrt{6 - x - x^2}$ 的定義域為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$(-3, 2)$"
+      },
+      {
+        "key": "B",
+        "text": "$[-2, 3]$"
+      },
+      {
+        "key": "C",
+        "text": "$(-\\infty, -3] \\cup [2, +\\infty)$"
+      },
+      {
+        "key": "D",
+        "text": "$(-\\infty, -2] \\cup [3, +\\infty)$"
+      },
+      {
+        "key": "E",
+        "text": "$[-6, 1]$"
+      },
+      {
+        "key": "F",
+        "text": "$[-3, 2]$"
+      }
+    ],
+    "correctKeys": [
+      "F"
+    ],
+    "answer": [
+      "F"
+    ],
+    "explanation": "要求被開方數非負：$6 - x - x^2 \\ge 0 \\implies x^2 + x - 6 \\le 0 \\implies (x + 3)(x - 2) \\le 0$。小於等於取中間閉區間，定義域為 $[-3, 2]$。"
+  },
+  {
+    "id": "4CD_1023_Q53",
+    "q_num": 53,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 含係數標準二次不等式",
+    "type": "single_choice",
+    "difficulty": "Intermediate",
+    "isVerbatimArchive": false,
+    "source": "1023進階題庫",
+    "stem": "解一元二次不等式 $2x^2 - 5x + 2 < 0$，其解集為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$(\\frac{1}{2}, 2)$"
+      },
+      {
+        "key": "B",
+        "text": "$(-\\infty, \\frac{1}{2}) \\cup (2, +\\infty)$"
+      },
+      {
+        "key": "C",
+        "text": "$[\\frac{1}{2}, 2]$"
+      },
+      {
+        "key": "D",
+        "text": "$(-2, -\\frac{1}{2})$"
+      },
+      {
+        "key": "E",
+        "text": "$(-\\infty, 2)$"
+      },
+      {
+        "key": "F",
+        "text": "$(0, 2)$"
+      }
+    ],
+    "correctKeys": [
+      "A"
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "十字相乘分解因式：$2x^2 - 5x + 2 = (2x - 1)(x - 2) < 0$。對應兩根為 $\\frac{1}{2}$ 和 $2$。二次項係數 $2 > 0$，小於取中間，解集為 $(\\frac{1}{2}, 2)$。"
+  },
+  {
+    "id": "4CD_1023_Q54",
+    "q_num": 54,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 含係數標準二次不等式",
+    "type": "single_choice",
+    "difficulty": "Intermediate",
+    "isVerbatimArchive": false,
+    "source": "1023進階題庫",
+    "stem": "解一元二次不等式 $3x^2 - 10x + 3 \\ge 0$，其解集為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$[\\frac{1}{3}, 3]$"
+      },
+      {
+        "key": "B",
+        "text": "$(-\\infty, \\frac{1}{3}] \\cup [3, +\\infty)$"
+      },
+      {
+        "key": "C",
+        "text": "$(\\frac{1}{3}, 3)$"
+      },
+      {
+        "key": "D",
+        "text": "$(-\\infty, \\frac{1}{3}) \\cup (3, +\\infty)$"
+      },
+      {
+        "key": "E",
+        "text": "$[3, +\\infty)$"
+      },
+      {
+        "key": "F",
+        "text": "$(-\\infty, 3]$"
+      }
+    ],
+    "correctKeys": [
+      "B"
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "因式分解：$(3x - 1)(x - 3) \\ge 0$。兩根為 $\\frac{1}{3}$ 和 $3$。大於等於取兩端閉區間，解集為 $(-\\infty, \\frac{1}{3}] \\cup [3, +\\infty)$。"
+  },
+  {
+    "id": "4CD_1023_Q55",
+    "q_num": 55,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 含係數標準二次不等式",
+    "type": "single_choice",
+    "difficulty": "Intermediate",
+    "isVerbatimArchive": false,
+    "source": "1023進階題庫",
+    "stem": "解一元二次不等式 $-2x^2 + x + 1 > 0$，其解集為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$(-\\infty, -\\frac{1}{2}) \\cup (1, +\\infty)$"
+      },
+      {
+        "key": "B",
+        "text": "$[-1, \\frac{1}{2}]$"
+      },
+      {
+        "key": "C",
+        "text": "$(-\\frac{1}{2}, 1)$"
+      },
+      {
+        "key": "D",
+        "text": "$(-1, \\frac{1}{2})$"
+      },
+      {
+        "key": "E",
+        "text": "$[0, 1]$"
+      },
+      {
+        "key": "F",
+        "text": "$(-1, 1)$"
+      }
+    ],
+    "correctKeys": [
+      "C"
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "兩邊同乘以 $-1$ 改變符號：$2x^2 - x - 1 < 0$。因式分解：$(2x + 1)(x - 1) < 0$。兩根為 $-\\frac{1}{2}$ 和 $1$。小於取中間，解集為 $(-\\frac{1}{2}, 1)$。"
+  },
+  {
+    "id": "4CD_1023_Q56",
+    "q_num": 56,
+    "chapter": "ch03_quadratic_functions_and_inequalities",
+    "topic": "一元二次不等式 · 含係數標準二次不等式",
+    "type": "single_choice",
+    "difficulty": "Intermediate",
+    "isVerbatimArchive": false,
+    "source": "1023進階題庫",
+    "stem": "解一元二次不等式 $4x^2 - 12x + 9 > 0$，其解集為？",
+    "options": [
+      {
+        "key": "A",
+        "text": "$\\mathbb{R}$"
+      },
+      {
+        "key": "B",
+        "text": "$\\emptyset$"
+      },
+      {
+        "key": "C",
+        "text": "$(\\frac{3}{2}, +\\infty)$"
+      },
+      {
+        "key": "D",
+        "text": "$\\{x \\mid x \\ne \\frac{3}{2}\\}$"
+      },
+      {
+        "key": "E",
+        "text": "$(-\\infty, \\frac{3}{2})$"
+      },
+      {
+        "key": "F",
+        "text": "$[\\frac{3}{2}, +\\infty)$"
+      }
+    ],
+    "correctKeys": [
+      "D"
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "左邊為完全平方式：$(2x - 3)^2 > 0$。除 $2x - 3 = 0$（即 $x = \\frac{3}{2}$）使得平方等於 0 外，其餘實數平方均嚴格大於 0。故解集為 $\\{x \\mid x \\ne \\frac{3}{2}\\}$。"
+  },
+  {
+    "id": "4CD_1023_Q57",
+    "q_num": 57,
     "topic": "一元二次不等式 · 基礎解集與拋物線特徵",
     "source": "Verbatim Archive: `F4CD一元二次不等式.pptx` Slide 3 例1",
     "difficulty": "Verbatim Archive",
@@ -13891,8 +16035,8 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選但無錯選給相應比例分（每選對 1 個且無錯選得 0.8 分）；凡選入任何錯誤選項（C、F、G）者，本小題得 0 分。"
   },
   {
-    "id": "4CD_1023_Q02",
-    "q_num": 2,
+    "id": "4CD_1023_Q58",
+    "q_num": 58,
     "topic": "一元二次不等式 · 判別式為零的臨界情況",
     "source": "Verbatim Archive: `F4CD一元二次不等式.pptx` Slide 4 例2",
     "difficulty": "Verbatim Archive",
@@ -13945,8 +16089,8 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；凡選入 C、G、H 中任何一項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q03",
-    "q_num": 3,
+    "id": "4CD_1023_Q59",
+    "q_num": 59,
     "topic": "一元二次不等式 · 負首項係數與判別式小於零",
     "source": "Verbatim Archive: `F4CD一元二次不等式.pptx` Slide 5 例3",
     "difficulty": "Verbatim Archive",
@@ -13999,8 +16143,8 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選給相應比例分；選入 F、G、H 中任何一項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q04",
-    "q_num": 4,
+    "id": "4CD_1023_Q60",
+    "q_num": 60,
     "topic": "一元二次不等式 · 解集運算與數軸映射",
     "source": "Verbatim Archive: `F4CD一元二次不等式.pptx` Slide 7 練習第1題",
     "difficulty": "Verbatim Archive",
@@ -14053,8 +16197,8 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例得分；選入 D、G、H 任何一項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q05",
-    "q_num": 5,
+    "id": "4CD_1023_Q61",
+    "q_num": 61,
     "topic": "一元二次不等式 · 非嚴格不等式與單點解集",
     "source": "Verbatim Archive: `F4CD一元二次不等式.pptx` Slide 7 練習第2題",
     "difficulty": "Verbatim Archive",
@@ -14107,8 +16251,8 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；凡選入 E、G、H 任何一項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q06",
-    "q_num": 6,
+    "id": "4CD_1023_Q62",
+    "q_num": 62,
     "topic": "一元二次不等式 · 恆成立與空集辨析矩陣",
     "source": "Verbatim Archive: `F4CD一元二次不等式.pptx` Slide 10 綜合練習",
     "difficulty": "Verbatim Archive",
@@ -14160,8 +16304,8 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選得相應比例分；選入 D、E、G、H 任何一項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q07",
-    "q_num": 7,
+    "id": "4CD_1023_Q63",
+    "q_num": 63,
     "topic": "一元二次不等式 · 雙不等式集合運算與交集並集",
     "source": "Verbatim Archive: `F4CD一元二次不等式.pptx` Slide 12 綜合題",
     "difficulty": "Verbatim Archive",
@@ -14215,9 +16359,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 F、G 任何一項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q08",
-    "q_num": 8,
-    "topic": "函數的概念 · 同一函數兩步判定法（定義域一票否決權）",
+    "id": "4CD_1023_Q64",
+    "q_num": 64,
+    "topic": "二次函數 · 同一函數兩步判定法（定義域一票否決權）",
     "source": "Verbatim Archive: `1014@F4CD` 導學案教師版 例3 & Slide 11",
     "difficulty": "Verbatim Archive",
     "isVerbatimArchive": true,
@@ -14269,9 +16413,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 D、G、H 任何一項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q09",
-    "q_num": 9,
-    "topic": "函數定義域 · 根式與分式雙重限制求解三部曲",
+    "id": "4CD_1023_Q65",
+    "q_num": 65,
+    "topic": "二次函數 · 根式與分式雙重限制求解三部曲",
     "source": "Verbatim Archive: `4CSEN/@融合提升1013.docx` 練習3(1) & `1014@F4CD` 例2",
     "difficulty": "Verbatim Archive",
     "isVerbatimArchive": true,
@@ -14323,9 +16467,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 D、F、G 任何一項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q10",
-    "q_num": 10,
-    "topic": "函數定義域 · 根式夾逼與雙重不等式組求解",
+    "id": "4CD_1023_Q66",
+    "q_num": 66,
+    "topic": "二次函數 · 根式夾逼與雙重不等式組求解",
     "source": "Verbatim Archive: `4CSEN/@融合提升1013.docx` 練習3(2) (蔡清琰示範題)",
     "difficulty": "Verbatim Archive",
     "isVerbatimArchive": true,
@@ -14377,9 +16521,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 C、F、H 任何一項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q11",
-    "q_num": 11,
-    "topic": "函數單調性 · 一次函數增減性依據定義作差證明",
+    "id": "4CD_1023_Q67",
+    "q_num": 67,
+    "topic": "二次函數 · 一次函數增減性依據定義作差證明",
     "source": "Verbatim Archive: `1021@F4CD.pptx` Slide 6 例1",
     "difficulty": "Verbatim Archive",
     "isVerbatimArchive": true,
@@ -14432,9 +16576,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 E、F 任何一項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q12",
-    "q_num": 12,
-    "topic": "函數單調性與極值 · 耐克函數（對勾函數）定義法深入證明",
+    "id": "4CD_1023_Q68",
+    "q_num": 68,
+    "topic": "二次函數 · 耐克函數（對勾函數）定義法深入證明",
     "source": "Verbatim Archive: `1021@F4CD.pptx` Slide 8 例3",
     "difficulty": "Verbatim Archive",
     "isVerbatimArchive": true,
@@ -14487,9 +16631,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 F、H 任何一項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q13",
-    "q_num": 13,
-    "topic": "函數單調性與最值 · 閉區間上反比例函數嚴格單調減與端點極值",
+    "id": "4CD_1023_Q69",
+    "q_num": 69,
+    "topic": "二次函數 · 閉區間上反比例函數嚴格單調減與端點極值",
     "source": "Verbatim Archive: `1021@F4CD.pptx` Slide 11 例5 & `1020@4CD.pptx`",
     "difficulty": "Verbatim Archive",
     "isVerbatimArchive": true,
@@ -14542,9 +16686,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 F、H 任何一項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q14",
-    "q_num": 14,
-    "topic": "深度綜合（難題） · 含參一元二次不等式兩根大小動態分類討論",
+    "id": "4CD_1023_Q70",
+    "q_num": 70,
+    "topic": "一元二次不等式 · 深度綜合辨析",
     "source": "Synthesis Hard: 參數分類討論與二次不等式根的位置關係",
     "difficulty": "Synthesis Hard",
     "isVerbatimArchive": false,
@@ -14597,9 +16741,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 G、H 任何一項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q15",
-    "q_num": 15,
-    "topic": "深度綜合（難題） · 二次不等式在給定閉區間恆成立的對稱軸分類討論",
+    "id": "4CD_1023_Q71",
+    "q_num": 71,
+    "topic": "一元二次不等式 · 深度綜合辨析",
     "source": "Synthesis Hard: 閉區間恆成立與拋物線動態對稱軸",
     "difficulty": "Synthesis Hard",
     "isVerbatimArchive": false,
@@ -14652,9 +16796,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 G、H 任何一項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q16",
-    "q_num": 16,
-    "topic": "深度綜合（難題） · 抽象複合函數定義域傳遞與二次根式雙重約束",
+    "id": "4CD_1023_Q72",
+    "q_num": 72,
+    "topic": "一元二次不等式 · 深度綜合辨析",
     "source": "Synthesis Hard: 抽象複合函數映射機制與二次根式約束",
     "difficulty": "Synthesis Hard",
     "isVerbatimArchive": false,
@@ -14707,9 +16851,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 F、H 任何一項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q17",
-    "q_num": 17,
-    "topic": "深度綜合（難題） · 分段二次-一次函數全局單調增的充要條件（斜率+對稱軸+交接點無斷崖跌落）",
+    "id": "4CD_1023_Q73",
+    "q_num": 73,
+    "topic": "一元二次不等式 · 深度綜合辨析",
     "source": "Synthesis Hard: 分段函數全局單調性與端點接合條件",
     "difficulty": "Synthesis Hard",
     "isVerbatimArchive": false,
@@ -14762,9 +16906,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 G、H 任何一項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q18",
-    "q_num": 18,
-    "topic": "深度綜合（難題） · 抽象函數嚴格單調性差商特徵與二次不等式聯動",
+    "id": "4CD_1023_Q74",
+    "q_num": 74,
+    "topic": "一元二次不等式 · 深度綜合辨析",
     "source": "Synthesis Hard: 差商大於0與抽象單調複合不等式",
     "difficulty": "Synthesis Hard",
     "isVerbatimArchive": false,
@@ -14818,9 +16962,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 H 錯誤選項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q19",
-    "q_num": 19,
-    "topic": "澳門實景與文化 · 澳門旅遊塔（Macau Tower）高空蹦極跳極限安全高度模型",
+    "id": "4CD_1023_Q75",
+    "q_num": 75,
+    "topic": "澳門情境 · 澳門旅遊塔（Macau Tower）高空蹦極跳極限安全高度模型",
     "source": "Macau Context: 澳門旅遊塔蹦極跳二次位移與不等式安全窗口",
     "difficulty": "Macau / Creative Context",
     "isVerbatimArchive": false,
@@ -14873,9 +17017,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 G、H 任何一項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q20",
-    "q_num": 20,
-    "topic": "澳門實景與文化 · 澳門格蘭披治大賽車東望洋賽道葡京彎制動模型",
+    "id": "4CD_1023_Q76",
+    "q_num": 76,
+    "topic": "澳門情境 · 澳門格蘭披治大賽車東望洋賽道葡京彎制動模型",
     "source": "Macau Context: 東望洋跑道葡京彎賽車減速二次位移與制動不等式",
     "difficulty": "Macau / Creative Context",
     "isVerbatimArchive": false,
@@ -14929,9 +17073,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 H 錯誤選項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q21",
-    "q_num": 21,
-    "topic": "澳門實景與文化 · 路氹城（Cotai）填海區生態景觀隔離帶圍欄規劃",
+    "id": "4CD_1023_Q77",
+    "q_num": 77,
+    "topic": "澳門情境 · 路氹城（Cotai）填海區生態景觀隔離帶圍欄規劃",
     "source": "Macau Context: 路氹城金光大道旁綠化隔離帶面積二次函數與不等式",
     "difficulty": "Macau / Creative Context",
     "isVerbatimArchive": false,
@@ -14985,9 +17129,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 H 錯誤選項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q22",
-    "q_num": 22,
-    "topic": "澳門實景與文化 · 港珠澳大橋（HZMB）穿梭金巴票價浮動收益函數",
+    "id": "4CD_1023_Q78",
+    "q_num": 78,
+    "topic": "澳門情境 · 港珠澳大橋（HZMB）穿梭金巴票價浮動收益函數",
     "source": "Macau Context: 港珠澳大橋金巴營運票價浮動與二次函數收益最優化",
     "difficulty": "Macau / Creative Context",
     "isVerbatimArchive": false,
@@ -15041,9 +17185,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 H 錯誤選項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q23",
-    "q_num": 23,
-    "topic": "創意實踐應用 · 澳門文創大賽紀念明信片印製平均成本函數單調性與最值",
+    "id": "4CD_1023_Q79",
+    "q_num": 79,
+    "topic": "澳門情境 · 澳門文創大賽紀念明信片印製平均成本函數單調性與最值",
     "source": "Creative Context: 文創紀念品批量生產邊際成本耐克函數模型",
     "difficulty": "Macau / Creative Context",
     "isVerbatimArchive": false,
@@ -15097,9 +17241,9 @@ window.ADMIN_STUDENT_PASSWORDS = {
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 H 錯誤選項者得 0 分。"
   },
   {
-    "id": "4CD_1023_Q24",
-    "q_num": 24,
-    "topic": "創意實踐應用 · 橫琴深合區微電子晶片表面散熱溫升二次模型",
+    "id": "4CD_1023_Q80",
+    "q_num": 80,
+    "topic": "澳門情境 · 橫琴深合區微電子晶片表面散熱溫升二次模型",
     "source": "Creative Context: 晶片散熱功率二次溫控模型與安全閾值不等式",
     "difficulty": "Macau / Creative Context",
     "isVerbatimArchive": false,
@@ -15151,1494 +17295,6 @@ window.ADMIN_STUDENT_PASSWORDS = {
     ],
     "explanation": "1. **溫升二次函數特徵**:\n     - $T(w) = w^2 - 8w + 25 = (w - 4)^2 + 9$。A 正確。\n     - 二次項係數為 $1 > 0$，開口向上，對稱軸為 $w = 4$。\n     - 函數在 $(0, 4]$ 上單調遞減，在 $[4, +\\infty)$ 上單調遞增。B 正確，H 錯誤（誤判為全域單調遞增）。\n     - 當 $w = 4$ 毫瓦時，取得晶片散熱的極佳靜態平衡點，溫升最低為 $9^\\circ\\text{C}$。C 正確。\n  2. **安全溫控不等式求解**:\n     - 要求 $T(w) \\le 40 \\iff w^2 - 8w + 25 \\le 40$。D 正確。\n     - 移項整理得：$w^2 - 8w - 15 \\le 0$。E 正確。\n     - 對應方程 $w^2 - 8w - 15 = 0$ 的判別式 $\\Delta = 64 + 60 = 124 > 0$。\n     - 求根公式：$w = \\frac{8 \\pm \\sqrt{124}}{2} = \\frac{8 \\pm 2\\sqrt{31}}{2} = 4 \\pm \\sqrt{31}$。F 正確。\n     - 代數解集為 $[4 - \\sqrt{31}, 4 + \\sqrt{31}]$。\n     - 考慮實際物理約束：因為 $5 < \\sqrt{31} < 6$，左根 $4 - \\sqrt{31} < 0$，而功率 $w > 0$。因此與物理限制 $w > 0$ 取交集，得 $0 < w \\le 4 + \\sqrt{31}$ 毫瓦，即 $(0, 4 + \\sqrt{31}]$。G 正確。",
     "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 H 錯誤選項者得 0 分。"
-  },
-  {
-    "id": "4CD_1023_Q25",
-    "q_num": 25,
-    "topic": "創意實踐應用 · 澳門新城 A 區跨海通道雙向車流密度與通行能力函數",
-    "source": "Creative Context: 城市道路交通流通行能力 Greenshields 二次模型",
-    "difficulty": "Macau / Creative Context",
-    "isVerbatimArchive": false,
-    "stem": "澳門新城 A 區與澳門半島之間的跨海連接通道在早高峰期間，車流平均時速 $v$（單位：公里/小時）與車流密度 $k$（單位：輛/公里）在實測範圍內滿足線性減函數關係 $v(k) = 80 - 0.5k$（其中 $0 \\le k \\le 120$）。每小時斷面通行總車流量為 $Q(k) = k \\cdot v(k) = 80k - 0.5k^2$（單位：輛/小時）。為防止跨海通道出現重度擁堵，澳門特區交通事務局要求斷面通行能力不低於 3000 輛/小時（即 $Q(k) \\ge 3000$）。下列各項結論中，正確的有：",
-    "diagram_spec": "交通流二次拋物線能力圖（開口向下拋物線 $Q(k) = -0.5(k-80)^2 + 3200$，頂點 $(80, 3200)$，暢通保證線 $Q = 3000$）",
-    "diagram_filename": "q25_diagram.png",
-    "options": [
-      {
-        "key": "A",
-        "text": "通行能力函數配方後為 $Q(k) = -0.5(k - 80)^2 + 3200$"
-      },
-      {
-        "key": "B",
-        "text": "函數 $Q(k)$ 在區間 $[0, 80]$ 上單調遞增，在區間 $[80, 120]$ 上單調遞減"
-      },
-      {
-        "key": "C",
-        "text": "當車流密度為 $k = 80$ 輛/公里時，通道達到最大通行能力 3200 輛/小時"
-      },
-      {
-        "key": "D",
-        "text": "通行能力不低於 3000 輛/小時對應的不等式為 $80k - 0.5k^2 \\ge 3000$"
-      },
-      {
-        "key": "E",
-        "text": "不等式 $80k - 0.5k^2 \\ge 3000$ 化簡得 $k^2 - 160k + 6000 \\le 0$"
-      },
-      {
-        "key": "F",
-        "text": "方程 $k^2 - 160k + 6000 = 0$ 的兩根分別為 $k_1 = 60$ 與 $k_2 = 100$"
-      },
-      {
-        "key": "G",
-        "text": "滿足通行能力要求的車流密度範圍是閉區間 $[60, 100]$ 輛/公里"
-      },
-      {
-        "key": "H",
-        "text": "當車流密度 $k = 120$ 輛/公里時，通行能力降為 0 輛/小時"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G"
-    ],
-    "explanation": "1. **交通工程模型建立與配方**:\n     - 車流量 $Q(k) = k \\cdot v(k) = k(80 - 0.5k) = -0.5k^2 + 80k$。\n     - 配方：$Q(k) = -0.5(k^2 - 160k + 6400) + 3200 = -0.5(k - 80)^2 + 3200$。A 正確。\n     - 開口向下，對稱軸為 $k = 80$。在 $[0, 80]$ 上為自由流狀態，密度增加流量單調遞增；在 $[80, 120]$ 上進入擁堵流狀態，密度過大導致嚴重減速，總流量反而單調遞減。B 正確。\n     - 頂點 $(80, 3200)$ 表示最大通行能力為 3200 輛/小時。C 正確。\n  2. **通行能力不等式推導與求解**:\n     - 交通保證要求：$Q(k) \\ge 3000 \\iff 80k - 0.5k^2 \\ge 3000$。D 正確。\n     - 移項整理：$0.5k^2 - 80k + 3000 \\le 0 \\iff k^2 - 160k + 6000 \\le 0$。E 正確。\n     - 因式分解：$(k - 60)(k - 100) \\le 0$，兩根為 $k_1 = 60, k_2 = 100$。F 正確。\n     - 小於等於 0 取兩根閉區間：$60 \\le k \\le 100$。G 正確。\n  3. **臨界邊界計算**:\n     - 代入 $k = 120$：速度 $v(120) = 80 - 0.5(120) = 80 - 60 = 20$ 公里/小時；總流量 $Q(120) = 120 \\times 20 = 2400$ 輛/小時，並未降為 0，H 錯誤。",
-    "rubric": "- 滿分 4 分。全對得 4 分；漏選且無錯選按比例給分；選入 H 錯誤選項者得 0 分。"
-  },
-  {
-    "id": "4CD_1023_Q26",
-    "q_num": 26,
-    "topic": "一元二次不等式 · 含參數不等式的分類討論",
-    "difficulty": "Synthesis",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 含參不等式",
-    "stem": "關於含參數 $a$ 的一元二次不等式 $ax^2 - (a + 2)x + 2 > 0$（其中 $a \\in \\mathbb{R}$），下列命題中正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "當 $a = 0$ 時，原不等式化為一元一次不等式 $-2x + 2 > 0$，其解集為 $(-\\infty, 1)$"
-      },
-      {
-        "key": "B",
-        "text": "二次三項式 $ax^2 - (a + 2)x + 2$ 可因式分解為 $(ax - 2)(x - 1)$"
-      },
-      {
-        "key": "C",
-        "text": "當 $a > 2$ 時，原不等式的解集為 $(-\\infty, 1) \\cup (\\frac{2}{a}, +\\infty)$"
-      },
-      {
-        "key": "D",
-        "text": "當 $a = 2$ 時，原不等式的解集為 $(-\\infty, 1) \\cup (1, +\\infty)$ 即 $\\{x \\mid x \\ne 1\\}$"
-      },
-      {
-        "key": "E",
-        "text": "當 $0 < a < 2$ 時，原不等式的解集為 $(-\\infty, 1) \\cup (\\frac{2}{a}, +\\infty)$"
-      },
-      {
-        "key": "F",
-        "text": "當 $a < 0$ 時，原不等式的解集為 $(1, \\frac{2}{a})$"
-      },
-      {
-        "key": "G",
-        "text": "當 $a < 0$ 時，原不等式的解集為 $(\\frac{2}{a}, 1)$"
-      },
-      {
-        "key": "H",
-        "text": "若原不等式的解集為全體實數 $\\mathbb{R}$，則實數 $a$ 的值不存在"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "D",
-      "E",
-      "G",
-      "H"
-    ],
-    "explanation": "【詳細解析】\n1. 因式分解：$ax^2 - (a+2)x + 2 = (ax - 2)(x - 1) = a(x - \\frac{2}{a})(x - 1)$（當 $a \\ne 0$ 時）。選項 B 正確。\n2. 當 $a = 0$ 時，不等式化為 $-2x + 2 > 0 \\implies x < 1$，解集為 $(-\\infty, 1)$。選項 A 正確。\n3. 當 $a \\ne 0$ 時，方程兩根為 $x_1 = 1, x_2 = \\frac{2}{a}$：\n   - 若 $a = 2$，兩根重合 $x_1 = x_2 = 1$，不等式為 $2(x - 1)^2 > 0$，解集為 $\\{x \\mid x \\ne 1\\}$。選項 D 正確。\n   - 若 $a > 2$，則 $0 < \\frac{2}{a} < 1$，解集為 $(-\\infty, \\frac{2}{a}) \\cup (1, +\\infty)$。故 C 錯誤（兩根順序倒置）。\n   - 若 $0 < a < 2$，則 $\\frac{2}{a} > 1$，解集為 $(-\\infty, 1) \\cup (\\frac{2}{a}, +\\infty)$。故 E 正確。\n   - 若 $a < 0$，兩邊同除以負數 $a$，變號為 $(x - \\frac{2}{a})(x - 1) < 0$。因為 $a < 0$，所以 $\\frac{2}{a} < 0 < 1$，解集為 $(\\frac{2}{a}, 1)$。故 G 正確，F 錯誤。\n4. 若解集為 $\\mathbb{R}$，需 $a > 0$ 且 $\\Delta = (a+2)^2 - 8a = (a-2)^2 < 0$，平方不可能小於 0，故不存在。選項 H 正確。\n綜上，正確選項為 A, B, D, E, G, H。"
-  },
-  {
-    "id": "4CD_1023_Q27",
-    "q_num": 27,
-    "topic": "一元二次不等式 · 恆成立問題與參數取值範圍",
-    "difficulty": "Synthesis",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 恆成立問題",
-    "stem": "若對任意實數 $x \\in \\mathbb{R}$，不等式 $(m - 1)x^2 + 2(m - 1)x - 4 < 0$ 恆成立，則關於參數 $m$ 的取值及相關性質，下列結論正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "當 $m = 1$ 時，原不等式化為 $-4 < 0$，對任意 $x \\in \\mathbb{R}$ 均成立，故 $m = 1$ 符合題意"
-      },
-      {
-        "key": "B",
-        "text": "當 $m \\ne 1$ 時，原不等式為二次不等式，恆成立的充要條件是 $m - 1 < 0$ 且判別式 $\\Delta < 0$"
-      },
-      {
-        "key": "C",
-        "text": "判別式 $\\Delta = 4(m - 1)^2 + 16(m - 1) = 4(m - 1)(m + 3)$"
-      },
-      {
-        "key": "D",
-        "text": "不等式 $\\Delta < 0$ 在 $m - 1 < 0$ 條件下的解集為 $(-3, 1)$"
-      },
-      {
-        "key": "E",
-        "text": "參數 $m$ 的最終取值範圍是 $[-3, 1)$"
-      },
-      {
-        "key": "F",
-        "text": "參數 $m$ 的最終取值範圍是 $(-3, 1]$"
-      },
-      {
-        "key": "G",
-        "text": "若 $m = -3$，則原式在 $x = 1$ 時取得最大值 $0$"
-      },
-      {
-        "key": "H",
-        "text": "當 $m = 0$ 時，二次函數 $y = -x^2 - 2x - 4$ 的圖象完全位於 $x$ 軸下方"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "F",
-      "G",
-      "H"
-    ],
-    "explanation": "【詳細解析】\n1. 分類討論二次項係數：\n   - 當 $m - 1 = 0 \\iff m = 1$ 時，原不等式為 $0x^2 + 0x - 4 = -4 < 0$，恆成立，因此 $m = 1$ 符合題意。選項 A 正確。\n   - 當 $m - 1 \\ne 0$ 時，原不等式為嚴格二次不等式，要在 $\\mathbb{R}$ 上恆小於 0，必須開口向下且與 $x$ 軸無交點，即 $m - 1 < 0$ 且 $\\Delta < 0$。選項 B 正確。\n2. 判別式計算：$\\Delta = [2(m-1)]^2 - 4(m-1)(-4) = 4(m-1)^2 + 16(m-1) = 4(m-1)(m-1+4) = 4(m-1)(m+3)$。選項 C 正確。\n3. 解不等式組：由 $4(m-1)(m+3) < 0$ 得 $-3 < m < 1$。且滿足 $m - 1 < 0$。選項 D 正確。\n4. 綜合兩類情況：$m = 1$ 或 $-3 < m < 1$，合併得 $m \\in (-3, 1]$。故 F 正確，E 錯誤（漏掉了 $m=1$ 且誤加了 $-3$）。\n5. 特殊值驗證：\n   - 當 $m = -3$ 時，式子為 $-4x^2 - 8x - 4 = -4(x+1)^2$，當 $x = -1$ 時最大值為 0（非 $x=1$？注意：頂點為 $x = -b/2a = 8/(-8) = -1$，式子為 $-4(-1+1)^2=0$；但在 $x=-1$ 時取最大值 0，若題目選項 G 寫 $x=1$ 則需精確計算：$-4(1)^2 - 8(1) - 4 = -16 \\ne 0$。但等等，若 $m = -3$，頂點為 $(-1, 0)$，所以最大值為 0。選項 G 寫 $x=1$，此處看題意，若 $x=-1$ 則成立。我們修改選項 G 為 $x=-1$ 以保證嚴謹性）。\n   - 當 $m = 0$ 時，$y = -x^2 - 2x - 4 = -(x+1)^2 - 3 \\le -3 < 0$，圖象完全在 $x$ 軸下方。選項 H 正確。\n綜上，A, B, C, D, F, H 正確。"
-  },
-  {
-    "id": "4CD_1023_Q28",
-    "q_num": 28,
-    "topic": "一元二次不等式 · 根的分佈綜合問題",
-    "difficulty": "Synthesis",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 根的分佈",
-    "stem": "已知關於 $x$ 的一元二次方程 $x^2 - 2mx + m + 2 = 0$ 的兩實數根為 $x_1, x_2$，且滿足 $x_1 < 1 < x_2$，則下列命題正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "令 $f(x) = x^2 - 2mx + m + 2$，則兩根分佈在 $1$ 兩側的充要條件是 $f(1) < 0$"
-      },
-      {
-        "key": "B",
-        "text": "$f(1) = 1 - 2m + m + 2 = 3 - m < 0$，解得 $m > 3$"
-      },
-      {
-        "key": "C",
-        "text": "當 $m > 3$ 時，判別式 $\\Delta = 4m^2 - 4(m + 2) > 0$ 必然自動成立"
-      },
-      {
-        "key": "D",
-        "text": "若要求兩根均大於 $1$，則需滿足 $f(1) > 0$、對稱軸 $x = m > 1$ 且 $\\Delta \\ge 0$"
-      },
-      {
-        "key": "E",
-        "text": "兩根均大於 $1$ 時，參數 $m$ 的取值範圍是 $2 \\le m < 3$"
-      },
-      {
-        "key": "F",
-        "text": "若兩根均為正數，則參數 $m$ 的取值範圍為 $m \\ge 2$"
-      },
-      {
-        "key": "G",
-        "text": "若 $x_1 < 0 < x_2$，則只需 $f(0) < 0$，解得 $m < -2$"
-      },
-      {
-        "key": "H",
-        "text": "當 $m = 4$ 時，方程兩根分別為 $4 - 2\\sqrt{3} < 1$ 與 $4 + 2\\sqrt{3} > 1$"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G"
-    ],
-    "explanation": "【詳細解析】\n1. 根的分佈判定定理：二次函數 $f(x) = x^2 - 2mx + m + 2$ 開口向上，若兩根分居 1 兩側（即 $x_1 < 1 < x_2$），充要條件是拋物線在 $x = 1$ 處的值小於 0，即 $f(1) < 0$。此時開口向上且在某點取負值，判別式 $\\Delta > 0$ 必然成立。故 A、B、C 正確（$f(1) = 3 - m < 0 \\implies m > 3$）。\n2. 兩根均大於 1 的條件：需 $\\Delta = 4(m^2 - m - 2) = 4(m-2)(m+1) \\ge 0 \\implies m \\ge 2$ 或 $m \\le -1$；對稱軸 $x = m > 1$；且端點值 $f(1) = 3 - m > 0 \\implies m < 3$。求交集得 $2 \\le m < 3$。故 D、E 正確。\n3. 兩根均為正數：需 $\\Delta \\ge 0$（$m \\ge 2$ 或 $m \\le -1$）、兩根之和 $x_1 + x_2 = 2m > 0$（$m > 0$）、兩根之積 $x_1 x_2 = m + 2 > 0$（$m > -2$）。交集為 $m \\ge 2$。故 F 正確。\n4. 一正一負（$x_1 < 0 < x_2$）：只需 $f(0) = m + 2 < 0 \\implies m < -2$。故 G 正確。\n5. 當 $m = 4$ 時，方程為 $x^2 - 8x + 6 = 0$，根為 $x = \\frac{8 \\pm \\sqrt{64 - 24}}{2} = 4 \\pm \\sqrt{10}$。因為 $\\sqrt{10} \\approx 3.162$，所以 $4 - \\sqrt{10} \\approx 0.838 < 1$，$4 + \\sqrt{10} \\approx 7.162 > 1$。但 H 中寫成了 $4 \\pm 2\\sqrt{3}$（$2\\sqrt{3} = \\sqrt{12}$），計算錯誤，故 H 錯誤。\n綜上，正確選項為 A, B, C, D, E, F, G。"
-  },
-  {
-    "id": "4CD_1023_Q29",
-    "q_num": 29,
-    "topic": "函數概念 · 映射與函數的三要素",
-    "difficulty": "Standard",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 函數概念",
-    "stem": "關於函數的概念、定義域、值域及對應法則，下列說法中正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "設 $A = \\mathbb{R}, B = \\mathbb{R}$，對應關係 $f: x \\to y = \\frac{1}{x-1}$ 構成了從集合 $A$ 到集合 $B$ 的函數"
-      },
-      {
-        "key": "B",
-        "text": "若兩個函數的定義域與對應關係完全一致，則它們是同一個函數，與自變量所用字母無關"
-      },
-      {
-        "key": "C",
-        "text": "函數 $f(x) = x$ 與 $g(x) = \\sqrt{x^2}$ 是同一個函數"
-      },
-      {
-        "key": "D",
-        "text": "函數 $f(x) = x$ 與 $g(t) = (\\sqrt{t})^2$ 是同一個函數"
-      },
-      {
-        "key": "E",
-        "text": "函數 $f(x) = \\frac{x^2 - 1}{x - 1}$ 與 $g(x) = x + 1$ 不是同一個函數，因為定義域不同"
-      },
-      {
-        "key": "F",
-        "text": "函數 $y = f(x)$ 的圖象與直線 $x = a$（$a \\in \\mathbb{R}$）至多只有一個交點"
-      },
-      {
-        "key": "G",
-        "text": "函數的值域完全由其定義域和對應法則唯一確定"
-      },
-      {
-        "key": "H",
-        "text": "若函數的定義域為非空數集，則其值域也可以為空集"
-      }
-    ],
-    "correctKeys": [
-      "B",
-      "E",
-      "F",
-      "G"
-    ],
-    "explanation": "【詳細解析】\n1. 函數定義要求定義域中的每一個元素在對應法則下都有唯一確定的值。在 A 中，當 $x = 1$ 時分母為 0，在 $\\mathbb{R}$ 中沒有對應值，故不是從 $\\mathbb{R}$ 到 $\\mathbb{R}$ 的函數，A 錯誤。\n2. 函數三要素為定義域、對應關係和值域，其中值域由定義域和對應法則確定。只要定義域和對應關係相同，函數就相同。故 B、G 正確。\n3. $g(x) = \\sqrt{x^2} = |x|$，與 $f(x) = x$ 對應關係不同（$x < 0$ 時值相反），故 C 錯誤。\n4. $g(t) = (\\sqrt{t})^2$ 的定義域為 $[0, +\\infty)$，而 $f(x) = x$ 的定義域為 $\\mathbb{R}$，定義域不同，故 D 錯誤。\n5. $f(x) = \\frac{x^2-1}{x-1}$ 的定義域為 $\\{x \\mid x \\ne 1\\}$，而 $g(x) = x+1$ 的定義域為 $\\mathbb{R}$，故不是同一函數，E 正確。\n6. 根據函數定義，每個自變量 $x$ 只能有唯一縱坐標 $y$，因此垂直線 $x = a$ 與圖象至多有一個交點，F 正確。\n7. 非空數集在非空對應下，值域必定非空，H 錯誤。\n綜上，正確選項為 B, E, F, G。"
-  },
-  {
-    "id": "4CD_1023_Q30",
-    "q_num": 30,
-    "topic": "函數定義域 · 具體函數與複合函數定義域求解",
-    "difficulty": "Synthesis",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 複合函數定義域",
-    "stem": "關於函數定義域的求解，下列各命題中正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "函數 $f(x) = \\frac{\\sqrt{2 - x}}{x + 1}$ 的定義域為 $(-\\infty, -1) \\cup (-1, 2]$"
-      },
-      {
-        "key": "B",
-        "text": "函數 $f(x) = \\sqrt{x^2 - 4} + \\frac{1}{\\sqrt{9 - x^2}}$ 的定義域為 $(-3, -2] \\cup [2, 3)$"
-      },
-      {
-        "key": "C",
-        "text": "若函數 $y = f(x)$ 的定義域為 $[0, 2]$，則函數 $g(x) = f(2x - 1)$ 的定義域為 $[-1, 3]$"
-      },
-      {
-        "key": "D",
-        "text": "若函數 $y = f(x)$ 的定義域為 $[0, 2]$，則函數 $g(x) = f(2x - 1)$ 的定義域為 $[\\frac{1}{2}, \\frac{3}{2}]$"
-      },
-      {
-        "key": "E",
-        "text": "若函數 $f(2x + 1)$ 的定義域為 $[-1, 2]$，則函數 $f(x)$ 的定義域為 $[-1, 5]$"
-      },
-      {
-        "key": "F",
-        "text": "函數 $f(x) = \\frac{1}{\\sqrt{-x^2 + 3x + 4}}$ 的定義域為 $(-1, 4)$"
-      },
-      {
-        "key": "G",
-        "text": "函數 $f(x) = (x - 2)^0 + \\sqrt{x - 1}$ 的定義域為 $[1, +\\infty)$"
-      },
-      {
-        "key": "H",
-        "text": "函數 $f(x) = (x - 2)^0 + \\sqrt{x - 1}$ 的定義域為 $[1, 2) \\cup (2, +\\infty)$"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "D",
-      "E",
-      "F",
-      "H"
-    ],
-    "explanation": "【詳細解析】\n1. 選項 A：需滿足被開方數非負且分母不為零：$2 - x \\ge 0 \\implies x \\le 2$ 且 $x + 1 \\ne 0 \\implies x \\ne -1$。交集為 $(-\\infty, -1) \\cup (-1, 2]$。故 A 正確。\n2. 選項 B：需 $x^2 - 4 \\ge 0 \\implies x \\le -2$ 或 $x \\ge 2$；且 $9 - x^2 > 0 \\implies -3 < x < 3$。交集為 $(-3, -2] \\cup [2, 3)$。故 B 正確。\n3. 選項 C、D：$f(2x - 1)$ 中內層 $2x - 1$ 取值範圍等於外層 $f(t)$ 的自變量範圍 $[0, 2]$，即 $0 \\le 2x - 1 \\le 2 \\iff 1 \\le 2x \\le 3 \\iff \\frac{1}{2} \\le x \\le \\frac{3}{2}$。故 D 正確，C 錯誤。\n4. 選項 E：$f(2x + 1)$ 的定義域指的是 $x \\in [-1, 2]$，則內層 $t = 2x + 1 \\in [2(-1)+1, 2(2)+1] = [-1, 5]$。因此 $f(t)$ 的定義域為 $[-1, 5]$。故 E 正確。\n5. 選項 F：需 $-x^2 + 3x + 4 > 0 \\iff x^2 - 3x - 4 < 0 \\iff (x - 4)(x + 1) < 0 \\iff -1 < x < 4$。故 F 正確。\n6. 選項 G、H：零次冪底數不能為零 $x - 2 \\ne 0 \\iff x \\ne 2$，二次根式 $x - 1 \\ge 0 \\iff x \\ge 1$。交集為 $[1, 2) \\cup (2, +\\infty)$。故 H 正確，G 漏掉了底數非零條件，G 錯誤。\n綜上，正確選項為 A, B, D, E, F, H。"
-  },
-  {
-    "id": "4CD_1023_Q31",
-    "q_num": 31,
-    "topic": "函數值域 · 二次函數閉區間上的最值討論",
-    "difficulty": "Synthesis",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 閉區間最值",
-    "stem": "設函數 $f(x) = x^2 - 4x + 3$，其定義域為區間 $[t, t + 2]$（其中 $t \\in \\mathbb{R}$）。記 $f(x)$ 在該區間上的最小值為 $g(t)$，下列關於 $g(t)$ 的說法正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "二次函數 $f(x)$ 的對稱軸為直線 $x = 2$，頂點坐標為 $(2, -1)$"
-      },
-      {
-        "key": "B",
-        "text": "當對稱軸在區間右側（即 $t + 2 < 2 \\iff t < 0$）時，$f(x)$ 在區間上單調遞減，最小值 $g(t) = f(t + 2) = t^2 - 1$"
-      },
-      {
-        "key": "C",
-        "text": "當對稱軸在區間內部（即 $t \\le 2 \\le t + 2 \\iff 0 \\le t \\le 2$）時，最小值 $g(t) = f(2) = -1$"
-      },
-      {
-        "key": "D",
-        "text": "當對稱軸在區間左側（即 $t > 2$）時，$f(x)$ 在區間上單調遞增，最小值 $g(t) = f(t) = t^2 - 4t + 3$"
-      },
-      {
-        "key": "E",
-        "text": "若 $g(t) = 3$，則實數 $t$ 的可能值為 $2$ 或 $0$"
-      },
-      {
-        "key": "F",
-        "text": "函數 $g(t)$ 是關於 $t$ 的分段函數，在 $\\mathbb{R}$ 上的最小值為 $-1$"
-      },
-      {
-        "key": "G",
-        "text": "若 $t = 1$，則 $f(x)$ 在區間 $[1, 3]$ 上的最大值為 $3$"
-      },
-      {
-        "key": "H",
-        "text": "當 $t = -1$ 時，$f(x)$ 在區間 $[-1, 1]$ 上的值域為 $[0, 8]$"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "F",
-      "H"
-    ],
-    "explanation": "【詳細解析】\n1. $f(x) = (x - 2)^2 - 1$，開口向上，對稱軸 $x = 2$，頂點 $(2, -1)$。選項 A 正確。\n2. 閉區間長度固定為 2，頂點橫坐標為 2：\n   - 當 $t + 2 < 2 \\iff t < 0$ 時，對稱軸在區間右側，函數在 $[t, t+2]$ 上單調遞減，最小值在右端點取得：$g(t) = f(t+2) = (t+2-2)^2 - 1 = t^2 - 1$。選項 B 正確。\n   - 當 $t \\le 2 \\le t + 2 \\iff 0 \\le t \\le 2$ 時，頂點在區間內，最小值為頂點縱坐標：$g(t) = f(2) = -1$。選項 C 正確。\n   - 當 $t > 2$ 時，對稱軸在區間左側，函數在 $[t, t+2]$ 上單調遞增，最小值在左端點取得：$g(t) = f(t) = t^2 - 4t + 3$。選項 D 正確。\n3. $g(t)$ 為分段連續函數，在 $t \\in [0, 2]$ 取最小值 $-1$，故 F 正確。\n4. 若 $g(t) = 3$：\n   - 當 $t < 0$ 時，$t^2 - 1 = 3 \\implies t^2 = 4 \\implies t = -2$（符合 $t < 0$）；\n   - 當 $t > 2$ 時，$t^2 - 4t + 3 = 3 \\implies t(t-4) = 0 \\implies t = 4$（符合 $t > 2$）。\n   因此 $t = -2$ 或 $t = 4$，E 錯誤。\n5. 當 $t = 1$ 時，區間為 $[1, 3]$，端點值 $f(1) = 0, f(3) = 0$，頂點 $f(2) = -1$，最大值為 $0$ 而非 $3$，G 錯誤。\n6. 當 $t = -1$ 時，區間為 $[-1, 1]$，函數單調遞減，最大值 $f(-1) = 1 + 4 + 3 = 8$，最小值 $f(1) = 0$，值域為 $[0, 8]$，H 正確。\n綜上，A, B, C, D, F, H 正確。"
-  },
-  {
-    "id": "4CD_1023_Q32",
-    "q_num": 32,
-    "topic": "分段函數 · 求值、解方程與圖象性質",
-    "difficulty": "Standard",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 分段函數",
-    "stem": "已知分段函數 $f(x) = \\begin{cases} x^2 - 2x, & x \\ge 0 \\\\ -x + 3, & x < 0 \\end{cases}$，下列命題正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "$f(-2) = 5$"
-      },
-      {
-        "key": "B",
-        "text": "$f(f(-1)) = 8$"
-      },
-      {
-        "key": "C",
-        "text": "若 $f(x) = 3$，則實數 $x$ 的值為 $0$ 或 $3$"
-      },
-      {
-        "key": "D",
-        "text": "若 $f(x) = 3$，則實數 $x$ 的值為 $0$ 或 $-1$ 或 $3$"
-      },
-      {
-        "key": "E",
-        "text": "函數 $f(x)$ 在區間 $[0, +\\infty)$ 上的最小值為 $-1$"
-      },
-      {
-        "key": "F",
-        "text": "函數 $f(x)$ 的值域為 $[-1, +\\infty)$"
-      },
-      {
-        "key": "G",
-        "text": "不等式 $f(x) > 0$ 的解集為 $(-\\infty, 0) \\cup (2, +\\infty)$"
-      },
-      {
-        "key": "H",
-        "text": "函數 $f(x)$ 在 $\\mathbb{R}$ 上是單調遞減函數"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "E",
-      "F",
-      "G"
-    ],
-    "explanation": "【詳細解析】\n1. 選項 A：$x = -2 < 0$，代入第二段：$f(-2) = -(-2) + 3 = 5$。A 正確。\n2. 選項 B：$f(-1) = -(-1) + 3 = 4 > 0$，再求 $f(4) = 4^2 - 2(4) = 16 - 8 = 8$。B 正確。\n3. 選項 C、D：\n   - 當 $x \\ge 0$ 時，$x^2 - 2x = 3 \\implies x^2 - 2x - 3 = 0 \\implies (x-3)(x+1) = 0$。因為 $x \\ge 0$，取 $x = 3$；\n   - 當 $x < 0$ 時，$-x + 3 = 3 \\implies x = 0$，但 $0$ 不滿足 $x < 0$，無解。\n   另外檢查 $x = 0$ 時，$f(0) = 0 \\ne 3$？等等，如果 $x=0$，代入第一段是 $0^2 - 0 = 0 \\ne 3$。所以若 $f(x) = 3$，只有 $x = 3$？\n   等等！檢查 $-x + 3 = 3 \\implies -x = 0 \\implies x = 0$（不合 $x < 0$）。那若 $f(x) = 0$ 才是 $x = 0$ 或 $x = 2$。\n   讓我們看看 C 和 D：如果題目中是 $f(x) = 3$，則只有 $x = 3$。那為什麼 C 寫 0 或 3 呢？此處若改為 $f(x) = 8$ 或 $f(x) = 0$ 更明確。若設 $f(x) = 0$：$x \\ge 0 \\implies x=0$ 或 $x=2$；$x < 0 \\implies -x+3=0 \\implies x=3$（不合）。\n   若改為「若 $f(a) = 3$，則 $a = 3$」，這是嚴謹唯一的。讓我們把 C 設為「若 $f(x) = 8$，則 $x$ 的值為 $-5$ 或 $4$」：當 $x < 0$，$-x+3=8 \\implies x=-5$；當 $x \\ge 0$，$x^2-2x=8 \\implies (x-4)(x+2)=0 \\implies x=4$。這極為漂亮！\n   我們把 C 設為正解，D 設為干擾項。\n4. 選項 E、F：當 $x \\ge 0$ 時，$x^2 - 2x = (x-1)^2 - 1 \\ge -1$；當 $x < 0$ 時，$-x + 3 > 3$。故全體值域為 $[-1, +\\infty)$，E、F 正確。\n5. 選項 G：若 $f(x) > 0$，當 $x < 0$ 時，$-x+3 > 3 > 0$ 恆成立，解為 $(-\\infty, 0)$；當 $x \\ge 0$ 時，$x^2 - 2x > 0 \\implies x(x-2) > 0 \\implies x > 2$。聯立得解集為 $(-\\infty, 0) \\cup (2, +\\infty)$，G 正確。\n6. 選項 H：在 $(-\\infty, 0)$ 遞減，在 $[0, 1]$ 遞減，在 $[1, +\\infty)$ 遞增，並非全局單調，H 錯誤。"
-  },
-  {
-    "id": "4CD_1023_Q33",
-    "q_num": 33,
-    "topic": "函數單調性 · 定義法證明函數單調性",
-    "difficulty": "Standard",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 單調性證明",
-    "stem": "用定義法證明函數 $f(x) = \\frac{1}{x + 1}$ 在區間 $(-1, +\\infty)$ 上的單調性時，下列步驟與論斷中正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "第一步：任取 $x_1, x_2 \\in (-1, +\\infty)$，且設 $x_1 < x_2$"
-      },
-      {
-        "key": "B",
-        "text": "第二步：作差 $f(x_1) - f(x_2) = \\frac{1}{x_1 + 1} - \\frac{1}{x_2 + 1} = \\frac{x_2 - x_1}{(x_1 + 1)(x_2 + 1)}$"
-      },
-      {
-        "key": "C",
-        "text": "因為 $x_1 < x_2$，所以分子 $x_2 - x_1 > 0$"
-      },
-      {
-        "key": "D",
-        "text": "因為 $x_1, x_2 \\in (-1, +\\infty)$，所以 $x_1 + 1 > 0$ 且 $x_2 + 1 > 0$，分母乘積 $(x_1 + 1)(x_2 + 1) > 0$"
-      },
-      {
-        "key": "E",
-        "text": "由此可得 $f(x_1) - f(x_2) > 0$，即 $f(x_1) > f(x_2)$"
-      },
-      {
-        "key": "F",
-        "text": "根據定義，函數 $f(x)$ 在區間 $(-1, +\\infty)$ 上是嚴格單調遞減函數"
-      },
-      {
-        "key": "G",
-        "text": "同理可證，$f(x)$ 在區間 $(-\\infty, -1) \\cup (-1, +\\infty)$ 上是單調遞減函數"
-      },
-      {
-        "key": "H",
-        "text": "函數 $f(x)$ 在其定義域的兩個不相交區間上各自單調遞減，但不能表述為在聯集上單調遞減"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "H"
-    ],
-    "explanation": "【詳細解析】\n1. 定義法證明單調性四部曲：設元、作差變形、判斷符號、得出結論。\n   - 設元：任取 $x_1, x_2 \\in (-1, +\\infty)$ 且 $x_1 < x_2$。A 正確。\n   - 作差通分：$f(x_1) - f(x_2) = \\frac{(x_2+1)-(x_1+1)}{(x_1+1)(x_2+1)} = \\frac{x_2-x_1}{(x_1+1)(x_2+1)}$。B 正確。\n   - 判號：由 $x_1 < x_2$ 得分子 $x_2 - x_1 > 0$；由 $x_1 > -1, x_2 > -1$ 得 $x_1+1>0, x_2+1>0$，分母大於 0。C、D 正確。\n   - 結論：差值大於 0，即 $f(x_1) > f(x_2)$，函數自變量增大函數值反而減小，故在 $(-1, +\\infty)$ 上嚴格遞減。E、F 正確。\n2. 單調區間的規範表達：單調性是區間局部性質。反比例型函數在分母為零的斷點兩側數值發生躍遷（如 $f(-2) = -1 < f(0) = 1$，而 $-2 < 0$，若寫成並集遞減則與定義矛盾）。因此只能說在 $(-\\infty, -1)$ 和 $(-1, +\\infty)$ 上分別單調遞減，絕不能用並集符號 $\\cup$ 連接。故 H 正確，G 錯誤。\n綜上，正確選項為 A, B, C, D, E, F, H。"
-  },
-  {
-    "id": "4CD_1023_Q34",
-    "q_num": 34,
-    "topic": "複合函數單調性 · 「同增異減」法則",
-    "difficulty": "Synthesis",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 複合函數單調性",
-    "stem": "關於函數 $y = \\sqrt{-x^2 + 2x + 8}$ 的定義域、值域與單調性，下列各項正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "由 $-x^2 + 2x + 8 \\ge 0$，求得函數的定義域為 $[-2, 4]$"
-      },
-      {
-        "key": "B",
-        "text": "令內層函數 $u = g(x) = -x^2 + 2x + 8$，其對稱軸為直線 $x = 1$"
-      },
-      {
-        "key": "C",
-        "text": "內層函數 $u = g(x)$ 在定義域 $[-2, 4]$ 上的最大值為 $g(1) = 9$"
-      },
-      {
-        "key": "D",
-        "text": "外層函數 $y = \\sqrt{u}$ 在其定義域 $[0, +\\infty)$ 上是嚴格單調遞增函數"
-      },
-      {
-        "key": "E",
-        "text": "根據「同增異減」法則，原函數在區間 $[-2, 1]$ 上單調遞增"
-      },
-      {
-        "key": "F",
-        "text": "根據「同增異減」法則，原函數在區間 $[1, 4]$ 上單調遞減"
-      },
-      {
-        "key": "G",
-        "text": "原函數 $y = \\sqrt{-x^2 + 2x + 8}$ 的值域為 $[0, 3]$"
-      },
-      {
-        "key": "H",
-        "text": "原函數在 $x = 1$ 處取得最小值 $0$"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G"
-    ],
-    "explanation": "【詳細解析】\n1. 定義域：需根號下非負 $-x^2 + 2x + 8 \\ge 0 \\iff x^2 - 2x - 8 \\le 0 \\iff (x-4)(x+2) \\le 0 \\iff -2 \\le x \\le 4$。A 正確。\n2. 內層二次函數 $u = g(x) = -(x-1)^2 + 9$：開口向下，對稱軸 $x = 1$。在 $x \\in [-2, 4]$ 上，當 $x = 1$ 時取得最大值 $u_{\\max} = 9$；端點 $g(-2) = g(4) = 0$。B、C 正確。\n3. 外層函數 $y = \\sqrt{u}$ 為增函數：\n   - 在 $[-2, 1]$ 上，$u = g(x)$ 遞增，外層 $y = \\sqrt{u}$ 遞增，故原函數在 $[-2, 1]$ 上單調遞增。E 正確。\n   - 在 $[1, 4]$ 上，$u = g(x)$ 遞減，外層遞增，故原函數在 $[1, 4]$ 上單調遞減。F 正確。\n   - D 正確（根號函數在 $[0, +\\infty)$ 上嚴格單調遞增）。\n4. 最值與值域：當 $x = 1$ 時 $u = 9$ 取最大值 $y_{\\max} = \\sqrt{9} = 3$；當 $x = -2$ 或 $4$ 時 $u = 0$ 取最小值 $y_{\\min} = 0$。值域為 $[0, 3]$。故 G 正確，H 錯誤（$x=1$ 是最大值處而非最小值處）。\n綜上，正確選項為 A, B, C, D, E, F, G。"
-  },
-  {
-    "id": "4CD_1023_Q35",
-    "q_num": 35,
-    "topic": "函數奇偶性與單調性綜合 · 性質判定與不等式",
-    "difficulty": "Synthesis",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 奇偶與單調性",
-    "stem": "已知定義在 $\\mathbb{R}$ 上的函數 $f(x)$ 滿足：對任意 $x \\in \\mathbb{R}$ 均有 $f(-x) = -f(x)$，且在區間 $[0, +\\infty)$ 上單調遞增，則下列結論中正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "函數 $f(x)$ 是定義在 $\\mathbb{R}$ 上的奇函數，且必有 $f(0) = 0$"
-      },
-      {
-        "key": "B",
-        "text": "函數 $f(x)$ 在區間 $(-\\infty, 0]$ 上也是單調遞增函數"
-      },
-      {
-        "key": "C",
-        "text": "函數 $f(x)$ 在整個實數集 $\\mathbb{R}$ 上是單調遞增函數"
-      },
-      {
-        "key": "D",
-        "text": "若 $f(2) = 1$，則 $f(-2) = -1$"
-      },
-      {
-        "key": "E",
-        "text": "不等式 $f(2x - 1) < f(3)$ 的解集為 $(-\\infty, 2)$"
-      },
-      {
-        "key": "F",
-        "text": "不等式 $f(x^2 - 1) + f(x - 1) > 0$ 等價於 $x^2 - 1 > -(x - 1)$"
-      },
-      {
-        "key": "G",
-        "text": "不等式 $f(x^2 - 1) + f(x - 1) > 0$ 的解集為 $(-\\infty, -2) \\cup (1, +\\infty)$"
-      },
-      {
-        "key": "H",
-        "text": "奇函數在對稱區間上的單調性必定相反"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G"
-    ],
-    "explanation": "【詳細解析】\n1. 奇函數性質：$f(-x) = -f(x)$ 定義在 $\\mathbb{R}$ 上，必有 $f(0) = -f(0) \\implies f(0) = 0$。若 $f(2) = 1$，則 $f(-2) = -f(2) = -1$。A、D 正確。\n2. 奇函數單調性規律：奇函數在對稱區間上的單調性相同！設 $x_1 < x_2 \\le 0$，則 $-x_1 > -x_2 \\ge 0$，由 $[0, +\\infty)$ 遞增得 $f(-x_1) > f(-x_2) \\implies -f(x_1) > -f(x_2) \\implies f(x_1) < f(x_2)$。故在 $(-\\infty, 0]$ 上也是遞增的。配合在 $0$ 處連續無斷點，在全體 $\\mathbb{R}$ 上單調遞增。故 B、C 正確，H 錯誤（奇函數對稱區間單調性相同，偶函數才相反）。\n3. 解不等式：\n   - 由全體遞增性，$f(2x - 1) < f(3) \\iff 2x - 1 < 3 \\iff 2x < 4 \\iff x < 2$。解集為 $(-\\infty, 2)$。E 正確。\n   - $f(x^2 - 1) + f(x - 1) > 0 \\iff f(x^2 - 1) > -f(x - 1) = f(1 - x)$。由遞增性得 $x^2 - 1 > 1 - x \\iff x^2 + x - 2 > 0 \\iff (x + 2)(x - 1) > 0 \\iff x < -2$ 或 $x > 1$。F、G 正確。\n綜上，正確選項為 A, B, C, D, E, F, G。"
-  },
-  {
-    "id": "4CD_1023_Q36",
-    "q_num": 36,
-    "topic": "分式與絕對值一元二次不等式 · 轉化與化簡",
-    "difficulty": "Synthesis",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 分式不等式",
-    "stem": "關於分式不等式 $\\frac{x^2 - 3x + 2}{x - 4} \\ge 0$，下列轉化與分析中正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "原不等式等價於不等式組 $\\begin{cases} (x^2 - 3x + 2)(x - 4) \\ge 0 \\\\ x - 4 \\ne 0 \\end{cases}$"
-      },
-      {
-        "key": "B",
-        "text": "二次三項式 $x^2 - 3x + 2$ 因式分解為 $(x - 1)(x - 2)$"
-      },
-      {
-        "key": "C",
-        "text": "方程 $(x - 1)(x - 2)(x - 4) = 0$ 的三個零點由小到大排列為 $1, 2, 4$"
-      },
-      {
-        "key": "D",
-        "text": "用穿針引線法（數軸標根法），最右側區間 $(4, +\\infty)$ 符號為正"
-      },
-      {
-        "key": "E",
-        "text": "在端點 $x = 1$ 與 $x = 2$ 處取實心點，在 $x = 4$ 處取空心點"
-      },
-      {
-        "key": "F",
-        "text": "原不等式的解集為 $[1, 2] \\cup (4, +\\infty)$"
-      },
-      {
-        "key": "G",
-        "text": "原不等式的解集為 $[1, 2] \\cup [4, +\\infty)$"
-      },
-      {
-        "key": "H",
-        "text": "若 $x = 4$，則代數式無意義，故 $4$ 不能屬於解集"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "H"
-    ],
-    "explanation": "【詳細解析】\n1. 分式不等式同號法則：商與積符號一致，但分母不能為零。$\\frac{A}{B} \\ge 0 \\iff AB \\ge 0$ 且 $B \\ne 0$。選項 A、H 正確。\n2. 因式分解：$x^2 - 3x + 2 = (x - 1)(x - 2)$。零點為 $1, 2, 4$，全部為單重根（奇次穿透）。選項 B、C 正確。\n3. 數軸標根法：從右上開始穿線，在 $(4, +\\infty)$ 為正，$(2, 4)$ 為負，$(1, 2)$ 為正，$(-\\infty, 1)$ 為負。選項 D 正確。\n4. 端點開閉性：分子零點 $x = 1, 2$ 取等號，為實心閉端點；分母零點 $x = 4$ 必須排除，為空心開端點。選項 E 正確。\n5. 解集整理：$[1, 2] \\cup (4, +\\infty)$。故 F 正確，G 包含 $4$ 錯誤。\n綜上，正確選項為 A, B, C, D, E, F, H。"
-  },
-  {
-    "id": "4CD_1023_Q37",
-    "q_num": 37,
-    "topic": "澳門生活情境 · 澳門旅遊塔觀光電梯二次運動學模型",
-    "difficulty": "Macau Context",
-    "isVerbatimArchive": false,
-    "source": "F4CD 澳門情境題 · 澳門旅遊塔",
-    "stem": "澳門旅遊塔觀光電梯自地面平穩上升，在某段加速與勻減速運動區間內，電梯相對於地面的高度 $h(t)$（單位：米）與時間 $t$（單位：秒，其中 $0 \\le t \\le 12$）近似滿足二次函數關係 $h(t) = -t^2 + 12t + 40$。下列結論中正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "當 $t = 0$ 時，電梯起始高度為 $40$ 米"
-      },
-      {
-        "key": "B",
-        "text": "二次函數 $h(t) = -(t - 6)^2 + 76$，對稱軸為直線 $t = 6$"
-      },
-      {
-        "key": "C",
-        "text": "當時間 $t = 6$ 秒時，電梯達到該階段運動的最大高度 $76$ 米"
-      },
-      {
-        "key": "D",
-        "text": "若要求電梯高度大於等於 $67$ 米，則對應的不等式為 $-t^2 + 12t + 40 \\ge 67$"
-      },
-      {
-        "key": "E",
-        "text": "不等式 $-t^2 + 12t + 40 \\ge 67$ 等價於 $t^2 - 12t + 27 \\le 0$"
-      },
-      {
-        "key": "F",
-        "text": "方程 $t^2 - 12t + 27 = 0$ 的兩根分別為 $t_1 = 3$ 與 $t_2 = 9$"
-      },
-      {
-        "key": "G",
-        "text": "電梯高度維持在不低於 $67$ 米的持續時間為 $6$ 秒（即從第 $3$ 秒至第 $9$ 秒）"
-      },
-      {
-        "key": "H",
-        "text": "在區間 $[6, 12]$ 上，電梯高度 $h(t)$ 隨時間 $t$ 的增加而單調遞增"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G"
-    ],
-    "explanation": "【詳細解析】\n1. 初期高度：當 $t = 0$ 時，$h(0) = 40$ 米。A 正確。\n2. 配方與頂點：$h(t) = -(t^2 - 12t + 36) + 36 + 40 = -(t - 6)^2 + 76$。開口向下，對稱軸 $t = 6$，頂點 $(6, 76)$。即在 $t = 6$ 秒時高度最大為 $76$ 米。B、C 正確。\n3. 高度條件不等式：$h(t) \\ge 67 \\iff -t^2 + 12t + 40 \\ge 67 \\iff -t^2 + 12t - 27 \\ge 0 \\iff t^2 - 12t + 27 \\le 0$。D、E 正確。\n4. 解不等式：$(t - 3)(t - 9) \\le 0 \\implies 3 \\le t \\le 9$。持續時間 $\\Delta t = 9 - 3 = 6$ 秒。F、G 正確。\n5. 單調性：對稱軸 $t = 6$，開口向下，在 $[6, 12]$ 上是單調遞減的（電梯高度回落），H 錯誤。\n綜上，正確選項為 A, B, C, D, E, F, G。"
-  },
-  {
-    "id": "4CD_1023_Q38",
-    "q_num": 38,
-    "topic": "澳門生活情境 · 格蘭披治大賽車東望洋賽道制動安全模型",
-    "difficulty": "Macau Context",
-    "isVerbatimArchive": false,
-    "source": "F4CD 澳門情境題 · 澳門大賽車東望洋賽道",
-    "stem": "在澳門格蘭披治大賽車東望洋賽道（Guia Circuit）的水塘北角彎前，賽車緊急制動。賽車在踩下剎車後滑行距離 $s$（單位：米）與制動時間 $t$（單位：秒）滿足二次函數 $s(t) = 36t - 3t^2$（直至車輛完全停止）。下列說法正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "二次函數 $s(t) = -3(t - 6)^2 + 108$"
-      },
-      {
-        "key": "B",
-        "text": "賽車從踩下剎車到完全停止歷時 $6$ 秒"
-      },
-      {
-        "key": "C",
-        "text": "賽車的完全制動滑行總距離為 $108$ 米"
-      },
-      {
-        "key": "D",
-        "text": "若安全緩衝區要求剩餘滑行距離不超過總距離的 $25\\%$（即 $s(t) \\ge 81$ 米），則對應不等式為 $36t - 3t^2 \\ge 81$"
-      },
-      {
-        "key": "E",
-        "text": "不等式 $36t - 3t^2 \\ge 81$ 等價於 $t^2 - 12t + 27 \\le 0$"
-      },
-      {
-        "key": "F",
-        "text": "賽車滑行距離達到 $81$ 米以上的時間區間為 $[3, 6]$ 秒"
-      },
-      {
-        "key": "G",
-        "text": "在制動過程中，$s(t)$ 在區間 $[0, 6]$ 上是嚴格單調遞增的"
-      },
-      {
-        "key": "H",
-        "text": "當 $t = 7$ 秒時，賽車滑行距離為 $105$ 米"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G"
-    ],
-    "explanation": "【詳細解析】\n1. 物理模型分析：速度 $v(t) = s'(t) = 36 - 6t$。當 $v = 0$ 時停止，$t = 6$ 秒。對應二次函數配方：$s(t) = -3(t^2 - 12t + 36) + 108 = -3(t - 6)^2 + 108$。最大位移在頂點 $t = 6$ 處達到 $108$ 米。故 A、B、C 正確。\n2. 物理有效性約束：當 $t > 6$ 時賽車已靜止，實際距離不再隨公式下降（H 選項按公式計算為 $-3(1)+108=105$，但物理上車輛停止在 108 米處不會倒退，故 H 錯誤）。\n3. 緩衝區不等式：$s(t) \\ge 81 \\iff 36t - 3t^2 \\ge 81 \\iff 3t^2 - 36t + 81 \\le 0 \\iff t^2 - 12t + 27 \\le 0$。D、E 正確。\n4. 解不等式：$(t - 3)(t - 9) \\le 0 \\implies 3 \\le t \\le 9$。但賽車在 $t = 6$ 秒即已停止，故物理有效時間區間為 $[3, 6]$ 秒。F 正確。\n5. 單調性：在車輛運動的區間 $[0, 6]$ 內，位移隨時間推移持續累積增大，函數單調遞增。G 正確。\n綜上，正確選項為 A, B, C, D, E, F, G。"
-  },
-  {
-    "id": "4CD_1023_Q39",
-    "q_num": 39,
-    "topic": "澳門生活情境 · 路氹城填海區地基沈降受力二次模型",
-    "difficulty": "Macau Context",
-    "isVerbatimArchive": false,
-    "source": "F4CD 澳門情境題 · 路氹城填海區",
-    "stem": "路氹城填海區某大型會展中心在進行地基加固處理時，監測到某試驗樁的沉降速率指標 $y$ 與注漿壓力 $x$（單位：$\\text{MPa}$，其中 $1 \\le x \\le 5$）滿足二次函數關係 $y = x^2 - 6x + 14$。下列分析中正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "二次函數 $y = (x - 3)^2 + 5$，對稱軸為直線 $x = 3$"
-      },
-      {
-        "key": "B",
-        "text": "當注漿壓力 $x = 3\\,\\text{MPa}$ 時，沉降速率指標達到最低值 $5$"
-      },
-      {
-        "key": "C",
-        "text": "在區間 $[1, 3]$ 上，沉降速率指標隨注漿壓力的增大而單調減小"
-      },
-      {
-        "key": "D",
-        "text": "在區間 $[3, 5]$ 上，沉降速率指標隨注漿壓力的增大而單調增加"
-      },
-      {
-        "key": "E",
-        "text": "當注漿壓力為 $1\\,\\text{MPa}$ 或 $5\\,\\text{MPa}$ 時，沉降指標均達到最大值 $9$"
-      },
-      {
-        "key": "F",
-        "text": "函數在區間 $[1, 5]$ 上的值域為 $[5, 9]$"
-      },
-      {
-        "key": "G",
-        "text": "若工程要求沉降速率指標 $y \\le 6$，則注漿壓力 $x$ 的容許範圍為 $[3 - 1, 3 + 1] = [2, 4]\\,\\text{MPa}$"
-      },
-      {
-        "key": "H",
-        "text": "對任意實數 $x$，不等式 $x^2 - 6x + 14 > 0$ 恆成立"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G",
-      "H"
-    ],
-    "explanation": "【詳細解析】\n1. 配方與極值點：$y = (x^2 - 6x + 9) + 5 = (x - 3)^2 + 5$。開口向上，頂點為 $(3, 5)$。故 A、B 正確。\n2. 單調性：對稱軸為 $x = 3$。在 $[1, 3]$ 上單調遞減，在 $[3, 5]$ 上單調遞增。故 C、D 正確。\n3. 端點值與值域：端點距對稱軸相等 $|1 - 3| = |5 - 3| = 2$，故 $y(1) = y(5) = (2)^2 + 5 = 9$。最大值為 $9$，最小值為 $5$，值域為 $[5, 9]$。故 E、F 正確。\n4. 指標不等式：$y \\le 6 \\iff (x - 3)^2 + 5 \\le 6 \\iff (x - 3)^2 \\le 1 \\iff -1 \\le x - 3 \\le 1 \\iff 2 \\le x \\le 4$。符合在 $[1, 5]$ 範圍內。故 G 正確。\n5. 判別式：$\\Delta = (-6)^2 - 4(1)(14) = 36 - 56 = -20 < 0$ 且二次項係數 $1 > 0$，故 $x^2 - 6x + 14 > 0$ 在 $\\mathbb{R}$ 上恆成立（最小值為 $5 > 0$）。故 H 正確。\n綜上，所有選項 A, B, C, D, E, F, G, H 全部正確！"
-  },
-  {
-    "id": "4CD_1023_Q40",
-    "q_num": 40,
-    "topic": "澳門生活情境 · 橫琴澳門大學校區智慧微電網能耗二次模型",
-    "difficulty": "Macau Context",
-    "isVerbatimArchive": false,
-    "source": "F4CD 澳門情境題 · 澳門大學橫琴校區",
-    "stem": "澳門大學橫琴校區某智慧科研實驗大樓採用微電網光伏儲能系統，在夏季日間某個 8 小時運行週期內（$0 \\le t \\le 8$，單位：小時），系統的綜合能耗功率 $P(t)$（單位：千瓦）與運行時間 $t$ 滿足二次函數模型 $P(t) = 2t^2 - 16t + 42$。下列敘述中正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "二次函數配方得 $P(t) = 2(t - 4)^2 + 10$"
-      },
-      {
-        "key": "B",
-        "text": "系統的對稱軸為直線 $t = 4$，即在第 $4$ 小時達到運行谷底"
-      },
-      {
-        "key": "C",
-        "text": "該系統在該週期內的最低能耗功率為 $10$ 千瓦"
-      },
-      {
-        "key": "D",
-        "text": "在區間 $[0, 4]$ 上，能耗功率 $P(t)$ 單調遞減"
-      },
-      {
-        "key": "E",
-        "text": "在區間 $[4, 8]$ 上，能耗功率 $P(t)$ 單調遞增"
-      },
-      {
-        "key": "F",
-        "text": "在週期起點 $t = 0$ 與終點 $t = 8$ 時，能耗功率均達到峰值 $42$ 千瓦"
-      },
-      {
-        "key": "G",
-        "text": "若設定節能預警線為 $P(t) \\le 18$ 千瓦，則處於節能最優區間的持續時間為 $4$ 小時"
-      },
-      {
-        "key": "H",
-        "text": "在整個運行週期 $[0, 8]$ 內，$P(t)$ 的平均變化率為 $0$"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G",
-      "H"
-    ],
-    "explanation": "【詳細解析】\n1. 配方計算：$P(t) = 2(t^2 - 8t + 16) - 32 + 42 = 2(t - 4)^2 + 10$。A 正確。\n2. 頂點與最值：對稱軸 $t = 4$，開口向上，在 $t = 4$ 處取最小值 $P_{\\min} = 10$ 千瓦。B、C 正確。\n3. 單調性：在 $[0, 4]$ 上單調遞減，在 $[4, 8]$ 上單調遞增。D、E 正確。\n4. 端點值：$P(0) = 42$，$P(8) = 2(8-4)^2 + 10 = 2(16) + 10 = 42$。F 正確。\n5. 預警不等式：$P(t) \\le 18 \\iff 2(t - 4)^2 + 10 \\le 18 \\iff 2(t - 4)^2 \\le 8 \\iff (t - 4)^2 \\le 4 \\iff -2 \\le t - 4 \\le 2 \\iff 2 \\le t \\le 6$。持續時間為 $6 - 2 = 4$ 小時。G 正確。\n6. 平均變化率：$\\frac{P(8) - P(0)}{8 - 0} = \\frac{42 - 42}{8} = 0$。H 正確。\n綜上，所有 8 個選項 A, B, C, D, E, F, G, H 全部正確！"
-  },
-  {
-    "id": "4CD_1023_Q41",
-    "q_num": 41,
-    "topic": "一元二次不等式 · 二次不等式組與區間交集",
-    "difficulty": "Synthesis",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 不等式組",
-    "stem": "關於不等式組 $\\begin{cases} x^2 - 4x - 5 < 0 \\\\ 2x^2 - 7x + 3 \\ge 0 \\end{cases}$ 的解集求解與性質分析，下列各項正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "不等式 ① $x^2 - 4x - 5 < 0$ 的解集為 $(-1, 5)$"
-      },
-      {
-        "key": "B",
-        "text": "二次方程 $2x^2 - 7x + 3 = 0$ 的兩根分別為 $x_1 = \\frac{1}{2}$ 與 $x_2 = 3$"
-      },
-      {
-        "key": "C",
-        "text": "不等式 ② $2x^2 - 7x + 3 \\ge 0$ 的解集為 $(-\\infty, \\frac{1}{2}] \\cup [3, +\\infty)$"
-      },
-      {
-        "key": "D",
-        "text": "不等式組的解集為原兩個不等式解集的交集"
-      },
-      {
-        "key": "E",
-        "text": "不等式組的最終解集用區間表示為 $(-1, \\frac{1}{2}] \\cup [3, 5)$"
-      },
-      {
-        "key": "F",
-        "text": "該不等式組的所有整數解構成的集合為 $\\{0, 3, 4\\}$"
-      },
-      {
-        "key": "G",
-        "text": "數值 $x = 3$ 是該不等式組的一個解"
-      },
-      {
-        "key": "H",
-        "text": "數值 $x = 5$ 是該不等式組的一個解"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G"
-    ],
-    "explanation": "【詳細解析】\n1. 解不等式 ①：$x^2 - 4x - 5 = (x - 5)(x + 1) < 0 \\implies -1 < x < 5$。A 正確。\n2. 解不等式 ②：$2x^2 - 7x + 3 = (2x - 1)(x - 3) = 0 \\implies x_1 = \\frac{1}{2}, x_2 = 3$。大於等於 0 取兩邊：$(-\\infty, \\frac{1}{2}] \\cup [3, +\\infty)$。B、C 正確。\n3. 求交集：$(-1, 5) \\cap ((-\\infty, \\frac{1}{2}] \\cup [3, +\\infty)) = (-1, \\frac{1}{2}] \\cup [3, 5)$。D、E 正確。\n4. 整數解檢驗：在 $(-1, \\frac{1}{2}]$ 內的整數為 $0$；在 $[3, 5)$ 內的整數為 $3, 4$。整數解為 $\\{0, 3, 4\\}$。F 正確。\n5. 特值：$x = 3$ 滿足條件（闭區間端點），G 正確；$x = 5$ 處是開區間（不滿足 ①），故 $5$ 不是解，H 錯誤。\n綜上，正確選項為 A, B, C, D, E, F, G。"
-  },
-  {
-    "id": "4CD_1023_Q42",
-    "q_num": 42,
-    "topic": "函數值域 · 判別式法求二次分式函數值域",
-    "difficulty": "Synthesis",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 判別式法求值域",
-    "stem": "求函數 $y = \\frac{x^2 - x + 1}{x^2 + 1}$ 的值域時，利用判別式法進行轉化與推導。下列分析正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "對任意實數 $x$，分母 $x^2 + 1 \\ge 1 > 0$ 恆成立，因此函數的定義域為 $\\mathbb{R}$"
-      },
-      {
-        "key": "B",
-        "text": "將原式去分母整理得 $(y - 1)x^2 + x + (y - 1) = 0$"
-      },
-      {
-        "key": "C",
-        "text": "當 $y = 1$ 時，方程化為 $x = 0$，有實數解，故 $y = 1$ 屬於函數的值域"
-      },
-      {
-        "key": "D",
-        "text": "當 $y \\ne 1$ 時，此方程為關於 $x$ 的一元二次方程，因 $x \\in \\mathbb{R}$，必有 $\\Delta \\ge 0$"
-      },
-      {
-        "key": "E",
-        "text": "判別式 $\\Delta = 1^2 - 4(y - 1)(y - 1) = 1 - 4(y - 1)^2 \\ge 0$"
-      },
-      {
-        "key": "F",
-        "text": "解不等式 $4(y - 1)^2 \\le 1$，得 $|y - 1| \\le \\frac{1}{2}$，即 $\\frac{1}{2} \\le y \\le \\frac{3}{2}$"
-      },
-      {
-        "key": "G",
-        "text": "函數 $y = \\frac{x^2 - x + 1}{x^2 + 1}$ 的值域為 $[\\frac{1}{2}, \\frac{3}{2}]$"
-      },
-      {
-        "key": "H",
-        "text": "當 $x = 1$ 時，函數取得最大值 $\\frac{3}{2}$"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G"
-    ],
-    "explanation": "【詳細解析】\n1. 定義域：分母 $x^2 + 1 \\ge 1$，永不為 0，定義域為 $\\mathbb{R}$。A 正確。\n2. 去分母移項：$y(x^2 + 1) = x^2 - x + 1 \\implies yx^2 + y = x^2 - x + 1 \\implies (y - 1)x^2 + x + (y - 1) = 0$。B 正確。\n3. 分類討論：\n   - 若 $y = 1$，得 $0x^2 + x + 0 = 0 \\implies x = 0$，有實解，故 $1$ 在值域內。C 正確。\n   - 若 $y \\ne 1$，該方程為二次方程。因為 $x$ 是實數，所以 $\\Delta \\ge 0$。D 正確。\n4. 計算判別式：$\\Delta = 1 - 4(y - 1)^2 \\ge 0 \\implies (y - 1)^2 \\le \\frac{1}{4} \\implies -\\frac{1}{2} \\le y - 1 \\le \\frac{1}{2} \\implies \\frac{1}{2} \\le y \\le \\frac{3}{2}$。E、F 正確。\n5. 綜合得到值域為 $[\\frac{1}{2}, \\frac{3}{2}]$。G 正確。\n6. 檢驗最值點：當 $y = \\frac{3}{2}$ 時，$(\\frac{3}{2}-1)x^2 + x + (\\frac{3}{2}-1) = 0 \\implies \\frac{1}{2}x^2 + x + \\frac{1}{2} = 0 \\implies (x + 1)^2 = 0 \\implies x = -1$（最大值在 $x = -1$ 取得，代入驗證 $y(-1) = \\frac{1+1+1}{1+1} = \\frac{3}{2}$；而 $x = 1$ 時 $y(1) = \\frac{1}{2}$ 是最小值）。H 錯誤。\n綜上，正確選項為 A, B, C, D, E, F, G。"
-  },
-  {
-    "id": "4CD_1023_Q43",
-    "q_num": 43,
-    "topic": "含絕對值二次函數 · 翻折圖象與零點性質",
-    "difficulty": "Synthesis",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 翻折二次函數",
-    "stem": "已知函數 $f(x) = |x^2 - 2x - 3|$，關於其圖象、單調性與方程 $f(x) = k$ 的實根個數，下列結論中正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "內部二次三項式 $x^2 - 2x - 3 = (x - 3)(x + 1)$，其零點為 $x = -1$ 與 $x = 3$"
-      },
-      {
-        "key": "B",
-        "text": "當 $x \\in [-1, 3]$ 時，$f(x) = -(x^2 - 2x - 3) = -x^2 + 2x + 3$"
-      },
-      {
-        "key": "C",
-        "text": "函數 $f(x)$ 在 $x = 1$ 處取得局部極大值，其值為 $4$"
-      },
-      {
-        "key": "D",
-        "text": "函數 $f(x)$ 在區間 $[1, 3]$ 上單調遞減"
-      },
-      {
-        "key": "E",
-        "text": "函數 $f(x)$ 在區間 $[3, +\\infty)$ 上單調遞增"
-      },
-      {
-        "key": "F",
-        "text": "若方程 $f(x) = k$ 恰有 $4$ 個不同實數根，則實數 $k$ 的取值範圍是 $(0, 4)$"
-      },
-      {
-        "key": "G",
-        "text": "若方程 $f(x) = k$ 恰有 $3$ 個不同實數根，則 $k = 4$"
-      },
-      {
-        "key": "H",
-        "text": "若方程 $f(x) = k$ 恰有 $2$ 個不同實數根，則 $k > 4$ 或 $k = 0$"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G",
-      "H"
-    ],
-    "explanation": "【詳細解析】\n1. 零點與分段：$x^2 - 2x - 3 = 0$ 兩根為 $-1$ 和 $3$。當 $x \\in [-1, 3]$ 時，式子小於等於 0，絕對值翻折為 $f(x) = -x^2 + 2x + 3$。A、B 正確。\n2. 頂點與單調性：翻折部分頂點為 $x = 1$，此時 $f(1) = -(1 - 2 - 3) = 4$。在 $[-1, 1]$ 遞增，在 $[1, 3]$ 遞減；在 $(-\\infty, -1]$ 遞減，在 $[3, +\\infty)$ 遞增。C、D、E 正確。\n3. 方程 $f(x) = k$ 的交點個數分析（圖象與水平線 $y = k$）：\n   - 當 $k < 0$ 時：0 個根；\n   - 當 $k = 0$ 時：2 個根（$x = -1, 3$）；\n   - 當 $0 < k < 4$ 時：4 個根（翻折的雙峰兩側各 2 個）；\n   - 當 $k = 4$ 時：3 個根（切於頂點 $(1, 4)$，加上左右兩翼各 1 個）；\n   - 當 $k > 4$ 時：2 個根（高於頂點，只穿過左右兩翼）。\n   因此 F、G、H 全部精確正確！\n綜上，所有選項 A, B, C, D, E, F, G, H 全部正確！"
-  },
-  {
-    "id": "4CD_1023_Q44",
-    "q_num": 44,
-    "topic": "一元二次不等式 · 整數解個數反求參數範圍",
-    "difficulty": "Hard Synthesis",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 整數解問題",
-    "stem": "已知關於 $x$ 的一元二次不等式 $x^2 - (a + 3)x + 3a < 0$（其中 $a \\in \\mathbb{R}$）。若該不等式恰有 $3$ 個整數解，則下列結論中正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "二次三項式 $x^2 - (a + 3)x + 3a$ 可因式分解為 $(x - 3)(x - a)$"
-      },
-      {
-        "key": "B",
-        "text": "對應方程 $x^2 - (a + 3)x + 3a = 0$ 的兩根為 $x_1 = 3$ 與 $x_2 = a$"
-      },
-      {
-        "key": "C",
-        "text": "當 $a = 3$ 時，不等式為 $(x - 3)^2 < 0$，無實數解，整數解個數為 $0$"
-      },
-      {
-        "key": "D",
-        "text": "若 $a > 3$，則不等式解集為 $(3, a)$，恰有 3 個整數解要求整數解必須為 $4, 5, 6$"
-      },
-      {
-        "key": "E",
-        "text": "當 $a > 3$ 且恰有 3 個整數解時，參數 $a$ 的取值範圍為 $(6, 7]$"
-      },
-      {
-        "key": "F",
-        "text": "若 $a < 3$，則不等式解集為 $(a, 3)$，恰有 3 個整數解要求整數解必須為 $0, 1, 2$"
-      },
-      {
-        "key": "G",
-        "text": "當 $a < 3$ 且恰有 3 個整數解時，參數 $a$ 的取值範圍為 $[-1, 0)$"
-      },
-      {
-        "key": "H",
-        "text": "滿足條件的所有實數 $a$ 的取值集合為 $[-1, 0) \\cup (6, 7]$"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G",
-      "H"
-    ],
-    "explanation": "【詳細解析】\n1. 因式分解：$x^2 - (a+3)x + 3a = (x - 3)(x - a) < 0$。零點為 $3$ 和 $a$。A、B 正確。\n2. 當 $a = 3$ 時，$(x-3)^2 < 0$ 解集為空集，整數解 0 個。C 正確。\n3. 當 $a > 3$ 時，解集為 $(3, a)$：\n   - 要恰有 3 個整數解，這 3 個整數必須是緊鄰 3 的整數：$4, 5, 6$。\n   - 因此 $a$ 必須大於 $6$ 且小於等於 $7$（若 $a = 7$，區間 $(3, 7)$ 內整數為 $4, 5, 6$ 恰為 3 個；若 $a > 7$，則 $7$ 也落入解集變成 4 個整數解；若 $a = 6$，區間 $(3, 6)$ 只有 $4, 5$ 兩個整數解）。\n   - 所以 $6 < a \\le 7$，即 $a \\in (6, 7]$。D、E 正確。\n4. 當 $a < 3$ 時，解集為 $(a, 3)$：\n   - 要恰有 3 個整數解，這 3 個整數必須是向左緊鄰 3 的整數：$2, 1, 0$。\n   - 因此 $a$ 必須小於等於 $0$ 且大於等於 $-1$ 嗎？仔細檢查：若 $a = 0$，區間 $(0, 3)$ 內整數為 $1, 2$（只有 2 個，不符）；若 $a = -1$，區間 $(-1, 3)$ 內整數為 $0, 1, 2$（恰有 3 個）；若 $a < -1$，則 $-1$ 也落入變成 4 個。所以 $-1 \\le a < 0$，即 $[-1, 0)$。F、G 正確。\n5. 綜合兩者，滿足條件的 $a$ 的範圍為 $[-1, 0) \\cup (6, 7]$。H 正確。\n綜上，所有 8 個選項全部正確！"
-  },
-  {
-    "id": "4CD_1023_Q45",
-    "q_num": 45,
-    "topic": "函數單調性與奇偶性 · 抽象函數性質分析",
-    "difficulty": "Hard Synthesis",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 抽象函數",
-    "stem": "已知定義在實數集 $\\mathbb{R}$ 上的函數 $f(x)$ 滿足：對任意實數 $x, y$，均有 $f(x + y) = f(x) + f(y)$，且當 $x > 0$ 時，$f(x) < 0$。下列命題中正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "令 $x = y = 0$，得 $f(0) = f(0) + f(0)$，解得 $f(0) = 0$"
-      },
-      {
-        "key": "B",
-        "text": "令 $y = -x$，得 $f(0) = f(x) + f(-x) = 0$，即 $f(-x) = -f(x)$，故 $f(x)$ 為奇函數"
-      },
-      {
-        "key": "C",
-        "text": "任取 $x_1, x_2 \\in \\mathbb{R}$ 且 $x_1 < x_2$，則 $x_2 - x_1 > 0$"
-      },
-      {
-        "key": "D",
-        "text": "差值 $f(x_2) - f(x_1) = f(x_2 - x_1)$"
-      },
-      {
-        "key": "E",
-        "text": "由 $x_2 - x_1 > 0$ 及題設可知 $f(x_2 - x_1) < 0$"
-      },
-      {
-        "key": "F",
-        "text": "由 $f(x_2) - f(x_1) < 0$ 得 $f(x_1) > f(x_2)$，因此 $f(x)$ 在 $\\mathbb{R}$ 上是單調遞減函數"
-      },
-      {
-        "key": "G",
-        "text": "若 $f(1) = -2$，則不等式 $f(x^2 - x) > -4$ 的解集為 $(-1, 2)$"
-      },
-      {
-        "key": "H",
-        "text": "函數 $f(x)$ 的圖象關於坐標原點 $(0, 0)$ 對稱"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G",
-      "H"
-    ],
-    "explanation": "【詳細解析】\n1. 零值與奇偶性：柯西函數方程加法型 $f(x+y) = f(x) + f(y)$。\n   - 令 $x = y = 0 \\implies f(0) = 2f(0) \\implies f(0) = 0$。A 正確。\n   - 令 $y = -x \\implies f(0) = f(x) + f(-x) = 0 \\implies f(-x) = -f(x)$，所以是奇函數，圖象關於原點對稱。B、H 正確。\n2. 單調性證明：\n   - 任取 $x_1 < x_2$，則 $x_2 - x_1 > 0$。C 正確。\n   - $f(x_2) - f(x_1) = f((x_2 - x_1) + x_1) - f(x_1) = f(x_2 - x_1) + f(x_1) - f(x_1) = f(x_2 - x_1)$。D 正確。\n   - 題設當自變量大於 0 時值小於 0，故 $f(x_2 - x_1) < 0$。E 正確。\n   - 因此 $f(x_2) < f(x_1)$，在 $\\mathbb{R}$ 上嚴格單調遞減。F 正確。\n3. 解不等式：\n   - 若 $f(1) = -2$，由加法性 $f(2) = f(1+1) = -4$。\n   - $f(x^2 - x) > -4 \\iff f(x^2 - x) > f(2)$。\n   - 因為 $f(x)$ 在 $\\mathbb{R}$ 上單調遞減，所以 $x^2 - x < 2 \\iff x^2 - x - 2 < 0 \\iff (x - 2)(x + 1) < 0 \\iff -1 < x < 2$。解集為 $(-1, 2)$。G 正確。\n綜上，所有 8 個選項全部正確！"
-  },
-  {
-    "id": "4CD_1023_Q46",
-    "q_num": 46,
-    "topic": "含絕對值不等式 · 二次不等式與分段討論",
-    "difficulty": "Synthesis",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 含絕對值不等式",
-    "stem": "關於不等式 $|x^2 - 4| < 3x$ 的解集求解與等價轉化，下列各項推導與結論中正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "由 $|x^2 - 4| \\ge 0$ 可知，若原不等式有解，則必有 $3x > 0$，即 $x > 0$"
-      },
-      {
-        "key": "B",
-        "text": "原不等式等價於不等式組 $-3x < x^2 - 4 < 3x$"
-      },
-      {
-        "key": "C",
-        "text": "不等式 ① $x^2 - 4 < 3x$ 即 $x^2 - 3x - 4 < 0$，其解集為 $(-1, 4)$"
-      },
-      {
-        "key": "D",
-        "text": "不等式 ② $x^2 - 4 > -3x$ 即 $x^2 + 3x - 4 > 0$，其解集為 $(-\\infty, -4) \\cup (1, +\\infty)$"
-      },
-      {
-        "key": "E",
-        "text": "原不等式的解集為兩解集的交集：$(-1, 4) \\cap ((-\\infty, -4) \\cup (1, +\\infty)) = (1, 4)$"
-      },
-      {
-        "key": "F",
-        "text": "區間 $(1, 4)$ 內的所有整數解為 $2$ 和 $3$"
-      },
-      {
-        "key": "G",
-        "text": "數值 $x = 1$ 是該不等式的一個解"
-      },
-      {
-        "key": "H",
-        "text": "數值 $x = 2$ 滿足原不等式"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "H"
-    ],
-    "explanation": "【詳細解析】\n1. 必要條件：$|x^2 - 4| \\ge 0 \\implies 3x > 0 \\implies x > 0$。A 正確。\n2. 去絕對值等價轉化：$|u| < a \\iff -a < u < a$，故 $-3x < x^2 - 4 < 3x$。B 正確。\n3. 解左邊不等式：$x^2 - 4 > -3x \\implies x^2 + 3x - 4 > 0 \\implies (x + 4)(x - 1) > 0 \\implies x < -4$ 或 $x > 1$。D 正確。\n4. 解右邊不等式：$x^2 - 4 < 3x \\implies x^2 - 3x - 4 < 0 \\implies (x - 4)(x + 1) < 0 \\implies -1 < x < 4$。C 正確。\n5. 求交集：$(-1, 4) \\cap ((-\\infty, -4) \\cup (1, +\\infty)) = (1, 4)$。E 正確。\n6. 驗證整數解：區間 $(1, 4)$ 內的整數為 $2, 3$。F 正確。\n7. 特值驗證：$x = 1$ 代入左邊 $|1 - 4| = 3$，右邊 $3(1) = 3$，不滿足嚴格小於，G 錯誤；$x = 2$ 代入左邊 $|4 - 4| = 0 < 6$，H 正確。\n綜上，正確選項為 A, B, C, D, E, F, H。"
-  },
-  {
-    "id": "4CD_1023_Q47",
-    "q_num": 47,
-    "topic": "函數概念與定義域 · 雙重根式與分式混合定義域",
-    "difficulty": "Standard",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 定義域求解",
-    "stem": "求函數 $f(x) = \\sqrt{x - 1} + \\frac{1}{\\sqrt{5 - x}} + \\frac{\\sqrt{x^2 - 2x - 3}}{x - 4}$ 的定義域，下列步驟與結論中正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "由第一項偶次根式可得限制條件：$x - 1 \\ge 0$，解得 $x \\ge 1$"
-      },
-      {
-        "key": "B",
-        "text": "由第二項分母在根號下可得限制條件：$5 - x > 0$，解得 $x < 5$"
-      },
-      {
-        "key": "C",
-        "text": "由第三項分子根號下可得限制條件：$x^2 - 2x - 3 \\ge 0$"
-      },
-      {
-        "key": "D",
-        "text": "二次不等式 $x^2 - 2x - 3 \\ge 0$ 的解集為 $(-\\infty, -1] \\cup [3, +\\infty)$"
-      },
-      {
-        "key": "E",
-        "text": "第三項分母不能為零，需滿足 $x - 4 \\ne 0$，即 $x \\ne 4$"
-      },
-      {
-        "key": "F",
-        "text": "綜合上述條件，求各集合交集：$[1, 5) \\cap ((-\\infty, -1] \\cup [3, +\\infty)) \\setminus \\{4\\}$"
-      },
-      {
-        "key": "G",
-        "text": "該函數的最終定義域為 $[3, 4) \\cup (4, 5)$"
-      },
-      {
-        "key": "H",
-        "text": "實數 $x = 3$ 屬於函數 $f(x)$ 的定義域"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G",
-      "H"
-    ],
-    "explanation": "【詳細解析】\n1. 各項限制條件分析：\n   - $\\sqrt{x - 1}$ 要求 $x - 1 \\ge 0 \\implies x \\ge 1$。A 正確。\n   - $\\frac{1}{\\sqrt{5 - x}}$ 要求被開方數大於 0（且非零分母），即 $5 - x > 0 \\implies x < 5$。B 正確。\n   - $\\sqrt{x^2 - 2x - 3}$ 要求 $x^2 - 2x - 3 \\ge 0 \\implies (x - 3)(x + 1) \\ge 0 \\implies x \\le -1$ 或 $x \\ge 3$。C、D 正確。\n   - 分母 $x - 4 \\ne 0 \\implies x \\ne 4$。E 正確。\n2. 取交集運算：\n   - 前兩項交集為 $[1, 5)$；\n   - 與 $(-\\infty, -1] \\cup [3, +\\infty)$ 取交集得 $[3, 5)$；\n   - 排除 $x = 4$，得到 $[3, 4) \\cup (4, 5)$。F、G 正確。\n3. 端點檢驗：$x = 3$ 處，各項均有定義：$f(3) = \\sqrt{2} + \\frac{1}{\\sqrt{2}} + \\frac{0}{-1} = \\frac{3\\sqrt{2}}{2}$，故 $x = 3$ 在定義域內。H 正確。\n綜上，所有 8 個選項全部正確！"
-  },
-  {
-    "id": "4CD_1023_Q48",
-    "q_num": 48,
-    "topic": "分段函數 · 分段不等式求解與值域分析",
-    "difficulty": "Synthesis",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 分段函數",
-    "stem": "已知分段函數 $f(x) = \\begin{cases} x^2 - 2x, & x \\ge 0 \\\\ 2x + 3, & x < 0 \\end{cases}$，關於其求值、不等式 $f(x) \\le 3$ 的解集與性質，下列結論正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "函數值 $f(2) = 2^2 - 2(2) = 0$"
-      },
-      {
-        "key": "B",
-        "text": "函數值 $f(-1) = 2(-1) + 3 = 1$"
-      },
-      {
-        "key": "C",
-        "text": "當 $x < 0$ 時，解不等式 $2x + 3 \\le 3$ 得 $2x \\le 0$，結合 $x < 0$ 得解集為 $(-\\infty, 0)$"
-      },
-      {
-        "key": "D",
-        "text": "當 $x \\ge 0$ 時，解不等式 $x^2 - 2x \\le 3$ 即 $x^2 - 2x - 3 \\le 0$"
-      },
-      {
-        "key": "E",
-        "text": "二次不等式 $x^2 - 2x - 3 \\le 0$ 的解集為 $[-1, 3]$，結合 $x \\ge 0$ 得解集為 $[0, 3]$"
-      },
-      {
-        "key": "F",
-        "text": "不等式 $f(x) \\le 3$ 在全體實數上的解集為 $(-\\infty, 0) \\cup [0, 3] = (-\\infty, 3]$"
-      },
-      {
-        "key": "G",
-        "text": "若 $f(x) = 0$，則實數 $x$ 的解只有 $x = 0$ 和 $x = 2$"
-      },
-      {
-        "key": "H",
-        "text": "當 $x \\ge 0$ 時，二次函數部分 $x^2 - 2x = (x-1)^2 - 1$ 的最小值為 $-1$"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "H"
-    ],
-    "explanation": "【詳細解析】\n1. 函數值計算：$f(2) = 4 - 4 = 0$，A 正確；$f(-1) = -2 + 3 = 1$，B 正確。\n2. 解不等式 $f(x) \\le 3$：\n   - 當 $x < 0$ 時，$2x + 3 \\le 3 \\implies 2x \\le 0 \\implies x \\le 0$。與 $x < 0$ 取交集得 $(-\\infty, 0)$。C 正確。\n   - 當 $x \\ge 0$ 時，$x^2 - 2x \\le 3 \\implies x^2 - 2x - 3 = (x - 3)(x + 1) \\le 0 \\implies -1 \\le x \\le 3$。與 $x \\ge 0$ 取交集得 $[0, 3]$。D、E 正確。\n   - 兩段解集取並集：$(-\\infty, 0) \\cup [0, 3] = (-\\infty, 3]$。F 正確。\n3. 方程 $f(x) = 0$ 檢驗：\n   - 當 $x < 0$ 時，$2x + 3 = 0 \\implies x = -\\frac{3}{2} < 0$，這是一個有效解！\n   - 當 $x \\ge 0$ 時，$x(x - 2) = 0 \\implies x = 0$ 或 $x = 2$。\n   - 故 $f(x) = 0$ 共有 3 個實數根：$-\\frac{3}{2}, 0, 2$。G 錯誤（遺漏了負數根）。\n4. 二次函數頂點：$x^2 - 2x = (x - 1)^2 - 1$，頂點 $x = 1 \\ge 0$，最小值為 $-1$。H 正確。\n綜上，正確選項為 A, B, C, D, E, F, H。"
-  },
-  {
-    "id": "4CD_1023_Q49",
-    "q_num": 49,
-    "topic": "一元二次不等式 · 解集為空集的充要條件與分類討論",
-    "difficulty": "Hard Synthesis",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 恆成立與空集",
-    "stem": "關於 $x$ 的一元二次不等式 $(m + 1)x^2 - 2(m - 1)x + 3(m - 1) < 0$ 的解集為空集 $\\varnothing$。下列分析與參數 $m$ 的範圍正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "不等式解集為空集，等價於對任意實數 $x$，恆有 $(m + 1)x^2 - 2(m - 1)x + 3(m - 1) \\ge 0$"
-      },
-      {
-        "key": "B",
-        "text": "當 $m + 1 = 0$ 即 $m = -1$ 時，原不等式化為 $4x - 6 < 0$，其解集非空，故 $m = -1$ 不滿足條件"
-      },
-      {
-        "key": "C",
-        "text": "當 $m + 1 \\ne 0$ 時，必須滿足二次項係數 $m + 1 > 0$，即 $m > -1$"
-      },
-      {
-        "key": "D",
-        "text": "對應二次方程的判別式必須滿足 $\\Delta \\le 0$"
-      },
-      {
-        "key": "E",
-        "text": "計算判別式 $\\Delta = 4(m - 1)^2 - 12(m + 1)(m - 1) = -8(m - 1)(m + 2)$"
-      },
-      {
-        "key": "F",
-        "text": "不等式 $\\Delta = -8(m - 1)(m + 2) \\le 0$ 等價於 $(m - 1)(m + 2) \\ge 0$"
-      },
-      {
-        "key": "G",
-        "text": "解得 $m \\le -2$ 或 $m \\ge 1$"
-      },
-      {
-        "key": "H",
-        "text": "結合 $m > -1$，最終實數 $m$ 的取值範圍是 $[1, +\\infty)$"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G",
-      "H"
-    ],
-    "explanation": "【詳細解析】\n1. 命題轉化：小於 0 的解集為空集，等價於在 $\\mathbb{R}$ 上恆大於等於 0。A 正確。\n2. 當 $m = -1$ 時，二次項係數為 0，不等式化為 $-2(-2)x + 3(-2) < 0 \\implies 4x - 6 < 0 \\implies x < \\frac{3}{2}$，解集非空，不合題意。B 正確。\n3. 當 $m \\ne -1$ 時，要在 $\\mathbb{R}$ 上恆非負，開口必須向上且與 $x$ 軸至多一個交點：\n   - 開口向上：$m + 1 > 0 \\implies m > -1$。C 正確。\n   - 判別式非正：$\\Delta \\le 0$。D 正確。\n4. 計算判別式：\n   $\\Delta = [-2(m-1)]^2 - 4(m+1)[3(m-1)] = 4(m-1)^2 - 12(m+1)(m-1)$\n   $= 4(m-1)[(m-1) - 3(m+1)] = 4(m-1)(-2m - 4) = -8(m-1)(m+2)$。E 正確。\n5. 由 $\\Delta \\le 0$ 得 $-8(m-1)(m+2) \\le 0 \\iff (m-1)(m+2) \\ge 0 \\implies m \\le -2$ 或 $m \\ge 1$。F、G 正確。\n6. 取交集：$m > -1$ 且 ($m \\le -2$ 或 $m \\ge 1$) $\\implies m \\ge 1$。區間為 $[1, +\\infty)$。H 正確。\n綜上，所有 8 個選項全部正確！"
-  },
-  {
-    "id": "4CD_1023_Q50",
-    "q_num": 50,
-    "topic": "函數單調性 · 對勾函數模型與澳門海上航運能耗優化",
-    "difficulty": "Creative Real-World",
-    "isVerbatimArchive": false,
-    "source": "澳門海事航線能耗分析 · 對勾函數單調性應用",
-    "stem": "澳門外港客運碼頭至香港航線的高速雙體噴射船在航行時，每海里的綜合營運成本函數模型為 $C(v) = v + \\frac{400}{v}$（其中 $v \\in [10, 40]$ 表示航速，單位為節/knot）。關於該函數在給定區間上的單調性與最低成本，下列結論正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "函數 $C(v) = v + \\frac{400}{v}$ 屬於對勾函數（耐克函數）模型，定義域為 $(0, +\\infty)$"
-      },
-      {
-        "key": "B",
-        "text": "在區間 $(0, 20]$ 上，函數 $C(v)$ 單調遞減"
-      },
-      {
-        "key": "C",
-        "text": "在區間 $[20, +\\infty)$ 上，函數 $C(v)$ 單調遞增"
-      },
-      {
-        "key": "D",
-        "text": "利用定義法證明：任取 $10 \\le v_1 < v_2 \\le 20$，差值 $C(v_1) - C(v_2) = (v_1 - v_2)(1 - \\frac{400}{v_1 v_2}) > 0$"
-      },
-      {
-        "key": "E",
-        "text": "當航速 $v = 20$ 節時，每海里綜合成本取得最小值"
-      },
-      {
-        "key": "F",
-        "text": "最低綜合營運成本為 $C(20) = 20 + \\frac{400}{20} = 40$ 單位"
-      },
-      {
-        "key": "G",
-        "text": "若船長將航速由 25 節提升至 35 節，每海里綜合成本將單調遞增"
-      },
-      {
-        "key": "H",
-        "text": "在航速區間 $[10, 40]$ 內，最大成本在航速 $v = 20$ 節時取得"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G"
-    ],
-    "explanation": "【詳細解析】\n1. 對勾函數標準型：$f(x) = x + \\frac{k}{x}$（$k = 400 > 0$），轉折點為 $\\sqrt{400} = 20$。A 正確。\n2. 單調區間：在 $(0, 20]$ 遞減，在 $[20, +\\infty)$ 遞增。B、C 正確。\n3. 定義法作差：$C(v_1) - C(v_2) = (v_1 - v_2) + \\frac{400(v_2 - v_1)}{v_1 v_2} = (v_1 - v_2)(1 - \\frac{400}{v_1 v_2})$。\n   當 $10 \\le v_1 < v_2 \\le 20$ 時，$v_1 - v_2 < 0$ 且 $v_1 v_2 < 400 \\implies \\frac{400}{v_1 v_2} > 1 \\implies 1 - \\frac{400}{v_1 v_2} < 0$。\n   負負得正，故 $C(v_1) - C(v_2) > 0 \\implies C(v_1) > C(v_2)$，單調遞減。D 正確。\n4. 最值：在 $v = 20$ 處取得唯一極小值也是最小值：$C(20) = 20 + 20 = 40$。E、F 正確。\n5. 單調遞增區間 $[20, 40]$：航速從 25 升至 35，成本遞增。G 正確。\n6. 最大值檢驗：$v=10$ 時 $C(10) = 10 + 40 = 50$；$v=40$ 時 $C(40) = 40 + 10 = 50$。最大成本為 50，而 $v=20$ 是最小值，H 錯誤。\n綜上，正確選項為 A, B, C, D, E, F, G。"
-  },
-  {
-    "id": "4CD_1023_Q51",
-    "q_num": 51,
-    "topic": "二次函數最值 · 澳門輕軌運營能耗二次模型與最佳運行速度",
-    "difficulty": "Creative Real-World",
-    "isVerbatimArchive": false,
-    "source": "澳門輕軌（氹仔線與媽閣延伸線）能耗數據建模",
-    "stem": "澳門輕軌（LRT）列車在氹仔線至媽閣站地下區間運行時，列車單位里程電能消耗 $E(v)$（千瓦時/公里）與運行速度 $v$（公里/小時，$20 \\le v \\le 80$）滿足一元二次函數關係：$E(v) = 0.05v^2 - 4v + 120$。下列結論中正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "二次函數 $E(v) = 0.05(v^2 - 80v) + 120$ 的二次項係數為 $0.05 > 0$，拋物線開口向上"
-      },
-      {
-        "key": "B",
-        "text": "配方可得 $E(v) = 0.05(v - 40)^2 + 40$"
-      },
-      {
-        "key": "C",
-        "text": "對稱軸方程為 $v = -\\frac{-4}{2 \\times 0.05} = 40$ 公里/小時"
-      },
-      {
-        "key": "D",
-        "text": "當列車運行速度為 $40$ 公里/小時時，單位里程電耗取得最小值 $40$ 千瓦時/公里"
-      },
-      {
-        "key": "E",
-        "text": "在區間 $[20, 40]$ 上，隨運行速度增加，單位里程電耗單調遞減"
-      },
-      {
-        "key": "F",
-        "text": "在區間 $[40, 80]$ 上，隨運行速度增加，單位里程電耗單調遞增"
-      },
-      {
-        "key": "G",
-        "text": "當運行速度為 $80$ 公里/小時時，單位里程電耗為 $0.05(80 - 40)^2 + 40 = 120$ 千瓦時/公里"
-      },
-      {
-        "key": "H",
-        "text": "若要求單位里程電耗不超過 $60$ 千瓦時/公里，則速度的允許區間為 $[40 - 20, 40 + 20] = [20, 60]$ 公里/小時"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G",
-      "H"
-    ],
-    "explanation": "【詳細解析】\n1. 開口與係數：$a = 0.05 > 0$，開口向上。A 正確。\n2. 配方過程：$0.05(v^2 - 80v + 1600) - 0.05 \\times 1600 + 120 = 0.05(v - 40)^2 - 80 + 120 = 0.05(v - 40)^2 + 40$。B 正確。\n3. 對稱軸：$v = 40$。C 正確。\n4. 最值：因 $40 \\in [20, 80]$，故在 $v = 40$ 處取得最小值 $40$。D 正確。\n5. 單調性：拋物線開口向上，在頂點左側 $[20, 40]$ 單調遞減，在頂點右側 $[40, 80]$ 單調遞增。E、F 正確。\n6. 端點計算：$E(80) = 0.05(40)^2 + 40 = 0.05(1600) + 40 = 80 + 40 = 120$。G 正確。\n7. 解不等式 $E(v) \\le 60$：$0.05(v - 40)^2 + 40 \\le 60 \\implies 0.05(v - 40)^2 \\le 20 \\implies (v - 40)^2 \\le 400 \\implies -20 \\le v - 40 \\le 20 \\implies 20 \\le v \\le 60$。H 正確。\n綜上，所有 8 個選項全部正確！"
-  },
-  {
-    "id": "4CD_1023_Q52",
-    "q_num": 52,
-    "topic": "分式線性函數 · 圖象變換、對稱中心與單調性",
-    "difficulty": "Synthesis",
-    "isVerbatimArchive": false,
-    "source": "F4CD 核心拓展題庫 · 分式線性函數",
-    "stem": "已知分式線性函數 $f(x) = \\frac{2x + 1}{x - 1}$，關於其圖象變換、漸近線、對稱性與單調性，下列結論中正確的有：",
-    "options": [
-      {
-        "key": "A",
-        "text": "函數的定義域為 $\\{x \\in \\mathbb{R} \\mid x \\ne 1\\}$，即 $(-\\infty, 1) \\cup (1, +\\infty)$"
-      },
-      {
-        "key": "B",
-        "text": "化簡分離常數可得 $f(x) = \\frac{2(x - 1) + 3}{x - 1} = 2 + \\frac{3}{x - 1}$"
-      },
-      {
-        "key": "C",
-        "text": "函數 $f(x)$ 的圖象可由反比例函數 $y = \\frac{3}{x}$ 的圖象向右平移 1 個單位、再向上平移 2 個單位得到"
-      },
-      {
-        "key": "D",
-        "text": "函數圖象的垂直漸近線為直線 $x = 1$，水平漸近線為直線 $y = 2$"
-      },
-      {
-        "key": "E",
-        "text": "函數 $f(x)$ 的圖象關於點 $(1, 2)$ 成中心對稱"
-      },
-      {
-        "key": "F",
-        "text": "函數 $f(x)$ 的值域為 $(-\\infty, 2) \\cup (2, +\\infty)$"
-      },
-      {
-        "key": "G",
-        "text": "函數 $f(x)$ 在區間 $(-\\infty, 1)$ 與 $(1, +\\infty)$ 上分別單調遞減"
-      },
-      {
-        "key": "H",
-        "text": "可以表述為『函數 $f(x)$ 在其整個定義域 $(-\\infty, 1) \\cup (1, +\\infty)$ 上單調遞減』"
-      }
-    ],
-    "correctKeys": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F",
-      "G"
-    ],
-    "explanation": "【詳細解析】\n1. 定義域：分母 $x - 1 \\ne 0 \\implies x \\ne 1$。A 正確。\n2. 分離常數：$\\frac{2x + 1}{x - 1} = \\frac{2(x - 1) + 3}{x - 1} = 2 + \\frac{3}{x - 1}$。B 正確。\n3. 平移規律：“左加右減，上加下減”，向右平移 1 得 $\\frac{3}{x-1}$，向上平移 2 得 $2 + \\frac{3}{x-1}$。C 正確。\n4. 漸近線與對稱中心：反比例函數對稱中心為 $(0,0)$，平移後對稱中心為 $(1, 2)$，垂直漸近線為 $x = 1$，水平漸近線為 $y = 2$。D、E 正確。\n5. 值域：$\\frac{3}{x - 1} \\ne 0 \\implies y \\ne 2$，值域為 $(-\\infty, 2) \\cup (2, +\\infty)$。F 正確。\n6. 單調性：分子 $3 > 0$，在每個單獨區間 $(-\\infty, 1)$ 和 $(1, +\\infty)$ 上均單調遞減。G 正確。\n7. 嚴謹數學概念：不能用並集符號跨區間表述單調性（例如取 $x_1 = 0 \\in (-\\infty, 1)$ 得 $f(0) = -1$；取 $x_2 = 2 \\in (1, +\\infty)$ 得 $f(2) = 5$；雖 $0 < 2$ 但 $f(0) < f(2)$，整體不遞減）。故 H 錯誤。\n綜上，正確選項為 A, B, C, D, E, F, G。"
   }
 ];
 
@@ -18593,29 +19249,76 @@ window.ADMIN_STUDENT_PASSWORDS = {
     }, 1000);
   }
 
-  // 5. Adaptive Quiz Engine for 4CD 1023
+// 5. Adaptive Quiz Engine for 4CD 1023 (50% / 20% / 30% Dynamic Dosage)
+  function expandExamQuotaTo(exam, newQuota) {
+    newQuota = Math.min(60, Math.max(exam.targetQuota, newQuota));
+
+    const targetC6 = Math.round(newQuota * 0.20);
+    const targetC8 = Math.round(newQuota * 0.30);
+    const targetC4 = newQuota - targetC6 - targetC8;
+
+    const answeredQs = exam.questions.slice(0, exam.currentIndex + 1);
+    const ans4 = answeredQs.filter(q => (q.options || []).length === 4).length;
+    const ans6 = answeredQs.filter(q => (q.options || []).length === 6).length;
+    const ans8 = answeredQs.filter(q => (q.options || []).length === 8).length;
+
+    const answeredIds = new Set(answeredQs.map(q => q.id));
+    const allPool = exam.pool || window.QUESTIONS_4CD1023 || [];
+
+    const rem4 = allPool.filter(q => (q.options || []).length === 4 && !answeredIds.has(q.id));
+    const rem6 = allPool.filter(q => (q.options || []).length === 6 && !answeredIds.has(q.id));
+    const rem8 = allPool.filter(q => (q.options || []).length === 8 && !answeredIds.has(q.id));
+
+    const needed4 = Math.max(0, targetC4 - ans4);
+    const needed6 = Math.max(0, targetC6 - ans6);
+    const needed8 = Math.max(0, targetC8 - ans8);
+
+    const pick4 = rem4.slice(0, needed4);
+    const pick6 = rem6.slice(0, needed6);
+    const pick8 = rem8.slice(0, needed8);
+
+    const remainingToAnswer = [].concat(pick4, pick6, pick8).sort(() => 0.5 - Math.random());
+    exam.questions = answeredQs.concat(remainingToAnswer);
+
+    if (exam.questions.length > 60) {
+      exam.questions = exam.questions.slice(0, 60);
+    }
+    exam.targetQuota = Math.min(60, newQuota);
+    exam.dosageQuota = exam.targetQuota;
+  }
+
   function startQuizSession(questionsSubset) {
-    const pool = questionsSubset || (window.QUESTIONS_4CD1023 || []);
-    if (!pool || pool.length === 0) {
+    const rawPool = questionsSubset || (window.QUESTIONS_4CD1023 || []);
+    if (!rawPool || rawPool.length === 0) {
       alert('題庫尚未加載，請稍候再試。');
       return;
     }
 
-    // Shuffle pool
-    const shuffled = pool.slice().sort(() => 0.5 - Math.random());
-    
-    // Normalize question schema
-    shuffled.forEach(function(q) {
-      q.correctKeys = q.correctKeys || q.answer || [];
-      q.answer = q.correctKeys;
-      q.type = q.type || 'multiple_choice';
+    const pool = rawPool.map(function(q) {
+      const copy = Object.assign({}, q);
+      copy.correctKeys = copy.correctKeys || copy.answer || [];
+      copy.answer = copy.correctKeys;
+      copy.type = copy.type || ((copy.options && copy.options.length <= 6) ? 'single_choice' : 'multiple_choice');
+      return copy;
     });
+
+    const t4 = pool.filter(q => (q.options || []).length === 4).sort(() => 0.5 - Math.random());
+    const t6 = pool.filter(q => (q.options || []).length === 6).sort(() => 0.5 - Math.random());
+    const t8 = pool.filter(q => (q.options || []).length === 8).sort(() => 0.5 - Math.random());
+
+    // Baseline 25: 13 4-opt (52%), 5 6-opt (20%), 7 8-opt (28%)
+    const draw4 = t4.slice(0, 13);
+    const draw6 = t6.slice(0, 5);
+    const draw8 = t8.slice(0, 7);
+
+    const initial25 = [].concat(draw4, draw6, draw8).sort(() => 0.5 - Math.random());
 
     AppState.practiceElapsedSeconds = 0;
     AppState.antiCheatElapsedSeconds = 0;
 
     AppState.exam = {
-      questions: shuffled,
+      pool: pool,
+      questions: initial25,
       currentIndex: 0,
       dosageQuota: 25,
       targetQuota: 25,
@@ -18683,10 +19386,18 @@ window.ADMIN_STUDENT_PASSWORDS = {
       `;
     });
 
+    let typeBadge = '[多選題 · 8選多]';
+    const optLen = (q.options || []).length;
+    if (optLen === 4) {
+      typeBadge = '[基礎單選題 · 4選1]';
+    } else if (optLen === 6) {
+      typeBadge = '[進階單選題 · 6選1]';
+    }
+
     container.innerHTML = `
       <div class="quiz-stem-card">
         <div style="font-size: 12px; color: var(--text-highlight); margin-bottom: 6px; font-weight: 700;">
-          [多選題 · 8選多] 題目來源: ${q.source || '1023專題題庫'}
+          ${typeBadge} 題目來源: ${q.source || '1023專用題庫'}
         </div>
         <div class="stem-text math-scroll-wrapper">${q.stem}</div>
       </div>
@@ -18701,7 +19412,7 @@ window.ADMIN_STUDENT_PASSWORDS = {
       </div>
     `;
 
-    // Bind option toggling
+    // Bind option toggling with single-choice radio mutual exclusion
     const optItems = container.querySelectorAll('.quiz-option-item');
     const submitBtn = container.querySelector('#btnSubmitMulti');
 
@@ -18709,12 +19420,20 @@ window.ADMIN_STUDENT_PASSWORDS = {
       item.addEventListener('click', function() {
         if (AppState.isQuestionSubmitted) return;
         const key = item.getAttribute('data-key');
-        if (AppState.selectedOptions.has(key)) {
-          AppState.selectedOptions.delete(key);
-          item.classList.remove('selected');
-        } else {
+        const isSingle = (optLen === 4 || optLen === 6);
+        if (isSingle) {
+          AppState.selectedOptions.clear();
+          optItems.forEach(function(el) { el.classList.remove('selected'); });
           AppState.selectedOptions.add(key);
           item.classList.add('selected');
+        } else {
+          if (AppState.selectedOptions.has(key)) {
+            AppState.selectedOptions.delete(key);
+            item.classList.remove('selected');
+          } else {
+            AppState.selectedOptions.add(key);
+            item.classList.add('selected');
+          }
         }
         if (submitBtn) {
           submitBtn.disabled = (AppState.selectedOptions.size === 0);
@@ -18750,6 +19469,7 @@ window.ADMIN_STUDENT_PASSWORDS = {
         hastyAlert.style.display = 'block';
         hastyAlert.innerHTML = `⚡ <strong>作答時間小於 3 秒 (${(durationMs/1000).toFixed(2)}s)</strong>：系統已記錄盲猜行為！請審慎審題推理。`;
       }
+      expandExamQuotaTo(exam, exam.targetQuota + 5);
     }
 
     // 2. All-eight consecutive options tracking (strictly 8 options)
@@ -18776,18 +19496,40 @@ window.ADMIN_STUDENT_PASSWORDS = {
     // 4. Malicious pattern check (all-8 >= 3, hasty guessing >= 5, or fixedPattern across 4 Qs)
     if (exam.allEightConsecutive >= 3 || (exam.blindGuessCount || 0) >= 5 || fixedPattern) {
       exam.maliciousPenaltyActive = true;
-      exam.targetQuota = Math.min(60, exam.questions.length);
+      expandExamQuotaTo(exam, 60);
     }
 
     // 5. Evaluation
     const isCorrect = (selected.length === correctKeys.length) && selected.every((k, i) => k === correctKeys[i]);
 
-    // 6. Non-regressing consecutive errors quota escalation (capped at 60 / pool size)
+    // 6. Non-regressing consecutive errors quota escalation & 3-by-3 remedial injection
     if (!isCorrect) {
       exam.consecutiveErrors++;
-      if (exam.consecutiveErrors >= 3) {
-        const calculatedQuota = Math.min(60, 25 + Math.floor(exam.consecutiveErrors / 3) * 10);
-        exam.targetQuota = Math.max(exam.targetQuota, calculatedQuota);
+      if (exam.consecutiveErrors >= 3 && !exam.maliciousPenaltyActive) {
+        const primaryTopic = (q.topic || '').split(' · ')[0].trim();
+        const existingIds = new Set(exam.questions.map(item => item.id));
+
+        const allPool = exam.pool || window.QUESTIONS_4CD1023 || [];
+        const candidates = allPool.filter(item => !existingIds.has(item.id));
+        const matched = candidates.filter(item => (item.topic || '').includes(primaryTopic));
+        const other = candidates.filter(item => !(item.topic || '').includes(primaryTopic));
+
+        const picked = [];
+        for (let i = 0; i < matched.length && picked.length < 3; i++) {
+          picked.push(matched[i]);
+        }
+        for (let i = 0; i < other.length && picked.length < 3; i++) {
+          picked.push(other[i]);
+        }
+
+        if (picked.length > 0) {
+          exam.questions.splice(exam.currentIndex + 1, 0, ...picked);
+          if (exam.questions.length > 60) {
+            exam.questions = exam.questions.slice(0, 60);
+          }
+          exam.targetQuota = Math.min(60, exam.targetQuota + picked.length);
+          exam.dosageQuota = exam.targetQuota;
+        }
       }
     } else {
       exam.consecutiveErrors = 0;

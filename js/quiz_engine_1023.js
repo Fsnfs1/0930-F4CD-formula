@@ -133,9 +133,15 @@
       return;
     }
 
-    state.questions = shuffleArray(pool);
+    const t4 = pool.filter(q => (q.options || []).length === 4).sort(() => 0.5 - Math.random());
+    const t6 = pool.filter(q => (q.options || []).length === 6).sort(() => 0.5 - Math.random());
+    const t8 = pool.filter(q => (q.options || []).length === 8).sort(() => 0.5 - Math.random());
+    const draw4 = t4.slice(0, 13);
+    const draw6 = t6.slice(0, 5);
+    const draw8 = t8.slice(0, 7);
+    state.questions = [].concat(draw4, draw6, draw8).sort(() => 0.5 - Math.random());
     state.currentIndex = 0;
-    state.targetDosage = Math.min(BASE_DOSAGE, state.questions.length);
+    state.targetDosage = 25;
     state.hastyGuessCount = 0;
     state.totalAnswered = 0;
     state.totalCorrect = 0;
@@ -339,10 +345,17 @@
    * Toggle selection state of an option key
    */
   function toggleOption(key) {
-    if (state.selectedOptions.has(key)) {
-      state.selectedOptions.delete(key);
-    } else {
+    const optLen = (state.currentQuestion && state.currentQuestion.options) ? state.currentQuestion.options.length : 8;
+    const isSingle = (optLen === 4 || optLen === 6);
+    if (isSingle) {
+      state.selectedOptions.clear();
       state.selectedOptions.add(key);
+    } else {
+      if (state.selectedOptions.has(key)) {
+        state.selectedOptions.delete(key);
+      } else {
+        state.selectedOptions.add(key);
+      }
     }
     renderOptionsList();
 
