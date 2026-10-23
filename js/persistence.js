@@ -40,6 +40,7 @@
     root.setStudentPasswordDirect = root.PersistenceModule.setStudentPasswordDirect;
     root.enhanceStudentVector = root.PersistenceModule.enhanceStudentVector;
     root.initDefaultPasswords = root.PersistenceModule.initDefaultPasswords;
+    root.loadPreloadedProfiles = root.PersistenceModule.loadPreloadedProfiles;
   }
 })(typeof globalThis !== 'undefined' ? globalThis : typeof self !== 'undefined' ? self : this, function () {
   'use strict';
@@ -840,6 +841,10 @@
     if (uploadData.version) {
       payload.version = uploadData.version;
     }
+    if (uploadData.fileName || uploadData.filename) {
+      payload.fileName = uploadData.fileName || uploadData.filename;
+      payload.filename = uploadData.fileName || uploadData.filename;
+    }
 
     const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
     const targetUrl = uploadData.gasUrl || PERSISTENCE_CONFIG.gasDriveUploaderUrl;
@@ -848,7 +853,9 @@
     if (!isOnline) {
       console.log("[Persistence] Offline: enqueuing Drive photo upload.");
       OfflineSyncManager.enqueue("DRIVE", targetUrl, payload);
-      return { success: true, queued: true, message: "Queued for upload when online" };
+      const offlineTs = payload.timestamp || Date.now();
+      const offlineFileName = payload.fileName || payload.filename || `${payload.classID}_${payload.studentID}_${payload.studentName}_${offlineTs}_${payload.tag}.jpg`;
+      return { success: true, queued: true, fileName: offlineFileName, filename: offlineFileName, message: "Queued for upload when online" };
     }
 
     // Check if real GAS URL configured
@@ -856,11 +863,13 @@
     if (isPlaceholder) {
       console.log("[Persistence] GAS Drive URL is placeholder. Simulated local archive complete.");
       const ts = payload.timestamp || Date.now();
+      const resolvedFileName = payload.fileName || payload.filename || `${payload.classID}_${payload.studentID}_${payload.studentName}_${ts}_${payload.tag}.jpg`;
       return {
         success: true,
         simulated: true,
         fileId: "mock_drive_file_" + ts,
-        fileName: `${payload.classID}_${payload.studentID}_${payload.studentName}_${ts}_${payload.tag}.jpg`,
+        fileName: resolvedFileName,
+        filename: resolvedFileName,
         folderId: payload.folderId,
         tag: payload.tag,
         timestamp: ts,
@@ -1574,6 +1583,39 @@
   /**
    * Initialize default passwords for all 88 students and 5B 99
    */
+
+  /**
+   * Load and cache preloaded student face profiles (e.g. from 1010 platform)
+   * Ensures instant offline recognition without network roundtrips
+   */
+  function loadPreloadedProfiles() {
+    const preloaded = (typeof window !== 'undefined' && window.PRELOADED_STUDENT_FACES) ||
+                      (typeof globalThis !== 'undefined' && globalThis.PRELOADED_STUDENT_FACES);
+    if (!preloaded) return 0;
+    let count = 0;
+    for (const k in preloaded) {
+      const item = preloaded[k];
+      if (!item || !item.classID || !item.studentID || !item.vector) continue;
+      const existing = getStudentProfile(item.classID, item.studentID);
+      const existingTime = existing ? extractTimestamp(existing) : 0;
+      if (!existing || (item.ts && item.ts > existingTime)) {
+        saveStudentProfile({
+          classID: item.classID,
+          studentID: item.studentID,
+          name: item.name || '',
+          vector: item.vector,
+          registeredAt: new Date(item.ts || Date.now()).toISOString(),
+          updatedAt: item.ts || Date.now(),
+          timestamp: item.ts || Date.now(),
+          version: 1,
+          forceLatest: true
+        });
+        count++;
+      }
+    }
+    return count;
+  }
+
   function initDefaultPasswords() {
     let count = 0;
     const roster = (typeof window !== 'undefined' && window.getRoster)
@@ -1626,6 +1668,11 @@
     return { count: count };
   }
 
+  try {
+    initDefaultPasswords();
+    loadPreloadedProfiles();
+  } catch (e) {}
+
   return {
     PERSISTENCE_CONFIG: PERSISTENCE_CONFIG,
     saveStudentProfile: saveStudentProfile,
@@ -1651,6 +1698,7 @@
     updateStudentPassword: updateStudentPassword,
     setStudentPasswordDirect: setStudentPasswordDirect,
     enhanceStudentVector: enhanceStudentVector,
-    initDefaultPasswords: initDefaultPasswords
+    initDefaultPasswords: initDefaultPasswords,
+    loadPreloadedProfiles: loadPreloadedProfiles
   };
 });
