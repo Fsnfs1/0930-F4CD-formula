@@ -698,8 +698,9 @@
             <h2 style="font-size: 20px; font-weight: 800; color: #f8fafc; margin: 0; display: flex; align-items: center; gap: 8px;">
               <span>📊 10 月 23 日數學小測成績詳情報告</span>
             </h2>
-            <p style="font-size: 13px; color: var(--text-muted); margin: 4px 0 0 0;">
-              考生姓名：<strong id="scoreStudentName" style="color: #38bdf8;">--</strong> | 班級學號：<strong id="scoreStudentClassId" style="color: #cbd5e1;">--</strong>
+            <p style="font-size: 13px; color: var(--text-muted); margin: 4px 0 0 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <span>考生姓名：<strong id="scoreStudentName" style="color: #38bdf8;">--</strong> | 班級學號：<strong id="scoreStudentClassId" style="color: #cbd5e1;">--</strong></span>
+              <span id="scoreCloudSyncStatus" style="font-size: 11.5px; color: #38bdf8; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); padding: 2px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px;">☁️ 雲端同步中...</span>
             </p>
           </div>
           <button id="btnBackFromScoreView" class="btn btn-secondary" style="font-size: 13px; padding: 6px 14px; border-radius: 6px; cursor: pointer;">
@@ -28060,6 +28061,49 @@ window.ADMIN_STUDENT_PASSWORDS = {
         capNoteEl.textContent = '(小測折算後最高 80 分封頂)';
         capNoteEl.style.color = '#fbbf24';
       }
+    }
+
+    // Post current quiz score (including bonus) to Google Form cloud server
+    const syncEl = document.getElementById('scoreCloudSyncStatus');
+    if (syncEl) {
+      syncEl.innerHTML = '☁️ 雲端同步中...';
+      syncEl.style.color = '#38bdf8';
+    }
+
+    try {
+      const submitFn = (typeof submitFormRecord === 'function') ? submitFormRecord : 
+                       (typeof window !== 'undefined' && typeof window.submitFormRecord === 'function') ? window.submitFormRecord : null;
+      if (submitFn && student && student.classID && student.studentID) {
+        const postPromise = submitFn({
+          classID: student.classID,
+          studentID: student.studentID,
+          dateID: `1023_QUIZ_SCORE|BASE:${baseNew}|BONUS:${bonus}|FINAL:${finalScore}|TS:${Date.now()}`,
+          scoreTag: String(finalScore),
+          score: finalScore
+        });
+
+        if (postPromise && typeof postPromise.then === 'function') {
+          postPromise.then(function (success) {
+            if (syncEl) {
+              if (success !== false) {
+                syncEl.innerHTML = '☁️ 雲端記錄已同步';
+                syncEl.style.color = '#34d399';
+              } else {
+                syncEl.innerHTML = '☁️ 離線佇列已登記';
+                syncEl.style.color = '#fbbf24';
+              }
+            }
+          }).catch(function (err) {
+            console.warn("[Quiz1023] Cloud score sync error:", err);
+            if (syncEl) {
+              syncEl.innerHTML = '☁️ 離線佇列已登記';
+              syncEl.style.color = '#fbbf24';
+            }
+          });
+        }
+      }
+    } catch (e) {
+      console.warn("[Quiz1023] Failed to submit score to Google Form:", e);
     }
 
     // Populate 20 Questions Table Body
