@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>高中數學智慧練習平臺 · 題庫導航大廳 - 澳門新華學校</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- USER GLOBAL RULE: MathJax script for LaTeX math formula rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- External Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    .portal-container {
+      max-width: 580px;
+      margin: 0 auto;
+      padding: 16px 14px 40px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .portal-header {
+      text-align: center;
+      padding: 18px 12px 14px;
+      margin-bottom: 14px;
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.4) 100%);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    .school-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(37, 99, 235, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: #93c5fd;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .portal-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #f8fafc;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .portal-subtitle {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+    .notice-card {
+      background: rgba(14, 116, 144, 0.15);
+      border: 1px solid rgba(6, 182, 212, 0.35);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+      color: #cffafe;
+      font-size: 13px;
+      line-height: 1.5;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .bank-card {
+      background: #1e293b;
+      border-radius: 16px;
+      border: 1px solid #334155;
+      padding: 18px;
+      margin-bottom: 16px;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    }
+    .bank-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+    }
+    .bank-card.featured {
+      border-color: #3b82f6;
+      background: linear-gradient(180deg, #1e293b 0%, #172554 100%);
+    }
+    .bank-card.featured::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, #3b82f6, #06b6d4, #10b981);
+    }
+    .bank-card.secondary-bank {
+      border-color: #475569;
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    }
+    .bank-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .bank-badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .bank-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+    .badge-featured {
+      background: #2563eb;
+      color: #ffffff;
+    }
+    .badge-subtle {
+      background: rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+    }
+    .badge-amber {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .bank-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 4px;
+    }
+    .bank-desc {
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 16px 0;
+    }
+    .feature-list li {
+      font-size: 12px;
+      color: #cbd5e1;
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .feature-list li i {
+      color: #38bdf8;
+      font-size: 12px;
+      width: 14px;
+    }
+    .math-preview-box {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: #94a3b8;
+      text-align: center;
+    }
+    .btn-portal-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+    .btn-portal-primary {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .btn-portal-primary:hover {
+      background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+      transform: translateY(-1px);
+    }
+    .btn-portal-secondary {
+      background: rgba(51, 65, 85, 0.9);
+      color: #f1f5f9;
+      border: 1px solid #475569;
+    }
+    .btn-portal-secondary:hover {
+      background: rgba(71, 85, 105, 0.9);
+      border-color: #64748b;
+      transform: translateY(-1px);
+    }
+    .quick-links-section {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 6px;
+    }
+    .quick-links-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #94a3b8;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .quick-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .quick-item {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px;
+      text-decoration: none;
+      color: #cbd5e1;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      transition: all 0.15s;
+    }
+    .quick-item:hover {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+    .quick-item-title {
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .quick-item-desc {
+      font-size: 11px;
+      color: #64748b;
+    }
+    .portal-footer {
+      text-align: center;
+      margin-top: auto;
+      padding-top: 24px;
+      font-size: 12px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="portal-container">
+    
+    <!-- Portal Header -->
+    <header class="portal-header">
+      <div class="school-pill">
+        <i class="fa-solid fa-school"></i> 澳門新華學校（中學部）
+      </div>
+      <h1 class="portal-title">高中數學智慧練習平臺</h1>
+      <p class="portal-subtitle">請依學習進度選擇題庫入口 · 支援人臉與密碼認證</p>
+    </header>
+
+    <!-- Notice Banner -->
+    <div class="notice-card">
+      <i class="fa-solid fa-circle-info" style="font-size: 16px; color: #06b6d4; margin-top: 2px;"></i>
+      <div>
+        <strong>題庫導航說明：</strong> 同學可按自身學習進度選題。欲練習最新內容請進入 <strong>1023 最新題庫</strong>；如需溫習前期考點，平臺完全開放 <strong>1010 舊題庫</strong> 供大家自主<strong>二刷</strong>與錯題重測。
+      </div>
+    </div>
+
+    <!-- Entrance 1: 1023 Featured Question Bank -->
+    <div class="bank-card featured">
+      <div class="bank-header">
+        <div>
+          <div class="bank-badges">
+            <span class="bank-badge badge-featured"><i class="fa-solid fa-fire"></i> 最新發布 (1023)</span>
+            <span class="bank-badge badge-subtle">高一 4C / 4D 專題</span>
+          </div>
+          <h2 class="bank-name">1023 專題 · 一元二次不等式與函數概念</h2>
+        </div>
+      </div>
+      <p class="bank-desc">
+        涵蓋一元二次不等式解法、二次函數性質、單調區間、圖象變換與澳門在地應用題（旅遊塔、東望洋賽道等）。
+      </p>
+
+      <div class="math-preview-box">
+        核心公式預覽：$ax^2 + bx + c > 0$ 與頂點式 $y = a(x-h)^2 + k$
+      </div>
+
+      <ul class="feature-list">
+        <li><i class="fa-solid fa-check-circle"></i> <strong>多選題機制：</strong> 每題 8 個選項 (A-H)，2 至 8 個正確答案</li>
+        <li><i class="fa-solid fa-bolt"></i> <strong>自適應題量：</strong> 25 題基石題量，智慧防盲猜與連續答錯擴充</li>
+        <li><i class="fa-solid fa-camera"></i> <strong>雙模防作弊：</strong> 智慧人臉識別 / 密碼登錄草稿拍照上傳</li>
+        <li><i class="fa-solid fa-clock"></i> <strong>定時核驗：</strong> 答題每滿 15 分鐘觸發本人身分鎖定核驗</li>
+      </ul>
+
+      <a href="4cd1023.html" class="btn-portal-action btn-portal-primary">
+        <span>🚀 進入 1023 最新題庫刷題</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <!-- Entrance 2: 1010 Classic Bank (Re-drill) -->
+    <div class="bank-card secondary-bank">
+      <div class="bank-header">
+        <div>
+          <div class="bank-badges">
+            <span class="bank-badge badge-amber"><i class="fa-solid fa-rotate-right"></i> 支援二刷 (1010)</span>
+            <span class="bank-badge badge-subtle">基礎鞏固專區</span>
+          </div>
+          <h2 class="bank-name">1010 專案 · 集合、邏輯用語與不等式</h2>
+        </div>
+      </div>
+      <p class="bank-desc">
+        高中數學必修起步核心：集合運算、常用邏輯用語、充要條件判斷與基本不等式，適合二刷複習。
+      </p>
+
+      <div class="math-preview-box">
+        核心公式預覽：$A \cap B, A \cup B$ 與基本不等式 $\frac{a+b}{2} \ge \sqrt{ab}$
+      </div>
+
+      <ul class="feature-list">
+        <li><i class="fa-solid fa-rotate"></i> <strong>自主二刷：</strong> 允許同學無限次二刷刷題，查漏補缺</li>
+        <li><i class="fa-solid fa-book-bookmark"></i> <strong>錯題溫習：</strong> 專屬錯題庫收集與錯題訂正重測模式</li>
+        <li><i class="fa-solid fa-trophy"></i> <strong>即時榮譽榜：</strong> 班級積分與排行榜即時比拼</li>
+        <li><i class="fa-solid fa-user-check"></i> <strong>便捷登入：</strong> 支援人臉與密碼登入驗證</li>
+      </ul>
+
+      <a href="index1010.html" class="btn-portal-action btn-portal-secondary">
+        <span>🔄 進入 1010 題庫繼續二刷</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <!-- Quick Links & Auxiliary Portals -->
+    <div class="quick-links-section">
+      <div class="quick-links-title">
+        <i class="fa-solid fa-compass"></i> 進階大測與教學輔助入口
+      </div>
+      <div class="quick-grid">
+        <a href="Advance/advance_test.html" class="quick-item">
+          <span class="quick-item-title">📝 理組進階大測</span>
+          <span class="quick-item-desc">40+10分鐘限時測驗</span>
+        </a>
+        <a href="Advance/advance_student_result.html" class="quick-item">
+          <span class="quick-item-title">📊 大測成績與查卷</span>
+          <span class="quick-item-desc">查閱評語與答卷照片</span>
+        </a>
+        <a href="1023-test.html" class="quick-item">
+          <span class="quick-item-title">🛠️ 1023 測試與重置</span>
+          <span class="quick-item-desc">免相機測試 / 密碼重置</span>
+        </a>
+        <a href="admin_dashboard.html" class="quick-item">
+          <span class="quick-item-title">👨‍🏫 教師管理後台</span>
+          <span class="quick-item-desc">榜單數據與批改中心</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="portal-footer">
+      <p>澳門新華學校 數學科組 · 2026-2027 學年</p>
+      <p style="margin-top: 4px; font-size: 11px;">系統版本：v2.1023 · 所有題庫皆支援本地緩存與雲端同步</p>
+    </footer>
+
+  </div>
+
+</body>
+</html>
