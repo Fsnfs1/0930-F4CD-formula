@@ -583,13 +583,10 @@
 
         <!-- 3. Actions Toolbar (Wrong Retest & Clean) -->
         <div id="wrongActionsToolbar" style="display: flex; gap: 10px; margin-bottom: 16px;">
-          <button id="btnStartWrongRetest" class="btn btn-primary" style="flex: 1; padding: 11px 14px; font-size: 14px; background: #0284c7;">
-            <span>🎯 開始錯題專項重測</span>
+          <button id="btnRestart1023QuizToolbar" class="btn btn-primary" style="flex: 2; padding: 12px 18px; font-size: 15px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #38bdf8); border: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(37,99,235,0.3); cursor: pointer;">
+            <span>🔄 重新作答 (智能適配上一輪錯題二刷)</span>
           </button>
-          <button id="btnRestart1023QuizToolbar" class="btn btn-primary" style="flex: 1; padding: 11px 14px; font-size: 14px; background: linear-gradient(135deg, #10b981, #059669);">
-            <span>🔄 重新作答 (二刷適應性題庫)</span>
-          </button>
-          <button id="btnClearMasteredWrong" class="btn btn-secondary" style="padding: 11px 14px; font-size: 13.5px;">
+          <button id="btnClearMasteredWrong" class="btn btn-secondary" style="flex: 1; padding: 12px 14px; font-size: 13.5px; border-radius: 8px; cursor: pointer;">
             <span>🧹 清除已掌握</span>
           </button>
         </div>
@@ -19395,15 +19392,39 @@ window.ADMIN_STUDENT_PASSWORDS = {
       return copy;
     });
 
-    // Shuffle within each tier
-    const t4 = pool.filter(q => (q.options || []).length === 4).sort(() => 0.5 - Math.random());
-    const t6 = pool.filter(q => (q.options || []).length === 6).sort(() => 0.5 - Math.random());
-    const t8 = pool.filter(q => (q.options || []).length === 8).sort(() => 0.5 - Math.random());
+    // Check for previous round wrong questions to adaptively prioritize in this new round
+    let priorWrongs = AppState.lastRoundWrongQuestions || [];
+    if (!priorWrongs || priorWrongs.length === 0) {
+      const student = AppState.currentStudent || {};
+      const studentKey = (student.classID && student.studentID) ? (student.classID + '_' + student.studentID) : 'DEFAULT_STUDENT';
+      try {
+        const cached = localStorage.getItem('MATH_LAST_ROUND_WRONG_' + studentKey);
+        if (cached) priorWrongs = JSON.parse(cached);
+      } catch (e) {}
+    }
 
-    // Baseline 25: 13 4-opt (52%), 5 6-opt (20%), 7 8-opt (28%)
-    const draw4 = t4.slice(0, 13);
-    const draw6 = t6.slice(0, 5);
-    const draw8 = t8.slice(0, 7);
+    const priorWrongIds = new Set((priorWrongs || []).map(q => q.id));
+
+    // Separate by tier: 4-opt, 6-opt, 8-opt
+    const t4 = pool.filter(q => (q.options || []).length === 4);
+    const t6 = pool.filter(q => (q.options || []).length === 6);
+    const t8 = pool.filter(q => (q.options || []).length === 8);
+
+    // Adaptive Prioritization: Prioritize previous round wrong questions within each tier
+    // Tier 4 (Target Quota: 13)
+    const prior4 = t4.filter(q => priorWrongIds.has(q.id)).sort(() => 0.5 - Math.random());
+    const fresh4 = t4.filter(q => !priorWrongIds.has(q.id)).sort(() => 0.5 - Math.random());
+    const draw4 = prior4.concat(fresh4).slice(0, 13).sort(() => 0.5 - Math.random());
+
+    // Tier 6 (Target Quota: 5)
+    const prior6 = t6.filter(q => priorWrongIds.has(q.id)).sort(() => 0.5 - Math.random());
+    const fresh6 = t6.filter(q => !priorWrongIds.has(q.id)).sort(() => 0.5 - Math.random());
+    const draw6 = prior6.concat(fresh6).slice(0, 5).sort(() => 0.5 - Math.random());
+
+    // Tier 8 (Target Quota: 7)
+    const prior8 = t8.filter(q => priorWrongIds.has(q.id)).sort(() => 0.5 - Math.random());
+    const fresh8 = t8.filter(q => !priorWrongIds.has(q.id)).sort(() => 0.5 - Math.random());
+    const draw8 = prior8.concat(fresh8).slice(0, 7).sort(() => 0.5 - Math.random());
 
     // Strictly ordered sequence: 4-opt (0..12) -> 6-opt (13..17) -> 8-opt (18..24)
     const initial25 = [].concat(draw4, draw6, draw8);
@@ -20110,11 +20131,22 @@ window.ADMIN_STUDENT_PASSWORDS = {
       localStorage.removeItem('MATH_ACTIVE_QUIZ_PROGRESS');
     } catch (e) {}
 
+    // Record previous round's wrong questions before clearing to adaptively prioritize them in 2nd-pass
+    if (AppState.wrongQuestions && AppState.wrongQuestions.length > 0) {
+      AppState.lastRoundWrongQuestions = AppState.wrongQuestions.map(w => w.question || w);
+      const student = AppState.currentStudent || {};
+      const studentKey = (student.classID && student.studentID) ? (student.classID + '_' + student.studentID) : 'DEFAULT_STUDENT';
+      try {
+        localStorage.setItem('MATH_LAST_ROUND_WRONG_' + studentKey, JSON.stringify(AppState.lastRoundWrongQuestions));
+      } catch (e) {}
+    }
+
     AppState.wrongQuestions = [];
     AppState.selectedOptions.clear();
     AppState.isQuestionSubmitted = false;
 
     // Start brand new randomized adaptive 1023 quiz session (50% 4-opt -> 20% 6-opt -> 30% 8-opt)
+    // with previous round wrong questions adaptively prioritized
     startQuizSession();
   }
 
@@ -20178,6 +20210,16 @@ window.ADMIN_STUDENT_PASSWORDS = {
 
     // 2. Persist history and render trend curve
     saveAndRenderHistoryCurve(accuracyRate, totalAnswered, correctCount, wrongCount);
+
+    // Persist last round wrong questions for adaptive weighting in the next round
+    if (wrongList.length > 0) {
+      AppState.lastRoundWrongQuestions = wrongList.map(w => w.question || w);
+      const student = AppState.currentStudent || {};
+      const studentKey = (student.classID && student.studentID) ? (student.classID + '_' + student.studentID) : 'DEFAULT_STUDENT';
+      try {
+        localStorage.setItem('MATH_LAST_ROUND_WRONG_' + studentKey, JSON.stringify(AppState.lastRoundWrongQuestions));
+      } catch (e) {}
+    }
 
     // 3. Render wrong questions or empty state
     const wrongListWrapper = document.getElementById('wrongQuestionsListContainer');
@@ -20339,23 +20381,19 @@ window.ADMIN_STUDENT_PASSWORDS = {
       }
     });
 
-    const btnStartWrongRetest = document.getElementById('btnStartWrongRetest');
-    if (btnStartWrongRetest) {
-      btnStartWrongRetest.addEventListener('click', function() {
-        if (!AppState.wrongQuestions || AppState.wrongQuestions.length === 0) {
-          alert('目前沒有錯題記錄，請點擊重新作答開始新一輪二刷！');
-          return;
-        }
-        const missedPool = AppState.wrongQuestions.map(w => w.question);
-        AppState.wrongQuestions = [];
-        startQuizSession(missedPool);
-      });
-    }
+    
 
     const btnClearMastered = document.getElementById('btnClearMasteredWrong');
     if (btnClearMastered) {
       btnClearMastered.addEventListener('click', function() {
         AppState.wrongQuestions = [];
+        AppState.lastRoundWrongQuestions = [];
+        const student = AppState.currentStudent || {};
+        const studentKey = (student.classID && student.studentID) ? (student.classID + '_' + student.studentID) : 'DEFAULT_STUDENT';
+        try {
+          localStorage.removeItem('MATH_LAST_ROUND_WRONG_' + studentKey);
+        } catch (e) {}
+
         const totalWrongEl = document.getElementById('summaryTotalWrong');
         if (totalWrongEl) totalWrongEl.textContent = '0';
         const wrongCountEl = document.getElementById('settlementWrongCount');
