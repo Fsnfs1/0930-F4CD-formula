@@ -509,6 +509,9 @@
           </div>
           <div style="display: flex; align-items: center; gap: 10px;">
             <span id="quizQuestionTimer" style="font-family: var(--font-mono); color: #cbd5e1; font-size: 13px;"><span id="quizTimerText">⏱ 00:00</span></span>
+            <button id="btnQuizSaveAndLogout" class="btn btn-secondary" style="font-size: 12px; padding: 4px 10px; border-radius: 6px; color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.12); cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600;">
+              <span>💾 保存並登出</span>
+            </button>
             <button id="btnQuizBackDashboard" class="btn-text-action" style="font-size: 13px; color: var(--text-muted); cursor: pointer; background: none; border: none;">✕ 暫停</button>
           </div>
         </div>
@@ -20297,6 +20300,28 @@ window.ADMIN_STUDENT_PASSWORDS = {
     container.innerHTML = svgHtml;
   }
 
+    // Save progress and logout from active quiz session
+  function handleQuizSaveAndLogout() {
+    persistProgress();
+
+    if (AppState.antiCheatTimer) {
+      clearInterval(AppState.antiCheatTimer);
+      AppState.antiCheatTimer = null;
+    }
+    if (AppState.eyeCareTimer) {
+      clearInterval(AppState.eyeCareTimer);
+      AppState.eyeCareTimer = null;
+    }
+
+    try {
+      const video = document.getElementById('faceFirstVideo');
+      if (video && window.stopCamera) window.stopCamera(video);
+    } catch (e) {}
+
+    alert('答題進度已妥善保存！下次登錄系統時將自動接續此題繼續作答。');
+    location.reload();
+  }
+
   function restart1023QuizSession() {
     try {
       localStorage.removeItem('MATH_ACTIVE_QUIZ_PROGRESS');
@@ -28256,6 +28281,27 @@ window.ADMIN_STUDENT_PASSWORDS = {
       });
     }
 
+    
+    // Quiz HUD Save & Logout, and Pause buttons
+    const btnSaveLogout = document.getElementById('btnQuizSaveAndLogout');
+    if (btnSaveLogout) {
+      btnSaveLogout.addEventListener('click', function() {
+        handleQuizSaveAndLogout();
+      });
+    }
+
+    const btnPauseQuiz = document.getElementById('btnQuizBackDashboard');
+    if (btnPauseQuiz) {
+      btnPauseQuiz.addEventListener('click', function() {
+        persistProgress();
+        if (AppState.antiCheatTimer) {
+          clearInterval(AppState.antiCheatTimer);
+          AppState.antiCheatTimer = null;
+        }
+        showScreen('screen4-dashboard');
+      });
+    }
+
     const btnEnterQuiz = document.getElementById('btnEnterQuiz');
     if (btnEnterQuiz) {
       btnEnterQuiz.addEventListener('click', function() {
@@ -28361,6 +28407,7 @@ window.ADMIN_STUDENT_PASSWORDS = {
   window.finishQuizSession = finishQuizSession;
   window.renderWrongReviewScreen = renderWrongReviewScreen;
   window.renderScoreDetailsScreen = renderScoreDetailsScreen;
+  window.handleQuizSaveAndLogout = handleQuizSaveAndLogout;
   window.getStudentQuiz1023Record = getStudentQuiz1023Record;
   window.getStudentAccumulatedBonus = getStudentAccumulatedBonus;
 
