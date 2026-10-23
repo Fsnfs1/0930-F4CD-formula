@@ -705,7 +705,7 @@
     if (badgeEl) {
       if (exam.maliciousPenaltyActive) {
         badgeEl.className = 'dosage-badge penalty';
-        badgeEl.textContent = '懲罰配額: 60題';
+        badgeEl.textContent = '進階獎勵挑戰: 60題 (加油！)';
       } else if (exam.targetQuota > 25) {
         badgeEl.className = 'dosage-badge escalated';
         badgeEl.textContent = `自適應擴充: ${exam.targetQuota}題`;
@@ -798,7 +798,7 @@
       const hastyAlert = document.getElementById('quizHastyAlert');
       if (hastyAlert) {
         hastyAlert.style.display = 'block';
-        hastyAlert.innerHTML = `⚡ <strong>作答時間小於 3 秒 (${(durationMs/1000).toFixed(2)}s)</strong>：系統已記錄盲猜行為！請審慎審題推理。`;
+        hastyAlert.innerHTML = `⚡ <strong>作答節奏較快 (${(durationMs/1000).toFixed(2)}s)</strong>：放慢腳步、仔細審題運算，相信你一定能掌握，加油！`;
       }
     }
 
@@ -850,7 +850,7 @@
     if (badgeEl) {
       if (exam.maliciousPenaltyActive) {
         badgeEl.className = 'dosage-badge penalty';
-        badgeEl.textContent = '懲罰配額: 60題';
+        badgeEl.textContent = '進階獎勵挑戰: 60題 (加油！)';
       } else if (exam.targetQuota > 25) {
         badgeEl.className = 'dosage-badge escalated';
         badgeEl.textContent = `自適應擴充: ${exam.targetQuota}題`;

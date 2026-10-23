@@ -105,9 +105,9 @@
       border-color: rgba(245, 158, 11, 0.4);
     }
     .dosage-badge.penalty {
-      background: rgba(239, 68, 68, 0.2);
-      color: #f87171;
-      border-color: rgba(239, 68, 68, 0.5);
+      background: rgba(168, 85, 247, 0.2);
+      color: #c084fc;
+      border-color: rgba(168, 85, 247, 0.5);
     }
     .quiz-options-grid {
       display: flex;
@@ -401,7 +401,7 @@
           <h3 id="dashTopicTitle" style="font-size: 15px; font-weight: 600; color: #38bdf8; margin-bottom: 6px;">1023專題 · 一元二次不等式與函數概念</h3>
           <p style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
             • 多選題題型：每題 8 個選項 (A-H)，2至8個正確答案。<br>
-            • 動態題量機制：基礎 25 題，若檢測到盲猜或連續答錯將自適應擴充。<br>
+            • 動態題量機制：基礎 25 題，系統會根據答題掌握度自適應提供獎勵與鞏固題目，助你衝刺高分，加油！<br>
             • 定時人臉核驗：答題每滿 15 分鐘觸發本人身分鎖定核驗。
           </p>
         </div>
@@ -19383,7 +19383,7 @@ window.ADMIN_STUDENT_PASSWORDS = {
     if (badgeEl) {
       if (exam.maliciousPenaltyActive) {
         badgeEl.className = 'dosage-badge penalty';
-        badgeEl.textContent = '懲罰配額: 60題';
+        badgeEl.textContent = '進階獎勵挑戰: 60題 (加油！)';
       } else if (exam.targetQuota > 25) {
         badgeEl.className = 'dosage-badge escalated';
         badgeEl.textContent = `自適應擴充: ${exam.targetQuota}題`;
@@ -19493,7 +19493,7 @@ window.ADMIN_STUDENT_PASSWORDS = {
       const hastyAlert = document.getElementById('quizHastyAlert');
       if (hastyAlert) {
         hastyAlert.style.display = 'block';
-        hastyAlert.innerHTML = `⚡ <strong>作答時間小於 3 秒 (${(durationMs/1000).toFixed(2)}s)</strong>：系統已記錄盲猜行為！請審慎審題推理。`;
+        hastyAlert.innerHTML = `⚡ <strong>作答節奏較快 (${(durationMs/1000).toFixed(2)}s)</strong>：放慢腳步、仔細審題運算，相信你一定能掌握，加油！`;
       }
       expandExamQuotaTo(exam, exam.targetQuota + 5);
     }
@@ -19568,7 +19568,7 @@ window.ADMIN_STUDENT_PASSWORDS = {
     if (badgeEl) {
       if (exam.maliciousPenaltyActive) {
         badgeEl.className = 'dosage-badge penalty';
-        badgeEl.textContent = '懲罰配額: 60題';
+        badgeEl.textContent = '進階獎勵挑戰: 60題 (加油！)';
       } else if (exam.targetQuota > 25) {
         badgeEl.className = 'dosage-badge escalated';
         badgeEl.textContent = `自適應擴充: ${exam.targetQuota}題`;

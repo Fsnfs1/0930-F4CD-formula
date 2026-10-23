@@ -246,7 +246,7 @@
     if (dosageAlert) {
       if (state.targetDosage > BASE_DOSAGE) {
         dosageAlert.style.display = "block";
-        dosageAlert.innerHTML = `⚠️ <strong>自適應防瞎猜機制已啟動</strong>：累計檢測到 ${state.hastyGuessCount} 次過快答題，題量自適應擴展至 <strong>${state.targetDosage} 題</strong>（上限 60 題）。請認真運算！`;
+        dosageAlert.innerHTML = `🌟 <strong>自適應鞏固激勵機制已啟動</strong>：題量自適應獎勵擴展至 <strong>${state.targetDosage} 題</strong>（上限 60 題），多練多進步，加油！`;
       } else {
         dosageAlert.style.display = "none";
       }
@@ -442,7 +442,7 @@
         <div style="font-size: 14px; margin-bottom: 8px;">
           <strong>您的選擇：</strong> ${chosen.join(", ") || "未作答"}<br>
           <strong>正確答案：</strong> <span style="color: #38bdf8; font-weight: 700;">${correct.join(", ")}</span>
-          ${isHastyGuess ? '<span class="badge bg-warning text-dark ms-2">⚠️ 答題時間過短（疑似瞎猜）</span>' : ''}
+          ${isHastyGuess ? '<span class="badge bg-warning text-dark ms-2">💡 答題節奏偏快，建議深入推理</span>' : ''}
         </div>
         <div style="font-size: 13.5px; background: rgba(15, 23, 42, 0.6); padding: 10px 12px; border-radius: 6px; border-left: 3px solid #38bdf8;">
           <strong>【題目解析】：</strong><br>
