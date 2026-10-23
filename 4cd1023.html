@@ -19169,9 +19169,21 @@ window.ADMIN_STUDENT_PASSWORDS = {
     AppState.currentClass = student.classID;
     AppState.currentStudentId = student.studentID;
     AppState.currentStudentName = student.name;
+    AppState.currentStudent = student;
     AppState.isPasswordOnlyLogin = !!isPasswordOnly;
     if (!isPasswordOnly) {
       AppState.draftUploaded = false;
+    }
+
+    // Match student against saved progress snapshot
+    if (AppState.savedProgressOwner) {
+      if (AppState.savedProgressOwner.classID === student.classID &&
+          String(AppState.savedProgressOwner.studentID) === String(student.studentID)) {
+        AppState.isRestoredFromSnapshot = true;
+      } else {
+        AppState.isRestoredFromSnapshot = false;
+        AppState.exam = null;
+      }
     }
 
     if (window.stopCamera) {
@@ -20291,9 +20303,48 @@ window.ADMIN_STUDENT_PASSWORDS = {
     container.innerHTML = svgHtml;
   }
 
-    // Save progress and logout from active quiz session
-  function handleQuizSaveAndLogout() {
-    persistProgress();
+    function clearAllCookiesAndTokens() {
+    try {
+      // 1. Clear all cookies across all potential paths and domains
+      if (typeof document !== 'undefined' && document.cookie) {
+        const cookies = document.cookie.split(";");
+        const domain = (typeof window !== 'undefined' && window.location && window.location.hostname) ? window.location.hostname : "";
+        const domains = [domain, "." + domain, ""];
+        const paths = ["/", "/0930-F4CD-formula/", "/0930-F4CD-formula", (typeof window !== 'undefined' && window.location && window.location.pathname) ? window.location.pathname : ""];
+
+        cookies.forEach(function(c) {
+          const eqPos = c.indexOf("=");
+          const name = eqPos > -1 ? c.substring(0, eqPos).trim() : c.trim();
+          if (name) {
+            domains.forEach(function(d) {
+              paths.forEach(function(p) {
+                document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=" + p + (d ? "; domain=" + d : "");
+              });
+            });
+          }
+        });
+      }
+
+      // 2. Clear SessionStorage completely
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.clear();
+      }
+
+      // 3. Clear transient login cache / session keys in LocalStorage (without wiping saved quiz progress questions)
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem('MATH_CURRENT_SESSION_USER');
+        localStorage.removeItem('MATH_AUTH_CACHE');
+        localStorage.removeItem('MATH_REMEMBERED_STUDENT');
+      }
+    } catch (e) {
+      console.warn("[Auth] Error clearing cookies/session:", e);
+    }
+  }
+
+  function performCompleteLogout(isSaveProgress) {
+    if (isSaveProgress) {
+      persistProgress();
+    }
 
     if (AppState.antiCheatTimer) {
       clearInterval(AppState.antiCheatTimer);
@@ -20309,8 +20360,46 @@ window.ADMIN_STUDENT_PASSWORDS = {
       if (video && window.stopCamera) window.stopCamera(video);
     } catch (e) {}
 
-    alert('答題進度已妥善保存！下次登錄系統時將自動接續此題繼續作答。');
-    location.reload();
+    clearAllCookiesAndTokens();
+
+    AppState.currentUser = null;
+    AppState.currentClass = null;
+    AppState.currentStudentId = null;
+    AppState.currentStudentName = null;
+    AppState.currentStudent = null;
+    AppState.isPasswordOnlyLogin = false;
+    AppState.draftUploaded = false;
+    AppState.isRestoredFromSnapshot = false;
+
+    const dashName = document.getElementById('dashStudentName');
+    const dashMeta = document.getElementById('dashClassAndId');
+    if (dashName) dashName.textContent = '同學，您好！';
+    if (dashMeta) dashMeta.textContent = '--';
+    const pwdInput = document.getElementById('manualPasswordInput');
+    if (pwdInput) pwdInput.value = '';
+
+    if (isSaveProgress) {
+      alert('答題進度已妥善保存！已徹底登出並清除 Cookies 與本機登入狀態。\n下次登錄系統時請重新身分驗證，系統將為您自動接續作答。');
+    }
+
+    if (typeof window !== 'undefined' && window.location) {
+      if (window.location.replace && window.location.href) {
+        try {
+          const cleanUrl = window.location.href.split('#')[0].split('?')[0];
+          window.location.replace(cleanUrl + '?logout=' + Date.now());
+        } catch (e) {}
+      }
+      if (typeof window.location.reload === 'function') {
+        window.location.reload();
+      }
+    } else if (typeof location !== 'undefined' && location.reload) {
+      location.reload();
+    }
+  }
+
+  // Save progress and completely logout from active quiz session
+  function handleQuizSaveAndLogout() {
+    performCompleteLogout(true);
   }
 
   function restart1023QuizSession() {
@@ -28155,15 +28244,10 @@ window.ADMIN_STUDENT_PASSWORDS = {
             if (banner) banner.style.display = 'block';
           }
 
-          AppState.isRestoredFromSnapshot = true;
-
-          // Maintain active session state in memory without auto-jumping to quiz
-          if (AppState.currentUser) {
-            const dashName = document.getElementById('dashStudentName');
-            const dashMeta = document.getElementById('dashClassAndId');
-            if (dashName) dashName.textContent = `${AppState.currentUser.name} 同學，您好！`;
-            if (dashMeta) dashMeta.textContent = `${AppState.currentUser.classID} 班 ${AppState.currentUser.studentID} 號`;
-          }
+          // Record progress owner without pre-logging in the account
+          AppState.savedProgressOwner = snap.currentUser || snap.currentStudent;
+          AppState.currentUser = null;
+          AppState.currentStudent = null;
         }
       }
     } catch (e) {
@@ -28358,7 +28442,7 @@ window.ADMIN_STUDENT_PASSWORDS = {
     const btnLogout = document.getElementById('btnLogout');
     if (btnLogout) {
       btnLogout.addEventListener('click', function() {
-        location.reload();
+        performCompleteLogout(false);
       });
     }
 
@@ -28447,6 +28531,8 @@ window.ADMIN_STUDENT_PASSWORDS = {
   window.renderWrongReviewScreen = renderWrongReviewScreen;
   window.renderScoreDetailsScreen = renderScoreDetailsScreen;
   window.handleQuizSaveAndLogout = handleQuizSaveAndLogout;
+  window.performCompleteLogout = performCompleteLogout;
+  window.clearAllCookiesAndTokens = clearAllCookiesAndTokens;
   window.getStudentQuiz1023Record = getStudentQuiz1023Record;
   window.getStudentAccumulatedBonus = getStudentAccumulatedBonus;
 
