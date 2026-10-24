@@ -1195,7 +1195,10 @@
           const accMatch = did.match(/_ACC(\d+)/);
           if (accMatch) acc = parseInt(accMatch[1], 10);
 
-          const qCode = did.split("_T")[0];
+          let qCode = did.split("_T")[0];
+          if (qCode.startsWith("1023_PRACTICE_")) {
+            qCode = qCode.replace("1023_PRACTICE_", "");
+          }
           uniqueQuestionCodes.add(qCode);
 
           let bankCategory = "OTHER";
@@ -1228,6 +1231,13 @@
           allAttempts.push(attempt);
           if (!studentAttempts[k]) studentAttempts[k] = [];
           studentAttempts[k].push(attempt);
+        });
+
+        // Ensure all attempts are sorted chronologically descending (newest first)
+        allAttempts.sort((a, b) => {
+          const ta = a.timestamp || "";
+          const tb = b.timestamp || "";
+          return tb.localeCompare(ta);
         });
 
         populateDynamicFilterOptions(uniqueDates, uniqueQuestionCodes);
@@ -1916,7 +1926,22 @@
         pageItems.forEach(att => {
           const tr = document.createElement("tr");
           const sName = window.getStudentName ? window.getStudentName(att.classID, att.studentID) : `學生 ${att.studentID}`;
-          const t = att.timestamp ? att.timestamp.replace("T", " ").replace(".000Z", "") : "-";
+          let tDisplay = "-";
+          if (att.timestamp) {
+            try {
+              const d = new Date(att.timestamp);
+              // Format as Macau/Hong Kong local time (UTC+8)
+              const y = d.getFullYear();
+              const m = String(d.getMonth() + 1).padStart(2, '0');
+              const day = String(d.getDate()).padStart(2, '0');
+              const hh = String(d.getHours()).padStart(2, '0');
+              const mm = String(d.getMinutes()).padStart(2, '0');
+              const ss = String(d.getSeconds()).padStart(2, '0');
+              tDisplay = `${y}-${m}-${day} ${hh}:${mm}:${ss}`;
+            } catch(e) {
+              tDisplay = att.timestamp.replace("T", " ").replace(".000Z", "");
+            }
+          }
 
           let scoreBadge = att.isCorrect
             ? '<span class="badge badge-success">答對</span>'
@@ -1932,7 +1957,7 @@
           const tooltipText = (qInfo.stem ? `${qInfo.title} | ${qInfo.stem}` : displayTitle).replace(/"/g, '&quot;');
 
           tr.innerHTML = `
-            <td style="font-size:12px; color:var(--text-muted);">${t}</td>
+            <td style="font-size:12px; color:var(--text-muted);" title="UTC: ${att.timestamp}">${tDisplay}</td>
             <td><strong>${att.classID}</strong></td>
             <td>${att.studentID} 號</td>
             <td><strong>${sName}</strong></td>
