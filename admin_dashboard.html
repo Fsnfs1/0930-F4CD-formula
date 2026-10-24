@@ -895,6 +895,29 @@
       }
       initQuestionBankDictionary();
 
+      function getQuestionInfo(qCode) {
+        if (!qCode) return { id: "", bankCategory: "OTHER", bankName: "未知題庫", title: "未知題目", stem: "" };
+        const info = questionBankDictionary[qCode];
+        if (info) return info;
+        if (qCode.startsWith("1023_QUIZ_Q")) {
+          const num = parseInt(qCode.replace("1023_QUIZ_Q", ""), 10) || 1;
+          return {
+            id: qCode,
+            bankCategory: "1023_QUIZ",
+            bankName: "1023課堂小測",
+            title: `1023 課堂小測第 ${num} 題`,
+            stem: `課堂統一小測第 ${num} 題作答記錄`
+          };
+        }
+        return {
+          id: qCode,
+          bankCategory: "OTHER",
+          bankName: "自訂題目",
+          title: qCode,
+          stem: qCode
+        };
+      }
+
       // DOM Elements Selection
       const btnManualRefresh = document.getElementById("btnManualRefresh");
       const btnExportCSV = document.getElementById("btnExportCSV");
@@ -1212,7 +1235,57 @@
         renderAllViews();
       }
 
+      let cachedUniqueDates = new Set();
+      let cachedUniqueQuestionCodes = new Set();
+
+      function updateQuestionCodeOptions() {
+        if (!selectQuestionCode) return;
+        const bankFilter = selectBankFilter ? selectBankFilter.value : "ALL";
+        const currentVal = selectQuestionCode.value;
+        selectQuestionCode.innerHTML = '<option value="ALL">全部具體題號</option>';
+
+        let candidates = [];
+        if (bankFilter === "1023_PRACTICE") {
+          for (let i = 1; i <= 80; i++) {
+            const id = "4CD_1023_Q" + String(i).padStart(2, "0");
+            const info = questionBankDictionary[id];
+            candidates.push({ id: id, label: info && info.title ? `${id} (${info.title.slice(0, 16)})` : id });
+          }
+        } else if (bankFilter === "1023_QUIZ") {
+          for (let i = 1; i <= 20; i++) {
+            const id = "1023_QUIZ_Q" + String(i).padStart(2, "0");
+            candidates.push({ id: id, label: `${id} (小測第 ${i} 題)` });
+          }
+        } else {
+          const allCodes = new Set([...cachedUniqueQuestionCodes]);
+          Object.keys(questionBankDictionary).forEach(k => allCodes.add(k));
+          const sorted = Array.from(allCodes).sort();
+          sorted.forEach(c => {
+            if (!c) return;
+            const info = questionBankDictionary[c];
+            if (bankFilter === "G10" && info && info.bankCategory !== "G10" && !c.startsWith("G10")) return;
+            if (bankFilter === "G11" && info && info.bankCategory !== "G11" && !c.startsWith("G11")) return;
+            if (bankFilter === "ADVANCE" && info && info.bankCategory !== "ADVANCE" && !c.startsWith("ADVANCE")) return;
+            if (bankFilter === "1023_ALL" && info && info.bankCategory !== "1023" && info.bankCategory !== "1023_QUIZ" && !c.includes("1023")) return;
+
+            const label = info && info.title ? `${c} (${info.title.slice(0, 16)})` : c;
+            candidates.push({ id: c, label: label });
+          });
+        }
+
+        candidates.forEach(item => {
+          const opt = document.createElement("option");
+          opt.value = item.id;
+          opt.textContent = item.label;
+          if (item.id === currentVal) opt.selected = true;
+          selectQuestionCode.appendChild(opt);
+        });
+      }
+
       function populateDynamicFilterOptions(datesSet, qCodesSet) {
+        cachedUniqueDates = datesSet;
+        cachedUniqueQuestionCodes = qCodesSet;
+
         // Dynamic dates dropdown
         const sortedDates = Array.from(datesSet).sort().reverse();
         selectDynamicDate.innerHTML = '<option value="">-- 請選擇指定單日 --</option>';
@@ -1223,16 +1296,7 @@
           selectDynamicDate.appendChild(opt);
         });
 
-        // Dynamic question codes dropdown
-        const sortedCodes = Array.from(qCodesSet).sort();
-        selectQuestionCode.innerHTML = '<option value="ALL">全部具體題號</option>';
-        sortedCodes.forEach(c => {
-          if (!c) return;
-          const opt = document.createElement("option");
-          opt.value = c;
-          opt.textContent = c;
-          selectQuestionCode.appendChild(opt);
-        });
+        updateQuestionCodeOptions();
       }
 
       function updateKPIs() {
@@ -1327,10 +1391,11 @@
         // Question keyword search
         const qKeyword = inputQuestionCodeSearch.value.trim().toLowerCase();
         if (qKeyword) {
-          const stem = (questionBankDictionary[att.questionCode] || "").toLowerCase();
-          const matchCode = att.questionCode.toLowerCase().includes(qKeyword);
-          const matchStem = stem.includes(qKeyword);
-          if (!matchCode && !matchStem) return false;
+          const qInfo = getQuestionInfo(att.questionCode);
+          const matchCode = (att.questionCode || "").toLowerCase().includes(qKeyword);
+          const matchTitle = (qInfo.title || "").toLowerCase().includes(qKeyword);
+          const matchStem = (qInfo.stem || "").toLowerCase().includes(qKeyword);
+          if (!matchCode && !matchTitle && !matchStem) return false;
         }
 
         // Global student/class search
@@ -1501,11 +1566,12 @@
         });
       }
 
-      // View 1023 Student 20-Question Breakdown in Modal
+      // View 1023 Student 20-Question Breakdown and Online Stream in Modal (R1)
       window.viewStudent1023QuizDetails = function (cid, sid) {
         const roster = window.ROSTER_DATA || {};
         const studentObj = (roster[cid] || []).find(s => s.id === sid);
         const sName = studentObj ? studentObj.name : `學生 ${sid}`;
+        const k = `${cid}_${sid}`;
 
         let dec = null;
         if (window.getStudentQuiz1023Record) {
@@ -1514,58 +1580,120 @@
           } catch (e) {}
         }
 
-        modalStudentTitle.textContent = `${cid} 班 ${sid} 號 ${sName} - 1023 課堂小測詳細作答 (20題)`;
+        modalStudentTitle.textContent = `${cid} 班 ${sid} 號 ${sName} - 1023 課堂小測作答詳細紀錄 (20題)`;
+
+        const studentAllAttempts = studentAttempts[k] || [];
+        const pAttempts = studentAllAttempts.filter(a => a.bankCategory === "1023" && matchesFilters(a));
+        const pCorrect = pAttempts.filter(a => a.isCorrect).length;
+        const practiceBonus = Math.min(10, Math.floor(pCorrect / 3));
+
+        let html = '';
 
         if (!dec || !dec.details || dec.details.length === 0) {
-          modalStudentBody.innerHTML = `
-            <div style="padding:20px; text-align:center; color:var(--text-muted);">
-              <i class="fa-solid fa-circle-exclamation" style="font-size:24px; color:#f59e0b; margin-bottom:8px;"></i>
-              <p>查無該學生 1023 課堂小測加密紀錄或該學生非 4C/4D 參測名單。</p>
+          html += `
+            <div style="padding:15px; background:rgba(245, 158, 11, 0.1); border:1px solid rgba(245, 158, 11, 0.3); border-radius:8px; margin-bottom:15px; text-align:center; color:#fbbf24;">
+              <i class="fa-solid fa-circle-info"></i> 該生（${cid} ${sid}號）無紙本小測加密卷或當日缺考，以下展示線上刷題即時流水。
             </div>
           `;
-          studentModal.classList.add("active");
-          return;
-        }
-
-        let html = `
-          <div style="display:flex; justify-content:space-between; margin-bottom:14px; background:#0f172a; padding:12px 16px; border-radius:8px; border:1px solid #334155;">
-            <div>考生編號：<strong>${dec.candId || "-"}</strong></div>
-            <div>小測原分：<strong>${dec.origTotal || 0} / 50</strong></div>
-            <div>折算得分：<strong style="color:#34d399;">${dec.newTotal || 0} 分</strong></div>
-          </div>
-          <table style="width:100%; border-collapse:collapse; font-size:13px;">
-            <thead>
-              <tr style="background:#0f172a;">
-                <th style="padding:8px;">題號</th>
-                <th style="padding:8px;">原始得分</th>
-                <th style="padding:8px;">折算得分</th>
-                <th style="padding:8px;">作答判定</th>
-                <th style="padding:8px;">題目考點</th>
-              </tr>
-            </thead>
-            <tbody>
-        `;
-
-        dec.details.forEach(item => {
-          let statusBadge = '<span class="badge badge-danger">錯誤</span>';
-          if (item.status === "full" || item.newScore >= 4) {
-            statusBadge = '<span class="badge badge-success">完全答對</span>';
-          } else if (item.status === "partial" || item.newScore > 0) {
-            statusBadge = '<span class="badge badge-warning">部分得分</span>';
-          }
+        } else {
+          const rawScore = dec.origTotal !== undefined ? dec.origTotal : (dec.quizRawScore || 0);
+          const convertedScore = dec.newTotal !== undefined ? dec.newTotal : (dec.convertedScore || 0);
+          const finalScore = Math.min(80, Math.round(convertedScore + practiceBonus));
 
           html += `
-            <tr style="border-bottom:1px solid #334155;">
-              <td style="padding:8px;"><strong>第 ${item.qNum || item.q_num} 題</strong></td>
-              <td style="padding:8px;">${item.origScore !== undefined ? item.origScore : item.rawScore} 分</td>
-              <td style="padding:8px; font-weight:bold; color:var(--primary);">${item.newScore} 分</td>
-              <td style="padding:8px;">${statusBadge}</td>
-              <td style="padding:8px; color:var(--text-muted);">1023 必修基礎概念 (Q${item.qNum || item.q_num})</td>
-            </tr>
+            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:14px; background:#0f172a; padding:12px 16px; border-radius:8px; border:1px solid #334155;">
+              <div>考生編號：<strong>${dec.candId || "-"}</strong></div>
+              <div>小測原始分：<strong>${rawScore} / 50</strong></div>
+              <div>折算分：<strong style="color:#60a5fa;">${convertedScore}</strong></div>
+              <div>線上刷題加分：<strong style="color:#34d399;">+${practiceBonus}</strong></div>
+              <div>加分後總評：<strong style="color:#f59e0b; font-size:15px;">${finalScore} / 80</strong></div>
+            </div>
+            <div style="max-height:260px; overflow-y:auto; border:1px solid #334155; border-radius:6px; margin-bottom:18px;">
+              <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                <thead style="position:sticky; top:0; background:#0f172a; z-index:1;">
+                  <tr>
+                    <th style="padding:8px;">題號</th>
+                    <th style="padding:8px;">原始分</th>
+                    <th style="padding:8px;">折算分</th>
+                    <th style="padding:8px;">作答判定</th>
+                    <th style="padding:8px;">考點知識模塊</th>
+                  </tr>
+                </thead>
+                <tbody>
           `;
-        });
 
-        html += `</tbody></table>`;
+          dec.details.forEach(item => {
+            let statusBadge = '<span class="badge badge-danger">錯誤</span>';
+            if (item.status === "full" || item.newScore >= 4) {
+              statusBadge = '<span class="badge badge-success">完全答對</span>';
+            } else if (item.status === "partial" || item.newScore > 0) {
+              statusBadge = '<span class="badge badge-warning">部分得分</span>';
+            }
+
+            html += `
+              <tr style="border-bottom:1px solid #1e293b;">
+                <td style="padding:8px;"><strong>第 ${item.qNum || item.q_num} 題</strong></td>
+                <td style="padding:8px;">${item.origScore !== undefined ? item.origScore : item.rawScore} 分</td>
+                <td style="padding:8px; font-weight:bold; color:var(--primary);">${item.newScore} 分</td>
+                <td style="padding:8px;">${statusBadge}</td>
+                <td style="padding:8px; color:var(--text-muted);">1023 必修基礎概念 (Q${item.qNum || item.q_num})</td>
+              </tr>
+            `;
+          });
+
+          html += `</tbody></table></div>`;
+        }
+
+        // Section 2: Online practice attempts stream
+        html += `
+          <div style="border-top:1px solid #334155; padding-top:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <h4 style="margin:0; font-size:14px; color:var(--text-bright);">
+                <i class="fa-solid fa-fire" style="color:#ef4444;"></i> 1023 線上刷題即時流水 (共 ${pAttempts.length} 次作答，答對 ${pCorrect} 題)
+              </h4>
+            </div>
+        `;
+
+        if (pAttempts.length === 0) {
+          html += `<div style="text-align:center; padding:15px; color:var(--text-muted); font-size:12px;">尚無線上刷題紀錄</div>`;
+        } else {
+          html += `
+            <div style="max-height:220px; overflow-y:auto; border:1px solid #334155; border-radius:6px;">
+              <table style="width:100%; border-collapse:collapse; font-size:12px;">
+                <thead style="position:sticky; top:0; background:#0f172a; z-index:1;">
+                  <tr>
+                    <th style="padding:6px 8px;">序號</th>
+                    <th style="padding:6px 8px;">題目編號</th>
+                    <th style="padding:6px 8px;">題目名稱</th>
+                    <th style="padding:6px 8px;">判定</th>
+                    <th style="padding:6px 8px;">耗時</th>
+                    <th style="padding:6px 8px;">提交時間</th>
+                  </tr>
+                </thead>
+                <tbody>
+          `;
+          pAttempts.forEach((a, idx) => {
+            const qInfo = getQuestionInfo(a.questionCode);
+            const scoreBadge = a.isCorrect
+              ? '<span class="badge badge-success" style="padding:2px 6px;">答對</span>'
+              : '<span class="badge badge-danger" style="padding:2px 6px;">錯誤</span>';
+            const t = a.timestamp ? a.timestamp.replace('T', ' ').replace('.000Z', '') : '-';
+            html += `
+              <tr style="border-bottom:1px solid #1e293b;">
+                <td style="padding:6px 8px;">${idx + 1}</td>
+                <td style="padding:6px 8px;"><code style="color:#93c5fd;">${a.questionCode}</code></td>
+                <td style="padding:6px 8px; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${qInfo.title}">${qInfo.title}</td>
+                <td style="padding:6px 8px;">${scoreBadge}</td>
+                <td style="padding:6px 8px;">${a.duration}s</td>
+                <td style="padding:6px 8px; color:var(--text-muted);">${t}</td>
+              </tr>
+            `;
+          });
+          html += `</tbody></table></div>`;
+        }
+
+        html += `</div>`;
+
         modalStudentBody.innerHTML = html;
         studentModal.classList.add("active");
         triggerMathJaxRender();
