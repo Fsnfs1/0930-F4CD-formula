@@ -1415,8 +1415,19 @@
 
       function updateFilterSummaryBadge() {
         const parts = [];
-        if (selectTimeFilter.value !== "ALL") parts.push(`時間: ${selectTimeFilter.options[selectTimeFilter.selectedIndex].text.split(' ')[0]}`);
-        if (selectBankFilter.value !== "ALL") parts.push(`題庫: ${selectBankFilter.options[selectBankFilter.selectedIndex].text.split(' ')[0]}`);
+        if (selectTimeFilter.value !== "ALL") {
+          const tRaw = selectTimeFilter.options[selectTimeFilter.selectedIndex].text;
+          const tText = tRaw.replace(/^[\s\S]*?(1023|今日|昨日|最近|舊版|依指定|自訂)/, '$1').split('(')[0].trim();
+          parts.push(`時間: ${tText || tRaw}`);
+        }
+        if (selectBankFilter.value !== "ALL") {
+          const bRaw = selectBankFilter.options[selectBankFilter.selectedIndex].text;
+          const bText = bRaw.replace(/^[\s\S]*?(1023|G10|G11|理組|全部)/, '$1').split('(')[0].trim();
+          parts.push(`題庫: ${bText || bRaw}`);
+        }
+        if (selectQuestionCode && selectQuestionCode.value !== "ALL") {
+          parts.push(`題號: ${selectQuestionCode.value}`);
+        }
         if (selectGlobalClass.value !== "ALL") parts.push(`班級: ${selectGlobalClass.value}`);
         if (inputGlobalSearch.value.trim()) parts.push(`人員: "${inputGlobalSearch.value.trim()}"`);
         if (inputQuestionCodeSearch.value.trim()) parts.push(`題目: "${inputQuestionCodeSearch.value.trim()}"`);
@@ -1898,11 +1909,11 @@
 
         attemptsTableBody.innerHTML = "";
         if (pageItems.length === 0) {
-          attemptsTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 25px; color: var(--text-muted);">無符合當前篩選條件之作答流水</td></tr>';
+          attemptsTableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 25px; color: var(--text-muted);">無符合當前篩選條件之作答流水</td></tr>';
           return;
         }
 
-        pageItems.forEach((att, idx) => {
+        pageItems.forEach(att => {
           const tr = document.createElement("tr");
           const sName = window.getStudentName ? window.getStudentName(att.classID, att.studentID) : `學生 ${att.studentID}`;
           const t = att.timestamp ? att.timestamp.replace("T", " ").replace(".000Z", "") : "-";
@@ -1916,17 +1927,18 @@
           if (att.bankCategory === "G11") bankBadge = '<span class="badge badge-warning">G11</span>';
           if (att.bankCategory === "ADVANCE") bankBadge = '<span class="badge badge-purple">大測</span>';
 
-          const stemText = questionBankDictionary[att.questionCode] || att.dateID.split("_T")[0];
+          const qInfo = getQuestionInfo(att.questionCode);
+          const displayTitle = qInfo.title || qInfo.stem || att.questionCode;
+          const tooltipText = (qInfo.stem ? `${qInfo.title} | ${qInfo.stem}` : displayTitle).replace(/"/g, '&quot;');
 
           tr.innerHTML = `
-            <td>${startIdx + idx + 1}</td>
             <td style="font-size:12px; color:var(--text-muted);">${t}</td>
             <td><strong>${att.classID}</strong></td>
             <td>${att.studentID} 號</td>
             <td><strong>${sName}</strong></td>
             <td>${bankBadge}</td>
             <td><code style="color:#93c5fd;">${att.questionCode}</code></td>
-            <td style="max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${stemText}">${stemText}</td>
+            <td style="max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${tooltipText}">${displayTitle}</td>
             <td>${scoreBadge}</td>
             <td>${att.duration} 秒</td>
             <td>${att.accuracy}%</td>
@@ -2013,7 +2025,7 @@
       inputStartDate.addEventListener("change", () => { currentLogPage = 1; renderAllViews(); });
       inputEndDate.addEventListener("change", () => { currentLogPage = 1; renderAllViews(); });
       selectDurationRange.addEventListener("change", () => { currentLogPage = 1; renderAllViews(); });
-      selectBankFilter.addEventListener("change", () => { currentLogPage = 1; renderAllViews(); });
+      selectBankFilter.addEventListener("change", () => { updateQuestionCodeOptions(); currentLogPage = 1; renderAllViews(); });
       selectQuestionCode.addEventListener("change", () => { currentLogPage = 1; renderAllViews(); });
       inputQuestionCodeSearch.addEventListener("input", () => { currentLogPage = 1; renderAllViews(); });
       selectGlobalClass.addEventListener("change", () => { currentLogPage = 1; renderAllViews(); });
@@ -2022,6 +2034,7 @@
       // Presets
       preset1023Btn.addEventListener("click", () => {
         selectBankFilter.value = "1023_ALL";
+        updateQuestionCodeOptions();
         selectTimeFilter.value = "1023_PERIOD";
         selectDynamicDate.style.display = "none";
         customDateRow.style.display = "none";
@@ -2045,6 +2058,7 @@
         inputEndDate.value = "";
         selectDurationRange.value = "ALL";
         selectBankFilter.value = "ALL";
+        updateQuestionCodeOptions();
         selectQuestionCode.value = "ALL";
         inputQuestionCodeSearch.value = "";
         selectGlobalClass.value = "ALL";
@@ -2063,7 +2077,7 @@
       btnManualRefresh.addEventListener("click", loadData);
 
       // RFC 4180 UTF-8 BOM CSV Export (R3)
-      btnExportCSV.addEventListener("click", function () {
+      function exportLogFlowCSV() {
         const filtered = allAttempts.filter(matchesFilters);
         const rows = [
           ["班級", "學號", "姓名", "作答提交時間", "題庫分類", "題目編號", "題目摘要/考點", "是否答對", "得分", "花費時長(秒)", "當時累積正確率(%)"]
@@ -2071,15 +2085,17 @@
 
         filtered.forEach(a => {
           const sName = window.getStudentName ? window.getStudentName(a.classID, a.studentID) : `學生 ${a.studentID}`;
-          const stem = questionBankDictionary[a.questionCode] || "";
+          const qInfo = getQuestionInfo(a.questionCode);
+          const stemSummary = qInfo.stem ? `${qInfo.title} | ${qInfo.stem}` : (qInfo.title || a.questionCode);
+          const t = a.timestamp ? a.timestamp.replace("T", " ").replace(".000Z", "") : "";
           rows.push([
             a.classID,
             a.studentID,
             sName,
-            a.timestamp,
+            t,
             a.bankCategory,
             a.questionCode,
-            stem.replace(/"/g, '""'),
+            stemSummary,
             a.isCorrect ? "答對" : "錯誤",
             a.score,
             a.duration,
@@ -2087,8 +2103,8 @@
           ]);
         });
 
-        // RFC 4180 Escaping
-        const csvContent = "\uFEFF" + rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+        // RFC 4180 Escaping with UTF-8 BOM (\uFEFF)
+        const csvContent = "\uFEFF" + rows.map(r => r.map(cell => `"${String(cell !== undefined && cell !== null ? cell : '').replace(/"/g, '""')}"`).join(",")).join("\r\n");
         const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -2097,7 +2113,12 @@
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-      });
+      }
+
+      btnExportCSV.addEventListener("click", exportLogFlowCSV);
+      if (btnExportLogFlowCSV) {
+        btnExportLogFlowCSV.addEventListener("click", exportLogFlowCSV);
+      }
 
       // Periodic Auto Refresh Timer
       countdownTimer = setInterval(() => {
