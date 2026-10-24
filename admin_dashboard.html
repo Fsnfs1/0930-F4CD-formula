@@ -524,14 +524,14 @@
           </span>
         </div>
         <div class="filter-presets">
-          <button class="btn btn-sm btn-outline" id="preset1023Btn">
-            🔥 僅看 1023 版答題
+          <button class="btn btn-sm btn-outline" id="btnPreset1023Only">
+            <i class="fa-solid fa-fire" style="color:#ef4444;"></i> 🔥 僅看1023版
           </button>
-          <button class="btn btn-sm btn-outline" id="presetTodayBtn">
-            📅 僅看今日最新 (10/24)
+          <button class="btn btn-sm btn-outline" id="btnPresetTodayOnly">
+            <i class="fa-solid fa-calendar-day" style="color:#3b82f6;"></i> 📅 僅看今日最新
           </button>
-          <button class="btn btn-sm btn-outline" id="presetResetBtn">
-            🔄 重置全部篩選
+          <button class="btn btn-sm btn-outline" id="btnPresetReset">
+            <i class="fa-solid fa-rotate-left"></i> 🔄 重置篩選
           </button>
         </div>
       </div>
@@ -543,10 +543,10 @@
             <i class="fa-regular fa-clock" style="color:#60a5fa;"></i> 維度一：答題提交時間
           </div>
           <div class="filter-row">
-            <select id="selectTimeFilter" class="select-input" style="flex:1;">
-              <option value="ALL">全部時間 (全體歷史紀錄)</option>
-              <option value="1023_PERIOD">1023專題期間 (10/23 至今)</option>
-              <option value="TODAY">今日最新 (10/24)</option>
+            <select id="filterQuickTime" class="select-input" style="flex:1;">
+              <option value="ALL">全部時間區間 (全體歷史紀錄)</option>
+              <option value="1023_PERIOD">🔥 1023專題期間 (10/23 至今)</option>
+              <option value="TODAY">📅 今日最新 (10/24)</option>
               <option value="YESTERDAY">昨日記錄 (10/23)</option>
               <option value="LAST_24H">最近 24 小時</option>
               <option value="LAST_7D">最近 7 天</option>
@@ -554,22 +554,22 @@
               <option value="DYNAMIC_DATE">依指定單日過濾...</option>
               <option value="CUSTOM_RANGE">自訂起訖日期...</option>
             </select>
-            <select id="selectDynamicDate" class="select-input" style="display:none; flex:1;">
+            <select id="filterDynamicDate" class="select-input" style="display:none; flex:1;">
               <option value="">載入動態日期清單...</option>
             </select>
           </div>
           <div class="filter-row" id="customDateRow" style="display:none;">
-            <input type="date" id="inputStartDate" class="date-input" title="起始日期">
+            <input type="date" id="filterStartDate" class="date-input" title="起始日期">
             <span style="color:var(--text-muted); font-size:12px;">至</span>
-            <input type="date" id="inputEndDate" class="date-input" title="結束日期">
+            <input type="date" id="filterEndDate" class="date-input" title="結束日期">
           </div>
           <div class="filter-row">
             <span style="font-size:12px; color:var(--text-muted);">單題耗時：</span>
-            <select id="selectDurationRange" class="select-input" style="flex:1;">
-              <option value="ALL">全部時長</option>
-              <option value="FAST">極速作答 (&le; 15秒)</option>
-              <option value="NORMAL">常規作答 (16 ~ 120秒)</option>
-              <option value="SLOW">深度思考 (&gt; 120秒)</option>
+            <select id="filterDurationRange" class="select-input" style="flex:1;">
+              <option value="ALL">全部耗時區間</option>
+              <option value="FAST">⚡ 秒殺速答 / 快速 (&le; 15秒)</option>
+              <option value="NORMAL">🧠 常規思考 (16 ~ 60秒)</option>
+              <option value="SLOW">🔬 深度思考 / 長考 (&gt; 60秒)</option>
             </select>
           </div>
         </div>
@@ -580,21 +580,21 @@
             <i class="fa-solid fa-book-bookmark" style="color:#34d399;"></i> 維度二：題庫與題目編號
           </div>
           <div class="filter-row">
-            <select id="selectBankFilter" class="select-input" style="flex:1;">
+            <select id="filterBankCategory" class="select-input" style="flex:1;">
               <option value="ALL">全部題庫 (1023版、G10、G11、理組大測)</option>
-              <option value="1023_ALL">1023版 全部 (4CD刷題庫 + 課堂小測)</option>
-              <option value="1023_PRACTICE">1023版 專案刷題庫 (4CD_1023_Q01~Q80)</option>
-              <option value="1023_QUIZ">1023版 課堂小測 (Q01~Q20 明細與加分)</option>
-              <option value="G10">高一通用題庫 (G10_Q01~Q20, MC01~05)</option>
-              <option value="G11">高二通用題庫 (G11_Q01~Q33, MC01~02)</option>
-              <option value="ADVANCE">理組進階大測題庫 (ADVANCE_EXAM)</option>
+              <option value="1023_ALL">🔥 1023版 全部 (4CD刷題庫 + 課堂小測)</option>
+              <option value="1023_PRACTICE">📚 1023 專題題庫 (4CD_1023_Q01~Q80)</option>
+              <option value="1023_QUIZ">📝 1023 課堂小測 (Q01~Q20)</option>
+              <option value="G10">📘 G10 高一題庫 (集合、不等式、邏輯)</option>
+              <option value="G11">📙 G11 高二題庫 (複數、空間立體幾何)</option>
+              <option value="ADVANCE">🔬 理組進階大測題庫 (ADVANCE_EXAM)</option>
             </select>
-            <select id="selectQuestionCode" class="select-input" style="flex:1;">
-              <option value="ALL">全部題號</option>
+            <select id="filterQuestionId" class="select-input" style="flex:1;">
+              <option value="ALL">全部具體題號</option>
             </select>
           </div>
           <div class="filter-row">
-            <input type="text" id="inputQuestionCodeSearch" class="search-input" placeholder="🔍 搜尋題號編號或題幹關鍵字 (如 Q01, 二次函數)...">
+            <input type="text" id="inputFilterSearch" class="search-input" placeholder="🔍 搜尋題目編號、考點、題幹或學生姓名/學號...">
           </div>
         </div>
 
@@ -620,8 +620,8 @@
 
     <!-- Navigation Tabs -->
     <div class="nav-tabs">
-      <button class="tab-btn active" data-tab="tab-1023">
-        <i class="fa-solid fa-bullseye"></i> 🎯 1023版全校答題情況與成績實時總覽 (<span id="tabCount1023">58</span>)
+      <button class="tab-btn active" data-tab="tab-1023-overview" id="btnTab1023">
+        <i class="fa-solid fa-fire"></i> 🔥 1023 專題總覽 (<span id="tabCount1023">58</span>)
       </button>
       <button class="tab-btn" data-tab="tab-roster">
         <i class="fa-solid fa-id-badge"></i> 👤 雲端人臉登記在庫清單 (<span id="tabCountRoster">88</span>)
@@ -629,13 +629,13 @@
       <button class="tab-btn" data-tab="tab-leaderboard">
         <i class="fa-solid fa-trophy"></i> 🏆 全體實時作答排行榜 (<span id="tabCountLeaderboard">0</span>)
       </button>
-      <button class="tab-btn" data-tab="tab-attempts">
-        <i class="fa-solid fa-clock-rotate-left"></i> 🕒 全校答題實時流水與題庫編號分析 (<span id="tabCountAttempts">0</span>)
+      <button class="tab-btn" data-tab="tab-logflow" id="btnTabLogFlow">
+        <i class="fa-solid fa-list-check"></i> 📜 全校答題實時流水 (<span id="tabCountLogFlow">0</span>)
       </button>
     </div>
 
-    <!-- Tab 1: 1023 School-wide Score & Quiz Overview Tab (R1) -->
-    <div id="tab-1023" class="tab-content active">
+    <!-- Tab 1: 1023 School-wide Score & Quiz Overview Tab (R1 - Default Active Tab) -->
+    <div id="tab-1023-overview" class="tab-content active">
       <div class="table-container">
         <table>
           <thead>
@@ -643,17 +643,17 @@
               <th>班級</th>
               <th>學號</th>
               <th>姓名</th>
-              <th>1023小測原分</th>
-              <th>折算成績</th>
-              <th>線上刷題累計加分</th>
-              <th>折算總分 (80分上限)</th>
-              <th>1023刷題題數</th>
-              <th>刷題正確率</th>
-              <th>雲端實時同步狀態</th>
-              <th>小測詳情</th>
+              <th>1023小測原始分</th>
+              <th>折算分</th>
+              <th>線上刷題獎勵加分</th>
+              <th>加分後折算總分(上限80分)</th>
+              <th>累積題數</th>
+              <th>正確率</th>
+              <th>雲端同步狀態</th>
+              <th>操作</th>
             </tr>
           </thead>
-          <tbody id="tableBody1023">
+          <tbody id="overview1023TableBody">
             <tr>
               <td colspan="11" style="text-align: center; padding: 30px; color: var(--text-muted);">
                 <i class="fa-solid fa-spinner fa-spin"></i> 正在解密載入 1023 版學生成績與小測數據...
@@ -750,38 +750,38 @@
       </div>
     </div>
 
-    <!-- Tab 4: Real-time Attempts Stream (R3) -->
-    <div id="tab-attempts" class="tab-content">
+    <!-- Tab 4: Real-time Practice Log Flow Tab (R3) -->
+    <div id="tab-logflow" class="tab-content">
       <div class="table-container">
         <table>
           <thead>
             <tr>
-              <th>序號</th>
               <th>提交時間</th>
               <th>班級</th>
               <th>學號</th>
               <th>姓名</th>
               <th>題庫版本</th>
-              <th>題目識別碼</th>
-              <th>題目摘要 / 題幹</th>
+              <th>題庫編號</th>
+              <th>題目名稱 / 題幹摘要</th>
               <th>得分</th>
-              <th>作答耗時</th>
+              <th>耗時</th>
               <th>當時正確率</th>
             </tr>
           </thead>
-          <tbody id="attemptsTableBody">
+          <tbody id="logFlowTableBody">
             <tr>
-              <td colspan="11" style="text-align: center; padding: 30px; color: var(--text-muted);">
+              <td colspan="10" style="text-align: center; padding: 30px; color: var(--text-muted);">
                 <i class="fa-solid fa-spinner fa-spin"></i> 載入符合條件的作答紀錄流水中...
               </td>
             </tr>
           </tbody>
         </table>
-        <div class="pagination-bar" id="attemptsPaginationBar">
-          <span id="attemptsPageInfo">顯示第 1 至 50 筆，共 0 筆紀錄</span>
+        <div class="pagination-bar" id="logFlowPaginationBar">
+          <span id="logFlowPageInfo">顯示第 1 至 50 筆，共 0 筆紀錄</span>
           <div style="display:flex; gap:6px;">
-            <button class="btn btn-sm btn-outline" id="btnPrevPage">上一頁</button>
-            <button class="btn btn-sm btn-outline" id="btnNextPage">下一頁</button>
+            <button class="btn btn-sm btn-outline" id="btnPrevLogPage">上一頁</button>
+            <button class="btn btn-sm btn-outline" id="btnNextLogPage">下一頁</button>
+            <button class="btn btn-sm btn-outline" id="btnExportLogFlowCSV"><i class="fa-solid fa-file-csv"></i> 匯出本流水分頁 CSV</button>
           </div>
         </div>
       </div>
@@ -829,23 +829,69 @@
       // Build question bank dictionary for fast title / stem lookup
       function initQuestionBankDictionary() {
         // 1023 Question Bank
-        if (typeof window.QUESTIONS_4CD_1023 !== "undefined" && Array.isArray(window.QUESTIONS_4CD_1023)) {
-          window.QUESTIONS_4CD_1023.forEach(q => {
-            if (q && q.id) questionBankDictionary[q.id] = q.stem || q.title || `1023 題目 ${q.id}`;
+        const q4cd = window.QUESTIONS_4CD1023 || window.QUESTIONS_4CD_1023;
+        if (Array.isArray(q4cd)) {
+          q4cd.forEach(q => {
+            if (q && q.id) {
+              questionBankDictionary[q.id] = {
+                id: q.id,
+                bankCategory: "1023",
+                bankName: "1023專題題庫",
+                title: q.topic || `第 ${q.q_num} 題`,
+                stem: q.stem || ""
+              };
+            }
           });
         }
         // G10 Question Bank
-        if (typeof window.QUESTIONS_G10 !== "undefined" && Array.isArray(window.QUESTIONS_G10)) {
-          window.QUESTIONS_G10.forEach(q => {
-            if (q && q.id) questionBankDictionary[q.id] = q.title || q.stem || `G10 題目 ${q.id}`;
+        const qg10 = window.QUESTIONS_G10 ? (window.QUESTIONS_G10.questions || window.QUESTIONS_G10) : null;
+        if (Array.isArray(qg10)) {
+          qg10.forEach(q => {
+            if (q && q.id) {
+              questionBankDictionary[q.id] = {
+                id: q.id,
+                bankCategory: "G10",
+                bankName: "G10高一題庫",
+                title: (q.tags && q.tags.join(" · ")) || q.topic || "高一集合與不等式",
+                stem: q.stem || q.prompt || ""
+              };
+            }
           });
         }
         // G11 Question Bank
-        if (typeof window.QUESTIONS_G11 !== "undefined" && Array.isArray(window.QUESTIONS_G11)) {
-          window.QUESTIONS_G11.forEach(q => {
-            if (q && q.id) questionBankDictionary[q.id] = q.title || q.stem || `G11 題目 ${q.id}`;
+        const qg11 = window.QUESTIONS_G11 ? (window.QUESTIONS_G11.questions || window.QUESTIONS_G11) : null;
+        if (Array.isArray(qg11)) {
+          qg11.forEach(q => {
+            if (q && q.id) {
+              questionBankDictionary[q.id] = {
+                id: q.id,
+                bankCategory: "G11",
+                bankName: "G11高二題庫",
+                title: (q.tags && q.tags.join(" · ")) || q.topic || "高二複數與幾何",
+                stem: q.stem || q.prompt || ""
+              };
+            }
           });
         }
+        // 1023 Quiz Q01~Q20
+        for (let i = 1; i <= 20; i++) {
+          const qid = "1023_QUIZ_Q" + String(i).padStart(2, "0");
+          questionBankDictionary[qid] = {
+            id: qid,
+            bankCategory: "1023_QUIZ",
+            bankName: "1023課堂小測",
+            title: `1023 課堂小測第 ${i} 題`,
+            stem: `課堂統一小測第 ${i} 題作答記錄`
+          };
+        }
+        // ADVANCE
+        questionBankDictionary["ADVANCE_EXAM"] = {
+          id: "ADVANCE_EXAM",
+          bankCategory: "ADVANCE",
+          bankName: "理組進階大測題庫",
+          title: "理組高一數學競賽與進階測驗",
+          stem: "包含邏輯推理、參數不等式、二次函數最值等綜合大測"
+        };
       }
       initQuestionBankDictionary();
 
@@ -863,25 +909,25 @@
       const kpi1023AvgScore = document.getElementById("kpi1023AvgScore");
 
       // Filter Controls
-      const selectTimeFilter = document.getElementById("selectTimeFilter");
-      const selectDynamicDate = document.getElementById("selectDynamicDate");
+      const selectTimeFilter = document.getElementById("filterQuickTime") || document.getElementById("selectTimeFilter");
+      const selectDynamicDate = document.getElementById("filterDynamicDate") || document.getElementById("selectDynamicDate");
       const customDateRow = document.getElementById("customDateRow");
-      const inputStartDate = document.getElementById("inputStartDate");
-      const inputEndDate = document.getElementById("inputEndDate");
-      const selectDurationRange = document.getElementById("selectDurationRange");
-      const selectBankFilter = document.getElementById("selectBankFilter");
-      const selectQuestionCode = document.getElementById("selectQuestionCode");
-      const inputQuestionCodeSearch = document.getElementById("inputQuestionCodeSearch");
+      const inputStartDate = document.getElementById("filterStartDate") || document.getElementById("inputStartDate");
+      const inputEndDate = document.getElementById("filterEndDate") || document.getElementById("inputEndDate");
+      const selectDurationRange = document.getElementById("filterDurationRange") || document.getElementById("selectDurationRange");
+      const selectBankFilter = document.getElementById("filterBankCategory") || document.getElementById("selectBankFilter");
+      const selectQuestionCode = document.getElementById("filterQuestionId") || document.getElementById("selectQuestionCode");
+      const inputQuestionCodeSearch = document.getElementById("inputFilterSearch") || document.getElementById("inputQuestionCodeSearch");
       const selectGlobalClass = document.getElementById("selectGlobalClass");
       const inputGlobalSearch = document.getElementById("inputGlobalSearch");
       const filterSummaryBadge = document.getElementById("filterSummaryBadge");
 
-      const preset1023Btn = document.getElementById("preset1023Btn");
-      const presetTodayBtn = document.getElementById("presetTodayBtn");
-      const presetResetBtn = document.getElementById("presetResetBtn");
+      const preset1023Btn = document.getElementById("btnPreset1023Only") || document.getElementById("preset1023Btn");
+      const presetTodayBtn = document.getElementById("btnPresetTodayOnly") || document.getElementById("presetTodayBtn");
+      const presetResetBtn = document.getElementById("btnPresetReset") || document.getElementById("presetResetBtn");
 
       // Tab Tables
-      const tableBody1023 = document.getElementById("tableBody1023");
+      const tableBody1023 = document.getElementById("overview1023TableBody") || document.getElementById("tableBody1023");
       const tabCount1023 = document.getElementById("tabCount1023");
       const selectRosterClass = document.getElementById("selectRosterClass");
       const selectRosterStatus = document.getElementById("selectRosterStatus");
@@ -895,11 +941,12 @@
       const leaderboardTableBody = document.getElementById("leaderboardTableBody");
       const tabCountLeaderboard = document.getElementById("tabCountLeaderboard");
 
-      const attemptsTableBody = document.getElementById("attemptsTableBody");
-      const tabCountAttempts = document.getElementById("tabCountAttempts");
-      const attemptsPageInfo = document.getElementById("attemptsPageInfo");
-      const btnPrevPage = document.getElementById("btnPrevPage");
-      const btnNextPage = document.getElementById("btnNextPage");
+      const attemptsTableBody = document.getElementById("logFlowTableBody") || document.getElementById("attemptsTableBody");
+      const tabCountAttempts = document.getElementById("tabCountLogFlow") || document.getElementById("tabCountAttempts");
+      const attemptsPageInfo = document.getElementById("logFlowPageInfo") || document.getElementById("attemptsPageInfo");
+      const btnPrevPage = document.getElementById("btnPrevLogPage") || document.getElementById("btnPrevPage");
+      const btnNextPage = document.getElementById("btnNextLogPage") || document.getElementById("btnNextPage");
+      const btnExportLogFlowCSV = document.getElementById("btnExportLogFlowCSV");
 
       const studentModal = document.getElementById("studentModal");
       const modalCloseBtn = document.getElementById("modalCloseBtn");
@@ -912,7 +959,14 @@
           document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
           document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
           this.classList.add("active");
-          const target = document.getElementById(this.dataset.tab);
+          const tTab = this.dataset.tab;
+          let target = document.getElementById(tTab);
+          if (!target) {
+            if (tTab === "tab-1023-overview") target = document.getElementById("tab-1023");
+            else if (tTab === "tab-1023") target = document.getElementById("tab-1023-overview");
+            else if (tTab === "tab-logflow") target = document.getElementById("tab-attempts");
+            else if (tTab === "tab-attempts") target = document.getElementById("tab-logflow");
+          }
           if (target) target.classList.add("active");
           triggerMathJaxRender();
         });
