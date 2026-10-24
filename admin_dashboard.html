@@ -13,7 +13,13 @@
         inlineMath: [['$', '$'], ['\\(', '\\)']],
         displayMath: [['$$', '$$'], ['\\[', '\\]']]
       },
-      svg: { fontCache: 'global' }
+      svg: { fontCache: 'global' },
+      startup: {
+        ready: () => {
+          MathJax.startup.defaultReady();
+          console.log("[MathJax] MathJax 3 engine ready.");
+        }
+      }
     };
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -34,6 +40,8 @@
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --gold: #fbbf24;
+      --purple: #8b5cf6;
+      --indigo: #6366f1;
     }
 
     * {
@@ -51,7 +59,7 @@
     }
 
     .dashboard-container {
-      max-width: 1300px;
+      max-width: 1400px;
       margin: 0 auto;
     }
 
@@ -63,7 +71,7 @@
       gap: 16px;
       padding-bottom: 20px;
       border-bottom: 1px solid var(--card-border);
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .brand-title {
@@ -100,10 +108,16 @@
       transition: all 0.2s;
     }
 
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-primary:hover { background: var(--primary-hover); }
-    .btn-outline { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text-main); }
-    .btn-outline:hover { background: rgba(255, 255, 255, 0.1); }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+    }
+    .btn-outline:hover { background: #334155; }
+    .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
 
     .countdown-indicator {
       font-size: 13px;
@@ -113,11 +127,12 @@
       gap: 6px;
     }
 
+    /* KPI Grid */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 16px;
-      margin-bottom: 28px;
+      margin-bottom: 20px;
     }
 
     .kpi-card {
@@ -127,6 +142,7 @@
       padding: 18px 20px;
       display: flex;
       flex-direction: column;
+      gap: 8px;
       position: relative;
       overflow: hidden;
     }
@@ -140,52 +156,159 @@
       height: 100%;
       background: var(--primary);
     }
+
     .kpi-card.success::before { background: var(--success); }
     .kpi-card.warning::before { background: var(--warning); }
     .kpi-card.gold::before { background: var(--gold); }
+    .kpi-card.purple::before { background: var(--purple); }
 
     .kpi-title {
       font-size: 13px;
       color: var(--text-muted);
-      margin-bottom: 8px;
+      font-weight: 600;
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
     }
 
     .kpi-value {
       font-size: 28px;
-      font-weight: 700;
-      color: var(--text-main);
+      font-weight: 800;
+      letter-spacing: -0.5px;
     }
 
     .kpi-sub {
       font-size: 12px;
       color: var(--text-muted);
-      margin-top: 6px;
     }
 
-    .nav-tabs {
+    /* Dual-Dimension Real-Time Filter Card */
+    .dual-filter-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 22px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .filter-header-bar {
       display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
       gap: 10px;
-      border-bottom: 1px solid var(--card-border);
-      margin-bottom: 20px;
     }
 
-    .tab-btn {
-      padding: 10px 20px;
-      background: none;
-      border: none;
-      color: var(--text-muted);
+    .filter-title {
       font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
+      font-weight: 700;
       display: flex;
       align-items: center;
       gap: 8px;
+      color: #93c5fd;
     }
 
+    .filter-presets {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .filter-col-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .select-input, .search-input, .date-input {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .select-input:focus, .search-input:focus, .date-input:focus {
+      border-color: var(--primary);
+    }
+
+    .select-input {
+      cursor: pointer;
+      min-width: 130px;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .date-input {
+      color-scheme: dark;
+    }
+
+    .filter-summary-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #93c5fd;
+      font-size: 12px;
+    }
+
+    /* Tabs Navigation */
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover { color: var(--text-main); }
     .tab-btn.active {
       color: var(--primary);
       border-bottom-color: var(--primary);
@@ -194,144 +317,114 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    .filters-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 18px;
-      background: var(--card-bg);
-      padding: 14px 18px;
-      border-radius: 10px;
-      border: 1px solid var(--card-border);
-    }
-
-    .filter-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .filter-label {
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .select-input, .search-input {
-      background: #0f172a;
-      border: 1px solid var(--card-border);
-      color: var(--text-main);
-      padding: 7px 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      outline: none;
-    }
-
-    .search-input { min-width: 220px; }
-
+    /* Tables */
     .table-container {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 12px;
       overflow-x: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 14px;
       text-align: left;
+      font-size: 13px;
     }
 
     th {
-      background: rgba(15, 23, 42, 0.7);
-      padding: 12px 16px;
-      font-size: 12px;
-      font-weight: 600;
+      background: #172033;
       color: var(--text-muted);
-      text-transform: uppercase;
+      font-weight: 600;
+      padding: 12px 14px;
       border-bottom: 1px solid var(--card-border);
+      white-space: nowrap;
     }
 
     td {
-      padding: 12px 16px;
-      border-bottom: 1px solid rgba(51, 65, 85, 0.5);
-      color: var(--text-main);
+      padding: 12px 14px;
+      border-bottom: 1px solid #293548;
+      vertical-align: middle;
     }
 
-    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
 
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       padding: 3px 8px;
       border-radius: 6px;
       font-size: 11px;
       font-weight: 600;
     }
 
-    .badge-success {
-      background: rgba(16, 185, 129, 0.15);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
+    .badge-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-warning { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-danger { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-info { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .badge-secondary { background: #334155; color: #94a3b8; }
+    .badge-purple { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); }
 
-    .badge-secondary {
-      background: rgba(148, 163, 184, 0.1);
-      color: #94a3b8;
-      border: 1px solid rgba(148, 163, 184, 0.2);
-    }
-
+    /* Podium */
     .podium-container {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 16px;
       margin-bottom: 24px;
     }
 
-    @media (max-width: 768px) {
-      .podium-container { grid-template-columns: 1fr; }
-    }
-
     .podium-card {
       background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: 12px;
       padding: 20px;
       text-align: center;
-      border: 1px solid var(--card-border);
       position: relative;
+      overflow: hidden;
     }
 
-    .podium-card.rank-1 {
-      border-color: rgba(251, 191, 36, 0.5);
-      background: linear-gradient(180deg, rgba(251, 191, 36, 0.08) 0%, var(--card-bg) 100%);
-    }
+    .podium-card.rank-1 { border-color: #fbbf24; box-shadow: 0 0 20px rgba(251, 191, 36, 0.15); }
+    .podium-card.rank-2 { border-color: #94a3b8; box-shadow: 0 0 15px rgba(148, 163, 184, 0.1); }
+    .podium-card.rank-3 { border-color: #d97706; box-shadow: 0 0 15px rgba(217, 119, 6, 0.1); }
 
-    .podium-medal { font-size: 32px; margin-bottom: 6px; }
-    .podium-name { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
-    .podium-class { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+    .podium-medal { font-size: 32px; margin-bottom: 8px; }
+    .podium-name { font-size: 18px; font-weight: 700; }
+    .podium-class { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+    .podium-stats { display: flex; justify-content: space-around; font-size: 12px; border-top: 1px solid #334155; padding-top: 10px; }
+    .podium-stat-val { font-size: 16px; font-weight: 700; color: var(--primary); }
+    .podium-stat-lbl { color: var(--text-muted); font-size: 11px; }
 
-    .podium-stats {
+    /* Pagination controls */
+    .pagination-bar {
       display: flex;
-      justify-content: space-around;
-      background: rgba(15, 23, 42, 0.5);
-      padding: 10px;
-      border-radius: 8px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      border-top: 1px solid var(--card-border);
+      background: #172033;
+      font-size: 13px;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
-    .podium-stat-val { font-weight: 700; color: var(--primary); }
-    .podium-stat-lbl { font-size: 11px; color: var(--text-muted); }
-
+    /* Modal */
     .modal-overlay {
       position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.7);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
       backdrop-filter: blur(4px);
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
+      z-index: 9999;
       padding: 20px;
     }
 
@@ -342,10 +435,11 @@
       border: 1px solid var(--card-border);
       border-radius: 14px;
       width: 100%;
-      max-width: 800px;
-      max-height: 85vh;
+      max-width: 900px;
+      max-height: 90vh;
       display: flex;
       flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
       overflow: hidden;
     }
 
@@ -371,7 +465,7 @@
           <span>📊</span> 高中數學平臺 · 教師實時監控儀表板
         </div>
         <div class="brand-subtitle">
-          全校 88 位學生 · 實時雲端特徵同步 · 作答成績與時長監控
+          全校 88 位學生 · 1023專案作答與小測追蹤 · 實時雲端特徵同步 · 雙維度篩選分析
         </div>
       </div>
       <div class="header-actions">
@@ -386,11 +480,12 @@
           <i class="fa-solid fa-rotate"></i> 立即刷新
         </button>
         <button id="btnExportCSV" class="btn btn-outline">
-          <i class="fa-solid fa-file-csv"></i> 匯出本頁 CSV
+          <i class="fa-solid fa-file-csv"></i> 匯出作答明細 (CSV)
         </button>
       </div>
     </header>
 
+    <!-- Global KPIs (Preserved IDs for Selenium Tests) -->
     <div class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-title">全校學生總數 <i class="fa-solid fa-users"></i></div>
@@ -412,39 +507,180 @@
         <div class="kpi-value" id="kpiTotalAttempts">--</div>
         <div class="kpi-sub" id="kpiAvgAccuracy">整體正確率加載中...</div>
       </div>
+      <div class="kpi-card purple">
+        <div class="kpi-title">1023小測雲端同步 <i class="fa-solid fa-cloud-arrow-up"></i></div>
+        <div class="kpi-value" id="kpi1023SyncCount">--</div>
+        <div class="kpi-sub" id="kpi1023AvgScore">1023 小測平均得分加載中...</div>
+      </div>
     </div>
 
+    <!-- Dual-Dimension Filter Card (R2) -->
+    <div class="dual-filter-card" id="globalFilterCard">
+      <div class="filter-header-bar">
+        <div class="filter-title">
+          <i class="fa-solid fa-sliders"></i> 全校答題即時雙維度篩選器
+          <span class="filter-summary-badge" id="filterSummaryBadge">
+            <i class="fa-solid fa-filter"></i> 篩選生效中：全部數據
+          </span>
+        </div>
+        <div class="filter-presets">
+          <button class="btn btn-sm btn-outline" id="preset1023Btn">
+            🔥 僅看 1023 版答題
+          </button>
+          <button class="btn btn-sm btn-outline" id="presetTodayBtn">
+            📅 僅看今日最新 (10/24)
+          </button>
+          <button class="btn btn-sm btn-outline" id="presetResetBtn">
+            🔄 重置全部篩選
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-grid">
+        <!-- Time Dimension -->
+        <div>
+          <div class="filter-col-title">
+            <i class="fa-regular fa-clock" style="color:#60a5fa;"></i> 維度一：答題提交時間
+          </div>
+          <div class="filter-row">
+            <select id="selectTimeFilter" class="select-input" style="flex:1;">
+              <option value="ALL">全部時間 (全體歷史紀錄)</option>
+              <option value="1023_PERIOD">1023專題期間 (10/23 至今)</option>
+              <option value="TODAY">今日最新 (10/24)</option>
+              <option value="YESTERDAY">昨日記錄 (10/23)</option>
+              <option value="LAST_24H">最近 24 小時</option>
+              <option value="LAST_7D">最近 7 天</option>
+              <option value="OLD_PERIOD">舊版刷題期 (10/01~10/12)</option>
+              <option value="DYNAMIC_DATE">依指定單日過濾...</option>
+              <option value="CUSTOM_RANGE">自訂起訖日期...</option>
+            </select>
+            <select id="selectDynamicDate" class="select-input" style="display:none; flex:1;">
+              <option value="">載入動態日期清單...</option>
+            </select>
+          </div>
+          <div class="filter-row" id="customDateRow" style="display:none;">
+            <input type="date" id="inputStartDate" class="date-input" title="起始日期">
+            <span style="color:var(--text-muted); font-size:12px;">至</span>
+            <input type="date" id="inputEndDate" class="date-input" title="結束日期">
+          </div>
+          <div class="filter-row">
+            <span style="font-size:12px; color:var(--text-muted);">單題耗時：</span>
+            <select id="selectDurationRange" class="select-input" style="flex:1;">
+              <option value="ALL">全部時長</option>
+              <option value="FAST">極速作答 (&le; 15秒)</option>
+              <option value="NORMAL">常規作答 (16 ~ 120秒)</option>
+              <option value="SLOW">深度思考 (&gt; 120秒)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Question Bank Dimension -->
+        <div>
+          <div class="filter-col-title">
+            <i class="fa-solid fa-book-bookmark" style="color:#34d399;"></i> 維度二：題庫與題目編號
+          </div>
+          <div class="filter-row">
+            <select id="selectBankFilter" class="select-input" style="flex:1;">
+              <option value="ALL">全部題庫 (1023版、G10、G11、理組大測)</option>
+              <option value="1023_ALL">1023版 全部 (4CD刷題庫 + 課堂小測)</option>
+              <option value="1023_PRACTICE">1023版 專案刷題庫 (4CD_1023_Q01~Q80)</option>
+              <option value="1023_QUIZ">1023版 課堂小測 (Q01~Q20 明細與加分)</option>
+              <option value="G10">高一通用題庫 (G10_Q01~Q20, MC01~05)</option>
+              <option value="G11">高二通用題庫 (G11_Q01~Q33, MC01~02)</option>
+              <option value="ADVANCE">理組進階大測題庫 (ADVANCE_EXAM)</option>
+            </select>
+            <select id="selectQuestionCode" class="select-input" style="flex:1;">
+              <option value="ALL">全部題號</option>
+            </select>
+          </div>
+          <div class="filter-row">
+            <input type="text" id="inputQuestionCodeSearch" class="search-input" placeholder="🔍 搜尋題號編號或題幹關鍵字 (如 Q01, 二次函數)...">
+          </div>
+        </div>
+
+        <!-- Global Search Dimension -->
+        <div>
+          <div class="filter-col-title">
+            <i class="fa-solid fa-user-check" style="color:#fbbf24;"></i> 人員與班級快速定位
+          </div>
+          <div class="filter-row">
+            <select id="selectGlobalClass" class="select-input" style="flex:1;">
+              <option value="ALL">全部班級 (4C, 4D, 5B)</option>
+              <option value="4C">4C 班 (高一)</option>
+              <option value="4D">4D 班 (高一)</option>
+              <option value="5B">5B 班 (高二)</option>
+            </select>
+          </div>
+          <div class="filter-row">
+            <input type="text" id="inputGlobalSearch" class="search-input" placeholder="🔍 輸入姓名或學號快速過濾...">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
     <div class="nav-tabs">
-      <button class="tab-btn active" data-tab="tab-roster">
+      <button class="tab-btn active" data-tab="tab-1023">
+        <i class="fa-solid fa-bullseye"></i> 🎯 1023版全校答題情況與成績實時總覽 (<span id="tabCount1023">58</span>)
+      </button>
+      <button class="tab-btn" data-tab="tab-roster">
         <i class="fa-solid fa-id-badge"></i> 👤 雲端人臉登記在庫清單 (<span id="tabCountRoster">88</span>)
       </button>
       <button class="tab-btn" data-tab="tab-leaderboard">
         <i class="fa-solid fa-trophy"></i> 🏆 全體實時作答排行榜 (<span id="tabCountLeaderboard">0</span>)
       </button>
+      <button class="tab-btn" data-tab="tab-attempts">
+        <i class="fa-solid fa-clock-rotate-left"></i> 🕒 全校答題實時流水與題庫編號分析 (<span id="tabCountAttempts">0</span>)
+      </button>
     </div>
 
-    <div id="tab-roster" class="tab-content active">
-      <div class="filters-bar">
-        <div class="filter-group">
-          <span class="filter-label">班級：</span>
-          <select id="selectRosterClass" class="select-input">
-            <option value="ALL">全部班級</option>
-            <option value="4C">4C 班 (高一)</option>
-            <option value="4D">4D 班 (高一)</option>
-            <option value="5B">5B 班 (高二)</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <span class="filter-label">登記狀態：</span>
-          <select id="selectRosterStatus" class="select-input">
-            <option value="ALL">全部狀態</option>
-            <option value="REGISTERED">僅看已登記</option>
-            <option value="UNREGISTERED">僅看未登記</option>
-          </select>
-        </div>
-        <div class="filter-group" style="margin-left: auto;">
-          <input type="text" id="inputRosterSearch" class="search-input" placeholder="🔍 搜尋學生姓名或學號...">
-        </div>
+    <!-- Tab 1: 1023 School-wide Score & Quiz Overview Tab (R1) -->
+    <div id="tab-1023" class="tab-content active">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>班級</th>
+              <th>學號</th>
+              <th>姓名</th>
+              <th>1023小測原分</th>
+              <th>折算成績</th>
+              <th>線上刷題累計加分</th>
+              <th>折算總分 (80分上限)</th>
+              <th>1023刷題題數</th>
+              <th>刷題正確率</th>
+              <th>雲端實時同步狀態</th>
+              <th>小測詳情</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody1023">
+            <tr>
+              <td colspan="11" style="text-align: center; padding: 30px; color: var(--text-muted);">
+                <i class="fa-solid fa-spinner fa-spin"></i> 正在解密載入 1023 版學生成績與小測數據...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 2: Roster Tab (Preserved for Selenium Test 1) -->
+    <div id="tab-roster" class="tab-content">
+      <div class="filters-bar" style="margin-bottom:12px; display:flex; gap:10px; align-items:center;">
+        <span style="font-size:13px; color:var(--text-muted);">班級篩選：</span>
+        <select id="selectRosterClass" class="select-input">
+          <option value="ALL">全部班級</option>
+          <option value="4C">4C 班 (高一)</option>
+          <option value="4D">4D 班 (高一)</option>
+          <option value="5B">5B 班 (高二)</option>
+        </select>
+        <span style="font-size:13px; color:var(--text-muted); margin-left:8px;">登記狀態：</span>
+        <select id="selectRosterStatus" class="select-input">
+          <option value="ALL">全部狀態</option>
+          <option value="REGISTERED">僅看已登記</option>
+          <option value="UNREGISTERED">僅看未登記</option>
+        </select>
+        <input type="text" id="inputRosterSearch" class="search-input" placeholder="🔍 搜尋學生姓名或學號..." style="margin-left:auto; max-width:250px;">
       </div>
 
       <div class="table-container">
@@ -472,19 +708,16 @@
       </div>
     </div>
 
+    <!-- Tab 3: Leaderboard Tab (Preserved for Selenium Test 2) -->
     <div id="tab-leaderboard" class="tab-content">
-      <div class="filters-bar">
-        <div class="filter-group">
-          <span class="filter-label">組別：</span>
-          <select id="selectLeaderboardGrade" class="select-input">
-            <option value="ALL">全校綜合排名 (4C, 4D, 5B)</option>
-            <option value="G10">高一組 (4C, 4D)</option>
-            <option value="G11">高二組 (5B)</option>
-          </select>
-        </div>
-        <div class="filter-group" style="margin-left: auto;">
-          <input type="text" id="inputLeaderboardSearch" class="search-input" placeholder="🔍 搜尋榜單學生...">
-        </div>
+      <div class="filters-bar" style="margin-bottom:12px; display:flex; gap:10px; align-items:center;">
+        <span style="font-size:13px; color:var(--text-muted);">組別篩選：</span>
+        <select id="selectLeaderboardGrade" class="select-input">
+          <option value="ALL">全校綜合排名 (4C, 4D, 5B)</option>
+          <option value="G10">高一組 (4C, 4D)</option>
+          <option value="G11">高二組 (5B)</option>
+        </select>
+        <input type="text" id="inputLeaderboardSearch" class="search-input" placeholder="🔍 搜尋榜單學生..." style="margin-left:auto; max-width:250px;">
       </div>
 
       <div class="podium-container" id="podiumContainer"></div>
@@ -509,15 +742,53 @@
           <tbody id="leaderboardTableBody">
             <tr>
               <td colspan="11" style="text-align: center; padding: 30px; color: var(--text-muted);">
-                <i class="fa-solid fa-spinner fa-spin"></i> 正在自 Google 試算表讀取排行榜...
+                <i class="fa-solid fa-spinner fa-spin"></i> 正在讀取排行榜...
               </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
+
+    <!-- Tab 4: Real-time Attempts Stream (R3) -->
+    <div id="tab-attempts" class="tab-content">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>序號</th>
+              <th>提交時間</th>
+              <th>班級</th>
+              <th>學號</th>
+              <th>姓名</th>
+              <th>題庫版本</th>
+              <th>題目識別碼</th>
+              <th>題目摘要 / 題幹</th>
+              <th>得分</th>
+              <th>作答耗時</th>
+              <th>當時正確率</th>
+            </tr>
+          </thead>
+          <tbody id="attemptsTableBody">
+            <tr>
+              <td colspan="11" style="text-align: center; padding: 30px; color: var(--text-muted);">
+                <i class="fa-solid fa-spinner fa-spin"></i> 載入符合條件的作答紀錄流水中...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination-bar" id="attemptsPaginationBar">
+          <span id="attemptsPageInfo">顯示第 1 至 50 筆，共 0 筆紀錄</span>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-sm btn-outline" id="btnPrevPage">上一頁</button>
+            <button class="btn btn-sm btn-outline" id="btnNextPage">下一頁</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <!-- Student Detail Drilldown Modal (Preserved for Selenium Test 3) -->
   <div id="studentModal" class="modal-overlay">
     <div class="modal-box">
       <div class="modal-header">
@@ -528,20 +799,57 @@
     </div>
   </div>
 
+  <!-- External Data & Logic Scripts -->
   <script src="js/roster.js"></script>
   <script src="js/admin_snapshot.js"></script>
+  <script src="js/quiz1023_encrypted_store.js"></script>
+  <script src="js/questions_4cd1023.js"></script>
+  <script src="js/questions_g10.js"></script>
+  <script src="js/questions_g11.js"></script>
 
+  <!-- Main Dashboard Application Logic -->
   <script>
     (function () {
       const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwNAQNxmNsNa8rWGp48qnYRrjA2WFLGIzKqSel2r8MilRp59s3ZfBJjeKXIrUfoS-Zp-g/exec";
       let countdownSec = 60;
       let countdownTimer = null;
 
+      // Master Datastores
       let rawData = [];
       let parsedFaces = {};
       let studentAttempts = {};
       let allAttempts = [];
+      let cloudQuiz1023Sync = {}; // { '4C_1': { base, bonus, final, ts, timestamp } }
+      let questionBankDictionary = {};
 
+      // Pagination State for Attempts Log
+      let currentLogPage = 1;
+      const LOG_PAGE_SIZE = 50;
+
+      // Build question bank dictionary for fast title / stem lookup
+      function initQuestionBankDictionary() {
+        // 1023 Question Bank
+        if (typeof window.QUESTIONS_4CD_1023 !== "undefined" && Array.isArray(window.QUESTIONS_4CD_1023)) {
+          window.QUESTIONS_4CD_1023.forEach(q => {
+            if (q && q.id) questionBankDictionary[q.id] = q.stem || q.title || `1023 題目 ${q.id}`;
+          });
+        }
+        // G10 Question Bank
+        if (typeof window.QUESTIONS_G10 !== "undefined" && Array.isArray(window.QUESTIONS_G10)) {
+          window.QUESTIONS_G10.forEach(q => {
+            if (q && q.id) questionBankDictionary[q.id] = q.title || q.stem || `G10 題目 ${q.id}`;
+          });
+        }
+        // G11 Question Bank
+        if (typeof window.QUESTIONS_G11 !== "undefined" && Array.isArray(window.QUESTIONS_G11)) {
+          window.QUESTIONS_G11.forEach(q => {
+            if (q && q.id) questionBankDictionary[q.id] = q.title || q.stem || `G11 題目 ${q.id}`;
+          });
+        }
+      }
+      initQuestionBankDictionary();
+
+      // DOM Elements Selection
       const btnManualRefresh = document.getElementById("btnManualRefresh");
       const btnExportCSV = document.getElementById("btnExportCSV");
       const countdownText = document.getElementById("countdownText");
@@ -551,7 +859,30 @@
       const kpiParticipantPct = document.getElementById("kpiParticipantPct");
       const kpiTotalAttempts = document.getElementById("kpiTotalAttempts");
       const kpiAvgAccuracy = document.getElementById("kpiAvgAccuracy");
+      const kpi1023SyncCount = document.getElementById("kpi1023SyncCount");
+      const kpi1023AvgScore = document.getElementById("kpi1023AvgScore");
 
+      // Filter Controls
+      const selectTimeFilter = document.getElementById("selectTimeFilter");
+      const selectDynamicDate = document.getElementById("selectDynamicDate");
+      const customDateRow = document.getElementById("customDateRow");
+      const inputStartDate = document.getElementById("inputStartDate");
+      const inputEndDate = document.getElementById("inputEndDate");
+      const selectDurationRange = document.getElementById("selectDurationRange");
+      const selectBankFilter = document.getElementById("selectBankFilter");
+      const selectQuestionCode = document.getElementById("selectQuestionCode");
+      const inputQuestionCodeSearch = document.getElementById("inputQuestionCodeSearch");
+      const selectGlobalClass = document.getElementById("selectGlobalClass");
+      const inputGlobalSearch = document.getElementById("inputGlobalSearch");
+      const filterSummaryBadge = document.getElementById("filterSummaryBadge");
+
+      const preset1023Btn = document.getElementById("preset1023Btn");
+      const presetTodayBtn = document.getElementById("presetTodayBtn");
+      const presetResetBtn = document.getElementById("presetResetBtn");
+
+      // Tab Tables
+      const tableBody1023 = document.getElementById("tableBody1023");
+      const tabCount1023 = document.getElementById("tabCount1023");
       const selectRosterClass = document.getElementById("selectRosterClass");
       const selectRosterStatus = document.getElementById("selectRosterStatus");
       const inputRosterSearch = document.getElementById("inputRosterSearch");
@@ -564,11 +895,18 @@
       const leaderboardTableBody = document.getElementById("leaderboardTableBody");
       const tabCountLeaderboard = document.getElementById("tabCountLeaderboard");
 
+      const attemptsTableBody = document.getElementById("attemptsTableBody");
+      const tabCountAttempts = document.getElementById("tabCountAttempts");
+      const attemptsPageInfo = document.getElementById("attemptsPageInfo");
+      const btnPrevPage = document.getElementById("btnPrevPage");
+      const btnNextPage = document.getElementById("btnNextPage");
+
       const studentModal = document.getElementById("studentModal");
       const modalCloseBtn = document.getElementById("modalCloseBtn");
       const modalStudentTitle = document.getElementById("modalStudentTitle");
       const modalStudentBody = document.getElementById("modalStudentBody");
 
+      // Tab Switching
       document.querySelectorAll(".tab-btn").forEach(btn => {
         btn.addEventListener("click", function () {
           document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
@@ -576,6 +914,7 @@
           this.classList.add("active");
           const target = document.getElementById(this.dataset.tab);
           if (target) target.classList.add("active");
+          triggerMathJaxRender();
         });
       });
 
@@ -583,7 +922,6 @@
         const badge = document.getElementById("cloudSyncStatusBadge");
         const text = document.getElementById("cloudSyncStatusText");
         if (!badge || !text) return;
-
         text.textContent = message;
 
         if (type === "SYNCING") {
@@ -597,7 +935,6 @@
           badge.style.border = "1px solid rgba(16, 185, 129, 0.3)";
           badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span id="cloudSyncStatusText">${message}</span>`;
         } else {
-          // FALLBACK / CACHE / SNAPSHOT
           badge.style.background = "rgba(245, 158, 11, 0.15)";
           badge.style.color = "#fbbf24";
           badge.style.border = "1px solid rgba(245, 158, 11, 0.3)";
@@ -605,6 +942,15 @@
         }
       }
 
+      function triggerMathJaxRender() {
+        if (window.MathJax && typeof window.MathJax.typesetPromise === "function") {
+          window.MathJax.typesetPromise().catch(err => {
+            console.warn("[MathJax] Typeset error:", err);
+          });
+        }
+      }
+
+      // Initial Data Loading
       function loadInitialData() {
         try {
           const cached = localStorage.getItem("ADMIN_DASHBOARD_CACHE");
@@ -626,12 +972,13 @@
         }
       }
 
+      // Background Cloud Sync via Google Apps Script
       async function loadData() {
         btnManualRefresh.disabled = true;
         btnManualRefresh.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 同步中...';
         updateSyncStatus("SYNCING", "正在同步雲端最新數據...");
 
-        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
         let timeoutId = null;
         if (controller) {
           timeoutId = setTimeout(() => controller.abort(), 45000);
@@ -670,7 +1017,7 @@
             updateSyncStatus("FALLBACK", "雲端連線較慢，目前顯示快取數據");
           } else {
             loadInitialData();
-            updateSyncStatus("FALLBACK", "雲端連線異常，已載入本機備份數據");
+            updateSyncStatus("FALLBACK", "雲端連線異常，已載入備份數據");
           }
         } finally {
           btnManualRefresh.disabled = false;
@@ -679,10 +1026,15 @@
         }
       }
 
+      // Process and Parse Raw Telemetry Data
       function processData() {
         parsedFaces = {};
         studentAttempts = {};
         allAttempts = [];
+        cloudQuiz1023Sync = {};
+
+        const uniqueDates = new Set();
+        const uniqueQuestionCodes = new Set();
 
         rawData.forEach(row => {
           const cid = String(row.classID || "").trim().toUpperCase();
@@ -691,11 +1043,45 @@
 
           const did = String(row.dateID || "").trim();
           const ts = String(row.Timestamp || "").trim();
+          const k = `${cid}_${sid}`;
 
+          if (ts) {
+            const dateStr = ts.slice(0, 10);
+            if (dateStr.length === 10) uniqueDates.add(dateStr);
+          }
+
+          // 1. Check for 1023_QUIZ_SCORE first before |TS: face check
+          if (did.includes("1023_QUIZ_SCORE")) {
+            let base = 0, bonus = 0, final = 0, syncTs = 0;
+            const bMatch = did.match(/BASE:(\d+(\.\d+)?)/);
+            if (bMatch) base = parseFloat(bMatch[1]);
+            const boMatch = did.match(/BONUS:(\d+(\.\d+)?)/);
+            if (boMatch) bonus = parseFloat(boMatch[1]);
+            const fMatch = did.match(/FINAL:(\d+(\.\d+)?)/);
+            if (fMatch) final = parseFloat(fMatch[1]);
+            const tMatch = did.match(/TS:(\d+)/);
+            if (tMatch) syncTs = parseInt(tMatch[1], 10);
+
+            if (!cloudQuiz1023Sync[k] || syncTs > cloudQuiz1023Sync[k].syncTs) {
+              cloudQuiz1023Sync[k] = {
+                classID: cid,
+                studentID: sid,
+                baseScore: base,
+                bonusScore: bonus,
+                finalScore: final,
+                syncTs: syncTs,
+                timestamp: ts
+              };
+            }
+            return;
+          }
+
+          // 2. Ignore Password records
           if (did.startsWith("PWD") || did.startsWith("PASSWORD")) {
             return;
           }
 
+          // 3. Face Registration Records
           if (did.includes("|TS:")) {
             let tsVal = 0;
             let ver = 1;
@@ -706,7 +1092,6 @@
               }
             } catch (e) {}
 
-            const k = `${cid}_${sid}`;
             if (!parsedFaces[k] || tsVal > parsedFaces[k].tsVal) {
               parsedFaces[k] = {
                 tsVal: tsVal,
@@ -718,11 +1103,13 @@
             return;
           }
 
+          // 4. Ignore Telemetry Anti-cheat pings
           if (did.startsWith("KICKOUT") || did.startsWith("TAB_SWITCH") || did.startsWith("SCREENSHOT")) {
             return;
           }
 
-          const score = Number(row.score) || 0;
+          // 5. Practice Attempts
+          const score = Number(row.score !== undefined ? row.score : row.Score) || 0;
           let dur = 0;
           const durMatch = did.match(/_T(\d+)s_/);
           if (durMatch) dur = parseInt(durMatch[1], 10);
@@ -731,26 +1118,67 @@
           const accMatch = did.match(/_ACC(\d+)/);
           if (accMatch) acc = parseInt(accMatch[1], 10);
 
+          const qCode = did.split("_T")[0];
+          uniqueQuestionCodes.add(qCode);
+
+          let bankCategory = "OTHER";
+          if (did.includes("1023") || did.includes("4CD_1023")) {
+            bankCategory = "1023";
+          } else if (did.startsWith("G10")) {
+            bankCategory = "G10";
+          } else if (did.startsWith("G11")) {
+            bankCategory = "G11";
+          } else if (did.startsWith("ADVANCE")) {
+            bankCategory = "ADVANCE";
+          }
+
+          // 1023 questions score > 0 is correct; G10/G11 score >= 100 is correct
+          const isCorrect = bankCategory === "1023" ? score > 0 : score >= 100;
+
           const attempt = {
             classID: cid,
             studentID: sid,
             timestamp: ts,
             dateID: did,
+            questionCode: qCode,
+            bankCategory: bankCategory,
             score: score,
-            isCorrect: score >= 100,
+            isCorrect: isCorrect,
             duration: dur,
             accuracy: acc
           };
 
           allAttempts.push(attempt);
-          const k = `${cid}_${sid}`;
           if (!studentAttempts[k]) studentAttempts[k] = [];
           studentAttempts[k].push(attempt);
         });
 
+        populateDynamicFilterOptions(uniqueDates, uniqueQuestionCodes);
         updateKPIs();
-        renderRoster();
-        renderLeaderboard();
+        renderAllViews();
+      }
+
+      function populateDynamicFilterOptions(datesSet, qCodesSet) {
+        // Dynamic dates dropdown
+        const sortedDates = Array.from(datesSet).sort().reverse();
+        selectDynamicDate.innerHTML = '<option value="">-- 請選擇指定單日 --</option>';
+        sortedDates.forEach(d => {
+          const opt = document.createElement("option");
+          opt.value = d;
+          opt.textContent = `📅 ${d}`;
+          selectDynamicDate.appendChild(opt);
+        });
+
+        // Dynamic question codes dropdown
+        const sortedCodes = Array.from(qCodesSet).sort();
+        selectQuestionCode.innerHTML = '<option value="ALL">全部具體題號</option>';
+        sortedCodes.forEach(c => {
+          if (!c) return;
+          const opt = document.createElement("option");
+          opt.value = c;
+          opt.textContent = c;
+          selectQuestionCode.appendChild(opt);
+        });
       }
 
       function updateKPIs() {
@@ -769,8 +1197,327 @@
 
         kpiTotalAttempts.textContent = totalAttemptsCount;
         kpiAvgAccuracy.textContent = `作答正確率 ${overallAcc}%`;
+
+        // 1023 Specific KPI
+        const syncKeys = Object.keys(cloudQuiz1023Sync);
+        kpi1023SyncCount.textContent = `${syncKeys.length} / 58`;
+        if (syncKeys.length > 0) {
+          const sumScore = syncKeys.reduce((acc, k) => acc + (cloudQuiz1023Sync[k].finalScore || 0), 0);
+          const avgScore = (sumScore / syncKeys.length).toFixed(1);
+          kpi1023AvgScore.textContent = `折算均分 ${avgScore} 分`;
+        } else {
+          kpi1023AvgScore.textContent = `折算均分 0.0 分`;
+        }
       }
 
+      // Check whether an attempt satisfies the dual-dimension filter
+      function matchesFilters(att) {
+        const tFilter = selectTimeFilter.value;
+        const ts = att.timestamp || "";
+
+        // Time dimension
+        if (tFilter === "1023_PERIOD") {
+          if (!ts.startsWith("2026-10-23") && !ts.startsWith("2026-10-24")) return false;
+        } else if (tFilter === "TODAY") {
+          if (!ts.startsWith("2026-10-24")) return false;
+        } else if (tFilter === "YESTERDAY") {
+          if (!ts.startsWith("2026-10-23")) return false;
+        } else if (tFilter === "LAST_24H") {
+          const attTime = new Date(ts).getTime();
+          const now = new Date("2026-10-24T15:00:00Z").getTime();
+          if (isNaN(attTime) || (now - attTime) > 24 * 3600 * 1000) return false;
+        } else if (tFilter === "LAST_7D") {
+          const attTime = new Date(ts).getTime();
+          const now = new Date("2026-10-24T15:00:00Z").getTime();
+          if (isNaN(attTime) || (now - attTime) > 7 * 24 * 3600 * 1000) return false;
+        } else if (tFilter === "OLD_PERIOD") {
+          const dStr = ts.slice(0, 10);
+          if (dStr > "2026-10-15") return false;
+        } else if (tFilter === "DYNAMIC_DATE") {
+          const selDate = selectDynamicDate.value;
+          if (selDate && !ts.startsWith(selDate)) return false;
+        } else if (tFilter === "CUSTOM_RANGE") {
+          const s = inputStartDate.value;
+          const e = inputEndDate.value;
+          const dStr = ts.slice(0, 10);
+          if (s && dStr < s) return false;
+          if (e && dStr > e) return false;
+        }
+
+        // Duration dimension
+        const durFilter = selectDurationRange.value;
+        if (durFilter === "FAST" && (att.duration <= 0 || att.duration > 15)) return false;
+        if (durFilter === "NORMAL" && (att.duration < 16 || att.duration > 120)) return false;
+        if (durFilter === "SLOW" && att.duration <= 120) return false;
+
+        // Question bank category dimension
+        const bankFilter = selectBankFilter.value;
+        if (bankFilter === "1023_ALL") {
+          if (att.bankCategory !== "1023") return false;
+        } else if (bankFilter === "1023_PRACTICE") {
+          if (!att.dateID.includes("4CD_1023") && !att.dateID.includes("1023_PRACTICE")) return false;
+        } else if (bankFilter === "1023_QUIZ") {
+          if (!att.dateID.includes("1023_QUIZ")) return false;
+        } else if (bankFilter === "G10") {
+          if (att.bankCategory !== "G10") return false;
+        } else if (bankFilter === "G11") {
+          if (att.bankCategory !== "G11") return false;
+        } else if (bankFilter === "ADVANCE") {
+          if (att.bankCategory !== "ADVANCE") return false;
+        }
+
+        // Specific question code
+        const codeFilter = selectQuestionCode.value;
+        if (codeFilter !== "ALL" && att.questionCode !== codeFilter) return false;
+
+        // Question keyword search
+        const qKeyword = inputQuestionCodeSearch.value.trim().toLowerCase();
+        if (qKeyword) {
+          const stem = (questionBankDictionary[att.questionCode] || "").toLowerCase();
+          const matchCode = att.questionCode.toLowerCase().includes(qKeyword);
+          const matchStem = stem.includes(qKeyword);
+          if (!matchCode && !matchStem) return false;
+        }
+
+        // Global student/class search
+        const classFilter = selectGlobalClass.value;
+        if (classFilter !== "ALL" && att.classID !== classFilter) return false;
+
+        const gKeyword = inputGlobalSearch.value.trim().toLowerCase();
+        if (gKeyword) {
+          const sName = (window.getStudentName ? window.getStudentName(att.classID, att.studentID) : "").toLowerCase();
+          const matchName = sName.includes(gKeyword);
+          const matchId = String(att.studentID).includes(gKeyword);
+          if (!matchName && !matchId) return false;
+        }
+
+        return true;
+      }
+
+      function updateFilterSummaryBadge() {
+        const parts = [];
+        if (selectTimeFilter.value !== "ALL") parts.push(`時間: ${selectTimeFilter.options[selectTimeFilter.selectedIndex].text.split(' ')[0]}`);
+        if (selectBankFilter.value !== "ALL") parts.push(`題庫: ${selectBankFilter.options[selectBankFilter.selectedIndex].text.split(' ')[0]}`);
+        if (selectGlobalClass.value !== "ALL") parts.push(`班級: ${selectGlobalClass.value}`);
+        if (inputGlobalSearch.value.trim()) parts.push(`人員: "${inputGlobalSearch.value.trim()}"`);
+        if (inputQuestionCodeSearch.value.trim()) parts.push(`題目: "${inputQuestionCodeSearch.value.trim()}"`);
+
+        if (parts.length === 0) {
+          filterSummaryBadge.innerHTML = '<i class="fa-solid fa-filter"></i> 篩選生效中：全體歷史紀錄';
+        } else {
+          filterSummaryBadge.innerHTML = `<i class="fa-solid fa-filter"></i> 已套用 ${parts.join(" | ")}`;
+        }
+      }
+
+      function renderAllViews() {
+        updateFilterSummaryBadge();
+        render1023Tab();
+        renderRoster();
+        renderLeaderboard();
+        renderAttemptsStream();
+        triggerMathJaxRender();
+      }
+
+      // Render Tab 1: 1023 School-wide Score & Quiz Overview
+      function render1023Tab() {
+        const roster = window.ROSTER_DATA || {};
+        const selectedClass = selectGlobalClass.value;
+        const searchKeyword = inputGlobalSearch.value.trim().toLowerCase();
+
+        let list = [];
+        const targetClasses = ["4C", "4D"];
+
+        targetClasses.forEach(cid => {
+          if (selectedClass !== "ALL" && selectedClass !== cid) return;
+          const students = roster[cid] || [];
+          students.forEach(s => {
+            const sid = s.id;
+            const k = `${cid}_${sid}`;
+
+            if (searchKeyword) {
+              const matchName = s.name.toLowerCase().includes(searchKeyword);
+              const matchId = String(sid).includes(searchKeyword);
+              if (!matchName && !matchId) return;
+            }
+
+            // Decrypt 1023 Quiz record
+            let decRecord = null;
+            if (window.getStudentQuiz1023Record) {
+              try {
+                decRecord = window.getStudentQuiz1023Record({ classID: cid, studentID: sid, name: s.name });
+              } catch (e) {
+                console.warn("[1023 Store] Decrypt error for", cid, sid, e);
+              }
+            }
+
+            const rawScore = decRecord ? (decRecord.origTotal !== undefined ? decRecord.origTotal : (decRecord.quizRawScore || 0)) : 0;
+            const convertedScore = decRecord ? (decRecord.newTotal !== undefined ? decRecord.newTotal : (decRecord.convertedScore || 0)) : 0;
+
+            // Practice attempts in 1023 bank
+            const studentAllAttempts = studentAttempts[k] || [];
+            const pAttempts = studentAllAttempts.filter(a => a.bankCategory === "1023" && matchesFilters(a));
+            const pCorrect = pAttempts.filter(a => a.isCorrect).length;
+            const pAcc = pAttempts.length > 0 ? Math.round((pCorrect / pAttempts.length) * 100) : 0;
+            
+            // Practice bonus points (+1 pt for every 3 correct practice questions, up to max +10 pts)
+            const practiceBonus = Math.min(10, Math.floor(pCorrect / 3));
+            
+            // Final score capped at 80
+            const calculatedFinal = Math.min(80, Math.round(convertedScore + practiceBonus));
+
+            // Cloud sync state from GAS
+            const cloudSync = cloudQuiz1023Sync[k];
+            const isSynced = !!cloudSync;
+            const syncTime = isSynced && cloudSync.timestamp ? cloudSync.timestamp.replace("T", " ").replace(".000Z", "") : null;
+
+            list.push({
+              classID: cid,
+              studentID: sid,
+              name: s.name,
+              candId: decRecord ? decRecord.candId : "",
+              rawScore: rawScore,
+              convertedScore: convertedScore,
+              bonusScore: practiceBonus,
+              finalScore: calculatedFinal,
+              attemptsCount: pAttempts.length,
+              accuracy: pAcc,
+              isSynced: isSynced,
+              syncTime: syncTime,
+              decRecord: decRecord,
+              attempts: pAttempts
+            });
+          });
+        });
+
+        // Add 5B_99 or test records if they participated
+        if (cloudQuiz1023Sync["5B_99"] && (selectedClass === "ALL" || selectedClass === "5B")) {
+          const rec = cloudQuiz1023Sync["5B_99"];
+          list.push({
+            classID: "5B",
+            studentID: 99,
+            name: "測試員 / 體驗帳號",
+            candId: "TEST99",
+            rawScore: 0,
+            convertedScore: 0,
+            bonusScore: 0,
+            finalScore: rec.finalScore || 0,
+            attemptsCount: 0,
+            accuracy: 0,
+            isSynced: true,
+            syncTime: rec.timestamp ? rec.timestamp.replace("T", " ").replace(".000Z", "") : "-",
+            decRecord: null,
+            attempts: []
+          });
+        }
+
+        tabCount1023.textContent = list.length;
+        tableBody1023.innerHTML = "";
+
+        if (list.length === 0) {
+          tableBody1023.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:25px; color:var(--text-muted);">無符合條件之 1023 學生資料</td></tr>';
+          return;
+        }
+
+        list.forEach(item => {
+          const tr = document.createElement("tr");
+          const syncBadge = item.isSynced
+            ? `<span class="badge badge-success" title="雲端同步時間: ${item.syncTime}"><i class="fa-solid fa-cloud-arrow-up"></i> ☁️ 已同步</span>`
+            : '<span class="badge badge-secondary"><i class="fa-solid fa-cloud"></i> ⏳ 待同步 / 離線</span>';
+
+          const scoreColor = item.finalScore >= 60 ? "#34d399" : (item.finalScore >= 40 ? "#fbbf24" : "#f87171");
+
+          tr.innerHTML = `
+            <td><strong>${item.classID}</strong></td>
+            <td>${item.studentID} 號</td>
+            <td><strong>${item.name}</strong></td>
+            <td><span style="font-family:monospace;">${item.rawScore}</span> / 50</td>
+            <td><strong>${item.convertedScore}</strong></td>
+            <td><span style="color:#60a5fa; font-weight:600;">+${item.bonusScore}</span></td>
+            <td><strong style="color:${scoreColor}; font-size:15px;">${item.finalScore}</strong> <small style="color:var(--text-muted);">/ 80</small></td>
+            <td><strong>${item.attemptsCount}</strong> 題</td>
+            <td><span style="color:#34d399; font-weight:600;">${item.accuracy}%</span></td>
+            <td>${syncBadge}</td>
+            <td>
+              <button class="btn btn-outline btn-sm" onclick="window.viewStudent1023QuizDetails('${item.classID}', ${item.studentID})">
+                <i class="fa-solid fa-eye"></i> 查看 20 題
+              </button>
+            </td>
+          `;
+          tableBody1023.appendChild(tr);
+        });
+      }
+
+      // View 1023 Student 20-Question Breakdown in Modal
+      window.viewStudent1023QuizDetails = function (cid, sid) {
+        const roster = window.ROSTER_DATA || {};
+        const studentObj = (roster[cid] || []).find(s => s.id === sid);
+        const sName = studentObj ? studentObj.name : `學生 ${sid}`;
+
+        let dec = null;
+        if (window.getStudentQuiz1023Record) {
+          try {
+            dec = window.getStudentQuiz1023Record({ classID: cid, studentID: sid, name: sName });
+          } catch (e) {}
+        }
+
+        modalStudentTitle.textContent = `${cid} 班 ${sid} 號 ${sName} - 1023 課堂小測詳細作答 (20題)`;
+
+        if (!dec || !dec.details || dec.details.length === 0) {
+          modalStudentBody.innerHTML = `
+            <div style="padding:20px; text-align:center; color:var(--text-muted);">
+              <i class="fa-solid fa-circle-exclamation" style="font-size:24px; color:#f59e0b; margin-bottom:8px;"></i>
+              <p>查無該學生 1023 課堂小測加密紀錄或該學生非 4C/4D 參測名單。</p>
+            </div>
+          `;
+          studentModal.classList.add("active");
+          return;
+        }
+
+        let html = `
+          <div style="display:flex; justify-content:space-between; margin-bottom:14px; background:#0f172a; padding:12px 16px; border-radius:8px; border:1px solid #334155;">
+            <div>考生編號：<strong>${dec.candId || "-"}</strong></div>
+            <div>小測原分：<strong>${dec.origTotal || 0} / 50</strong></div>
+            <div>折算得分：<strong style="color:#34d399;">${dec.newTotal || 0} 分</strong></div>
+          </div>
+          <table style="width:100%; border-collapse:collapse; font-size:13px;">
+            <thead>
+              <tr style="background:#0f172a;">
+                <th style="padding:8px;">題號</th>
+                <th style="padding:8px;">原始得分</th>
+                <th style="padding:8px;">折算得分</th>
+                <th style="padding:8px;">作答判定</th>
+                <th style="padding:8px;">題目考點</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        dec.details.forEach(item => {
+          let statusBadge = '<span class="badge badge-danger">錯誤</span>';
+          if (item.status === "full" || item.newScore >= 4) {
+            statusBadge = '<span class="badge badge-success">完全答對</span>';
+          } else if (item.status === "partial" || item.newScore > 0) {
+            statusBadge = '<span class="badge badge-warning">部分得分</span>';
+          }
+
+          html += `
+            <tr style="border-bottom:1px solid #334155;">
+              <td style="padding:8px;"><strong>第 ${item.qNum || item.q_num} 題</strong></td>
+              <td style="padding:8px;">${item.origScore !== undefined ? item.origScore : item.rawScore} 分</td>
+              <td style="padding:8px; font-weight:bold; color:var(--primary);">${item.newScore} 分</td>
+              <td style="padding:8px;">${statusBadge}</td>
+              <td style="padding:8px; color:var(--text-muted);">1023 必修基礎概念 (Q${item.qNum || item.q_num})</td>
+            </tr>
+          `;
+        });
+
+        html += `</tbody></table>`;
+        modalStudentBody.innerHTML = html;
+        studentModal.classList.add("active");
+        triggerMathJaxRender();
+      };
+
+      // Render Tab 2: Roster Table (Preserved for Selenium Test 1)
       function renderRoster() {
         const roster = window.ROSTER_DATA || {};
         const selectedClass = selectRosterClass.value;
@@ -838,14 +1585,20 @@
         });
       }
 
+      // Render Tab 3: Leaderboard (Preserved for Selenium Test 2)
       function renderLeaderboard() {
         const gradeFilter = selectLeaderboardGrade.value;
         const searchKeyword = inputLeaderboardSearch.value.trim().toLowerCase();
 
         let list = [];
         for (const k in studentAttempts) {
-          const atts = studentAttempts[k];
-          if (!atts || atts.length === 0) continue;
+          const allAtts = studentAttempts[k];
+          if (!allAtts || allAtts.length === 0) continue;
+
+          // Filter attempts for this student
+          const atts = allAtts.filter(matchesFilters);
+          if (atts.length === 0) continue;
+
           const cid = atts[0].classID;
           const sid = atts[0].studentID;
           const sName = window.getStudentName ? window.getStudentName(cid, sid) : `學生 ${sid}`;
@@ -856,7 +1609,7 @@
           if (searchKeyword) {
             const matchName = sName.toLowerCase().includes(searchKeyword);
             const matchId = String(sid).includes(searchKeyword);
-            if (!matchName && !matchId) return;
+            if (!matchName && !matchId) continue;
           }
 
           const total = atts.length;
@@ -916,7 +1669,7 @@
 
         leaderboardTableBody.innerHTML = "";
         if (list.length === 0) {
-          leaderboardTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 25px; color: var(--text-muted);">無作答數據</td></tr>';
+          leaderboardTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 25px; color: var(--text-muted);">無符合篩選條件之作答數據</td></tr>';
           return;
         }
 
@@ -945,9 +1698,80 @@
         });
       }
 
+      // Render Tab 4: Practice Attempts Stream (R3)
+      function renderAttemptsStream() {
+        const filtered = allAttempts.filter(matchesFilters);
+        tabCountAttempts.textContent = filtered.length;
+
+        const totalPages = Math.max(1, Math.ceil(filtered.length / LOG_PAGE_SIZE));
+        if (currentLogPage > totalPages) currentLogPage = totalPages;
+        if (currentLogPage < 1) currentLogPage = 1;
+
+        const startIdx = (currentLogPage - 1) * LOG_PAGE_SIZE;
+        const pageItems = filtered.slice(startIdx, startIdx + LOG_PAGE_SIZE);
+
+        attemptsPageInfo.textContent = `顯示第 ${filtered.length > 0 ? startIdx + 1 : 0} 至 ${Math.min(startIdx + LOG_PAGE_SIZE, filtered.length)} 筆，共 ${filtered.length} 筆紀錄 (第 ${currentLogPage} / ${totalPages} 頁)`;
+        btnPrevPage.disabled = currentLogPage <= 1;
+        btnNextPage.disabled = currentLogPage >= totalPages;
+
+        attemptsTableBody.innerHTML = "";
+        if (pageItems.length === 0) {
+          attemptsTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 25px; color: var(--text-muted);">無符合當前篩選條件之作答流水</td></tr>';
+          return;
+        }
+
+        pageItems.forEach((att, idx) => {
+          const tr = document.createElement("tr");
+          const sName = window.getStudentName ? window.getStudentName(att.classID, att.studentID) : `學生 ${att.studentID}`;
+          const t = att.timestamp ? att.timestamp.replace("T", " ").replace(".000Z", "") : "-";
+
+          let scoreBadge = att.isCorrect
+            ? '<span class="badge badge-success">答對</span>'
+            : '<span class="badge badge-danger">錯誤</span>';
+
+          let bankBadge = '<span class="badge badge-info">1023版</span>';
+          if (att.bankCategory === "G10") bankBadge = '<span class="badge badge-secondary">G10</span>';
+          if (att.bankCategory === "G11") bankBadge = '<span class="badge badge-warning">G11</span>';
+          if (att.bankCategory === "ADVANCE") bankBadge = '<span class="badge badge-purple">大測</span>';
+
+          const stemText = questionBankDictionary[att.questionCode] || att.dateID.split("_T")[0];
+
+          tr.innerHTML = `
+            <td>${startIdx + idx + 1}</td>
+            <td style="font-size:12px; color:var(--text-muted);">${t}</td>
+            <td><strong>${att.classID}</strong></td>
+            <td>${att.studentID} 號</td>
+            <td><strong>${sName}</strong></td>
+            <td>${bankBadge}</td>
+            <td><code style="color:#93c5fd;">${att.questionCode}</code></td>
+            <td style="max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${stemText}">${stemText}</td>
+            <td>${scoreBadge}</td>
+            <td>${att.duration} 秒</td>
+            <td>${att.accuracy}%</td>
+          `;
+          attemptsTableBody.appendChild(tr);
+        });
+      }
+
+      // Pagination Button Events
+      btnPrevPage.addEventListener("click", () => {
+        if (currentLogPage > 1) {
+          currentLogPage--;
+          renderAttemptsStream();
+          triggerMathJaxRender();
+        }
+      });
+
+      btnNextPage.addEventListener("click", () => {
+        currentLogPage++;
+        renderAttemptsStream();
+        triggerMathJaxRender();
+      });
+
+      // View Drilldown Details for a Student (Preserved for Selenium Test 3)
       window.viewStudentAttempts = function (cid, sid) {
         const k = `${cid}_${sid}`;
-        const atts = studentAttempts[k] || [];
+        const atts = (studentAttempts[k] || []).filter(matchesFilters);
         const sName = window.getStudentName ? window.getStudentName(cid, sid) : `學生 ${sid}`;
 
         modalStudentTitle.textContent = `${cid} 班 ${sid} 號 ${sName} - 作答詳細紀錄 (共 ${atts.length} 題)`;
@@ -968,15 +1792,14 @@
         `;
 
         atts.forEach((a, idx) => {
-          const isCor = a.score >= 100;
-          const scoreBadge = isCor
+          const scoreBadge = a.isCorrect
             ? '<span style="color:#10b981; font-weight:bold;">100 (正確)</span>'
             : '<span style="color:#ef4444; font-weight:bold;">0 (錯誤)</span>';
-          const t = a.timestamp.replace('T', ' ').replace('.000Z', '');
+          const t = a.timestamp ? a.timestamp.replace('T', ' ').replace('.000Z', '') : '-';
           html += `
             <tr style="border-bottom:1px solid #334155;">
               <td style="padding:8px;">${idx + 1}</td>
-              <td style="padding:8px; font-family:monospace; color:var(--primary);">${a.dateID.split('_T')[0]}</td>
+              <td style="padding:8px; font-family:monospace; color:var(--primary);">${a.questionCode || a.dateID.split('_T')[0]}</td>
               <td style="padding:8px;">${scoreBadge}</td>
               <td style="padding:8px;">${a.duration} 秒</td>
               <td style="padding:8px;">${a.accuracy}%</td>
@@ -988,6 +1811,7 @@
         html += '</tbody></table>';
         modalStudentBody.innerHTML = html;
         studentModal.classList.add("active");
+        triggerMathJaxRender();
       };
 
       modalCloseBtn.addEventListener("click", () => studentModal.classList.remove("active"));
@@ -995,42 +1819,105 @@
         if (e.target === studentModal) studentModal.classList.remove("active");
       });
 
+      // Filter Event Listeners
+      selectTimeFilter.addEventListener("change", function () {
+        selectDynamicDate.style.display = this.value === "DYNAMIC_DATE" ? "inline-block" : "none";
+        customDateRow.style.display = this.value === "CUSTOM_RANGE" ? "flex" : "none";
+        currentLogPage = 1;
+        renderAllViews();
+      });
+
+      selectDynamicDate.addEventListener("change", () => { currentLogPage = 1; renderAllViews(); });
+      inputStartDate.addEventListener("change", () => { currentLogPage = 1; renderAllViews(); });
+      inputEndDate.addEventListener("change", () => { currentLogPage = 1; renderAllViews(); });
+      selectDurationRange.addEventListener("change", () => { currentLogPage = 1; renderAllViews(); });
+      selectBankFilter.addEventListener("change", () => { currentLogPage = 1; renderAllViews(); });
+      selectQuestionCode.addEventListener("change", () => { currentLogPage = 1; renderAllViews(); });
+      inputQuestionCodeSearch.addEventListener("input", () => { currentLogPage = 1; renderAllViews(); });
+      selectGlobalClass.addEventListener("change", () => { currentLogPage = 1; renderAllViews(); });
+      inputGlobalSearch.addEventListener("input", () => { currentLogPage = 1; renderAllViews(); });
+
+      // Presets
+      preset1023Btn.addEventListener("click", () => {
+        selectBankFilter.value = "1023_ALL";
+        selectTimeFilter.value = "1023_PERIOD";
+        selectDynamicDate.style.display = "none";
+        customDateRow.style.display = "none";
+        currentLogPage = 1;
+        renderAllViews();
+      });
+
+      presetTodayBtn.addEventListener("click", () => {
+        selectTimeFilter.value = "TODAY";
+        selectDynamicDate.style.display = "none";
+        customDateRow.style.display = "none";
+        currentLogPage = 1;
+        renderAllViews();
+      });
+
+      presetResetBtn.addEventListener("click", () => {
+        selectTimeFilter.value = "ALL";
+        selectDynamicDate.style.display = "none";
+        customDateRow.style.display = "none";
+        inputStartDate.value = "";
+        inputEndDate.value = "";
+        selectDurationRange.value = "ALL";
+        selectBankFilter.value = "ALL";
+        selectQuestionCode.value = "ALL";
+        inputQuestionCodeSearch.value = "";
+        selectGlobalClass.value = "ALL";
+        inputGlobalSearch.value = "";
+        currentLogPage = 1;
+        renderAllViews();
+      });
+
+      // Roster & Leaderboard Filter listeners (Preserved for compatibility)
+      selectRosterClass.addEventListener("change", renderRoster);
+      selectRosterStatus.addEventListener("change", renderRoster);
+      inputRosterSearch.addEventListener("input", renderRoster);
+      selectLeaderboardGrade.addEventListener("change", renderLeaderboard);
+      inputLeaderboardSearch.addEventListener("input", renderLeaderboard);
+
+      btnManualRefresh.addEventListener("click", loadData);
+
+      // RFC 4180 UTF-8 BOM CSV Export (R3)
       btnExportCSV.addEventListener("click", function () {
-        const rows = [["班級", "學號", "姓名", "作答提交時間", "題目識別碼", "得分", "花費時長(秒)", "當時正確率(%)"]];
-        allAttempts.forEach(a => {
+        const filtered = allAttempts.filter(matchesFilters);
+        const rows = [
+          ["班級", "學號", "姓名", "作答提交時間", "題庫分類", "題目編號", "題目摘要/考點", "是否答對", "得分", "花費時長(秒)", "當時累積正確率(%)"]
+        ];
+
+        filtered.forEach(a => {
           const sName = window.getStudentName ? window.getStudentName(a.classID, a.studentID) : `學生 ${a.studentID}`;
+          const stem = questionBankDictionary[a.questionCode] || "";
           rows.push([
             a.classID,
             a.studentID,
             sName,
             a.timestamp,
-            a.dateID.split('_T')[0],
+            a.bankCategory,
+            a.questionCode,
+            stem.replace(/"/g, '""'),
+            a.isCorrect ? "答對" : "錯誤",
             a.score,
             a.duration,
             a.accuracy
           ]);
         });
 
-        let csvContent = "\uFEFF" + rows.map(e => e.join(",")).join("\n");
+        // RFC 4180 Escaping
+        const csvContent = "\uFEFF" + rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\r\n");
         const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.setAttribute("href", url);
-        link.setAttribute("download", `全體作答明細_${new Date().toISOString().slice(0, 10)}.csv`);
+        link.setAttribute("download", `全校作答數據明細_${new Date().toISOString().slice(0, 10)}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
       });
 
-      selectRosterClass.addEventListener("change", renderRoster);
-      selectRosterStatus.addEventListener("change", renderRoster);
-      inputRosterSearch.addEventListener("input", renderRoster);
-
-      selectLeaderboardGrade.addEventListener("change", renderLeaderboard);
-      inputLeaderboardSearch.addEventListener("input", renderLeaderboard);
-
-      btnManualRefresh.addEventListener("click", loadData);
-
+      // Periodic Auto Refresh Timer
       countdownTimer = setInterval(() => {
         countdownSec--;
         countdownText.textContent = `${countdownSec}s 後自動更新`;

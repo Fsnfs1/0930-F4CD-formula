@@ -19953,6 +19953,23 @@ window.ADMIN_STUDENT_PASSWORDS = {
       AppState.wrongQuestions.push(record);
     }
 
+    // Telemetry: stream 1023 practice question attempt to cloud
+    try {
+      const submitFn = (typeof submitFormRecord === 'function') ? submitFormRecord : 
+                       (typeof window !== 'undefined' && typeof window.submitFormRecord === 'function') ? window.submitFormRecord : null;
+      const curStud = AppState.currentStudent || AppState.currentUser;
+      if (submitFn && curStud && curStud.classID && curStud.studentID) {
+        const durSec = Math.max(1, Math.round(durationMs / 1000));
+        const runningAcc = Math.round(((exam.currentIndex + 1 - (AppState.wrongQuestions ? AppState.wrongQuestions.length : 0)) / (exam.currentIndex + 1)) * 100);
+        submitFn({
+          classID: curStud.classID,
+          studentID: curStud.studentID,
+          dateID: `1023_PRACTICE_${q.id}_T${durSec}s_ACC${runningAcc}`,
+          score: isCorrect ? 4 : 0
+        }).catch(function() {});
+      }
+    } catch (e) {}
+
     persistProgress();
 
     // 8. Transform submit button to next question button
@@ -20628,6 +20645,25 @@ window.ADMIN_STUDENT_PASSWORDS = {
 
       try {
         localStorage.setItem('MATH_1023_BONUS_' + studentKey, JSON.stringify(bonusData));
+      } catch (e) {}
+
+      // Telemetry: immediately push updated 1023 quiz score with bonus to Google Form
+      try {
+        const submitFn = (typeof submitFormRecord === 'function') ? submitFormRecord : 
+                         (typeof window !== 'undefined' && typeof window.submitFormRecord === 'function') ? window.submitFormRecord : null;
+        if (submitFn && student && student.classID && student.studentID) {
+          const baseRec = (typeof getStudentQuiz1023Record === 'function') ? getStudentQuiz1023Record(student) : null;
+          const baseNew = baseRec ? baseRec.newTotal : 0;
+          const currentBonus = bonusData.accumulatedBonus || 0;
+          const finalScore = Math.min(80, baseNew + currentBonus);
+          submitFn({
+            classID: student.classID,
+            studentID: student.studentID,
+            dateID: `1023_QUIZ_SCORE|BASE:${baseNew}|BONUS:${currentBonus}|FINAL:${finalScore}|TS:${Date.now()}`,
+            scoreTag: String(finalScore),
+            score: finalScore
+          }).catch(function() {});
+        }
       } catch (e) {}
 
       const quoteEl = document.getElementById('settlementFeedbackQuote');
