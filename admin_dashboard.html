@@ -756,7 +756,7 @@
         <table>
           <thead>
             <tr>
-              <th>提交時間</th>
+              <th>提交時間 (澳門時間 UTC+8)</th>
               <th>班級</th>
               <th>學號</th>
               <th>姓名</th>
@@ -1104,6 +1104,42 @@
       }
 
       // Process and Parse Raw Telemetry Data
+      
+      // Robust ISO/UTC to Macau Local Time (UTC+8) Formatter
+      function formatMacauTime(ts) {
+        if (!ts) return "-";
+        try {
+          let dateObj = null;
+          if (ts.endsWith("Z") || ts.includes("+") || ts.includes("-")) {
+            dateObj = new Date(ts);
+          } else {
+            dateObj = new Date(ts + "Z");
+          }
+          if (isNaN(dateObj.getTime())) {
+            return String(ts).replace("T", " ").replace(".000Z", "");
+          }
+          // Shift to UTC+8 explicitly
+          const utcMs = dateObj.getTime() + (dateObj.getTimezoneOffset() * 60000);
+          const macauDate = new Date(utcMs + (8 * 3600000));
+
+          const y = macauDate.getFullYear();
+          const m = String(macauDate.getMonth() + 1).padStart(2, '0');
+          const d = String(macauDate.getDate()).padStart(2, '0');
+          const hh = String(macauDate.getHours()).padStart(2, '0');
+          const mm = String(macauDate.getMinutes()).padStart(2, '0');
+          const ss = String(macauDate.getSeconds()).padStart(2, '0');
+          return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
+        } catch (e) {
+          return String(ts).replace("T", " ").replace(".000Z", "");
+        }
+      }
+
+      function getMacauDateString(ts) {
+        if (!ts) return "";
+        const formatted = formatMacauTime(ts);
+        return formatted.slice(0, 10);
+      }
+
       function processData() {
         parsedFaces = {};
         studentAttempts = {};
@@ -1343,13 +1379,14 @@
         const tFilter = selectTimeFilter.value;
         const ts = att.timestamp || "";
 
-        // Time dimension
+        // Time dimension (calculated against Macau local time UTC+8)
+        const macauDateStr = getMacauDateString(ts);
         if (tFilter === "1023_PERIOD") {
-          if (!ts.startsWith("2026-10-23") && !ts.startsWith("2026-10-24")) return false;
+          if (macauDateStr < "2026-10-23") return false;
         } else if (tFilter === "TODAY") {
-          if (!ts.startsWith("2026-10-24")) return false;
+          if (macauDateStr !== "2026-10-24") return false;
         } else if (tFilter === "YESTERDAY") {
-          if (!ts.startsWith("2026-10-23")) return false;
+          if (macauDateStr !== "2026-10-23") return false;
         } else if (tFilter === "LAST_24H") {
           const attTime = new Date(ts).getTime();
           const now = new Date("2026-10-24T15:00:00Z").getTime();
@@ -1508,7 +1545,7 @@
             // Cloud sync state from GAS
             const cloudSync = cloudQuiz1023Sync[k];
             const isSynced = !!cloudSync;
-            const syncTime = isSynced && cloudSync.timestamp ? cloudSync.timestamp.replace("T", " ").replace(".000Z", "") : null;
+            const syncTime = isSynced && cloudSync.timestamp ? formatMacauTime(cloudSync.timestamp) : null;
 
             list.push({
               classID: cid,
@@ -1544,7 +1581,7 @@
             attemptsCount: 0,
             accuracy: 0,
             isSynced: true,
-            syncTime: rec.timestamp ? rec.timestamp.replace("T", " ").replace(".000Z", "") : "-",
+            syncTime: rec.timestamp ? formatMacauTime(rec.timestamp) : "-",
             decRecord: null,
             attempts: []
           });
@@ -1698,7 +1735,7 @@
             const scoreBadge = a.isCorrect
               ? '<span class="badge badge-success" style="padding:2px 6px;">答對</span>'
               : '<span class="badge badge-danger" style="padding:2px 6px;">錯誤</span>';
-            const t = a.timestamp ? a.timestamp.replace('T', ' ').replace('.000Z', '') : '-';
+            const t = a.timestamp ? formatMacauTime(a.timestamp) : '-';
             html += `
               <tr style="border-bottom:1px solid #1e293b;">
                 <td style="padding:6px 8px;">${idx + 1}</td>
@@ -1769,7 +1806,7 @@
             ? '<span class="badge badge-success"><i class="fa-solid fa-check"></i> 已登記</span>'
             : '<span class="badge badge-secondary"><i class="fa-solid fa-minus"></i> 未登記</span>';
           
-          const timeStr = s.face && s.face.timestamp ? s.face.timestamp.replace('T', ' ').replace('.000Z', '') : '-';
+          const timeStr = s.face && s.face.timestamp ? formatMacauTime(s.face.timestamp) : '-';
           const verStr = s.face ? `v${s.face.version}` : '-';
           const vecStr = s.isRegistered ? '<span style="color:#10b981;">128維特徵正常</span>' : '<span style="color:#64748b;">無特徵</span>';
           const attemptStr = attCount > 0 ? `<strong style="color:var(--primary);">${attCount} 題</strong>` : '<span style="color:#64748b;">未作答</span>';
@@ -1878,7 +1915,7 @@
 
         list.forEach((s, idx) => {
           const tr = document.createElement("tr");
-          const lastTs = s.lastTimestamp ? s.lastTimestamp.replace('T', ' ').replace('.000Z', '') : '-';
+          const lastTs = s.lastTimestamp ? formatMacauTime(s.lastTimestamp) : '-';
 
           tr.innerHTML = `
             <td><strong>#${idx + 1}</strong></td>
@@ -1926,22 +1963,7 @@
         pageItems.forEach(att => {
           const tr = document.createElement("tr");
           const sName = window.getStudentName ? window.getStudentName(att.classID, att.studentID) : `學生 ${att.studentID}`;
-          let tDisplay = "-";
-          if (att.timestamp) {
-            try {
-              const d = new Date(att.timestamp);
-              // Format as Macau/Hong Kong local time (UTC+8)
-              const y = d.getFullYear();
-              const m = String(d.getMonth() + 1).padStart(2, '0');
-              const day = String(d.getDate()).padStart(2, '0');
-              const hh = String(d.getHours()).padStart(2, '0');
-              const mm = String(d.getMinutes()).padStart(2, '0');
-              const ss = String(d.getSeconds()).padStart(2, '0');
-              tDisplay = `${y}-${m}-${day} ${hh}:${mm}:${ss}`;
-            } catch(e) {
-              tDisplay = att.timestamp.replace("T", " ").replace(".000Z", "");
-            }
-          }
+          const tDisplay = formatMacauTime(att.timestamp);
 
           let scoreBadge = att.isCorrect
             ? '<span class="badge badge-success">答對</span>'
@@ -1957,7 +1979,7 @@
           const tooltipText = (qInfo.stem ? `${qInfo.title} | ${qInfo.stem}` : displayTitle).replace(/"/g, '&quot;');
 
           tr.innerHTML = `
-            <td style="font-size:12px; color:var(--text-muted);" title="UTC: ${att.timestamp}">${tDisplay}</td>
+            <td style="font-size:12px; color:#cbd5e1; font-family:monospace;" title="澳門/香港時間 (UTC: ${att.timestamp})"><i class="fa-regular fa-clock" style="color:#60a5fa; margin-right:4px;"></i>${tDisplay}</td>
             <td><strong>${att.classID}</strong></td>
             <td>${att.studentID} 號</td>
             <td><strong>${sName}</strong></td>
@@ -2014,7 +2036,7 @@
           const scoreBadge = a.isCorrect
             ? '<span style="color:#10b981; font-weight:bold;">100 (正確)</span>'
             : '<span style="color:#ef4444; font-weight:bold;">0 (錯誤)</span>';
-          const t = a.timestamp ? a.timestamp.replace('T', ' ').replace('.000Z', '') : '-';
+          const t = a.timestamp ? formatMacauTime(a.timestamp) : '-';
           html += `
             <tr style="border-bottom:1px solid #334155;">
               <td style="padding:8px;">${idx + 1}</td>
@@ -2105,14 +2127,14 @@
       function exportLogFlowCSV() {
         const filtered = allAttempts.filter(matchesFilters);
         const rows = [
-          ["班級", "學號", "姓名", "作答提交時間", "題庫分類", "題目編號", "題目摘要/考點", "是否答對", "得分", "花費時長(秒)", "當時累積正確率(%)"]
+          ["班級", "學號", "姓名", "作答提交時間 (澳門時間 UTC+8)", "題庫分類", "題目編號", "題目摘要/考點", "是否答對", "得分", "花費時長(秒)", "當時累積正確率(%)"]
         ];
 
         filtered.forEach(a => {
           const sName = window.getStudentName ? window.getStudentName(a.classID, a.studentID) : `學生 ${a.studentID}`;
           const qInfo = getQuestionInfo(a.questionCode);
           const stemSummary = qInfo.stem ? `${qInfo.title} | ${qInfo.stem}` : (qInfo.title || a.questionCode);
-          const t = a.timestamp ? a.timestamp.replace("T", " ").replace(".000Z", "") : "";
+          const t = a.timestamp ? formatMacauTime(a.timestamp) : "";
           rows.push([
             a.classID,
             a.studentID,
