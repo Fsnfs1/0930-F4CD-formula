@@ -1536,16 +1536,26 @@
             const pCorrect = pAttempts.filter(a => a.isCorrect).length;
             const pAcc = pAttempts.length > 0 ? Math.round((pCorrect / pAttempts.length) * 100) : 0;
             
-            // Practice bonus points (+1 pt for every 3 correct practice questions, up to max +10 pts)
-            const practiceBonus = Math.min(10, Math.floor(pCorrect / 3));
-            
-            // Final score capped at 80
-            const calculatedFinal = Math.min(80, Math.round(convertedScore + practiceBonus));
-
             // Cloud sync state from GAS
             const cloudSync = cloudQuiz1023Sync[k];
             const isSynced = !!cloudSync;
             const syncTime = isSynced && cloudSync.timestamp ? formatMacauTime(cloudSync.timestamp) : null;
+
+            // Student online practice bonus:
+            // Rule: When accuracyRate n > 80%, each round awards (n - 80) bonus points.
+            // Multiple rounds accumulate additively.
+            // If cloudSync has synced BONUS, prioritize cloud synced bonus;
+            // Otherwise, calculate practice bonus dynamically.
+            let effectiveBonus = 0;
+            if (cloudSync && typeof cloudSync.bonusScore === "number") {
+              effectiveBonus = cloudSync.bonusScore;
+            } else {
+              // Local fallback: derive from accuracy if available or practice counts
+              effectiveBonus = pAcc > 80 ? (pAcc - 80) : 0;
+            }
+
+            // Final score: base converted score + accumulated bonus, strictly capped at 80
+            const calculatedFinal = Math.min(80, Math.round(convertedScore + effectiveBonus));
 
             list.push({
               classID: cid,
@@ -1554,7 +1564,7 @@
               candId: decRecord ? decRecord.candId : "",
               rawScore: rawScore,
               convertedScore: convertedScore,
-              bonusScore: practiceBonus,
+              bonusScore: effectiveBonus,
               finalScore: calculatedFinal,
               attemptsCount: pAttempts.length,
               accuracy: pAcc,
