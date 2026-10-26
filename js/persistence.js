@@ -969,23 +969,98 @@
 
     init: function () {
       if (typeof window !== 'undefined') {
+        const self = this;
         window.addEventListener("online", function () {
-          console.log("[OfflineSyncManager] Network online detected. Triggering queue flush.");
-          OfflineSyncManager.flushQueue();
+          console.log("[OfflineSyncManager] Network online detected. Probing Macau network & flushing queue.");
+          self.triggerProbeAndFlush();
         });
         window.addEventListener("offline", function () {
           console.log("[OfflineSyncManager] Network offline detected.");
-          OfflineSyncManager.notifyListeners();
+          self.notifyListeners();
         });
 
         // Periodic queue inspection every 25 seconds
         if (!this.timerId) {
           this.timerId = setInterval(function () {
-            OfflineSyncManager.flushQueue();
+            self.flushQueue();
           }, 25000);
         }
+
+        // Attach DOM triggers
+        if (typeof document !== 'undefined') {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", function () {
+              self.bindTriggers();
+            });
+          } else {
+            this.bindTriggers();
+          }
+        }
+
+        // Auto-probe on initial load after brief delay
+        setTimeout(function () {
+          self.triggerProbeAndFlush();
+        }, 150);
       }
       this.notifyListeners();
+    },
+
+    bindTriggers: function () {
+      if (typeof document === 'undefined') return;
+      const self = this;
+      const triggers = [
+        document.getElementById("btnManualSyncQueue"),
+        document.getElementById("syncStatusBadge"),
+        document.getElementById("queueSyncBadge")
+      ];
+
+      triggers.forEach(function (el) {
+        if (el && !el.__syncListenerAttached) {
+          el.__syncListenerAttached = true;
+          el.addEventListener("click", function (e) {
+            e.preventDefault();
+            const status = self.getStatus();
+            if (status.isFlushing) {
+              console.log("[OfflineSyncManager] Flush already in progress.");
+              return;
+            }
+            if (status.pendingCount > 0) {
+              console.log("[OfflineSyncManager] User manually triggered queue flush (forceAll=true).");
+              self.flushQueue(true);
+            } else {
+              console.log("[OfflineSyncManager] Queue is empty. No pending items.");
+            }
+          });
+        }
+      });
+    },
+
+    triggerProbeAndFlush: async function (timeoutMs) {
+      const queue = this.getQueue();
+      if (queue.length === 0) {
+        this.notifyListeners();
+        return false;
+      }
+      const probeFn = typeof probeMacauNetwork === 'function' ? probeMacauNetwork : (typeof window !== 'undefined' ? window.probeMacauNetwork : null);
+      if (typeof probeFn === 'function') {
+        try {
+          const isReachable = await probeFn(timeoutMs || 3500);
+          if (isReachable) {
+            console.log("[OfflineSyncManager] Macau network confirmed. Flushing queue.");
+            await this.flushQueue();
+            return true;
+          } else {
+            console.log("[OfflineSyncManager] Macau network probe failed. Queue retained.");
+            this.notifyListeners();
+            return false;
+          }
+        } catch (e) {
+          console.warn("[OfflineSyncManager] Probe error:", e);
+        }
+      } else {
+        await this.flushQueue();
+      }
+      return false;
     },
 
     getQueue: function () {
@@ -1047,7 +1122,7 @@
       return item.id;
     },
 
-    flushQueue: async function () {
+    flushQueue: async function (forceAll) {
       if (this.isFlushing) return;
       const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
       if (!isOnline) {
@@ -1071,27 +1146,39 @@
         const now = Date.now();
         for (let i = 0; i < queue.length; i++) {
           const item = queue[i];
-          if (item.nextRetryTime && item.nextRetryTime > now) {
+          if (!forceAll && item.nextRetryTime && item.nextRetryTime > now) {
             continue;
+          }
+
+          const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+          let timeoutId = null;
+          if (controller) {
+            timeoutId = setTimeout(function () {
+              try { controller.abort(); } catch (e) {}
+            }, 3500);
           }
 
           try {
             if (item.channel === "FORM") {
               const bodyParams = new URLSearchParams(item.payload);
-              await fetch(item.url, {
+              const fetchOpts = {
                 method: "POST",
                 mode: "no-cors",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 body: bodyParams.toString()
-              });
+              };
+              if (controller) fetchOpts.signal = controller.signal;
+              await fetch(item.url, fetchOpts);
             } else if (item.channel === "DRIVE") {
               // If placeholder, skip real fetch
               if (!item.url.includes("placeholder_drive_uploader")) {
-                const res = await fetch(item.url, {
+                const fetchOpts = {
                   method: "POST",
                   headers: { "Content-Type": "text/plain;charset=utf-8" },
                   body: JSON.stringify(item.payload)
-                });
+                };
+                if (controller) fetchOpts.signal = controller.signal;
+                const res = await fetch(item.url, fetchOpts);
                 if (!res.ok) {
                   throw new Error(`HTTP ${res.status}`);
                 }
@@ -1111,6 +1198,16 @@
             item.nextRetryTime = Date.now() + backoff;
             item.status = "failed";
             failedItemsMap.set(item.id, item);
+
+            // Abort timeout or offline detected: break immediately to release isFlushing lock within 3.5s
+            if (err.name === 'AbortError' || err.name === 'TimeoutError' || (typeof navigator !== 'undefined' && !navigator.onLine)) {
+              console.warn('[OfflineSyncManager] Abort timeout / offline detected; ending flush early to release lock.');
+              break;
+            }
+          } finally {
+            if (timeoutId) {
+              clearTimeout(timeoutId);
+            }
           }
         }
 
@@ -1162,6 +1259,8 @@
 
     updateUI: function (state, count) {
       if (typeof document === 'undefined') return;
+      
+      // 1. Update Header Badges
       const badges = [
         document.getElementById("syncStatusBadge"),
         document.getElementById("queueSyncBadge")
@@ -1169,17 +1268,88 @@
 
       badges.forEach(function (badge) {
         if (!badge) return;
-        badge.className = "sync-badge " + state;
+        const isClickable = (state === "pending" || state === "offline");
+        badge.className = "sync-badge " + state + (isClickable ? " sync-clickable" : "");
         if (state === "synced") {
           badge.innerHTML = `<span class="badge-dot dot-green"></span> 數據已全部同步`;
+          badge.title = "所有作答數據已成功同步至雲端";
+          badge.style.cursor = "default";
         } else if (state === "syncing") {
           badge.innerHTML = `<span class="badge-spinner"></span> 正在同步 (${count})...`;
+          badge.title = `正在同步 ${count} 筆本地作答紀錄至雲端...`;
+          badge.style.cursor = "wait";
         } else if (state === "offline") {
-          badge.innerHTML = `<span class="badge-dot dot-red"></span> 離線模式 (待傳送 ${count})`;
+          badge.innerHTML = `<span class="badge-dot dot-red"></span> 離線模式 (${count} 待傳送) · 點擊重試 🔄`;
+          badge.title = `離線暫存 ${count} 筆紀錄，點擊嘗試重新連線同步`;
+          badge.style.cursor = "pointer";
         } else if (state === "pending") {
-          badge.innerHTML = `<span class="badge-dot dot-yellow"></span> 離線隊列暫存 (${count})`;
+          badge.innerHTML = `<span class="badge-dot dot-yellow"></span> 發現未同步紀錄 (${count}) · 點擊補發 🔄`;
+          badge.title = `發現本地隊列有 ${count} 筆未同步紀錄，點擊立即同步到雲端`;
+          badge.style.cursor = "pointer";
         }
       });
+
+      // 2. Update Notification Banner & Action Button (#queueSyncBanner)
+      const banner = document.getElementById("queueSyncBanner");
+      const btnManual = document.getElementById("btnManualSyncQueue");
+      const bannerText = document.getElementById("queueSyncText");
+      const btnLabel = document.getElementById("btnManualSyncLabel");
+      const btnIcon = document.getElementById("btnManualSyncIcon");
+      const bannerIcon = document.getElementById("queueSyncIcon");
+
+      if (banner) {
+        if (state === "synced") {
+          if (banner.style.display !== "none" && banner.classList.contains("banner-syncing")) {
+            banner.className = "queue-sync-banner banner-synced";
+            if (bannerIcon) bannerIcon.textContent = "✅";
+            if (bannerText) bannerText.innerHTML = "所有離線作答與加分紀錄已成功補發至雲端！";
+            if (btnManual) {
+              btnManual.disabled = true;
+              if (btnIcon) btnIcon.textContent = "✔";
+              if (btnLabel) btnLabel.textContent = "已同步完成";
+            }
+            if (banner.__hideTimeout) clearTimeout(banner.__hideTimeout);
+            banner.__hideTimeout = setTimeout(function () {
+              banner.style.display = "none";
+            }, 3500);
+          } else {
+            banner.style.display = "none";
+          }
+        } else if (state === "syncing") {
+          if (banner.__hideTimeout) clearTimeout(banner.__hideTimeout);
+          banner.style.display = "flex";
+          banner.className = "queue-sync-banner banner-syncing";
+          if (bannerIcon) bannerIcon.innerHTML = `<span class="badge-spinner"></span>`;
+          if (bannerText) bannerText.innerHTML = `正在同步 <strong id="queueSyncCount">${count}</strong> 筆離線紀錄至 Google 雲端...`;
+          if (btnManual) {
+            btnManual.disabled = true;
+            if (btnIcon) btnIcon.textContent = "⏳";
+            if (btnLabel) btnLabel.textContent = "同步中...";
+          }
+        } else if (state === "offline") {
+          if (banner.__hideTimeout) clearTimeout(banner.__hideTimeout);
+          banner.style.display = "flex";
+          banner.className = "queue-sync-banner banner-offline";
+          if (bannerIcon) bannerIcon.textContent = "📡";
+          if (bannerText) bannerText.innerHTML = `目前設備離線，已有 <strong id="queueSyncCount">${count}</strong> 筆作答紀錄安全暫存於本地`;
+          if (btnManual) {
+            btnManual.disabled = false;
+            if (btnIcon) btnIcon.textContent = "🔄";
+            if (btnLabel) btnLabel.textContent = "檢查網絡並重試";
+          }
+        } else if (state === "pending") {
+          if (banner.__hideTimeout) clearTimeout(banner.__hideTimeout);
+          banner.style.display = "flex";
+          banner.className = "queue-sync-banner banner-pending";
+          if (bannerIcon) bannerIcon.textContent = "⚠️";
+          if (bannerText) bannerText.innerHTML = `發現本地有 <strong id="queueSyncCount">${count}</strong> 筆未同步的作答與加分紀錄！`;
+          if (btnManual) {
+            btnManual.disabled = false;
+            if (btnIcon) btnIcon.textContent = "🔄";
+            if (btnLabel) btnLabel.textContent = "立即手動同步 (flushQueue)";
+          }
+        }
+      }
     }
   };
 
