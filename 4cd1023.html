@@ -288,7 +288,23 @@
           </button>
         </div>
 
-        
+        <!-- R4: Key Direct Entry UI -->
+        <div id="cardKeyLoginSection" style="margin-top: 16px; padding: 14px; background: rgba(15, 23, 42, 0.6); border: 1.5px dashed rgba(56, 189, 248, 0.45); border-radius: 12px; text-align: center;">
+          <div style="font-size: 13.5px; color: #94a3b8; margin-bottom: 8px; font-weight: 500;">
+            🔑 免刷臉密鑰快速登錄入口
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap;">
+            <input type="text" id="inputKeyLogin" class="form-input" 
+                   placeholder="請輸入口令密鑰 (如 4C01-K8M2)" 
+                   maxlength="20" autocomplete="off" 
+                   style="flex: 1; min-width: 170px; max-width: 250px; padding: 10px 12px; background: #0f172a; border: 1.5px solid #334155; border-radius: 8px; color: #f8fafc; font-size: 14px; text-transform: uppercase;">
+            <button id="btnKeyLogin" class="btn btn-primary" 
+                    style="padding: 10px 16px; font-weight: 700; white-space: nowrap; background: linear-gradient(135deg, #2563eb, #38bdf8); border: none; border-radius: 8px; cursor: pointer; color: #ffffff;">
+              輸入密鑰XXXX，然後點登錄
+            </button>
+          </div>
+          <div id="keyLoginAlert" style="display: none; margin-top: 8px; padding: 8px 12px; border-radius: 6px; font-size: 13px; text-align: center;"></div>
+        </div>
 
         <div style="text-align: center; margin-top: 16px;">
           <a href="javascript:void(0)" id="linkGoToManualPage" title="不方便刷臉，用密碼登錄" data-text-cn="不方便刷脸，用密码登录" style="font-size: 14px; color: var(--primary-light); text-decoration: underline; font-weight: 500;">
@@ -18867,10 +18883,7 @@ window.ADMIN_STUDENT_PASSWORDS = {
   };
 });
 
-</script>
-<!-- Application Controller -->
-<script>
-
+/* Application Controller */
 
 /**
  * 4cd1023 Adaptive Practice Platform Controller
@@ -21056,6 +21069,225 @@ window.ADMIN_STUDENT_PASSWORDS = {
     }
   }
 
+  // --- R4: 4CD Credentials & Key Direct Login ---
+  const CREDENTIALS_4CD = [
+    { classID: "4C", studentID: 1, name: "古永晴", key: "4C01-X33C" },
+    { classID: "4C", studentID: 2, name: "王嘉熙", key: "4C02-B3MW" },
+    { classID: "4C", studentID: 3, name: "宋榛", key: "4C03-G3HH" },
+    { classID: "4C", studentID: 4, name: "周子謙", key: "4C04-JH4E" },
+    { classID: "4C", studentID: 5, name: "李藝彤", key: "4C05-KCDG" },
+    { classID: "4C", studentID: 6, name: "谷雨", key: "4C06-A3A6" },
+    { classID: "4C", studentID: 7, name: "冼周蔚", key: "4C07-62MR" },
+    { classID: "4C", studentID: 8, name: "林國榮", key: "4C08-2RY7" },
+    { classID: "4C", studentID: 9, name: "林晨欣", key: "4C09-7ACC" },
+    { classID: "4C", studentID: 10, name: "徐浟", key: "4C10-4D29" },
+    { classID: "4C", studentID: 11, name: "曹爵先", key: "4C11-PZ4E" },
+    { classID: "4C", studentID: 12, name: "梁寶娟", key: "4C12-WAMY" },
+    { classID: "4C", studentID: 14, name: "莫芷瑤", key: "4C14-BJSB" },
+    { classID: "4C", studentID: 15, name: "陳子豪", key: "4C15-64KW" },
+    { classID: "4C", studentID: 16, name: "陳心怡", key: "4C16-VQJN" },
+    { classID: "4C", studentID: 17, name: "陳芷澄", key: "4C17-YZCZ" },
+    { classID: "4C", studentID: 18, name: "陳穎彤", key: "4C18-3E8A" },
+    { classID: "4C", studentID: 19, name: "陸恩希", key: "4C19-YJGW" },
+    { classID: "4C", studentID: 20, name: "麥曉楠", key: "4C20-UZXM" },
+    { classID: "4C", studentID: 21, name: "溫愛嫦", key: "4C21-3D7A" },
+    { classID: "4C", studentID: 22, name: "葉峰", key: "4C22-ZY4S" },
+    { classID: "4C", studentID: 23, name: "趙政熹", key: "4C23-YAW6" },
+    { classID: "4C", studentID: 24, name: "劉卓盈", key: "4C24-6T5A" },
+    { classID: "4C", studentID: 25, name: "蔡清琰", key: "4C25-TVSV" },
+    { classID: "4C", studentID: 26, name: "謝嘉瑩", key: "4C26-UCAA" },
+    { classID: "4C", studentID: 27, name: "譚梓鈞", key: "4C27-AYHH" },
+    { classID: "4C", studentID: 28, name: "譚志坤", key: "4C28-9AVS" },
+    { classID: "4C", studentID: 29, name: "譚欣", key: "4C29-KSZW" },
+    { classID: "4C", studentID: 30, name: "羅清璋", key: "4C30-JKZR" },
+    { classID: "4D", studentID: 1, name: "洪佳佳", key: "4D01-4ZXP" },
+    { classID: "4D", studentID: 2, name: "王偉德", key: "4D02-V9GA" },
+    { classID: "4D", studentID: 3, name: "王煜鑫", key: "4D03-85HF" },
+    { classID: "4D", studentID: 4, name: "甘俊誠", key: "4D04-7466" },
+    { classID: "4D", studentID: 5, name: "余浩賢", key: "4D05-B6UX" },
+    { classID: "4D", studentID: 6, name: "李青霞", key: "4D06-WUVP" },
+    { classID: "4D", studentID: 7, name: "李語鵑", key: "4D07-EW6N" },
+    { classID: "4D", studentID: 8, name: "李樂瞳", key: "4D08-SZRU" },
+    { classID: "4D", studentID: 9, name: "李穎欣", key: "4D09-47TC" },
+    { classID: "4D", studentID: 10, name: "李臻斌", key: "4D10-WBZP" },
+    { classID: "4D", studentID: 11, name: "周梓霖", key: "4D11-393M" },
+    { classID: "4D", studentID: 12, name: "林川雲", key: "4D12-JKYJ" },
+    { classID: "4D", studentID: 13, name: "施舒晨", key: "4D13-GAHZ" },
+    { classID: "4D", studentID: 14, name: "徐芷瑤", key: "4D14-67GQ" },
+    { classID: "4D", studentID: 15, name: "翁淮洋", key: "4D15-67G4" },
+    { classID: "4D", studentID: 16, name: "馬雨彤", key: "4D16-AF7U" },
+    { classID: "4D", studentID: 17, name: "張博聰", key: "4D17-KNFN" },
+    { classID: "4D", studentID: 18, name: "曾浚恩", key: "4D18-B2T6" },
+    { classID: "4D", studentID: 19, name: "黃悅軒", key: "4D19-7HUJ" },
+    { classID: "4D", studentID: 20, name: "黃梓建", key: "4D20-JJFN" },
+    { classID: "4D", studentID: 21, name: "黃嫣然", key: "4D21-V3EG" },
+    { classID: "4D", studentID: 22, name: "董清霞", key: "4D22-6F2G" },
+    { classID: "4D", studentID: 23, name: "劉付穎", key: "4D23-PVD6" },
+    { classID: "4D", studentID: 24, name: "劉泳欣", key: "4D24-DAKQ" },
+    { classID: "4D", studentID: 25, name: "鄭佩芝", key: "4D25-8C9W" },
+    { classID: "4D", studentID: 26, name: "鄭東沅", key: "4D26-K6N6" },
+    { classID: "4D", studentID: 27, name: "盧肇琪", key: "4D27-2FEZ" },
+    { classID: "4D", studentID: 28, name: "賴君華", key: "4D28-VXGP" },
+    { classID: "4D", studentID: 29, name: "譚佩泳", key: "4D29-E2EN" },
+    { classID: "4D", studentID: 30, name: "鄭梓浩", key: "4D30-FH9V" },
+    { classID: "4D", studentID: 31, name: "鄭國樺", key: "4D31-HC9Q" }
+  ];
+
+  const CREDENTIALS_4CD_MAP = {};
+  CREDENTIALS_4CD.forEach(function(item) {
+    const kUpper = item.key.toUpperCase();
+    const kClean = kUpper.replace(/[^A-Z0-9]/g, '');
+    CREDENTIALS_4CD_MAP[kUpper] = item;
+    CREDENTIALS_4CD_MAP[kClean] = item;
+  });
+
+  async function verify4CDKey(inputKey) {
+    if (!inputKey || !String(inputKey).trim()) return { success: false, reason: '請輸入口令密鑰！' };
+    const raw = String(inputKey).trim().toUpperCase();
+    const normalized = raw.replace(/[^A-Z0-9]/g, '');
+
+    // 1. Local offline lookup (<5ms)
+    if (CREDENTIALS_4CD_MAP[raw] || CREDENTIALS_4CD_MAP[normalized]) {
+      const student = CREDENTIALS_4CD_MAP[raw] || CREDENTIALS_4CD_MAP[normalized];
+      return { success: true, student: student, source: 'LOCAL' };
+    }
+
+    // 2. Cloud GAS query fallback
+    try {
+      const gasUrl = (typeof PERSISTENCE_CONFIG !== 'undefined' && PERSISTENCE_CONFIG.gasSheetReaderUrl)
+        || "https://script.google.com/macros/s/AKfycbwNAQNxmNsNa8rWGp48qnYRrjA2WFLGIzKqSel2r8MilRp59s3ZfBJjeKXIrUfoS-Zp-g/exec";
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3500);
+      const resp = await fetch(gasUrl, { method: 'GET', mode: 'cors', signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (resp.ok) {
+        const rows = await resp.json();
+        if (Array.isArray(rows)) {
+          for (let i = rows.length - 1; i >= 0; i--) {
+            const r = rows[i];
+            const rowScore = String(r.score || r.Score || "").trim().toUpperCase();
+            const rowClean = rowScore.replace(/[^A-Z0-9]/g, '');
+            if (rowScore === raw || rowClean === normalized) {
+              const cls = String(r.classID || "").trim().toUpperCase();
+              const sid = parseInt(r.studentID, 10);
+              const name = String(r.dateID || r.name || "").trim() || (window.getStudentName ? window.getStudentName(cls, sid) : `學生 ${sid}`);
+              return {
+                success: true,
+                student: { classID: cls, studentID: sid, name: name, key: rowScore },
+                source: 'CLOUD'
+              };
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("[Auth] Cloud GAS verification failed/timeout:", e.message);
+    }
+
+    return { success: false, reason: '❌ 口令無效或不存在！' };
+  }
+
+  async function handleKeyLogin() {
+    const inputEl = document.getElementById('inputKeyLogin');
+    const alertEl = document.getElementById('keyLoginAlert');
+    const btn = document.getElementById('btnKeyLogin');
+    if (!inputEl) return;
+
+    const rawKey = inputEl.value.trim().toUpperCase();
+    if (!rawKey) {
+      if (alertEl) {
+        alertEl.style.display = 'block';
+        alertEl.style.background = 'rgba(239, 68, 68, 0.15)';
+        alertEl.style.color = '#fca5a5';
+        alertEl.textContent = '請先輸入口令密鑰！';
+      }
+      inputEl.focus();
+      return;
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = '正在核驗密鑰...';
+    }
+    if (alertEl) alertEl.style.display = 'none';
+
+    try {
+      const res = await verify4CDKey(rawKey);
+      if (!res.success) {
+        if (alertEl) {
+          alertEl.style.display = 'block';
+          alertEl.style.background = 'rgba(239, 68, 68, 0.15)';
+          alertEl.style.color = '#fca5a5';
+          alertEl.textContent = res.reason || '❌ 密鑰無效或不存在，請確認後重試！';
+        }
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '輸入密鑰XXXX，然後點登錄';
+        }
+        inputEl.focus();
+        return;
+      }
+
+      const student = res.student;
+
+      // Stop camera & blink tracker
+      const video = document.getElementById('faceFirstVideo');
+      if (video && window.stopCamera) window.stopCamera(video);
+      if (faceFirstBlinkTracker) {
+        faceFirstBlinkTracker.stop();
+        faceFirstBlinkTracker = null;
+      }
+
+      // Lock student identity into AppState
+      AppState.currentUser = student;
+      AppState.currentClass = student.classID;
+      AppState.currentStudentId = student.studentID;
+      AppState.currentStudentName = student.name;
+      AppState.currentStudent = student;
+      AppState.isPasswordOnlyLogin = true;
+      AppState.draftUploaded = false;
+
+      // Show R5 warning banners
+      const dashBanner = document.getElementById('dashBannerPasswordOnly');
+      const quizBanner = document.getElementById('quizBannerPasswordOnly');
+      if (dashBanner) dashBanner.style.display = 'block';
+      if (quizBanner) quizBanner.style.display = 'block';
+
+      // Update HUD and Dashboard DOM bindings
+      const dashName = document.getElementById('dashStudentName');
+      const dashMeta = document.getElementById('dashClassAndId');
+      if (dashName) dashName.textContent = `${student.name} 同學，您好！`;
+      if (dashMeta) dashMeta.textContent = `${student.classID} 班 ${student.studentID} 號`;
+
+      const scoreName = document.getElementById('scoreStudentName');
+      const scoreMeta = document.getElementById('scoreStudentClassId');
+      if (scoreName) scoreName.textContent = student.name;
+      if (scoreMeta) scoreMeta.textContent = `${student.classID} 班 ${student.studentID} 號`;
+
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = '輸入密鑰XXXX，然後點登錄';
+      }
+
+      // Enter platform navigation portal
+      (window.showScreen || showScreen)('screen4-dashboard');
+
+    } catch (err) {
+      console.error('[KeyLogin] Error during key verification:', err);
+      if (alertEl) {
+        alertEl.style.display = 'block';
+        alertEl.style.background = 'rgba(239, 68, 68, 0.15)';
+        alertEl.style.color = '#fca5a5';
+        alertEl.textContent = '驗證發生異常，請重試！';
+      }
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = '輸入密鑰XXXX，然後點登錄';
+      }
+    }
+  }
+
   // 7. Event Wiring on DOM Load
   document.addEventListener('DOMContentLoaded', function() {
     // Restore active quiz progress from LocalStorage if present (R3 Global Refresh Recovery)
@@ -21119,6 +21351,23 @@ window.ADMIN_STUDENT_PASSWORDS = {
         });
       }
     } catch (e) {}
+
+    // R4: Key Direct Login button & input
+    const btnKeyLogin = document.getElementById('btnKeyLogin');
+    const inputKeyLogin = document.getElementById('inputKeyLogin');
+    if (btnKeyLogin) {
+      btnKeyLogin.addEventListener('click', function() {
+        handleKeyLogin();
+      });
+    }
+    if (inputKeyLogin) {
+      inputKeyLogin.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleKeyLogin();
+        }
+      });
+    }
 
     // Link: 不方便刷臉，用密碼登錄
     const linkGoManual = document.getElementById('linkGoToManualPage');
@@ -21377,6 +21626,11 @@ window.ADMIN_STUDENT_PASSWORDS = {
   window.restart1023QuizSession = restart1023QuizSession;
   window.saveAndRenderHistoryCurve = saveAndRenderHistoryCurve;
   window.renderHistoryCurveSVG = renderHistoryCurveSVG;
+
+  // R4: Expose key login globals
+  window.verify4CDKey = verify4CDKey;
+  window.handleKeyLogin = handleKeyLogin;
+  window.PASSWORDS_4CD = CREDENTIALS_4CD;
 })();
 
 </script>
