@@ -2,6 +2,63 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
+
+  <!-- Target Pages Anti-Bypass Guard (Strict 7-Person Whitelist) -->
+  <script>
+    (function() {
+      const WHITELIST = ['5B_99', '4C_6', '4C_29', '4D_21', '4D_15', '5B_24', '5B_10'];
+      const rawToken = sessionStorage.getItem('AUTH_GATE_TOKEN');
+      let isAuthorized = false;
+      let authUser = null;
+
+      if (rawToken) {
+        try {
+          authUser = JSON.parse(rawToken);
+          const key = (authUser.classID ? (authUser.classID + '_') : '') + (authUser.studentID || '');
+          const altKey = authUser.key || key;
+          if (WHITELIST.includes(altKey) || WHITELIST.includes(key)) {
+            isAuthorized = true;
+          }
+        } catch (e) {
+          if (WHITELIST.includes(String(rawToken).trim())) {
+            isAuthorized = true;
+            authUser = { key: String(rawToken).trim(), name: String(rawToken).trim() };
+          }
+        }
+      }
+
+      // Enforce on HTTP / HTTPS (production and test server)
+      // Allow file:/// for offline development
+      if (!isAuthorized && (location.protocol === 'http:' || location.protocol === 'https:')) {
+        try { sessionStorage.removeItem('AUTH_GATE_TOKEN'); } catch(e){}
+        if (document.documentElement) {
+          document.documentElement.style.display = 'none';
+        }
+        const currentPage = encodeURIComponent(location.pathname.split('/').pop() || '1023-test.html');
+        location.replace('auth_gate.html?redirect=' + currentPage);
+      } else {
+        window.__AUTH_USER = authUser;
+        document.addEventListener('DOMContentLoaded', function() {
+          const nameEl = document.getElementById('authUserName');
+          const logoutBtn = document.getElementById('btnLogoutAuthGate');
+          if (nameEl) {
+            if (authUser && (authUser.name || authUser.classID)) {
+              const label = (authUser.classID ? (authUser.classID + ' 班 ') : '') + (authUser.name || authUser.studentID || authUser.key);
+              nameEl.textContent = label;
+            } else if (location.protocol === 'file:') {
+              nameEl.textContent = '本地開發預覽 (5B 教師測試員)';
+            }
+          }
+          if (logoutBtn) {
+            logoutBtn.addEventListener('click', function() {
+              try { sessionStorage.removeItem('AUTH_GATE_TOKEN'); } catch(e){}
+              location.replace('auth_gate.html');
+            });
+          }
+        });
+      }
+    })();
+  </script>
   <title>高一 (4C / 4D) 數學自適應練習平臺 (1023專題 · 一元二次不等式與函數概念)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#0f172a">
@@ -216,6 +273,17 @@
   <script src="js/admin_snapshot.js"></script>
 </head>
 <body>
+  <!-- Auth Gate Identity Banner & Logout Component -->
+  <div id="authIdentityBanner" style="display:flex; justify-content:space-between; align-items:center; background:#1e293b; color:#f8fafc; padding:8px 20px; font-size:13px; border-bottom:1px solid #334155; position:sticky; top:0; z-index:99999; box-shadow:0 2px 8px rgba(0,0,0,0.3);">
+    <span id="authIdentityText" style="display:inline-flex; align-items:center; gap:8px;">
+      <span style="font-size:15px;">👤</span>
+      <span>已認證：<strong id="authUserName" style="color:#38bdf8; font-weight:700;">載入中...</strong></span>
+      <span style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.35); padding:1px 8px; border-radius:12px; font-size:11px; font-weight:600;">白名單特許</span>
+    </span>
+    <button id="btnLogoutAuthGate" type="button" style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.35); padding:5px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+      <span>🚪</span> 登出門禁
+    </button>
+  </div>
 
 
   <!-- SCREEN 0: Macau Network Lock (Bypassed / Present for parity) -->

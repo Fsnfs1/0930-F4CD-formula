@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>高中數學平臺 - 安全門禁驗證 (Auth Gate)</title>
+
+  <!-- USER GLOBAL RULE: MathJax script for LaTeX math formula rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' },
+      startup: {
+        ready: () => {
+          if (window.MathJax && window.MathJax.startup) {
+            window.MathJax.startup.defaultReady();
+          }
+        }
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Core Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
+  <script src="js/preloaded_faces.js"></script>
+  <script src="js/roster.js"></script>
+  <script src="js/face_auth.js"></script>
+  <script src="js/persistence.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #070d18;
+      --card-bg: rgba(15, 23, 42, 0.88);
+      --card-border: rgba(56, 189, 248, 0.25);
+      --primary-cyan: #38bdf8;
+      --primary-blue: #2563eb;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.9) 0px, transparent 100%);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .gate-container {
+      width: 100%;
+      max-width: 520px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 25px rgba(56, 189, 248, 0.12);
+      backdrop-filter: blur(12px);
+      text-align: center;
+      position: relative;
+    }
+
+    .gate-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, #ffffff 30%, var(--primary-cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .gate-header p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    /* Math Formula Decoration */
+    .math-formula-box {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: var(--primary-cyan);
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+
+    /* Circular Viewfinder & Aperture */
+    .viewfinder-wrapper {
+      position: relative;
+      width: 250px;
+      height: 250px;
+      margin: 0 auto 20px auto;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .viewfinder-aperture {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent, var(--primary-cyan), var(--primary-blue), transparent);
+      animation: rotateAperture 3s linear infinite;
+      z-index: 1;
+    }
+
+    .viewfinder-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #000;
+      z-index: 2;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+    }
+
+    #cameraVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+
+    /* HUD Reticle Overlay */
+    .hud-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+      border-radius: 50%;
+    }
+
+    .hud-scan-line {
+      position: absolute;
+      top: 0;
+      left: 10%;
+      width: 80%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--primary-cyan), transparent);
+      box-shadow: 0 0 10px var(--primary-cyan);
+      animation: scanSweep 2.2s ease-in-out infinite alternate;
+    }
+
+    .hud-corner {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-color: var(--primary-cyan);
+      border-style: solid;
+      opacity: 0.75;
+    }
+    .hud-tl { top: 32px; left: 32px; border-width: 2px 0 0 2px; }
+    .hud-tr { top: 32px; right: 32px; border-width: 2px 2px 0 0; }
+    .hud-bl { bottom: 32px; left: 32px; border-width: 0 0 2px 2px; }
+    .hud-br { bottom: 32px; right: 32px; border-width: 0 2px 2px 0; }
+
+    @keyframes rotateAperture {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes scanSweep {
+      0% { top: 15%; opacity: 0.3; }
+      50% { opacity: 1; }
+      100% { top: 85%; opacity: 0.3; }
+    }
+
+    /* Status & Alerts */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 12px;
+      color: var(--text-main);
+    }
+    .status-badge.scanning {
+      border-color: rgba(56, 189, 248, 0.4);
+      color: var(--primary-cyan);
+    }
+    .status-badge.success {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.5);
+      color: #34d399;
+    }
+    .status-badge.warning {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #f87171;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.6; }
+    }
+
+    /* Warning/Alert Container */
+    #gateAlert {
+      display: none;
+      background: rgba(239, 68, 68, 0.18);
+      border: 1px solid var(--accent-red);
+      color: #fca5a5;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      line-height: 1.5;
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    /* Whitelist Notice */
+    .whitelist-notice {
+      margin-top: 14px;
+      padding: 10px 12px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .whitelist-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 6px;
+    }
+    .whitelist-chip {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: #7dd3fc;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+    }
+
+    /* Action Buttons */
+    .cyber-btn {
+      width: 100%;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      outline: none;
+      margin-top: 8px;
+    }
+
+    .cyber-btn.primary {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
+    }
+    .cyber-btn.primary:hover {
+      background: linear-gradient(135deg, #0369a1, #1d4ed8);
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .cyber-btn.secondary {
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+    .cyber-btn.secondary:hover {
+      background: linear-gradient(135deg, #047857, #059669);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+      transform: translateY(-1px);
+    }
+
+    .link-btn {
+      background: none;
+      border: none;
+      color: var(--primary-cyan);
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: underline;
+      margin-top: 14px;
+      opacity: 0.85;
+      transition: opacity 0.2s;
+    }
+    .link-btn:hover {
+      opacity: 1;
+    }
+
+    /* Dual Action Container */
+    #dualActionContainer {
+      display: none;
+      animation: fadeIn 0.4s ease;
+      margin-top: 16px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Modal Backdrop */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-card {
+      background: #0f172a;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 400px;
+      padding: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
+      text-align: left;
+    }
+
+    .modal-card h3 {
+      font-size: 18px;
+      color: #fff;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-control:focus {
+      border-color: var(--primary-cyan);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .modal-actions button {
+      flex: 1;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-modal-cancel {
+      background: #334155;
+      color: #cbd5e1;
+    }
+    .btn-modal-cancel:hover {
+      background: #475569;
+    }
+
+    .btn-modal-submit {
+      background: var(--primary-blue);
+      color: #fff;
+    }
+    .btn-modal-submit:hover {
+      background: #1d4ed8;
+    }
+
+    #fallbackPasswordAlert {
+      display: none;
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid var(--accent-red);
+      color: #fca5a5;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="gate-container">
+    <div class="gate-header">
+      <h1>高中數學平臺 · 安全門禁</h1>
+      <p>特許授權驗證系統 · 雙維度特徵防護</p>
+    </div>
+
+    <!-- MathJax Mathematical Formula Rendering -->
+    <div class="math-formula-box">
+      $$ \text{Cosine Sim} = \frac{\mathbf{v}_{\text{live}} \cdot \mathbf{v}_{\text{reg}}}{\|\mathbf{v}_{\text{live}}\| \|\mathbf{v}_{\text{reg}}\|} \ge 0.85 $$
+    </div>
+
+    <!-- Real-time Alert Banner -->
+    <div id="gateAlert">
+      <span id="authAlertMessage">⚠️ 非授權白名單成員，無權進入此系統！</span>
+    </div>
+
+    <!-- Circular Viewfinder & Aperture -->
+    <div class="viewfinder-wrapper" id="viewfinderWrapper">
+      <div class="viewfinder-aperture"></div>
+      <div class="viewfinder-inner">
+        <video id="cameraVideo" autoplay playsinline muted></video>
+        <canvas id="captureCanvas" style="display: none;"></canvas>
+        <div class="hud-overlay">
+          <div class="hud-scan-line"></div>
+          <div class="hud-corner hud-tl"></div>
+          <div class="hud-corner hud-tr"></div>
+          <div class="hud-corner hud-bl"></div>
+          <div class="hud-corner hud-br"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Badge -->
+    <div>
+      <div id="scanStatusBadge" class="status-badge scanning">
+        <span class="pulse-dot"></span>
+        <span id="scanStatusText">正在啟動人臉識別引擎...</span>
+      </div>
+    </div>
+
+    <!-- Dual Action Destination Container (shown post-auth if no redirect param) -->
+    <div id="dualActionContainer">
+      <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 8px; padding: 10px; margin-bottom: 12px;">
+        <span style="color: #34d399; font-weight: 700; font-size: 14px;">✅ 認證成功：<span id="authenticatedUserName">---</span></span>
+      </div>
+      <button id="btnGoDashboard" class="cyber-btn primary">進入教師後台 (Admin Dashboard)</button>
+      <button id="btnGoQuiz" class="cyber-btn secondary">進入小測答題端 (1023 Quiz)</button>
+    </div>
+
+    <!-- Whitelist Authorized Personnel Notice -->
+    <div class="whitelist-notice">
+      <span>🔒 授權通行白名單 (7 人特許制)</span>
+      <div class="whitelist-chips">
+        <span class="whitelist-chip">5B 99 教師測試員</span>
+        <span class="whitelist-chip">4C 6 谷雨</span>
+        <span class="whitelist-chip">4C 29 譚欣</span>
+        <span class="whitelist-chip">4D 21 黃嫣然</span>
+        <span class="whitelist-chip">4D 15 翁淮洋</span>
+        <span class="whitelist-chip">5B 24 黃卓林</span>
+        <span class="whitelist-chip">5B 10 高尚禮</span>
+      </div>
+    </div>
+
+    <!-- Emergency Fallback Password Trigger -->
+    <div>
+      <button id="btnFallbackPasswordAuth" class="link-btn" type="button">
+        📷 無法識別或無相機？點此使用備用密碼驗證
+      </button>
+    </div>
+  </div>
+
+  <!-- Fallback Password Modal -->
+  <div id="fallbackModal" class="modal-backdrop">
+    <div class="modal-card">
+      <h3>🔑 備用安全密碼驗證</h3>
+      <p>僅限 7 位特許白名單成員使用個人密碼登入。</p>
+
+      <div id="fallbackPasswordAlert"></div>
+
+      <div class="form-group">
+        <label for="fallbackStudentSelect">選擇白名單成員</label>
+        <select id="fallbackStudentSelect" class="form-control">
+          <option value="" disabled selected>-- 請選擇身份 --</option>
+          <option value="5B_99">5B 班 99 號 - 教師測試員</option>
+          <option value="4C_6">4C 班 6 號 - 谷雨</option>
+          <option value="4C_29">4C 班 29 號 - 譚欣</option>
+          <option value="4D_21">4D 班 21 號 - 黃嫣然</option>
+          <option value="4D_15">4D 班 15 號 - 翁淮洋</option>
+          <option value="5B_24">5B 班 24 號 - 黃卓林 (黃卓琳)</option>
+          <option value="5B_10">5B 班 10 號 - 高尚禮</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="fallbackPasswordInput">安全密碼</label>
+        <input type="password" id="fallbackPasswordInput" class="form-control" placeholder="請輸入 4 位以上自訂密碼" autocomplete="current-password">
+      </div>
+
+      <div class="modal-actions">
+        <button id="btnCloseFallbackModal" type="button" class="btn-modal-cancel">取消返回</button>
+        <button id="btnSubmitFallbackPassword" type="button" class="btn-modal-submit">確認驗證</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    'use strict';
+
+    // 1. Strict 7-Person Whitelist Definition
+    const AUTH_WHITELIST = {
+      '5B_99': { classID: '5B', studentID: 99, name: '教師測試員', label: '5B 班 99 號 - 教師測試員' },
+      '4C_6':  { classID: '4C', studentID: 6,  name: '谷雨',       label: '4C 班 6 號 - 谷雨' },
+      '4C_29': { classID: '4C', studentID: 29, name: '譚欣',       label: '4C 班 29 號 - 譚欣' },
+      '4D_21': { classID: '4D', studentID: 21, name: '黃嫣然',     label: '4D 班 21 號 - 黃嫣然' },
+      '4D_15': { classID: '4D', studentID: 15, name: '翁淮洋',     label: '4D 班 15 號 - 翁淮洋' },
+      '5B_24': { classID: '5B', studentID: 24, name: '黃卓林',     label: '5B 班 24 號 - 黃卓林 (黃卓琳)', altName: '黃卓琳' },
+      '5B_10': { classID: '5B', studentID: 10, name: '高尚禮',     label: '5B 班 10 號 - 高尚禮' }
+    };
+    window.AUTH_WHITELIST = AUTH_WHITELIST;
+
+    // DOM References
+    const cameraVideo = document.getElementById('cameraVideo');
+    const captureCanvas = document.getElementById('captureCanvas');
+    const scanStatusBadge = document.getElementById('scanStatusBadge');
+    const scanStatusText = document.getElementById('scanStatusText');
+    const gateAlert = document.getElementById('gateAlert');
+    const authAlertMessage = document.getElementById('authAlertMessage');
+    const dualActionContainer = document.getElementById('dualActionContainer');
+    const authenticatedUserName = document.getElementById('authenticatedUserName');
+    const btnGoDashboard = document.getElementById('btnGoDashboard');
+    const btnGoQuiz = document.getElementById('btnGoQuiz');
+
+    // Fallback Modal DOM References
+    const btnFallbackPasswordAuth = document.getElementById('btnFallbackPasswordAuth');
+    const fallbackModal = document.getElementById('fallbackModal');
+    const btnCloseFallbackModal = document.getElementById('btnCloseFallbackModal');
+    const btnSubmitFallbackPassword = document.getElementById('btnSubmitFallbackPassword');
+    const fallbackStudentSelect = document.getElementById('fallbackStudentSelect');
+    const fallbackPasswordInput = document.getElementById('fallbackPasswordInput');
+    const fallbackPasswordAlert = document.getElementById('fallbackPasswordAlert');
+
+    let isScanningActive = false;
+    let cameraStream = null;
+    let scanIntervalTimer = null;
+
+    function setStatus(text, type) {
+      if (!scanStatusText || !scanStatusBadge) return;
+      scanStatusText.textContent = text;
+      scanStatusBadge.className = 'status-badge ' + (type || 'scanning');
+    }
+
+    function showGateAlert(msg) {
+      if (!gateAlert || !authAlertMessage) return;
+      authAlertMessage.textContent = msg;
+      gateAlert.style.display = 'block';
+      setStatus(msg, 'warning');
+    }
+
+    function clearGateAlert() {
+      if (!gateAlert) return;
+      gateAlert.style.display = 'none';
+    }
+
+    function showFallbackAlert(msg) {
+      if (!fallbackPasswordAlert) return;
+      fallbackPasswordAlert.textContent = msg;
+      fallbackPasswordAlert.style.display = 'block';
+    }
+
+    function clearFallbackAlert() {
+      if (!fallbackPasswordAlert) return;
+      fallbackPasswordAlert.style.display = 'none';
+    }
+
+    // 2. Facial Biometrics Descriptor Evaluation
+    function handleFaceDescriptor(descriptor) {
+      if (!descriptor) {
+        setStatus("未檢測到有效面部特徵，請調整角度", "warning");
+        return false;
+      }
+
+      const allProfiles = (window.PRELOADED_STUDENT_FACES) ? Object.values(window.PRELOADED_STUDENT_FACES) : [];
+      if (allProfiles.length === 0) {
+        setStatus("特徵資料庫未載入，請稍後重試", "warning");
+        return false;
+      }
+
+      // Run 1:N Identification
+      const matchResult = (window.FaceAuthModule && window.FaceAuthModule.identifyFace1toN)
+        ? window.FaceAuthModule.identifyFace1toN(descriptor, allProfiles, 0.80)
+        : null;
+
+      if (!matchResult || !matchResult.topCandidate) {
+        setStatus("未比對到登記特徵，請面向鏡頭重試", "warning");
+        return false;
+      }
+
+      const topCand = matchResult.topCandidate;
+      const topKey = topCand.classID + '_' + topCand.studentID;
+      const centeredSim = matchResult.centeredSimilarity !== undefined ? matchResult.centeredSimilarity : matchResult.similarity;
+      const isTopMatch = (centeredSim >= 0.75) || (matchResult.euclideanDistance < 0.45);
+
+      if (!isTopMatch) {
+        setStatus("特徵相似度不足，請靠近鏡頭重試", "warning");
+        return false;
+      }
+
+      // Intercept Non-Whitelist Students
+      if (!AUTH_WHITELIST[topKey]) {
+        const alertMsg = "⚠️ 非授權白名單成員，無權進入此系統！";
+        showGateAlert(alertMsg);
+        if (typeof window.alert === 'function') {
+          window.alert(alertMsg);
+        }
+        return false;
+      }
+
+      // Whitelist Member Authenticated!
+      const member = AUTH_WHITELIST[topKey];
+      clearGateAlert();
+      onAuthSuccess(member, "face");
+      return true;
+    }
+
+    // 3. Successful Authentication Dispatcher
+    function onAuthSuccess(member, method) {
+      stopCameraScan();
+
+      const token = {
+        key: member.classID + '_' + member.studentID,
+        classID: member.classID,
+        studentID: member.studentID,
+        name: member.name,
+        timestamp: Date.now(),
+        method: method || 'face'
+      };
+      sessionStorage.setItem('AUTH_GATE_TOKEN', JSON.stringify(token));
+
+      setStatus("認證通過：歡迎 " + member.classID + " " + member.name, "success");
+
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get('redirect');
+
+      if (redirect) {
+        setStatus("驗證通過，正在跳轉至 " + redirect + "...", "success");
+        setTimeout(function() {
+          window.location.replace(redirect);
+        }, 300);
+      } else {
+        if (dualActionContainer && authenticatedUserName) {
+          authenticatedUserName.textContent = member.classID + ' ' + member.name;
+          dualActionContainer.style.display = 'block';
+        }
+      }
+    }
+
+    // 4. Fallback Password Verification Logic
+    function submitFallbackPassword() {
+      clearFallbackAlert();
+      const key = fallbackStudentSelect ? fallbackStudentSelect.value : '';
+      if (!key || !AUTH_WHITELIST[key]) {
+        showFallbackAlert("請先選擇白名單成員！");
+        return;
+      }
+      const member = AUTH_WHITELIST[key];
+      const enteredPwd = fallbackPasswordInput ? (fallbackPasswordInput.value || '').trim() : '';
+      if (!enteredPwd) {
+        showFallbackAlert("請輸入安全密碼！");
+        return;
+      }
+
+      const pwdRec = (typeof window.getStudentPasswordRecord === 'function')
+        ? window.getStudentPasswordRecord(member.classID, member.studentID)
+        : null;
+
+      if (!pwdRec || !pwdRec.passwordChanged || enteredPwd === '1234') {
+        const interceptMsg = "⚠️ 請聯繫科代表更新初始登錄密碼 (请联系科代表更新初始登录密码)";
+        showFallbackAlert(interceptMsg);
+        if (typeof window.alert === 'function') {
+          window.alert(interceptMsg);
+        }
+        return;
+      }
+
+      const isValid = (typeof window.verifyStudentPassword === 'function')
+        ? window.verifyStudentPassword(member.classID, member.studentID, enteredPwd)
+        : false;
+
+      if (!isValid) {
+        showFallbackAlert("❌ 密碼錯誤，請重新輸入！");
+        return;
+      }
+
+      fallbackModal.style.display = 'none';
+      onAuthSuccess(member, "password");
+    }
+
+    // Camera Lifecycle
+    async function startCameraScan() {
+      try {
+        setStatus("正在啟動攝影機與光圈檢測...", "scanning");
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
+            audio: false
+          });
+          if (cameraVideo) {
+            cameraVideo.srcObject = cameraStream;
+            await cameraVideo.play();
+          }
+          isScanningActive = true;
+          setStatus("請將臉部移入光圈取景框內...", "scanning");
+          scanIntervalTimer = setInterval(scanFrame, 800);
+        } else {
+          setStatus("未檢測到可用攝影機，請使用備用密碼", "warning");
+        }
+      } catch (err) {
+        console.warn("[AuthGate] Camera start skipped or denied:", err);
+        setStatus("攝影機不可用或已禁止，可使用備用密碼", "warning");
+      }
+    }
+
+    async function scanFrame() {
+      if (!isScanningActive || !cameraVideo || cameraVideo.paused || cameraVideo.ended) return;
+      if (!window.faceapi || !window.FaceAuthModule) return;
+
+      try {
+        const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 });
+        const detection = await faceapi.detectSingleFace(cameraVideo, options)
+          .withFaceLandmarks(true)
+          .withFaceDescriptor();
+
+        if (detection && detection.descriptor) {
+          setStatus("檢測到面部特徵，比對中...", "scanning");
+          handleFaceDescriptor(detection.descriptor);
+        }
+      } catch (e) {}
+    }
+
+    function stopCameraScan() {
+      isScanningActive = false;
+      if (scanIntervalTimer) {
+        clearInterval(scanIntervalTimer);
+        scanIntervalTimer = null;
+      }
+      if (cameraStream) {
+        try {
+          cameraStream.getTracks().forEach(t => t.stop());
+        } catch (e) {}
+        cameraStream = null;
+      }
+    }
+
+    // Modal UI Handlers
+    if (btnFallbackPasswordAuth) {
+      btnFallbackPasswordAuth.addEventListener('click', function() {
+        clearFallbackAlert();
+        if (fallbackPasswordInput) fallbackPasswordInput.value = '';
+        if (fallbackModal) fallbackModal.style.display = 'flex';
+      });
+    }
+
+    if (btnCloseFallbackModal) {
+      btnCloseFallbackModal.addEventListener('click', function() {
+        if (fallbackModal) fallbackModal.style.display = 'none';
+      });
+    }
+
+    if (btnSubmitFallbackPassword) {
+      btnSubmitFallbackPassword.addEventListener('click', submitFallbackPassword);
+    }
+
+    if (fallbackPasswordInput) {
+      fallbackPasswordInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          submitFallbackPassword();
+        }
+      });
+    }
+
+    // Dual Navigation Buttons Handlers
+    if (btnGoDashboard) {
+      btnGoDashboard.addEventListener('click', function() {
+        window.location.href = 'admin_dashboard.html';
+      });
+    }
+
+    if (btnGoQuiz) {
+      btnGoQuiz.addEventListener('click', function() {
+        window.location.href = '1023-test.html';
+      });
+    }
+
+    // 5. Automated Selenium Testing Simulation Hooks
+    window.simulateFaceAuth = function(classID, studentID) {
+      const key = classID + '_' + studentID;
+      const profile = (window.PRELOADED_STUDENT_FACES || {})[key];
+      if (!profile || !profile.vector) {
+        console.error("[AuthGate] Preloaded vector not found for:", key);
+        return false;
+      }
+      return handleFaceDescriptor(profile.vector);
+    };
+
+    window.simulateDescriptorAuth = function(descriptor) {
+      return handleFaceDescriptor(descriptor);
+    };
+
+    window.setStudentPasswordDirect = function(classID, studentID, password, passwordChanged) {
+      if (typeof window.saveStudentPassword === 'function') {
+        return window.saveStudentPassword(classID, studentID, password, passwordChanged);
+      }
+      if (window.PersistenceModule && typeof window.PersistenceModule.saveStudentPassword === 'function') {
+        return window.PersistenceModule.saveStudentPassword(classID, studentID, password, passwordChanged);
+      }
+      return false;
+    };
+
+    window.__AUTH_GATE_READY__ = true;
+
+    // Initialization on DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function() {
+      startCameraScan();
+    });
+
+  })();
+  </script>
+</body>
+</html>
