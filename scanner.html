@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>4CD 數學小測答題卡掃描器 (iPad 專用)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      background: rgba(15, 23, 42, 0.95);
+      border-bottom: 1px solid #334155;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+    .header-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-bar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .badge {
+      background: #1e293b;
+      border: 1px solid #475569;
+      border-radius: 9999px;
+      padding: 4px 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+    .badge.success { color: #4ade80; border-color: #22c55e; }
+    .badge.warning { color: #facc15; border-color: #eab308; }
+
+    #viewfinder-container {
+      flex: 1;
+      position: relative;
+      background: #020617;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    video {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    #overlay-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .guide-box {
+      position: absolute;
+      border: 2px dashed rgba(56, 189, 248, 0.6);
+      border-radius: 8px;
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.2s;
+    }
+    .guide-box.detected {
+      border: 3px solid #4ade80;
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55), 0 0 20px rgba(74, 222, 128, 0.4);
+    }
+    .corner-mark {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border: 3px solid #38bdf8;
+    }
+    .guide-box.detected .corner-mark { border-color: #4ade80; }
+    .corner-mark.tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+    .corner-mark.tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+    .corner-mark.bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+    .corner-mark.br { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+    .prompt-text {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid #334155;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 5;
+    }
+
+    #controls-panel {
+      background: #0f172a;
+      border-top: 1px solid #1e293b;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 15px;
+      z-index: 10;
+    }
+    .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease-in-out;
+    }
+    .btn:active { transform: scale(0.96); }
+    .btn-shutter {
+      background: #38bdf8;
+      color: #0f172a;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+    }
+    .btn-shutter:hover { background: #7dd3fc; }
+    .btn-secondary {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+    }
+    .btn-secondary:hover { background: #334155; }
+    
+    #toast {
+      position: fixed;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      border: 1px solid #38bdf8;
+      color: #f8fafc;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      z-index: 100;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    #toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-title">
+      <span>📐 4CD 數學大測二答題卡掃描</span>
+    </div>
+    <div class="badge-bar">
+      <div id="badge-scanned" class="badge">已拍攝: 0</div>
+      <div id="badge-uploading" class="badge warning">隊列: 0</div>
+      <div id="badge-success" class="badge success">雲端上傳: 0</div>
+    </div>
+  </header>
+
+  <div id="viewfinder-container">
+    <video id="camera-feed" autoplay playsinline muted webkit-playsinline></video>
+    <canvas id="overlay-canvas"></canvas>
+
+    <div id="guide-box" class="guide-box">
+      <div class="corner-mark tl"></div>
+      <div class="corner-mark tr"></div>
+      <div class="corner-mark bl"></div>
+      <div class="corner-mark br"></div>
+    </div>
+
+    <div id="prompt" class="prompt-text">請將答題卡的 4 個黑色方塊對齊框線內</div>
+  </div>
+
+  <div id="controls-panel">
+    <input type="file" id="file-input" accept="image/*" style="display: none;">
+    <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()">📁 相簿/檔案</button>
+    <button id="btn-snap" class="btn btn-shutter" title="拍照/掃描">
+      <div style="width: 28px; height: 28px; border-radius: 50%; background: #0f172a;"></div>
+    </button>
+    <button id="btn-switch-cam" class="btn btn-secondary">🔄 切換鏡頭</button>
+  </div>
+
+  <div id="toast"></div>
+
+  <!-- Offscreen Processing Canvas -->
+  <canvas id="work-canvas" style="display: none;"></canvas>
+  <canvas id="warp-canvas" width="2091" height="1037" style="display: none;"></canvas>
+
+  <script>
+    const GAS_UPLOAD_URL = "https://script.google.com/macros/s/AKfycbxjkXzqp4WOghvi__SF8qoVBGAcXcSKv96JoRsKN3hLU6xHwLjK4rHyaXODIv_fE9Ak/exec";
+    const TARGET_CANON_W = 2091;
+    const TARGET_CANON_H = 1037;
+    const CARD_ASPECT = TARGET_CANON_W / TARGET_CANON_H; // ~2.016
+
+    // Geometry Specification Coordinates from survey_spec_miner
+    const OMR_SPEC = {
+      class_bubbles: {
+        "4C": [0.28577, 0.10473],
+        "4D": [0.32044, 0.10473],
+        "5B": [0.35473, 0.10473]
+      },
+      id_tens_bubbles: {
+        "0": [0.28577, 0.17930],
+        "1": [0.30870, 0.17930],
+        "2": [0.33163, 0.17930],
+        "3": [0.35473, 0.17930]
+      },
+      id_units_bubbles: {
+        "0": [0.23991, 0.24899],
+        "1": [0.25705, 0.24899],
+        "2": [0.27419, 0.24899],
+        "3": [0.29133, 0.24899],
+        "4": [0.30870, 0.24899],
+        "5": [0.32584, 0.24899],
+        "6": [0.34298, 0.24899],
+        "7": [0.36012, 0.24899],
+        "8": [0.37726, 0.24899],
+        "9": [0.39440, 0.24899]
+      }
+    };
+
+    let videoEl = document.getElementById("camera-feed");
+    let guideBox = document.getElementById("guide-box");
+    let promptEl = document.getElementById("prompt");
+    let currentStream = null;
+    let facingMode = "environment";
+    
+    let scannedCount = 0;
+    let uploadQueue = [];
+    let isUploading = false;
+    let successCount = 0;
+
+    // Toast Notification
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.innerText = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2500);
+    }
+
+    // Update Counter Badges
+    function updateBadges() {
+      document.getElementById("badge-scanned").innerText = `已拍攝: ${scannedCount}`;
+      document.getElementById("badge-uploading").innerText = `隊列: ${uploadQueue.length}`;
+      document.getElementById("badge-success").innerText = `雲端上傳: ${successCount}`;
+    }
+
+    // Resize Guide Box to match A5 Card Aspect Ratio
+    function layoutGuideBox() {
+      const container = document.getElementById("viewfinder-container");
+      const cW = container.clientWidth;
+      const cH = container.clientHeight;
+      const margin = 30;
+
+      let bW, bH;
+      if (cW / cH > CARD_ASPECT) {
+        bH = cH - margin * 2;
+        bW = bH * CARD_ASPECT;
+      } else {
+        bW = cW - margin * 2;
+        bH = bW / CARD_ASPECT;
+      }
+      guideBox.style.width = `${bW}px`;
+      guideBox.style.height = `${bH}px`;
+      guideBox.style.left = `${(cW - bW) / 2}px`;
+      guideBox.style.top = `${(cH - bH) / 2}px`;
+    }
+    window.addEventListener("resize", layoutGuideBox);
+
+    // Initialize Camera Stream
+    async function startCamera() {
+      if (currentStream) {
+        currentStream.getTracks().forEach(t => t.stop());
+      }
+      try {
+        const constraints = {
+          video: {
+            facingMode: { ideal: facingMode },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+          },
+          audio: false
+        };
+        currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+        videoEl.srcObject = currentStream;
+        await videoEl.play();
+        layoutGuideBox();
+        requestAnimationFrame(tick);
+      } catch (err) {
+        console.error("Camera init error:", err);
+        showToast("相機啟動受阻，可點擊「相簿/檔案」手動上傳");
+      }
+    }
+
+    document.getElementById("btn-switch-cam").addEventListener("click", () => {
+      facingMode = (facingMode === "environment") ? "user" : "environment";
+      startCamera();
+    });
+
+    // File Upload Fallback
+    document.getElementById("file-input").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const img = new Image();
+        img.onload = () => processImageFrame(img);
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Snap Button Trigger
+    document.getElementById("btn-snap").addEventListener("click", () => {
+      if (!videoEl.videoWidth) return;
+      processImageFrame(videoEl);
+    });
+
+    // Computer Vision: Frame Processing & Rectification
+    function processImageFrame(source) {
+      const workCanvas = document.getElementById("work-canvas");
+      const ctx = workCanvas.getContext("2d");
+      
+      const sW = source.videoWidth || source.naturalWidth || source.width;
+      const sH = source.videoHeight || source.naturalHeight || source.height;
+      workCanvas.width = sW;
+      workCanvas.height = sH;
+      ctx.drawImage(source, 0, 0, sW, sH);
+
+      // Extract corners (or fallback to guide box bounds)
+      let corners = detectFourCornerMarkers(ctx, sW, sH);
+      if (!corners) {
+        // Fallback: Use guide box relative quad
+        corners = getGuideBoxQuadInImage(sW, sH);
+      }
+
+      // Warp perspective into 2091 x 1037 canonical canvas
+      const warpCanvas = document.getElementById("warp-canvas");
+      warpQuadToCanonical(workCanvas, warpCanvas, corners);
+
+      // Perform OMR Bubble Reading
+      const omrResult = decodeOMRBubbles(warpCanvas);
+      
+      // Generate Filename
+      const now = new Date();
+      const ts = now.getFullYear().toString() +
+        String(now.getMonth() + 1).padStart(2, '0') +
+        String(now.getDate()).padStart(2, '0') + "_" +
+        String(now.getHours()).padStart(2, '0') +
+        String(now.getMinutes()).padStart(2, '0') +
+        String(now.getSeconds()).padStart(2, '0');
+
+      const classID = omrResult.classID || "4C";
+      const studentID = omrResult.studentID || "0";
+      const fileName = `4CD@1030-${classID}-${studentID}-${ts}.jpg`;
+
+      // Export High Quality JPEG
+      const base64Data = warpCanvas.toDataURL("image/jpeg", 0.92).split(",")[1];
+
+      // Enqueue Upload
+      enqueueUpload({
+        fileName: fileName,
+        classID: `4CD@1030-${classID}`,
+        studentID: studentID,
+        studentName: omrResult.studentName || "學生",
+        timestamp: ts,
+        base64: base64Data
+      });
+
+      scannedCount++;
+      updateBadges();
+      showToast(`✅ 掃描成功: ${classID}班 ${studentID}號`);
+    }
+
+    // Corner Square Detection
+    function detectFourCornerMarkers(ctx, w, h) {
+      // Scale down for fast candidate search
+      const scale = Math.min(1.0, 800 / Math.max(w, h));
+      const sw = Math.floor(w * scale);
+      const sh = Math.floor(h * scale);
+      
+      const smallCanvas = document.createElement("canvas");
+      smallCanvas.width = sw;
+      smallCanvas.height = sh;
+      const sctx = smallCanvas.getContext("2d");
+      sctx.drawImage(ctx.canvas, 0, 0, sw, sh);
+      
+      const imgData = sctx.getImageData(0, 0, sw, sh);
+      const data = imgData.data;
+      
+      // Calculate grayscale threshold
+      let sum = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        sum += (data[i] + data[i+1] + data[i+2]) / 3;
+      }
+      const mean = sum / (sw * sh);
+      const thresh = mean * 0.45; // Dark anchor threshold
+
+      // Connected component analysis on grid
+      const visited = new Uint8Array(sw * sh);
+      const candidates = [];
+
+      for (let y = 4; y < sh - 4; y += 2) {
+        for (let x = 4; x < sw - 4; x += 2) {
+          const idx = y * sw + x;
+          const gray = (data[idx*4] + data[idx*4+1] + data[idx*4+2]) / 3;
+          if (!visited[idx] && gray < thresh) {
+            let minX = x, maxX = x, minY = y, maxY = y, area = 0;
+            const q = [x, y];
+            visited[idx] = 1;
+            while (q.length > 0) {
+              const cy = q.pop();
+              const cx = q.pop();
+              area++;
+              if (cx < minX) minX = cx;
+              if (cx > maxX) maxX = cx;
+              if (cy < minY) minY = cy;
+              if (cy > maxY) maxY = cy;
+
+              const neighbors = [[cx-1, cy], [cx+1, cy], [cx, cy-1], [cx, cy+1]];
+              for (const [nx, ny] of neighbors) {
+                if (nx >= 0 && nx < sw && ny >= 0 && ny < sh) {
+                  const nidx = ny * sw + nx;
+                  if (!visited[nidx]) {
+                    visited[nidx] = 1;
+                    const ngray = (data[nidx*4] + data[nidx*4+1] + data[nidx*4+2]) / 3;
+                    if (ngray < thresh) {
+                      q.push(nx, ny);
+                    }
+                  }
+                }
+              }
+            }
+            const bw = maxX - minX + 1;
+            const bh = maxY - minY + 1;
+            const fill = area / (bw * bh);
+            const aspect = bw / bh;
+            if (area >= 15 && area <= 3000 && aspect >= 0.7 && aspect <= 1.45 && fill >= 0.72) {
+              candidates.push({
+                x: ((minX + maxX) / 2) / scale,
+                y: ((minY + maxY) / 2) / scale,
+                area: area,
+                fill: fill
+              });
+            }
+          }
+        }
+      }
+
+      if (candidates.length < 4) return null;
+
+      // Group into 4 quadrants
+      const avgX = candidates.reduce((s, c) => s + c.x, 0) / candidates.length;
+      const avgY = candidates.reduce((s, c) => s + c.y, 0) / candidates.length;
+
+      const tlCands = candidates.filter(c => c.x < avgX && c.y < avgY);
+      const trCands = candidates.filter(c => c.x > avgX && c.y < avgY);
+      const blCands = candidates.filter(c => c.x < avgX && c.y > avgY);
+      const brCands = candidates.filter(c => c.x > avgX && c.y > avgY);
+
+      if (!tlCands.length || !trCands.length || !blCands.length || !brCands.length) return null;
+
+      return {
+        tl: tlCands.sort((a,b) => b.fill - a.fill)[0],
+        tr: trCands.sort((a,b) => b.fill - a.fill)[0],
+        bl: blCands.sort((a,b) => b.fill - a.fill)[0],
+        br: brCands.sort((a,b) => b.fill - a.fill)[0]
+      };
+    }
+
+    // Guide Box Fallback Quad
+    function getGuideBoxQuadInImage(imgW, imgH) {
+      const container = document.getElementById("viewfinder-container");
+      const cW = container.clientWidth;
+      const cH = container.clientHeight;
+      const gb = guideBox.getBoundingClientRect();
+      const cb = container.getBoundingClientRect();
+
+      const relL = (gb.left - cb.left) / cW;
+      const relT = (gb.top - cb.top) / cH;
+      const relW = gb.width / cW;
+      const relH = gb.height / cH;
+
+      return {
+        tl: { x: relL * imgW, y: relT * imgH },
+        tr: { x: (relL + relW) * imgW, y: relT * imgH },
+        bl: { x: relL * imgW, y: (relT + relH) * imgH },
+        br: { x: (relL + relW) * imgW, y: (relT + relH) * imgH }
+      };
+    }
+
+    // Closed-Form Bilinear Homography Warp
+    function warpQuadToCanonical(srcCanvas, dstCanvas, quad) {
+      const dstCtx = dstCanvas.getContext("2d");
+      const dW = dstCanvas.width;
+      const dH = dstCanvas.height;
+
+      const sCtx = srcCanvas.getContext("2d");
+      const sImgData = sCtx.getImageData(0, 0, srcCanvas.width, srcCanvas.height);
+      const sData = sImgData.data;
+      const sW = srcCanvas.width;
+      const sH = srcCanvas.height;
+
+      const dImgData = dstCtx.createImageData(dW, dH);
+      const dData = dImgData.data;
+
+      const x0 = quad.tl.x, y0 = quad.tl.y;
+      const x1 = quad.tr.x, y1 = quad.tr.y;
+      const x2 = quad.br.x, y2 = quad.br.y;
+      const x3 = quad.bl.x, y3 = quad.bl.y;
+
+      const dx1 = x1 - x2, dx2 = x3 - x2, dx3 = x0 - x1 + x2 - x3;
+      const dy1 = y1 - y2, dy2 = y3 - y2, dy3 = y0 - y1 + y2 - y3;
+      const den = dx1 * dy2 - dx2 * dy1;
+
+      const g = (dx3 * dy2 - dx2 * dy3) / den;
+      const h = (dx1 * dy3 - dx3 * dy1) / den;
+      const a = x1 - x0 + g * x1;
+      const b = x3 - x0 + h * x3;
+      const c = x0;
+      const d = y1 - y0 + g * y1;
+      const e = y3 - y0 + h * y3;
+      const f = y0;
+
+      let dIdx = 0;
+      for (let y = 0; y < dH; y++) {
+        const v = y / (dH - 1);
+        for (let x = 0; x < dW; x++) {
+          const u = x / (dW - 1);
+          const wDenom = g * u + h * v + 1.0;
+          const sx = (a * u + b * v + c) / wDenom;
+          const sy = (d * u + e * v + f) / wDenom;
+
+          const ix = Math.floor(sx);
+          const iy = Math.floor(sy);
+          if (ix >= 0 && ix < sW && iy >= 0 && iy < sH) {
+            const sIdx = (iy * sW + ix) * 4;
+            dData[dIdx] = sData[sIdx];
+            dData[dIdx+1] = sData[sIdx+1];
+            dData[dIdx+2] = sData[sIdx+2];
+            dData[dIdx+3] = 255;
+          } else {
+            dData[dIdx] = 255;
+            dData[dIdx+1] = 255;
+            dData[dIdx+2] = 255;
+            dData[dIdx+3] = 255;
+          }
+          dIdx += 4;
+        }
+      }
+      dstCtx.putImageData(dImgData, 0, 0);
+    }
+
+    // Optical Mark Recognition (OMR)
+    function decodeOMRBubbles(canvas) {
+      const ctx = canvas.getContext("2d");
+      const imgData = ctx.getImageData(0, 0, TARGET_CANON_W, TARGET_CANON_H);
+      const data = imgData.data;
+
+      function sampleDarkness(u, v) {
+        const cx = Math.floor(u * TARGET_CANON_W);
+        const cy = Math.floor(v * TARGET_CANON_H);
+        const r = 14;
+        let sum = 0, count = 0;
+        for (let dy = -r; dy <= r; dy++) {
+          for (let dx = -r; dx <= r; dx++) {
+            if (dx*dx + dy*dy <= r*r) {
+              const px = cx + dx;
+              const py = cy + dy;
+              if (px >= 0 && px < TARGET_CANON_W && py >= 0 && py < TARGET_CANON_H) {
+                const idx = (py * TARGET_CANON_W + px) * 4;
+                const gray = (data[idx] + data[idx+1] + data[idx+2]) / 3;
+                sum += (255 - gray);
+                count++;
+              }
+            }
+          }
+        }
+        return count > 0 ? (sum / count) : 0;
+      }
+
+      // Class
+      let bestClass = "4C", maxClassDark = -1;
+      for (const [cName, uv] of Object.entries(OMR_SPEC.class_bubbles)) {
+        const score = sampleDarkness(uv[0], uv[1]);
+        if (score > maxClassDark) {
+          maxClassDark = score;
+          bestClass = cName;
+        }
+      }
+
+      // Tens
+      let bestTens = "0", maxTensDark = -1;
+      for (const [tName, uv] of Object.entries(OMR_SPEC.id_tens_bubbles)) {
+        const score = sampleDarkness(uv[0], uv[1]);
+        if (score > maxTensDark) {
+          maxTensDark = score;
+          bestTens = tName;
+        }
+      }
+
+      // Units
+      let bestUnits = "0", maxUnitsDark = -1;
+      for (const [uName, uv] of Object.entries(OMR_SPEC.id_units_bubbles)) {
+        const score = sampleDarkness(uv[0], uv[1]);
+        if (score > maxUnitsDark) {
+          maxUnitsDark = score;
+          bestUnits = uName;
+        }
+      }
+
+      const studentID = String(parseInt(bestTens, 10) * 10 + parseInt(bestUnits, 10));
+      return {
+        classID: bestClass,
+        studentID: studentID
+      };
+    }
+
+    // Silent Upload Queue via Google Apps Script
+    function enqueueUpload(payload) {
+      uploadQueue.push(payload);
+      processUploadQueue();
+    }
+
+    async function processUploadQueue() {
+      if (isUploading || uploadQueue.length === 0) return;
+      isUploading = true;
+      updateBadges();
+
+      const item = uploadQueue.shift();
+      try {
+        const bodyPayload = JSON.stringify({
+          action: "upload_scan",
+          fileName: item.fileName,
+          classID: item.classID,
+          studentID: item.studentID,
+          studentName: item.studentName,
+          timestamp: item.timestamp,
+          image: item.base64
+        });
+
+        // Use text/plain to avoid preflight OPTIONS CORS issue
+        const resp = await fetch(GAS_UPLOAD_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: bodyPayload
+        });
+        
+        successCount++;
+      } catch (err) {
+        console.error("Upload error, re-enqueuing:", err);
+        // Retry
+        uploadQueue.push(item);
+      } finally {
+        isUploading = false;
+        updateBadges();
+        if (uploadQueue.length > 0) {
+          setTimeout(processUploadQueue, 500);
+        }
+      }
+    }
+
+    // Real-time Viewfinder loop
+    function tick() {
+      if (videoEl.readyState === videoEl.HAVE_ENOUGH_DATA) {
+        const overlay = document.getElementById("overlay-canvas");
+        overlay.width = overlay.clientWidth;
+        overlay.height = overlay.clientHeight;
+        const octx = overlay.getContext("2d");
+        octx.clearRect(0, 0, overlay.width, overlay.height);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // Auto-Start Camera on load
+    window.addEventListener("DOMContentLoaded", () => {
+      layoutGuideBox();
+      startCamera();
+    });
+  </script>
+</body>
+</html>

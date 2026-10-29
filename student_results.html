@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>4CD 數學大測二公式小測 — 學生在線查分與留痕答題卡</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0f172a;
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 16px;
+    }
+    header {
+      width: 100%;
+      max-width: 800px;
+      text-align: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #334155;
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 8px;
+    }
+    p.subtitle {
+      font-size: 0.95rem;
+      color: #94a3b8;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 600px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+    }
+    input, select {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid #475569;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      color: #f8fafc;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus {
+      border-color: #38bdf8;
+    }
+
+    .btn {
+      width: 100%;
+      background: #0284c7;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.15s;
+    }
+    .btn:hover { background: #0369a1; }
+    .btn:active { transform: scale(0.98); }
+
+    /* Result Display */
+    #result-view {
+      display: none;
+      width: 100%;
+      max-width: 800px;
+      text-align: center;
+    }
+    .result-badge {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid #38bdf8;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+    .result-badge div {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    .marked-img {
+      width: 100%;
+      border-radius: 12px;
+      border: 2px solid #475569;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+      margin-bottom: 20px;
+    }
+
+    .security-tag {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: #4ade80;
+      margin-top: 15px;
+    }
+
+    #error-msg {
+      color: #f87171;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: center;
+      margin-top: 12px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🔐 4CD 數學大測二公式小測查分系統</h1>
+    <p class="subtitle">端對端加密技術保障隱私 — 僅憑個人登入憑證與專屬口令解密個人考卷</p>
+  </header>
+
+  <div id="login-card" class="card">
+    <div class="form-group">
+      <label for="class-select">選擇班別</label>
+      <select id="class-select">
+        <option value="4C">高二 4C 班</option>
+        <option value="4D">高二 4D 班</option>
+        <option value="5B">高三 5B 班</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="student-id">學生學號 (例如: 15 或 29)</label>
+      <input type="number" id="student-id" placeholder="請輸入學號 (數字)" min="1" max="39">
+    </div>
+
+    <div class="form-group">
+      <label for="passcode">個人登入密鑰 / 查詢口令</label>
+      <input type="password" id="passcode" placeholder="請輸入個人口令 (如: 4C29-KSZW)">
+    </div>
+
+    <button id="btn-decrypt" class="btn" onclick="decryptAndShowResult()">
+      <span>🔓 安全解密並查看我的答題卡</span>
+    </button>
+
+    <div id="error-msg"></div>
+
+    <div class="security-tag">
+      <span>🛡️ AES-256-GCM 本地內存解密，伺服器不儲存明文</span>
+    </div>
+  </div>
+
+  <div id="result-view">
+    <div class="result-badge">
+      <div id="res-student-info">4C 班 29 號 譚欣</div>
+      <div style="color: #4ade80;">解密狀態: ✅ 驗證通過</div>
+    </div>
+
+    <img id="decrypted-image" class="marked-img" src="" alt="解密後的留痕答題卡">
+
+    <button class="btn" style="background: #334155; max-width: 300px; margin: 0 auto;" onclick="returnToLogin()">
+      <span>⬅️ 返回重新查詢</span>
+    </button>
+  </div>
+
+  <script>
+    // Check if student already authenticated in math_platform
+    window.addEventListener("DOMContentLoaded", () => {
+      try {
+        const tokenStr = sessionStorage.getItem("AUTH_GATE_TOKEN") || localStorage.getItem("MATH_USER_SESSION");
+        if (tokenStr) {
+          const token = JSON.parse(tokenStr);
+          if (token.classID) document.getElementById("class-select").value = token.classID;
+          if (token.studentID) document.getElementById("student-id").value = token.studentID;
+          if (token.key) document.getElementById("passcode").value = token.key;
+        }
+      } catch (e) {}
+    });
+
+    function showError(msg) {
+      const el = document.getElementById("error-msg");
+      el.innerText = msg;
+      el.style.display = "block";
+    }
+
+    function clearError() {
+      const el = document.getElementById("error-msg");
+      el.style.display = "none";
+    }
+
+    async function decryptAndShowResult() {
+      clearError();
+      const classID = document.getElementById("class-select").value.trim();
+      const studentID = document.getElementById("student-id").value.trim();
+      const passcode = document.getElementById("passcode").value.trim();
+
+      if (!studentID || !passcode) {
+        showError("請填寫完整的學號與查詢口令！");
+        return;
+      }
+
+      const btn = document.getElementById("btn-decrypt");
+      btn.innerText = "⏳ 正在獲取加密資料並進行金鑰解密...";
+      btn.disabled = true;
+
+      try {
+        // 1. Fetch encrypted payload from GitHub Pages
+        const encUrl = `quiz_results/${classID}_${studentID}.enc?t=${Date.now()}`;
+        const resp = await fetch(encUrl);
+        if (!resp.ok) {
+          throw new Error("查無此學號的加密考卷檔案，或批改尚未發布！");
+        }
+        const encBuffer = await resp.arrayBuffer();
+
+        // 2. Validate payload structure: 12-byte IV + Ciphertext with 16-byte tag
+        if (encBuffer.byteLength < 28) {
+          throw new Error("加密檔案數據長度異常！");
+        }
+        const iv = encBuffer.slice(0, 12);
+        const ciphertext = encBuffer.slice(12);
+
+        // 3. Derive AES-256 Key via Web Crypto SHA-256
+        const saltStr = `F4CD_1030_SECRET_${classID}_${studentID}_${passcode}`;
+        const keyHash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(saltStr));
+
+        const cryptoKey = await crypto.subtle.importKey(
+          "raw",
+          keyHash,
+          { name: "AES-GCM" },
+          false,
+          ["decrypt"]
+        );
+
+        // 4. Decrypt in-memory
+        const decryptedBuffer = await crypto.subtle.decrypt(
+          { name: "AES-GCM", iv: new Uint8Array(iv) },
+          cryptoKey,
+          ciphertext
+        );
+
+        // 5. Create in-memory Blob URL
+        const blob = new Blob([decryptedBuffer], { type: "image/jpeg" });
+        const imgUrl = URL.createObjectURL(blob);
+
+        document.getElementById("decrypted-image").src = imgUrl;
+        document.getElementById("res-student-info").innerText = `${classID} 班 ${studentID} 號同學 — 留痕答題卡`;
+        
+        document.getElementById("login-card").style.display = "none";
+        document.getElementById("result-view").style.display = "block";
+      } catch (err) {
+        console.error("Decryption failed:", err);
+        if (err.name === "OperationError") {
+          showError("❌ 口令錯誤！無法解密此考卷，請確認口令是否正確輸入。");
+        } else {
+          showError(`❌ 解密失敗：${err.message}`);
+        }
+      } finally {
+        btn.innerText = "🔓 安全解密並查看我的答題卡";
+        btn.disabled = false;
+      }
+    }
+
+    function returnToLogin() {
+      document.getElementById("result-view").style.display = "none";
+      document.getElementById("login-card").style.display = "block";
+    }
+  </script>
+</body>
+</html>
