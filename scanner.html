@@ -407,6 +407,16 @@
 
       const classID = omrResult.classID || "4C";
       const studentID = omrResult.studentID || "0";
+
+      // Look up student name from Roster if available
+      let studentName = "";
+      if (typeof getStudentName === "function") {
+        studentName = getStudentName(classID, parseInt(studentID, 10)) || "";
+      } else if (window.RosterModule && typeof window.RosterModule.getStudentName === "function") {
+        studentName = window.RosterModule.getStudentName(classID, parseInt(studentID, 10)) || "";
+      }
+      if (!studentName) studentName = `學生_${studentID}`;
+
       const fileName = `4CD@1030-${classID}-${studentID}-${ts}.jpg`;
 
       // Export High Quality JPEG
@@ -416,8 +426,10 @@
       enqueueUpload({
         fileName: fileName,
         classID: `4CD@1030-${classID}`,
+        detectedClass: classID,
         studentID: studentID,
-        studentName: omrResult.studentName || "學生",
+        studentName: studentName,
+        tag: "EX",
         timestamp: ts,
         base64: base64Data
       });
@@ -690,7 +702,10 @@
           classID: item.classID,
           studentID: item.studentID,
           studentName: item.studentName,
+          tag: item.tag || "EX",
           timestamp: item.timestamp,
+          imageBase64: item.base64,
+          base64: item.base64,
           image: item.base64
         });
 
