@@ -240,36 +240,37 @@
   <canvas id="work-canvas" style="display: none;"></canvas>
   <canvas id="warp-canvas" width="2091" height="1037" style="display: none;"></canvas>
 
+  <script src="js/roster.js"></script>
   <script>
     const GAS_UPLOAD_URL = "https://script.google.com/macros/s/AKfycbxjkXzqp4WOghvi__SF8qoVBGAcXcSKv96JoRsKN3hLU6xHwLjK4rHyaXODIv_fE9Ak/exec";
     const TARGET_CANON_W = 2091;
     const TARGET_CANON_H = 1037;
     const CARD_ASPECT = TARGET_CANON_W / TARGET_CANON_H; // ~2.016
 
-    // Geometry Specification Coordinates from survey_spec_miner
+    // Geometry Specification Coordinates from survey_spec_miner (verified against Page 2 PDF)
     const OMR_SPEC = {
       class_bubbles: {
         "4C": [0.28577, 0.10473],
-        "4D": [0.32044, 0.10473],
-        "5B": [0.35473, 0.10473]
+        "4D": [0.39385, 0.10473],
+        "5B": [0.50193, 0.10473]
       },
       id_tens_bubbles: {
-        "0": [0.28577, 0.17930],
-        "1": [0.30870, 0.17930],
-        "2": [0.33163, 0.17930],
-        "3": [0.35473, 0.17930]
+        "0": [0.15533, 0.17930],
+        "1": [0.26018, 0.17930],
+        "2": [0.36492, 0.17930],
+        "3": [0.46965, 0.17930]
       },
       id_units_bubbles: {
-        "0": [0.23991, 0.24899],
-        "1": [0.25705, 0.24899],
-        "2": [0.27419, 0.24899],
-        "3": [0.29133, 0.24899],
-        "4": [0.30870, 0.24899],
-        "5": [0.32584, 0.24899],
-        "6": [0.34298, 0.24899],
-        "7": [0.36012, 0.24899],
-        "8": [0.37726, 0.24899],
-        "9": [0.39440, 0.24899]
+        "0": [0.15533, 0.24898],
+        "1": [0.21583, 0.24898],
+        "2": [0.27620, 0.24898],
+        "3": [0.33670, 0.24898],
+        "4": [0.39708, 0.24898],
+        "5": [0.45758, 0.24898],
+        "6": [0.51795, 0.24898],
+        "7": [0.57849, 0.24898],
+        "8": [0.63887, 0.24898],
+        "9": [0.69937, 0.24898]
       }
     };
 

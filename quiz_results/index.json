@@ -6,8 +6,8 @@
     "score": 100,
     "timestamp": "2026-10-30 01:39:42",
     "file": "4C_29.enc",
-    "iv": "NAAg4vwFtifiFeeg",
-    "tag": "+Oy1MaoNxyT1q+z1JVxgBw==",
+    "iv": "qaDRJyEbiAAf52fk",
+    "tag": "CHg+OLomGunPTrdYrKkMtg==",
     "cipherLength": 351079
   },
   {
@@ -17,8 +17,8 @@
     "score": 84,
     "timestamp": "2026-10-30 01:39:58",
     "file": "4D_15.enc",
-    "iv": "J8brO0w6ujA2ygBt",
-    "tag": "cS4Vi+LO8Tiks0SRyoWmvw==",
+    "iv": "aLOteyUIFV5319nh",
+    "tag": "dPOK+2SgYB8qyJ1rQfmIsg==",
     "cipherLength": 351797
   }
 ]
