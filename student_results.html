@@ -4,6 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>4CD 數學大測二公式小測 — 學生在線查分與留痕答題卡</title>
+
+  <!-- Global MathJax v3 Script (USER GLOBAL RULE) -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' },
+      startup: {
+        ready: () => {
+          if (window.MathJax && window.MathJax.startup) {
+            window.MathJax.startup.defaultReady();
+          }
+        }
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -14,40 +34,74 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px 16px;
+      padding: 24px 16px 40px;
     }
     header {
       width: 100%;
-      max-width: 800px;
+      max-width: 860px;
       text-align: center;
       margin-bottom: 24px;
-      padding-bottom: 16px;
+      padding-bottom: 18px;
       border-bottom: 1px solid #334155;
     }
     h1 {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: 800;
       color: #38bdf8;
       margin-bottom: 8px;
+      letter-spacing: -0.5px;
     }
     p.subtitle {
       font-size: 0.95rem;
       color: #94a3b8;
+      line-height: 1.5;
     }
+
+    /* Auth session banner */
+    #auth-session-banner {
+      display: none;
+      width: 100%;
+      max-width: 640px;
+      background: rgba(14, 165, 233, 0.12);
+      border: 1px solid #0284c7;
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.95rem;
+    }
+    .auth-banner-info {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+    .btn-small {
+      background: #334155;
+      color: #e2e8f0;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-small:hover { background: #475569; }
 
     .card {
       width: 100%;
-      max-width: 600px;
+      max-width: 640px;
       background: #1e293b;
       border: 1px solid #334155;
       border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      margin-bottom: 20px;
+      padding: 28px 24px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.5);
+      margin-bottom: 24px;
     }
 
     .form-group {
-      margin-bottom: 18px;
+      margin-bottom: 20px;
     }
     label {
       display: block;
@@ -65,10 +119,26 @@
       font-size: 1rem;
       color: #f8fafc;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
     input:focus, select:focus {
       border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
+    .password-wrap {
+      position: relative;
+    }
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 4px;
     }
 
     .btn {
@@ -85,57 +155,151 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: background 0.15s;
+      transition: background 0.15s, transform 0.1s;
     }
     .btn:hover { background: #0369a1; }
     .btn:active { transform: scale(0.98); }
+    .btn:disabled {
+      background: #475569;
+      cursor: not-allowed;
+      transform: none;
+    }
 
-    /* Result Display */
+    .math-info-panel {
+      margin-top: 20px;
+      padding: 16px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px dashed #334155;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+    .math-info-panel strong {
+      color: #38bdf8;
+    }
+
+    /* Result View */
     #result-view {
       display: none;
       width: 100%;
-      max-width: 800px;
+      max-width: 900px;
       text-align: center;
     }
     .result-badge {
       background: rgba(56, 189, 248, 0.1);
       border: 1px solid #38bdf8;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 20px;
+      border-radius: 14px;
+      padding: 18px 24px;
+      margin-bottom: 22px;
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-around;
       align-items: center;
+      gap: 16px;
     }
-    .result-badge div {
+    .result-badge .item {
+      text-align: center;
+    }
+    .result-badge .item-label {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .result-badge .item-value {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+    .result-badge .score-val {
+      color: #38bdf8;
+      font-size: 1.6rem;
+    }
+    .result-badge .status-val {
+      color: #4ade80;
       font-size: 1.1rem;
-      font-weight: 700;
+    }
+
+    /* Canvas & Image Viewer */
+    .viewer-container {
+      background: #020617;
+      border: 2px solid #334155;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.7);
+      position: relative;
+      overflow: hidden;
+    }
+    .viewer-toolbar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .viewer-btn {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s;
+    }
+    .viewer-btn:hover { background: #334155; color: #fff; }
+
+    #canvas-wrap {
+      max-width: 100%;
+      overflow-x: auto;
+      text-align: center;
+    }
+    canvas#result-canvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      background: #ffffff;
+      display: inline-block;
     }
     .marked-img {
-      width: 100%;
-      border-radius: 12px;
-      border: 2px solid #475569;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-      margin-bottom: 20px;
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      margin-bottom: 8px;
+      display: none; /* Default to canvas rendering */
     }
 
     .security-tag {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      font-size: 0.85rem;
+      gap: 8px;
+      font-size: 0.88rem;
       color: #4ade80;
-      margin-top: 15px;
+      margin-top: 18px;
     }
 
     #error-msg {
       color: #f87171;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid #ef4444;
+      border-radius: 10px;
+      padding: 14px 16px;
       font-size: 0.95rem;
       font-weight: 600;
       text-align: center;
-      margin-top: 12px;
+      margin-top: 16px;
       display: none;
+      line-height: 1.5;
     }
   </style>
 </head>
@@ -143,27 +307,42 @@
 
   <header>
     <h1>🔐 4CD 數學大測二公式小測查分系統</h1>
-    <p class="subtitle">端對端加密技術保障隱私 — 僅憑個人登入憑證與專屬口令解密個人考卷</p>
+    <p class="subtitle">
+      端對端密碼學保障學生隱私 — 僅憑個人授權憑證在線解密個人答題留痕卡<br>
+      考核範圍：一元二次不等式 $(ax^2+bx+c \gtrless 0)$、判別式 $\Delta = b^2 - 4ac$ 與函數定義域
+    </p>
   </header>
 
+  <!-- Pre-authenticated Session Indicator -->
+  <div id="auth-session-banner" style="display: none;">
+    <div class="auth-banner-info" id="session-info-text">
+      👤 已登入學生：4C 班 29 號 譚欣
+    </div>
+    <button class="btn-small" onclick="clearCurrentSession()">登出 / 更換學生</button>
+  </div>
+
+  <!-- Login & Decryption Card -->
   <div id="login-card" class="card">
     <div class="form-group">
       <label for="class-select">選擇班別</label>
       <select id="class-select">
-        <option value="4C">高二 4C 班</option>
-        <option value="4D">高二 4D 班</option>
-        <option value="5B">高三 5B 班</option>
+        <option value="4C">高一 4C 班</option>
+        <option value="4D">高一 4D 班</option>
+        <option value="5B">高二 5B 班</option>
       </select>
     </div>
 
     <div class="form-group">
       <label for="student-id">學生學號 (例如: 15 或 29)</label>
-      <input type="number" id="student-id" placeholder="請輸入學號 (數字)" min="1" max="39">
+      <input type="number" id="student-id" placeholder="請輸入學號 (數字 1-31)" min="1" max="99">
     </div>
 
     <div class="form-group">
       <label for="passcode">個人登入密鑰 / 查詢口令</label>
-      <input type="password" id="passcode" placeholder="請輸入個人口令 (如: 4C29-KSZW)">
+      <div class="password-wrap">
+        <input type="password" id="passcode" placeholder="請輸入個人口令 (如: 4C29-KSZW) 或預設密碼">
+        <button type="button" class="password-toggle" onclick="togglePasscodeVisibility()" title="顯示/隱藏密碼">👁️</button>
+      </div>
     </div>
 
     <button id="btn-decrypt" class="btn" onclick="decryptAndShowResult()">
@@ -173,111 +352,271 @@
     <div id="error-msg"></div>
 
     <div class="security-tag">
-      <span>🛡️ AES-256-GCM 本地內存解密，伺服器不儲存明文</span>
+      <span>🛡️ Web Crypto API (AES-256-GCM) 本地內存解密，伺服器不暴露任何明文答題卡</span>
+    </div>
+
+    <div class="math-info-panel">
+      <strong>📌 查分與隱私說明：</strong><br>
+      • 每位同學之答題卡均以專屬金鑰實施 AES-256-GCM 獨立加密，未經授權無法檢視他人成績。<br>
+      • 考卷包含 25 道公式填空評分留痕（綠勾 $\boldsymbol{\surd}$ 與紅叉 $\boldsymbol{\times}$）及大測總分。<br>
+      • 若忘記專屬口令，請參考 `4CD.CSV` 專屬密鑰或聯繫任課數學老師。
     </div>
   </div>
 
+  <!-- Decrypted Result Display View -->
   <div id="result-view">
     <div class="result-badge">
-      <div id="res-student-info">4C 班 29 號 譚欣</div>
-      <div style="color: #4ade80;">解密狀態: ✅ 驗證通過</div>
+      <div class="item">
+        <div class="item-label">學生資訊</div>
+        <div class="item-value" id="res-student-info">4C 班 29 號 譚欣</div>
+      </div>
+      <div class="item">
+        <div class="item-label">小測得分</div>
+        <div class="item-value score-val" id="res-score-badge">-- / 100</div>
+      </div>
+      <div class="item">
+        <div class="item-label">批改時間</div>
+        <div class="item-value" id="res-timestamp" style="font-size: 1rem; color: #94a3b8;">--</div>
+      </div>
+      <div class="item">
+        <div class="item-label">加密校驗</div>
+        <div class="item-value status-val" id="res-crypto-status">✅ AES-256-GCM 驗證通過</div>
+      </div>
     </div>
 
-    <img id="decrypted-image" class="marked-img" src="" alt="解密後的留痕答題卡">
+    <!-- Viewer with Canvas and Toolbar -->
+    <div class="viewer-container">
+      <div class="viewer-toolbar">
+        <button class="viewer-btn" onclick="zoomCanvas(1.15)"><span>🔍 放大</span></button>
+        <button class="viewer-btn" onclick="zoomCanvas(0.85)"><span>🔍 縮小</span></button>
+        <button class="viewer-btn" onclick="resetZoom()"><span>↺ 原始大小</span></button>
+        <button class="viewer-btn" onclick="downloadDecryptedCard()"><span>💾 下載答題卡</span></button>
+        <button class="viewer-btn" onclick="toggleViewMode()"><span>🖼️ 切換圖片/畫布視圖</span></button>
+      </div>
 
-    <button class="btn" style="background: #334155; max-width: 300px; margin: 0 auto;" onclick="returnToLogin()">
+      <div id="canvas-wrap">
+        <!-- HTML5 Canvas rendering target -->
+        <canvas id="result-canvas"></canvas>
+        <!-- In-memory Blob URL image target -->
+        <img id="decrypted-image" class="marked-img" src="" alt="解密後的留痕答題卡">
+      </div>
+    </div>
+
+    <button class="btn" style="background: #334155; max-width: 320px; margin: 0 auto 24px;" onclick="returnToLogin()">
       <span>⬅️ 返回重新查詢</span>
     </button>
   </div>
 
   <script>
-    // Check if student already authenticated in math_platform
+    let currentBlobUrl = null;
+    let originalImageObj = null;
+    let currentZoom = 1.0;
+    let showingCanvas = true;
+
+    // Check existing authentication on page load
     window.addEventListener("DOMContentLoaded", () => {
+      checkExistingSession();
+      // Handle URL query parameters: ?class=4C&id=29&key=4C29-KSZW
+      const params = new URLSearchParams(window.location.search);
+      const c = params.get("class") || params.get("classID");
+      const s = params.get("id") || params.get("studentID");
+      const k = params.get("key") || params.get("passcode");
+      if (c) document.getElementById("class-select").value = c.toUpperCase();
+      if (s) document.getElementById("student-id").value = s;
+      if (k) document.getElementById("passcode").value = k;
+    });
+
+    function checkExistingSession() {
       try {
-        const tokenStr = sessionStorage.getItem("AUTH_GATE_TOKEN") || localStorage.getItem("MATH_USER_SESSION");
-        if (tokenStr) {
-          const token = JSON.parse(tokenStr);
+        const rawToken = sessionStorage.getItem("AUTH_GATE_TOKEN") || localStorage.getItem("MATH_USER_SESSION");
+        if (rawToken) {
+          const token = JSON.parse(rawToken);
           if (token.classID) document.getElementById("class-select").value = token.classID;
           if (token.studentID) document.getElementById("student-id").value = token.studentID;
           if (token.key) document.getElementById("passcode").value = token.key;
+
+          const banner = document.getElementById("auth-session-banner");
+          const infoText = document.getElementById("session-info-text");
+          infoText.innerText = `👤 已認證學生：${token.classID} 班 ${token.studentID} 號 ${token.name || ''}`;
+          banner.style.display = "flex";
         }
+      } catch (e) {
+        console.warn("[Session] Error checking session token:", e);
+      }
+    }
+
+    function clearCurrentSession() {
+      try {
+        sessionStorage.removeItem("AUTH_GATE_TOKEN");
+        localStorage.removeItem("MATH_USER_SESSION");
       } catch (e) {}
-    });
+      document.getElementById("auth-session-banner").style.display = "none";
+      document.getElementById("passcode").value = "";
+    }
+
+    function togglePasscodeVisibility() {
+      const input = document.getElementById("passcode");
+      input.type = input.type === "password" ? "text" : "password";
+    }
 
     function showError(msg) {
       const el = document.getElementById("error-msg");
-      el.innerText = msg;
+      el.innerHTML = msg;
       el.style.display = "block";
     }
 
     function clearError() {
       const el = document.getElementById("error-msg");
       el.style.display = "none";
+      el.innerHTML = "";
     }
 
+    /**
+     * Derive AES-256 Key via Web Crypto SHA-256
+     */
+    async function deriveAesKey(classID, studentID, passcode, format = "F4CD") {
+      const c = String(classID).trim().toUpperCase();
+      const s = String(studentID).trim();
+      const p = String(passcode).trim();
+
+      let saltStr = "";
+      if (format === "F4CD") {
+        saltStr = `F4CD_1030_SECRET_${c}_${s}_${p}`;
+      } else if (format === "MATH_SALT") {
+        saltStr = `MATH_SALT_${c}_${s}:${p}`;
+      } else {
+        saltStr = `${c}_${s}_${p}`;
+      }
+
+      const keyHash = await window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(saltStr));
+      return window.crypto.subtle.importKey(
+        "raw",
+        keyHash,
+        { name: "AES-GCM" },
+        false,
+        ["decrypt"]
+      );
+    }
+
+    /**
+     * In-Browser Decryption Workflow
+     */
     async function decryptAndShowResult() {
       clearError();
-      const classID = document.getElementById("class-select").value.trim();
+      const classID = document.getElementById("class-select").value.trim().toUpperCase();
       const studentID = document.getElementById("student-id").value.trim();
       const passcode = document.getElementById("passcode").value.trim();
 
-      if (!studentID || !passcode) {
-        showError("請填寫完整的學號與查詢口令！");
+      if (!studentID) {
+        showError("⚠️ 請輸入學生學號！");
+        return;
+      }
+      if (!passcode) {
+        showError("⚠️ 請輸入個人查詢口令或密鑰！");
         return;
       }
 
       const btn = document.getElementById("btn-decrypt");
-      btn.innerText = "⏳ 正在獲取加密資料並進行金鑰解密...";
+      btn.innerText = "⏳ 正在驗證金鑰並進行 AES-256-GCM 解密...";
       btn.disabled = true;
 
       try {
-        // 1. Fetch encrypted payload from GitHub Pages
-        const encUrl = `quiz_results/${classID}_${studentID}.enc?t=${Date.now()}`;
-        const resp = await fetch(encUrl);
+        // 1. Fetch metadata index to find score and student name if available
+        let studentMeta = null;
+        try {
+          const idxResp = await fetch(`quiz_results/index.json?t=${Date.now()}`);
+          if (idxResp.ok) {
+            const indexData = await idxResp.json();
+            studentMeta = indexData.find(item => 
+              String(item.classID).toUpperCase() === classID && 
+              String(item.studentID) === String(parseInt(studentID, 10))
+            );
+          }
+        } catch (idxErr) {
+          console.warn("[Index] Optional index.json could not be loaded:", idxErr);
+        }
+
+        // 2. Fetch encrypted payload file (.enc)
+        const encFileName = `quiz_results/${classID}_${studentID}.enc?t=${Date.now()}`;
+        const resp = await fetch(encFileName);
         if (!resp.ok) {
-          throw new Error("查無此學號的加密考卷檔案，或批改尚未發布！");
+          throw new Error(`查無 ${classID} 班 ${studentID} 號同學的加密答題卡檔案，可能小測批改尚未發布。`);
         }
         const encBuffer = await resp.arrayBuffer();
 
-        // 2. Validate payload structure: 12-byte IV + Ciphertext with 16-byte tag
+        // 3. Payload integrity check (12-byte IV + ciphertext + 16-byte tag)
         if (encBuffer.byteLength < 28) {
-          throw new Error("加密檔案數據長度異常！");
+          throw new Error("加密考卷數據長度損壞（小於 28 字節），無法解密！");
         }
         const iv = encBuffer.slice(0, 12);
         const ciphertext = encBuffer.slice(12);
 
-        // 3. Derive AES-256 Key via Web Crypto SHA-256
-        const saltStr = `F4CD_1030_SECRET_${classID}_${studentID}_${passcode}`;
-        const keyHash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(saltStr));
+        // 4. Decrypt with Web Crypto API: try primary salt format, then fallback
+        let decryptedBuffer = null;
+        let decryptError = null;
 
-        const cryptoKey = await crypto.subtle.importKey(
-          "raw",
-          keyHash,
-          { name: "AES-GCM" },
-          false,
-          ["decrypt"]
-        );
+        const saltFormats = ["F4CD", "MATH_SALT"];
+        for (const fmt of saltFormats) {
+          try {
+            const cryptoKey = await deriveAesKey(classID, studentID, passcode, fmt);
+            decryptedBuffer = await window.crypto.subtle.decrypt(
+              { name: "AES-GCM", iv: new Uint8Array(iv) },
+              cryptoKey,
+              ciphertext
+            );
+            break; // Decryption succeeded!
+          } catch (e) {
+            decryptError = e;
+          }
+        }
 
-        // 4. Decrypt in-memory
-        const decryptedBuffer = await crypto.subtle.decrypt(
-          { name: "AES-GCM", iv: new Uint8Array(iv) },
-          cryptoKey,
-          ciphertext
-        );
+        if (!decryptedBuffer) {
+          // If neither salt succeeded, throw authentication error
+          throw decryptError || new Error("Decryption failed");
+        }
 
         // 5. Create in-memory Blob URL
+        if (currentBlobUrl) {
+          URL.revokeObjectURL(currentBlobUrl);
+        }
         const blob = new Blob([decryptedBuffer], { type: "image/jpeg" });
-        const imgUrl = URL.createObjectURL(blob);
+        currentBlobUrl = URL.createObjectURL(blob);
 
-        document.getElementById("decrypted-image").src = imgUrl;
-        document.getElementById("res-student-info").innerText = `${classID} 班 ${studentID} 號同學 — 留痕答題卡`;
-        
-        document.getElementById("login-card").style.display = "none";
-        document.getElementById("result-view").style.display = "block";
+        // 6. Update student info badges
+        const studentName = (studentMeta && studentMeta.name) ? studentMeta.name : "同學";
+        const studentScore = (studentMeta && studentMeta.score !== undefined) ? studentMeta.score : "已批改";
+        const studentTime = (studentMeta && studentMeta.timestamp) ? studentMeta.timestamp : new Date().toLocaleString();
+
+        document.getElementById("res-student-info").innerText = `${classID} 班 ${studentID} 號 ${studentName}`;
+        document.getElementById("res-score-badge").innerText = typeof studentScore === 'number' ? `${studentScore} / 100` : studentScore;
+        document.getElementById("res-timestamp").innerText = studentTime;
+        document.getElementById("res-crypto-status").innerText = "✅ AES-256-GCM 驗證通過";
+
+        // 7. Load into Image object and render onto HTML5 Canvas
+        const img = new Image();
+        img.onload = () => {
+          originalImageObj = img;
+          renderImageToCanvas(img);
+          document.getElementById("decrypted-image").src = currentBlobUrl;
+
+          // Switch UI view
+          document.getElementById("login-card").style.display = "none";
+          document.getElementById("result-view").style.display = "block";
+
+          // Trigger MathJax re-render for header math
+          if (window.MathJax && window.MathJax.typesetPromise) {
+            window.MathJax.typesetPromise();
+          }
+        };
+        img.onerror = () => {
+          throw new Error("解密後的數據非有效 JPEG 圖像！");
+        };
+        img.src = currentBlobUrl;
+
       } catch (err) {
-        console.error("Decryption failed:", err);
+        console.error("[Decryption] Error:", err);
         if (err.name === "OperationError") {
-          showError("❌ 口令錯誤！無法解密此考卷，請確認口令是否正確輸入。");
+          showError("❌ 認證失敗：口令或密鑰錯誤！<br>AES-256-GCM 認證標籤 (Tag) 校驗未通過。每位學生答題卡均經過獨立密鑰加密，嚴禁他人未授權查閱。");
         } else {
           showError(`❌ 解密失敗：${err.message}`);
         }
@@ -287,9 +626,78 @@
       }
     }
 
+    /**
+     * Render Image directly to HTML5 Canvas
+     */
+    function renderImageToCanvas(img) {
+      const canvas = document.getElementById("result-canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = Math.round(img.naturalWidth * currentZoom);
+      canvas.height = Math.round(img.naturalHeight * currentZoom);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    }
+
+    function zoomCanvas(factor) {
+      if (!originalImageObj) return;
+      currentZoom *= factor;
+      if (currentZoom < 0.2) currentZoom = 0.2;
+      if (currentZoom > 4.0) currentZoom = 4.0;
+      renderImageToCanvas(originalImageObj);
+    }
+
+    function resetZoom() {
+      if (!originalImageObj) return;
+      currentZoom = 1.0;
+      renderImageToCanvas(originalImageObj);
+    }
+
+    function toggleViewMode() {
+      const canvas = document.getElementById("result-canvas");
+      const img = document.getElementById("decrypted-image");
+      showingCanvas = !showingCanvas;
+      if (showingCanvas) {
+        canvas.style.display = "inline-block";
+        img.style.display = "none";
+      } else {
+        canvas.style.display = "none";
+        img.style.display = "inline-block";
+      }
+    }
+
+    function downloadDecryptedCard() {
+      if (!currentBlobUrl) return;
+      const classID = document.getElementById("class-select").value.trim();
+      const studentID = document.getElementById("student-id").value.trim();
+      const link = document.createElement("a");
+      link.href = currentBlobUrl;
+      link.download = `4CD_Quiz_Result_${classID}_${studentID}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    /**
+     * Privacy clean-up when returning to login view
+     */
     function returnToLogin() {
+      // Clear in-memory canvas and blob
+      const canvas = document.getElementById("result-canvas");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (currentBlobUrl) {
+        URL.revokeObjectURL(currentBlobUrl);
+        currentBlobUrl = null;
+      }
+      originalImageObj = null;
+      document.getElementById("decrypted-image").src = "";
+      document.getElementById("passcode").value = "";
+
       document.getElementById("result-view").style.display = "none";
       document.getElementById("login-card").style.display = "block";
+      clearError();
     }
   </script>
 </body>

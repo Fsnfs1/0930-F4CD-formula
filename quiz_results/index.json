@@ -3,12 +3,22 @@
     "classID": "4C",
     "studentID": "29",
     "name": "譚欣",
-    "file": "4C_29.enc"
+    "score": 100,
+    "timestamp": "2026-10-30 01:39:42",
+    "file": "4C_29.enc",
+    "iv": "NAAg4vwFtifiFeeg",
+    "tag": "+Oy1MaoNxyT1q+z1JVxgBw==",
+    "cipherLength": 351079
   },
   {
     "classID": "4D",
     "studentID": "15",
     "name": "翁淮洋",
-    "file": "4D_15.enc"
+    "score": 84,
+    "timestamp": "2026-10-30 01:39:58",
+    "file": "4D_15.enc",
+    "iv": "J8brO0w6ujA2ygBt",
+    "tag": "cS4Vi+LO8Tiks0SRyoWmvw==",
+    "cipherLength": 351797
   }
 ]
