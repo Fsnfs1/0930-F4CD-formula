@@ -3,561 +3,306 @@
     "classID": "4C",
     "studentID": "1",
     "name": "古永晴",
-    "score": 60,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_1.enc",
-    "iv": "BR3P9qVY1E3f7pr9",
-    "tag": "FvnWnHs8lvofrqgMCfXA7g==",
-    "cipherLength": 404319
+    "file": "4C_1.enc"
   },
   {
     "classID": "4C",
     "studentID": "10",
     "name": "徐浟",
-    "score": 32,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_10.enc",
-    "iv": "suA1CoXi7yJJxtrV",
-    "tag": "JfPbcEJXajv/gZbYr+6p/w==",
-    "cipherLength": 381025
+    "file": "4C_10.enc"
   },
   {
     "classID": "4C",
     "studentID": "11",
     "name": "曹爵先",
-    "score": 8,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_11.enc",
-    "iv": "VNVNMASPc/Rn2AkM",
-    "tag": "qdde0g9tow++33wEu1BNfw==",
-    "cipherLength": 357657
+    "file": "4C_11.enc"
   },
   {
     "classID": "4C",
     "studentID": "12",
     "name": "梁寶娟",
-    "score": 28,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_12.enc",
-    "iv": "Eh9MYhWyfbw4tmHb",
-    "tag": "dZqU+YTwfWnPq5qKDJDd8w==",
-    "cipherLength": 383505
+    "file": "4C_12.enc"
   },
   {
     "classID": "4C",
     "studentID": "14",
     "name": "莫芷瑤",
-    "score": 40,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_14.enc",
-    "iv": "3i2yGxDqAtak04rJ",
-    "tag": "bPLlNjY54ML2SE6Dq8OtBQ==",
-    "cipherLength": 437570
+    "file": "4C_14.enc"
   },
   {
     "classID": "4C",
     "studentID": "15",
     "name": "陳子豪",
-    "score": 80,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_15.enc",
-    "iv": "d/B8Z37eve9FV++U",
-    "tag": "kn2/444dM/NwKub0kY8h9A==",
-    "cipherLength": 446502
+    "file": "4C_15.enc"
   },
   {
     "classID": "4C",
     "studentID": "16",
     "name": "陳心怡",
-    "score": 36,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_16.enc",
-    "iv": "+SlhQiTQ5jmfxz7C",
-    "tag": "W5acCdKCC6/JC4bUsCHv8Q==",
-    "cipherLength": 349601
+    "file": "4C_16.enc"
   },
   {
     "classID": "4C",
     "studentID": "17",
     "name": "陳芷澄",
-    "score": 24,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_17.enc",
-    "iv": "0WhSz9zV31Tf33sd",
-    "tag": "aTChwfHoG0OrsBzQBZ8GSQ==",
-    "cipherLength": 340456
+    "file": "4C_17.enc"
   },
   {
     "classID": "4C",
     "studentID": "18",
     "name": "陳穎彤",
-    "score": 28,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_18.enc",
-    "iv": "5gD9R/w/aez90AQ5",
-    "tag": "/elBo2nikTfSfKfNsT2ZvA==",
-    "cipherLength": 362745
+    "file": "4C_18.enc"
   },
   {
     "classID": "4C",
     "studentID": "19",
     "name": "陸恩希",
-    "score": 24,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_19.enc",
-    "iv": "SqQMG5dWhUZtQh5w",
-    "tag": "DSahYC6fZIn2TpZvFlMutw==",
-    "cipherLength": 340514
+    "file": "4C_19.enc"
   },
   {
     "classID": "4C",
     "studentID": "2",
     "name": "王嘉熙",
-    "score": 60,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_2.enc",
-    "iv": "JS/Tt+7pL45zelH1",
-    "tag": "OUU1bQU3wUb2bMHF2t6hmQ==",
-    "cipherLength": 400097
+    "file": "4C_2.enc"
   },
   {
     "classID": "4C",
     "studentID": "20",
     "name": "麥曉楠",
-    "score": 20,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_20.enc",
-    "iv": "OhOykyhwbptXIvwe",
-    "tag": "QA0ek9meC7dPgACDthMggA==",
-    "cipherLength": 367895
+    "file": "4C_20.enc"
   },
   {
     "classID": "4C",
     "studentID": "21",
     "name": "溫愛嫦",
-    "score": 28,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_21.enc",
-    "iv": "9vtAQbL21zoT2f4K",
-    "tag": "mvm8bKff++XnF8VlI/MmqA==",
-    "cipherLength": 361961
+    "file": "4C_21.enc"
   },
   {
     "classID": "4C",
     "studentID": "22",
     "name": "葉峰",
-    "score": 28,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_22.enc",
-    "iv": "XIQIZLIVEK+tVZb5",
-    "tag": "8/vum5DwAsuqS4x9/30KFA==",
-    "cipherLength": 391211
+    "file": "4C_22.enc"
   },
   {
     "classID": "4C",
     "studentID": "23",
     "name": "趙政熹",
-    "score": 16,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_23.enc",
-    "iv": "GXEJl9avw7e+86GL",
-    "tag": "I1vD3aQGLpZyaYh/2fjZIg==",
-    "cipherLength": 357922
+    "file": "4C_23.enc"
   },
   {
     "classID": "4C",
     "studentID": "24",
     "name": "劉卓盈",
-    "score": 28,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_24.enc",
-    "iv": "j7r1sYknj/sxNiQt",
-    "tag": "eKUSazAAtKPjBlYL+CoCPg==",
-    "cipherLength": 398376
+    "file": "4C_24.enc"
   },
   {
     "classID": "4C",
     "studentID": "25",
     "name": "蔡清琰",
-    "score": 28,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_25.enc",
-    "iv": "bIW47I/U72RaAZAQ",
-    "tag": "k/ZLOg8ir+5uoDRyc9gVWQ==",
-    "cipherLength": 372861
+    "file": "4C_25.enc"
   },
   {
     "classID": "4C",
     "studentID": "26",
     "name": "謝嘉瑩",
-    "score": 64,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_26.enc",
-    "iv": "2i+Lhsh9lAjshFXQ",
-    "tag": "rhD6IQE/TB13g0h1PPf3Lw==",
-    "cipherLength": 381971
+    "file": "4C_26.enc"
   },
   {
     "classID": "4C",
     "studentID": "27",
     "name": "譚梓鈞",
-    "score": 32,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_27.enc",
-    "iv": "xOr/xh52qW2hMQoP",
-    "tag": "/UYW10OWl9hgb7vuHhpZVg==",
-    "cipherLength": 388653
+    "file": "4C_27.enc"
   },
   {
     "classID": "4C",
     "studentID": "28",
     "name": "譚志坤",
-    "score": 8,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_28.enc",
-    "iv": "PGMTlQZ4bG04XFwE",
-    "tag": "vW56tH30c6r2V4MqezpX6w==",
-    "cipherLength": 334522
+    "file": "4C_28.enc"
   },
   {
     "classID": "4C",
     "studentID": "29",
     "name": "譚欣",
-    "score": 56,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_29.enc",
-    "iv": "AQq+h5xFLHC/1Obx",
-    "tag": "7hoCmP5yalmrJh81RfstRw==",
-    "cipherLength": 414438
+    "file": "4C_29.enc"
   },
   {
     "classID": "4C",
     "studentID": "3",
     "name": "宋榛",
-    "score": 4,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_3.enc",
-    "iv": "ijvHvpX4th4Jnd+K",
-    "tag": "tXh2QLr431nDmorTXaPLkA==",
-    "cipherLength": 367254
+    "file": "4C_3.enc"
   },
   {
     "classID": "4C",
     "studentID": "4",
     "name": "周子謙",
-    "score": 36,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_4.enc",
-    "iv": "rYavaueawYW856dt",
-    "tag": "UyJVak3muwyZeUJHgQLCng==",
-    "cipherLength": 373812
+    "file": "4C_4.enc"
   },
   {
     "classID": "4C",
     "studentID": "5",
     "name": "李藝彤",
-    "score": 12,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_5.enc",
-    "iv": "IsX3SEecNw4vdSju",
-    "tag": "fUwzCujDhQZ+7ZIEdS9HZA==",
-    "cipherLength": 340466
+    "file": "4C_5.enc"
   },
   {
     "classID": "4C",
     "studentID": "6",
     "name": "谷雨",
-    "score": 68,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_6.enc",
-    "iv": "zSm9IeA51LmMGohy",
-    "tag": "TlG+H5WoBlk/Xtb4eCu/2Q==",
-    "cipherLength": 411744
+    "file": "4C_6.enc"
   },
   {
     "classID": "4C",
     "studentID": "7",
     "name": "冼周蔚",
-    "score": 64,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_7.enc",
-    "iv": "aygiDVTH2khhXVL5",
-    "tag": "A+dD1pKFuBn+nXGBS6FVQw==",
-    "cipherLength": 428443
+    "file": "4C_7.enc"
   },
   {
     "classID": "4C",
     "studentID": "8",
     "name": "林國榮",
-    "score": 24,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_8.enc",
-    "iv": "oQFZRrxt/CbfymeD",
-    "tag": "xfsQcZdPp0i24xQFePz5tQ==",
-    "cipherLength": 363223
+    "file": "4C_8.enc"
   },
   {
     "classID": "4C",
     "studentID": "9",
     "name": "林晨欣",
-    "score": 8,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4C_9.enc",
-    "iv": "NQ6y9YY6kr39Fkdb",
-    "tag": "MXfG3GikHLmYXHgH2fUJUQ==",
-    "cipherLength": 382666
+    "file": "4C_9.enc"
   },
   {
     "classID": "4D",
     "studentID": "1",
     "name": "洪佳佳",
-    "score": 60,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4D_1.enc",
-    "iv": "j63ZbCwIij+cQrv5",
-    "tag": "EjWBkuH1clogQ4nudZqEiQ==",
-    "cipherLength": 477502
+    "file": "4D_1.enc"
   },
   {
     "classID": "4D",
     "studentID": "10",
     "name": "李臻斌",
-    "score": 32,
-    "timestamp": "2026-10-30 19:34:22",
-    "file": "4D_10.enc",
-    "iv": "5Tb8hNjZIwEMmlcD",
-    "tag": "V342Z3OfKEDVGT+MPeeCvQ==",
-    "cipherLength": 398000
+    "file": "4D_10.enc"
   },
   {
     "classID": "4D",
     "studentID": "13",
     "name": "施舒晨",
-    "score": 48,
-    "timestamp": "2026-10-30 19:34:22",
-    "file": "4D_13.enc",
-    "iv": "R20t5DkPLS+Fe9kA",
-    "tag": "8IjkmTdUUd6DV07ThgS3sQ==",
-    "cipherLength": 363480
+    "file": "4D_13.enc"
   },
   {
     "classID": "4D",
     "studentID": "14",
     "name": "徐芷瑤",
-    "score": 40,
-    "timestamp": "2026-10-30 19:34:22",
-    "file": "4D_14.enc",
-    "iv": "fuYDqRQK+IyhxE4c",
-    "tag": "fwMzGTcK4VZ+rHNHbQPDqg==",
-    "cipherLength": 466843
+    "file": "4D_14.enc"
   },
   {
     "classID": "4D",
     "studentID": "17",
     "name": "張博聰",
-    "score": 36,
-    "timestamp": "2026-10-30 19:34:22",
-    "file": "4D_17.enc",
-    "iv": "7hUlMLITZFzMFxmv",
-    "tag": "o4yL6jeKCa4eO8SC4NO0tQ==",
-    "cipherLength": 442717
+    "file": "4D_17.enc"
   },
   {
     "classID": "4D",
     "studentID": "19",
     "name": "黃悅軒",
-    "score": 8,
-    "timestamp": "2026-10-30 19:34:22",
-    "file": "4D_19.enc",
-    "iv": "EnLFwc9RfmZPIeYb",
-    "tag": "iC+qWyAnWs8p0lNtcxF9pA==",
-    "cipherLength": 375848
+    "file": "4D_19.enc"
   },
   {
     "classID": "4D",
     "studentID": "2",
     "name": "王偉德",
-    "score": 24,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4D_2.enc",
-    "iv": "7KOxkjCOcmhkqT2e",
-    "tag": "uIWZsdhRwc4/TCuU6vD7ZQ==",
-    "cipherLength": 372147
+    "file": "4D_2.enc"
   },
   {
     "classID": "4D",
     "studentID": "20",
     "name": "黃梓建",
-    "score": 24,
-    "timestamp": "2026-10-30 19:34:22",
-    "file": "4D_20.enc",
-    "iv": "oXdtyJadJW+QuWkI",
-    "tag": "Zya4Fjz0a1nrPkqtzD+BRQ==",
-    "cipherLength": 421078
+    "file": "4D_20.enc"
   },
   {
     "classID": "4D",
     "studentID": "21",
     "name": "黃嫣然",
-    "score": 32,
-    "timestamp": "2026-10-30 19:34:22",
-    "file": "4D_21.enc",
-    "iv": "DsJk2ZIoonjFGXJM",
-    "tag": "pnHQeFJIwFl/tD8yvlnCfQ==",
-    "cipherLength": 349291
+    "file": "4D_21.enc"
   },
   {
     "classID": "4D",
     "studentID": "22",
     "name": "董清霞",
-    "score": 24,
-    "timestamp": "2026-10-30 19:34:22",
-    "file": "4D_22.enc",
-    "iv": "C/NL7qo35eDn/Zzq",
-    "tag": "Dfv1R1DJodvKIEp2uyXA2g==",
-    "cipherLength": 372222
+    "file": "4D_22.enc"
   },
   {
     "classID": "4D",
     "studentID": "23",
     "name": "劉付穎",
-    "score": 36,
-    "timestamp": "2026-10-30 19:34:22",
-    "file": "4D_23.enc",
-    "iv": "0OwxaGzqn3o8KFk2",
-    "tag": "HtFD2iB08apEyKvMohnrHw==",
-    "cipherLength": 393395
+    "file": "4D_23.enc"
   },
   {
     "classID": "4D",
     "studentID": "24",
     "name": "劉泳欣",
-    "score": 8,
-    "timestamp": "2026-10-30 19:34:22",
-    "file": "4D_24.enc",
-    "iv": "TnYPHYwDqsvpHIRW",
-    "tag": "Ll5L2j0qyEMEsT30znUA2w==",
-    "cipherLength": 432512
+    "file": "4D_24.enc"
   },
   {
     "classID": "4D",
     "studentID": "25",
     "name": "鄭佩芝",
-    "score": 8,
-    "timestamp": "2026-10-30 19:34:22",
-    "file": "4D_25.enc",
-    "iv": "a455KDZLt2u0WE5m",
-    "tag": "xyIRMcKs/kbBNF5gULpDOQ==",
-    "cipherLength": 433189
+    "file": "4D_25.enc"
   },
   {
     "classID": "4D",
     "studentID": "26",
     "name": "鄭東沅",
-    "score": 52,
-    "timestamp": "2026-10-30 19:34:22",
-    "file": "4D_26.enc",
-    "iv": "7QfgAN5R4t/ZsQ1f",
-    "tag": "3cKUsJLt1sIUbdTkEaz42Q==",
-    "cipherLength": 502758
+    "file": "4D_26.enc"
   },
   {
     "classID": "4D",
     "studentID": "28",
     "name": "賴君華",
-    "score": 44,
-    "timestamp": "2026-10-30 19:34:22",
-    "file": "4D_28.enc",
-    "iv": "QckvVdfDjDx4mgI8",
-    "tag": "URGqJniqyvSc8a46T3k6sA==",
-    "cipherLength": 452640
+    "file": "4D_28.enc"
   },
   {
     "classID": "4D",
     "studentID": "29",
     "name": "譚佩泳",
-    "score": 32,
-    "timestamp": "2026-10-30 19:34:22",
-    "file": "4D_29.enc",
-    "iv": "/kHXIRjY/iFD4/lL",
-    "tag": "w/zKIXuqxINRS6Iur1QaKQ==",
-    "cipherLength": 460202
+    "file": "4D_29.enc"
   },
   {
     "classID": "4D",
     "studentID": "3",
     "name": "王煜鑫",
-    "score": 48,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4D_3.enc",
-    "iv": "4Na9bxbGdm65GTfE",
-    "tag": "vo9r/d06T6yOYl8ZpS45ZA==",
-    "cipherLength": 470081
+    "file": "4D_3.enc"
   },
   {
     "classID": "4D",
     "studentID": "30",
     "name": "鄭梓浩",
-    "score": 24,
-    "timestamp": "2026-10-30 19:34:22",
-    "file": "4D_30.enc",
-    "iv": "Rzwiw1UpAuSbiSkE",
-    "tag": "Rvzt4tBxhXf11HXyANXU5A==",
-    "cipherLength": 406079
+    "file": "4D_30.enc"
   },
   {
     "classID": "4D",
     "studentID": "5",
     "name": "余浩賢",
-    "score": 36,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4D_5.enc",
-    "iv": "38unKt8nZ99Z2LMR",
-    "tag": "N2a0yw05hVfC7iuoU/6hLw==",
-    "cipherLength": 461347
+    "file": "4D_5.enc"
   },
   {
     "classID": "4D",
     "studentID": "6",
     "name": "李青霞",
-    "score": 40,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4D_6.enc",
-    "iv": "k1RoRxHYqVumz5NK",
-    "tag": "LACSaBNJZN+e7ZjsJiWIPA==",
-    "cipherLength": 393011
+    "file": "4D_6.enc"
   },
   {
     "classID": "4D",
     "studentID": "7",
     "name": "李語鵑",
-    "score": 44,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4D_7.enc",
-    "iv": "ZC+zWzjNxXYGANQe",
-    "tag": "PAP1wHE795GsBSm/Rn++sQ==",
-    "cipherLength": 494532
+    "file": "4D_7.enc"
   },
   {
     "classID": "4D",
     "studentID": "8",
     "name": "李樂瞳",
-    "score": 44,
-    "timestamp": "2026-10-30 19:34:21",
-    "file": "4D_8.enc",
-    "iv": "nHF8essP8Orx+Uhd",
-    "tag": "fu7znGhG0C6lXjj/EO7ATw==",
-    "cipherLength": 457771
+    "file": "4D_8.enc"
   },
   {
     "classID": "4D",
     "studentID": "9",
     "name": "李穎欣",
-    "score": 0,
-    "timestamp": "2026-10-30 19:34:22",
-    "file": "4D_9.enc",
-    "iv": "GWCKKCfT2xiHt4fw",
-    "tag": "Sz/qhtb9g2/r3ZLK3QXgxg==",
-    "cipherLength": 312409
+    "file": "4D_9.enc"
   }
 ]
