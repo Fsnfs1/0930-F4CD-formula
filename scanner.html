@@ -100,11 +100,11 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
     .guide-box.detected {
       border: 3px solid #4ade80;
-      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55), 0 0 20px rgba(74, 222, 128, 0.4);
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55), 0 0 24px rgba(74, 222, 128, 0.45);
     }
     .corner-mark {
       position: absolute;
@@ -123,9 +123,9 @@
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(15, 23, 42, 0.85);
+      background: rgba(15, 23, 42, 0.9);
       border: 1px solid #334155;
-      padding: 8px 18px;
+      padding: 8px 20px;
       border-radius: 20px;
       font-size: 0.95rem;
       font-weight: 600;
@@ -133,6 +133,13 @@
       pointer-events: none;
       white-space: nowrap;
       z-index: 5;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      transition: background 0.2s;
+    }
+    .prompt-text.locked {
+      background: rgba(22, 101, 52, 0.92);
+      border-color: #4ade80;
+      color: #ffffff;
     }
 
     #controls-panel {
@@ -167,7 +174,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+      box-shadow: 0 0 18px rgba(56, 189, 248, 0.5);
     }
     .btn-shutter:hover { background: #7dd3fc; }
     .btn-secondary {
@@ -451,6 +458,7 @@
   <!-- Offscreen Processing Canvas -->
   <canvas id="work-canvas" style="display: none;"></canvas>
   <canvas id="warp-canvas" width="2091" height="1037" style="display: none;"></canvas>
+  <canvas id="live-canvas" style="display: none;"></canvas>
 
   <script src="js/roster.js"></script>
   <script>
@@ -489,6 +497,8 @@
     let videoEl = document.getElementById("camera-feed");
     let guideBox = document.getElementById("guide-box");
     let promptEl = document.getElementById("prompt");
+    let overlayCanvas = document.getElementById("overlay-canvas");
+    let octx = overlayCanvas.getContext("2d");
     let currentStream = null;
     let facingMode = "environment";
     
@@ -497,7 +507,12 @@
     let isUploading = false;
     let successCount = 0;
 
-    // Toast Notification
+    let liveQuad = null;
+    let lastDetectionTime = 0;
+    let pendingScan = null;
+    let countdownInterval = null;
+    let countdownRemaining = 5;
+
     function showToast(msg) {
       const toast = document.getElementById("toast");
       toast.innerText = msg;
@@ -505,19 +520,17 @@
       setTimeout(() => toast.classList.remove("show"), 2500);
     }
 
-    // Update Counter Badges
     function updateBadges() {
       document.getElementById("badge-scanned").innerText = `已拍攝: ${scannedCount}`;
       document.getElementById("badge-uploading").innerText = `隊列: ${uploadQueue.length}`;
       document.getElementById("badge-success").innerText = `雲端上傳: ${successCount}`;
     }
 
-    // Resize Guide Box to match A5 Card Aspect Ratio
     function layoutGuideBox() {
       const container = document.getElementById("viewfinder-container");
       const cW = container.clientWidth;
       const cH = container.clientHeight;
-      const margin = 30;
+      const margin = 28;
 
       let bW, bH;
       if (cW / cH > CARD_ASPECT) {
@@ -534,7 +547,6 @@
     }
     window.addEventListener("resize", layoutGuideBox);
 
-    // Initialize Camera Stream
     async function startCamera() {
       if (currentStream) {
         currentStream.getTracks().forEach(t => t.stop());
@@ -564,187 +576,321 @@
       startCamera();
     });
 
-    // File Upload Fallback
-    document.getElementById("file-input").addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        const img = new Image();
-        img.onload = () => processImageFrame(img);
-        img.src = evt.target.result;
-      };
-      reader.readAsDataURL(file);
-    });
-
-    // Snap Button Trigger
-    document.getElementById("btn-snap").addEventListener("click", () => {
-      if (!videoEl.videoWidth) return;
-      processImageFrame(videoEl);
-    });
-
-    // Computer Vision: Frame Processing & Rectification
-    function processImageFrame(source) {
-      const workCanvas = document.getElementById("work-canvas");
-      const ctx = workCanvas.getContext("2d");
-      
-      const sW = source.videoWidth || source.naturalWidth || source.width;
-      const sH = source.videoHeight || source.naturalHeight || source.height;
-      workCanvas.width = sW;
-      workCanvas.height = sH;
-      ctx.drawImage(source, 0, 0, sW, sH);
-
-      // Extract corners (or fallback to guide box bounds)
-      let corners = detectFourCornerMarkers(ctx, sW, sH);
-      if (!corners) {
-        // Fallback: Use guide box relative quad
-        corners = getGuideBoxQuadInImage(sW, sH);
-      }
-
-      // Warp perspective into 2091 x 1037 canonical canvas
-      const warpCanvas = document.getElementById("warp-canvas");
-      warpQuadToCanonical(workCanvas, warpCanvas, corners);
-
-      // Perform OMR Bubble Reading
-      const omrResult = decodeOMRBubbles(warpCanvas);
-      
-      // Generate Filename
-      const now = new Date();
-      const ts = now.getFullYear().toString() +
-        String(now.getMonth() + 1).padStart(2, '0') +
-        String(now.getDate()).padStart(2, '0') + "_" +
-        String(now.getHours()).padStart(2, '0') +
-        String(now.getMinutes()).padStart(2, '0') +
-        String(now.getSeconds()).padStart(2, '0');
-
-      const classID = omrResult.classID || "4C";
-      const studentID = omrResult.studentID || "0";
-
-      // Look up student name from Roster if available
-      let studentName = "";
-      if (typeof getStudentName === "function") {
-        studentName = getStudentName(classID, parseInt(studentID, 10)) || "";
-      } else if (window.RosterModule && typeof window.RosterModule.getStudentName === "function") {
-        studentName = window.RosterModule.getStudentName(classID, parseInt(studentID, 10)) || "";
-      }
-      if (!studentName) studentName = `學生_${studentID}`;
-
-      const fileName = `4CD@1030-${classID}-${studentID}-${ts}.jpg`;
-
-      // Export High Quality JPEG
-      const base64Data = warpCanvas.toDataURL("image/jpeg", 0.92).split(",")[1];
-
-      // Enqueue Upload
-      enqueueUpload({
-        fileName: fileName,
-        classID: `4CD@1030-${classID}`,
-        detectedClass: classID,
-        studentID: studentID,
-        studentName: studentName,
-        tag: "EX",
-        timestamp: ts,
-        base64: base64Data
-      });
-
-      scannedCount++;
-      updateBadges();
-      showToast(`✅ 掃描成功: ${classID}班 ${studentID}號`);
-    }
-
-    // Corner Square Detection
+    // Robust Marker Quad Detection matching verified BFS specification
     function detectFourCornerMarkers(ctx, w, h) {
-      // Scale down for fast candidate search
-      const scale = Math.min(1.0, 800 / Math.max(w, h));
+      const imgData = ctx.getImageData(0, 0, w, h);
+      const data = imgData.data;
+
+      function sampleAreaMean(x0, y0, x1, y1) {
+        x0 = Math.max(0, Math.min(w, Math.floor(x0)));
+        x1 = Math.max(0, Math.min(w, Math.floor(x1)));
+        y0 = Math.max(0, Math.min(h, Math.floor(y0)));
+        y1 = Math.max(0, Math.min(h, Math.floor(y1)));
+        if (x1 <= x0 || y1 <= y0) return 255.0;
+        let sum = 0, count = 0;
+        for (let y = y0; y < y1; y++) {
+          const rowOffset = y * w;
+          for (let x = x0; x < x1; x++) {
+            const idx = (rowOffset + x) * 4;
+            sum += (data[idx] * 77 + data[idx+1] * 150 + data[idx+2] * 29) >> 8;
+            count++;
+          }
+        }
+        return count > 0 ? (sum / count) : 255.0;
+      }
+
+      // Check 1: Already Rectified Check
+      const c_tl = sampleAreaMean(2, 2, 20, 20);
+      const c_tr = sampleAreaMean(w - 20, 2, w - 2, 20);
+      const c_bl = sampleAreaMean(2, h - 20, 20, h - 2);
+      const c_br = sampleAreaMean(w - 20, h - 20, w - 2, h - 2);
+
+      const adj_tl = sampleAreaMean(30, 5, 70, 20);
+      const adj_tr = sampleAreaMean(w - 70, 5, w - 30, 20);
+      const adj_bl = sampleAreaMean(30, h - 20, 70, h - 5);
+      const adj_br = sampleAreaMean(w - 70, h - 20, w - 30, h - 5);
+
+      if (adj_tl - c_tl > 40 && adj_tr - c_tr > 40 && adj_bl - c_bl > 40 && adj_br - c_br > 40 &&
+          adj_tl > 180 && adj_tr > 180 && adj_bl > 180 && adj_br > 180) {
+        return {
+          tl: { x: 6.5, y: 6.5 },
+          tr: { x: w - 6.5, y: 6.5 },
+          bl: { x: 6.5, y: h - 6.5 },
+          br: { x: w - 6.5, y: h - 6.5 },
+          type: 'already_rectified',
+          score: 99999
+        };
+      }
+
+      // Scale down to 800px max dim
+      const scale = 800.0 / Math.max(w, h);
       const sw = Math.floor(w * scale);
       const sh = Math.floor(h * scale);
-      
+
       const smallCanvas = document.createElement("canvas");
       smallCanvas.width = sw;
       smallCanvas.height = sh;
-      const sctx = smallCanvas.getContext("2d");
+      const sctx = smallCanvas.getContext("2d", { willReadFrequently: true });
       sctx.drawImage(ctx.canvas, 0, 0, sw, sh);
-      
-      const imgData = sctx.getImageData(0, 0, sw, sh);
-      const data = imgData.data;
-      
-      // Calculate grayscale threshold
-      let sum = 0;
-      for (let i = 0; i < data.length; i += 4) {
-        sum += (data[i] + data[i+1] + data[i+2]) / 3;
+      const sImg = sctx.getImageData(0, 0, sw, sh);
+      const sData = sImg.data;
+
+      const gray = new Uint8Array(sw * sh);
+      for (let i = 0, j = 0; i < sData.length; i += 4, j++) {
+        gray[j] = (sData[i] * 77 + sData[i+1] * 150 + sData[i+2] * 29) >> 8;
       }
-      const mean = sum / (sw * sh);
-      const thresh = mean * 0.45; // Dark anchor threshold
 
-      // Connected component analysis on grid
-      const visited = new Uint8Array(sw * sh);
-      const candidates = [];
+      // Build Integral Image
+      const sw1 = sw + 1;
+      const integral = new Uint32Array((sh + 1) * sw1);
+      for (let y = 0; y < sh; y++) {
+        let rowSum = 0;
+        const y_sw = y * sw;
+        const y1_sw1 = (y + 1) * sw1;
+        const y_sw1 = y * sw1;
+        for (let x = 0; x < sw; x++) {
+          rowSum += gray[y_sw + x];
+          integral[y1_sw1 + (x + 1)] = integral[y_sw1 + (x + 1)] + rowSum;
+        }
+      }
 
-      for (let y = 4; y < sh - 4; y += 2) {
-        for (let x = 4; x < sw - 4; x += 2) {
-          const idx = y * sw + x;
-          const gray = (data[idx*4] + data[idx*4+1] + data[idx*4+2]) / 3;
-          if (!visited[idx] && gray < thresh) {
-            let minX = x, maxX = x, minY = y, maxY = y, area = 0;
-            const q = [x, y];
-            visited[idx] = 1;
-            while (q.length > 0) {
-              const cy = q.pop();
-              const cx = q.pop();
-              area++;
-              if (cx < minX) minX = cx;
-              if (cx > maxX) maxX = cx;
-              if (cy < minY) minY = cy;
-              if (cy > maxY) maxY = cy;
+      function rectMean(x0, y0, x1, y1) {
+        x0 = Math.max(0, Math.min(sw, x0 | 0));
+        x1 = Math.max(0, Math.min(sw, x1 | 0));
+        y0 = Math.max(0, Math.min(sh, y0 | 0));
+        y1 = Math.max(0, Math.min(sh, y1 | 0));
+        if (x1 <= x0 || y1 <= y0) return 255.0;
+        const area = (x1 - x0) * (y1 - y0);
+        const s = integral[y1 * sw1 + x1] - integral[y0 * sw1 + x1] - integral[y1 * sw1 + x0] + integral[y0 * sw1 + x0];
+        return s / area;
+      }
 
-              const neighbors = [[cx-1, cy], [cx+1, cy], [cx, cy-1], [cx, cy+1]];
-              for (const [nx, ny] of neighbors) {
-                if (nx >= 0 && nx < sw && ny >= 0 && ny < sh) {
-                  const nidx = ny * sw + nx;
-                  if (!visited[nidx]) {
-                    visited[nidx] = 1;
-                    const ngray = (data[nidx*4] + data[nidx*4+1] + data[nidx*4+2]) / 3;
-                    if (ngray < thresh) {
-                      q.push(nx, ny);
-                    }
-                  }
-                }
+      // Multi-radius adaptive thresholding
+      const binMap = new Uint8Array(sw * sh);
+      const passes = [[18, 14], [30, 18]];
+      for (let p = 0; p < passes.length; p++) {
+        const radius = passes[p][0];
+        const C = passes[p][1];
+        for (let y = 0; y < sh; y += 2) {
+          const y0 = Math.max(0, y - radius);
+          const y1 = Math.min(sh, y + radius + 1);
+          const rowOffset = y * sw;
+          const nextRowOffset = (y + 1 < sh) ? (y + 1) * sw : -1;
+          for (let x = 0; x < sw; x += 2) {
+            const x0 = Math.max(0, x - radius);
+            const x1 = Math.min(sw, x + radius + 1);
+            const m = rectMean(x0, y0, x1, y1);
+            if (gray[rowOffset + x] < (m - C)) {
+              binMap[rowOffset + x] = 1;
+              if (x + 1 < sw) binMap[rowOffset + x + 1] = 1;
+              if (nextRowOffset !== -1) {
+                binMap[nextRowOffset + x] = 1;
+                if (x + 1 < sw) binMap[nextRowOffset + x + 1] = 1;
               }
-            }
-            const bw = maxX - minX + 1;
-            const bh = maxY - minY + 1;
-            const fill = area / (bw * bh);
-            const aspect = bw / bh;
-            if (area >= 15 && area <= 3000 && aspect >= 0.7 && aspect <= 1.45 && fill >= 0.72) {
-              candidates.push({
-                x: ((minX + maxX) / 2) / scale,
-                y: ((minY + maxY) / 2) / scale,
-                area: area,
-                fill: fill
-              });
             }
           }
         }
       }
 
-      if (candidates.length < 4) return null;
+      // Pure BFS Connected Components
+      const visited = new Uint8Array(sw * sh);
+      const rawCands = [];
+      const qx = new Int32Array(sw * sh);
+      const qy = new Int32Array(sw * sh);
 
-      // Group into 4 quadrants
-      const avgX = candidates.reduce((s, c) => s + c.x, 0) / candidates.length;
-      const avgY = candidates.reduce((s, c) => s + c.y, 0) / candidates.length;
+      for (let y = 2; y < sh - 2; y += 2) {
+        const rowOffset = y * sw;
+        for (let x = 2; x < sw - 2; x += 2) {
+          const idx = rowOffset + x;
+          if (binMap[idx] && !visited[idx]) {
+            let minX = x, maxX = x, minY = y, maxY = y;
+            let area = 0;
+            let head = 0, tail = 0;
+            qx[tail] = x;
+            qy[tail++] = y;
+            visited[idx] = 1;
 
-      const tlCands = candidates.filter(c => c.x < avgX && c.y < avgY);
-      const trCands = candidates.filter(c => c.x > avgX && c.y < avgY);
-      const blCands = candidates.filter(c => c.x < avgX && c.y > avgY);
-      const brCands = candidates.filter(c => c.x > avgX && c.y > avgY);
+            while (head < tail) {
+              const cxP = qx[head];
+              const cyP = qy[head++];
+              area++;
+              if (cxP < minX) minX = cxP;
+              if (cxP > maxX) maxX = cxP;
+              if (cyP < minY) minY = cyP;
+              if (cyP > maxY) maxY = cyP;
 
-      if (!tlCands.length || !trCands.length || !blCands.length || !brCands.length) return null;
+              if (cxP > 0) {
+                const nidx = cyP * sw + (cxP - 1);
+                if (binMap[nidx] && !visited[nidx]) { visited[nidx] = 1; qx[tail] = cxP - 1; qy[tail++] = cyP; }
+              }
+              if (cxP < sw - 1) {
+                const nidx = cyP * sw + (cxP + 1);
+                if (binMap[nidx] && !visited[nidx]) { visited[nidx] = 1; qx[tail] = cxP + 1; qy[tail++] = cyP; }
+              }
+              if (cyP > 0) {
+                const nidx = (cyP - 1) * sw + cxP;
+                if (binMap[nidx] && !visited[nidx]) { visited[nidx] = 1; qx[tail] = cxP; qy[tail++] = cyP - 1; }
+              }
+              if (cyP < sh - 1) {
+                const nidx = (cyP + 1) * sw + cxP;
+                if (binMap[nidx] && !visited[nidx]) { visited[nidx] = 1; qx[tail] = cxP; qy[tail++] = cyP + 1; }
+              }
+            }
 
-      return {
-        tl: tlCands.sort((a,b) => b.fill - a.fill)[0],
-        tr: trCands.sort((a,b) => b.fill - a.fill)[0],
-        bl: blCands.sort((a,b) => b.fill - a.fill)[0],
-        br: brCands.sort((a,b) => b.fill - a.fill)[0]
-      };
+            const bw = maxX - minX + 1;
+            const bh = maxY - minY + 1;
+            if (bw >= 4 && bw <= 65 && bh >= 4 && bh <= 55 && area >= 16 && area <= 2500) {
+              const ar = bw / bh;
+              const fill = area / (bw * bh);
+              if (ar >= 0.40 && ar <= 3.8 && fill >= 0.40) {
+                rawCands.push({
+                  x: ((minX + maxX) / 2.0) / scale,
+                  y: ((minY + maxY) / 2.0) / scale,
+                  bw: bw / scale,
+                  bh: bh / scale
+                });
+              }
+            }
+          }
+        }
+      }
+
+      // Deduplicate and evaluate local contrast
+      const merged = [];
+      for (let i = 0; i < rawCands.length; i++) {
+        const c = rawCands[i];
+        let found = false;
+        for (let j = 0; j < merged.length; j++) {
+          const m = merged[j];
+          if ((c.x - m.x) * (c.x - m.x) + (c.y - m.y) * (c.y - m.y) < 484) { // 22^2
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          const icx = Math.round(c.x);
+          const icy = Math.round(c.y);
+          const r = Math.max(4, Math.floor(Math.max(c.bw, c.bh) / 2));
+          const x0 = Math.max(0, icx - r), x1 = Math.min(w, icx + r + 1);
+          const y0 = Math.max(0, icy - r), y1 = Math.min(h, icy + r + 1);
+          if (x1 <= x0 || y1 <= y0) continue;
+          const innerMean = sampleAreaMean(x0, y0, x1, y1);
+
+          const r_out = r + Math.max(6, Math.floor(1.2 * r));
+          const x0_o = Math.max(0, icx - r_out), x1_o = Math.min(w, icx + r_out + 1);
+          const y0_o = Math.max(0, icy - r_out), y1_o = Math.min(h, icy + r_out + 1);
+          const outerMean = sampleAreaMean(x0_o, y0_o, x1_o, y1_o);
+
+          const contrast = outerMean - innerMean;
+          if (contrast > 15) {
+            merged.push({ x: c.x, y: c.y, contrast: contrast });
+          }
+        }
+      }
+
+      function lineDarkness(p1, p2, n = 25) {
+        let sum = 0, count = 0;
+        for (let k = 3; k <= n - 4; k++) {
+          const t = k / (n - 1);
+          const px = Math.round(p1.x + t * (p2.x - p1.x));
+          const py = Math.round(p1.y + t * (p2.y - p1.y));
+          if (px >= 0 && px < w && py >= 0 && py < h) {
+            const idx = (py * w + px) * 4;
+            sum += (data[idx] * 77 + data[idx+1] * 150 + data[idx+2] * 29) >> 8;
+            count++;
+          }
+        }
+        return count > 0 ? (sum / count) : 255.0;
+      }
+
+      // Combinatorial 4-Corner Search
+      merged.sort((a, b) => b.contrast - a.contrast);
+      const candList = merged.slice(0, 45);
+      let bestQuad = null;
+      let bestScore = -1e9;
+      const numCands = candList.length;
+
+      for (let i = 0; i < numCands; i++) {
+        for (let j = 0; j < numCands; j++) {
+          if (i === j) continue;
+          const c_tl = candList[i];
+          const c_tr = candList[j];
+          const dx_top = c_tr.x - c_tl.x;
+          const dy_top = c_tr.y - c_tl.y;
+          if (dx_top < w * 0.35) continue;
+          const top_len = Math.sqrt(dx_top * dx_top + dy_top * dy_top);
+          if (Math.abs(dy_top) / dx_top > 0.35) continue;
+
+          for (let k = 0; k < numCands; k++) {
+            if (k === i || k === j) continue;
+            const c_bl = candList[k];
+            const dx_left = c_bl.x - c_tl.x;
+            const dy_left = c_bl.y - c_tl.y;
+            if (dy_left < h * 0.20) continue;
+            const left_len = Math.sqrt(dx_left * dx_left + dy_left * dy_left);
+            if (Math.abs(dx_left) / dy_left > 0.35) continue;
+
+            const exp_br_x = c_tr.x + dx_left;
+            const exp_br_y = c_tr.y + dy_left;
+
+            for (let m = 0; m < numCands; m++) {
+              if (m === i || m === j || m === k) continue;
+              const c_br = candList[m];
+              const dist_to_exp = Math.sqrt((c_br.x - exp_br_x) * (c_br.x - exp_br_x) + (c_br.y - exp_br_y) * (c_br.y - exp_br_y));
+              if (dist_to_exp > top_len * 0.25) continue;
+
+              const dx_bot = c_br.x - c_bl.x;
+              const dy_bot = c_br.y - c_bl.y;
+              const bot_len = Math.sqrt(dx_bot * dx_bot + dy_bot * dy_bot);
+              if (dx_bot < w * 0.35) continue;
+
+              const dx_right = c_br.x - c_tr.x;
+              const dy_right = c_br.y - c_tr.y;
+              const right_len = Math.sqrt(dx_right * dx_right + dy_right * dy_right);
+
+              const len_ratio_w = Math.min(top_len, bot_len) / Math.max(top_len, bot_len);
+              const len_ratio_h = Math.min(left_len, right_len) / Math.max(left_len, right_len);
+              if (len_ratio_w < 0.70 || len_ratio_h < 0.70) continue;
+
+              const avg_w = (top_len + bot_len) / 2.0;
+              const avg_h = (left_len + right_len) / 2.0;
+              const aspect = avg_w / avg_h;
+              if (aspect < 1.4 || aspect > 4.2) continue;
+
+              const card_area = avg_w * avg_h;
+              if (card_area < (w * h * 0.12)) continue;
+
+              const border_darkness = (
+                lineDarkness(c_tl, c_tr) + lineDarkness(c_bl, c_br) +
+                lineDarkness(c_tl, c_bl) + lineDarkness(c_tr, c_br)
+              ) / 4.0;
+
+              const marker_contrast = c_tl.contrast + c_tr.contrast + c_bl.contrast + c_br.contrast;
+              const area_ratio = card_area / (w * h);
+              const aspect_diff = Math.abs(aspect - 2.016);
+              const symmetry = (len_ratio_w + len_ratio_h) / 2.0;
+              const parallelogram_score = 1.0 - (dist_to_exp / top_len);
+              const border_score = Math.max(0.0, 255.0 - border_darkness);
+
+              const score = (
+                marker_contrast * 40.0 +
+                area_ratio * 4000.0 +
+                symmetry * 2000.0 +
+                parallelogram_score * 1000.0 +
+                border_score * 10.0 -
+                aspect_diff * 400.0
+              );
+
+              if (score > bestScore) {
+                bestScore = score;
+                bestQuad = { tl: c_tl, tr: c_tr, bl: c_bl, br: c_br, score: score, type: 'photo_quad' };
+              }
+            }
+          }
+        }
+      }
+
+      return bestQuad;
     }
 
     // Guide Box Fallback Quad
@@ -764,11 +910,12 @@
         tl: { x: relL * imgW, y: relT * imgH },
         tr: { x: (relL + relW) * imgW, y: relT * imgH },
         bl: { x: relL * imgW, y: (relT + relH) * imgH },
-        br: { x: (relL + relW) * imgW, y: (relT + relH) * imgH }
+        br: { x: (relL + relW) * imgW, y: (relT + relH) * imgH },
+        type: 'guide_box_fallback'
       };
     }
 
-    // Closed-Form Bilinear Homography Warp
+    // Closed-Form Bilinear Homography Perspective Warp
     function warpQuadToCanonical(srcCanvas, dstCanvas, quad) {
       const dstCtx = dstCanvas.getContext("2d");
       const dW = dstCanvas.width;
@@ -814,12 +961,12 @@
           const iy = Math.floor(sy);
           if (ix >= 0 && ix < sW && iy >= 0 && iy < sH) {
             const sIdx = (iy * sW + ix) * 4;
-            dData[dIdx] = sData[sIdx];
+            dData[dIdx]   = sData[sIdx];
             dData[dIdx+1] = sData[sIdx+1];
             dData[dIdx+2] = sData[sIdx+2];
             dData[dIdx+3] = 255;
           } else {
-            dData[dIdx] = 255;
+            dData[dIdx]   = 255;
             dData[dIdx+1] = 255;
             dData[dIdx+2] = 255;
             dData[dIdx+3] = 255;
@@ -830,70 +977,314 @@
       dstCtx.putImageData(dImgData, 0, 0);
     }
 
-    // Optical Mark Recognition (OMR)
+    // Calibrated OMR bubble contrast: inner core (r<=8) vs outer paper ring (24<=r<=36)
+    function computeContrastCalibrated(gray, w, h, u, v) {
+      const cx = Math.round(u * w);
+      const cy = Math.round(v * h);
+      let innerSum = 0, innerCount = 0;
+      let outerSum = 0, outerCount = 0;
+
+      for (let dy = -36; dy <= 36; dy++) {
+        const py = cy + dy;
+        if (py < 0 || py >= h) continue;
+        const rowOffset = py * w;
+        for (let dx = -36; dx <= 36; dx++) {
+          const px = cx + dx;
+          if (px < 0 || px >= w) continue;
+          const d2 = dx * dx + dy * dy;
+          const val = gray[rowOffset + px];
+          if (d2 <= 64) { // r <= 8: inner core
+            innerSum += val;
+            innerCount++;
+          } else if (d2 >= 576 && d2 <= 1296) { // 24 <= r <= 36: outer background ring
+            outerSum += val;
+            outerCount++;
+          }
+        }
+      }
+      if (innerCount === 0 || outerCount === 0) return 0.0;
+      return (outerSum / outerCount) - (innerSum / innerCount);
+    }
+
+    // Decode OMR Bubbles with Contrast Thresholding & Roster Verification
     function decodeOMRBubbles(canvas) {
       const ctx = canvas.getContext("2d");
       const imgData = ctx.getImageData(0, 0, TARGET_CANON_W, TARGET_CANON_H);
       const data = imgData.data;
 
-      function sampleDarkness(u, v) {
-        const cx = Math.floor(u * TARGET_CANON_W);
-        const cy = Math.floor(v * TARGET_CANON_H);
-        const r = 14;
-        let sum = 0, count = 0;
-        for (let dy = -r; dy <= r; dy++) {
-          for (let dx = -r; dx <= r; dx++) {
-            if (dx*dx + dy*dy <= r*r) {
-              const px = cx + dx;
-              const py = cy + dy;
-              if (px >= 0 && px < TARGET_CANON_W && py >= 0 && py < TARGET_CANON_H) {
-                const idx = (py * TARGET_CANON_W + px) * 4;
-                const gray = (data[idx] + data[idx+1] + data[idx+2]) / 3;
-                sum += (255 - gray);
-                count++;
-              }
-            }
-          }
-        }
-        return count > 0 ? (sum / count) : 0;
+      const gray = new Uint8Array(TARGET_CANON_W * TARGET_CANON_H);
+      for (let i = 0, j = 0; i < data.length; i += 4, j++) {
+        gray[j] = (data[i] * 77 + data[i+1] * 150 + data[i+2] * 29) >> 8;
       }
 
-      // Class
-      let bestClass = "4C", maxClassDark = -1;
+      // Class bubbles
+      let bestClass = "4C", maxClassDark = -999.0;
       for (const [cName, uv] of Object.entries(OMR_SPEC.class_bubbles)) {
-        const score = sampleDarkness(uv[0], uv[1]);
+        const score = computeContrastCalibrated(gray, TARGET_CANON_W, TARGET_CANON_H, uv[0], uv[1]);
         if (score > maxClassDark) {
           maxClassDark = score;
           bestClass = cName;
         }
       }
+      const hasClass = maxClassDark >= 25.0;
 
-      // Tens
-      let bestTens = "0", maxTensDark = -1;
+      // ID Tens
+      let bestTens = "0", maxTensDark = -999.0;
       for (const [tName, uv] of Object.entries(OMR_SPEC.id_tens_bubbles)) {
-        const score = sampleDarkness(uv[0], uv[1]);
+        const score = computeContrastCalibrated(gray, TARGET_CANON_W, TARGET_CANON_H, uv[0], uv[1]);
         if (score > maxTensDark) {
           maxTensDark = score;
           bestTens = tName;
         }
       }
+      const hasTens = maxTensDark >= 25.0;
 
-      // Units
-      let bestUnits = "0", maxUnitsDark = -1;
+      // ID Units
+      let bestUnits = "0", maxUnitsDark = -999.0;
       for (const [uName, uv] of Object.entries(OMR_SPEC.id_units_bubbles)) {
-        const score = sampleDarkness(uv[0], uv[1]);
+        const score = computeContrastCalibrated(gray, TARGET_CANON_W, TARGET_CANON_H, uv[0], uv[1]);
         if (score > maxUnitsDark) {
           maxUnitsDark = score;
           bestUnits = uName;
         }
       }
+      const hasUnits = maxUnitsDark >= 25.0;
 
-      const studentID = String(parseInt(bestTens, 10) * 10 + parseInt(bestUnits, 10));
+      const isBlank = (!hasClass && !hasTens && !hasUnits);
+      const classID = hasClass ? bestClass : "";
+      const tens = hasTens ? bestTens : "0";
+      const units = hasUnits ? bestUnits : "0";
+      const studentID = (hasClass || hasTens || hasUnits) ? String(parseInt(tens, 10) * 10 + parseInt(units, 10)) : "";
+
+      // Lookup student name in Roster
+      let studentName = "";
+      if (classID && studentID) {
+        if (typeof getStudentName === "function") {
+          studentName = getStudentName(classID, parseInt(studentID, 10)) || "";
+        } else if (window.RosterModule && typeof window.RosterModule.getStudentName === "function") {
+          studentName = window.RosterModule.getStudentName(classID, parseInt(studentID, 10)) || "";
+        }
+      }
+
       return {
-        classID: bestClass,
-        studentID: studentID
+        classID: classID,
+        studentID: studentID,
+        studentName: studentName,
+        isBlank: isBlank,
+        hasClass: hasClass,
+        hasTens: hasTens,
+        hasUnits: hasUnits,
+        maxClassDark: maxClassDark,
+        maxTensDark: maxTensDark,
+        maxUnitsDark: maxUnitsDark
       };
     }
+
+    // Instant Verification Modal Management
+    const verifyModal = document.getElementById("verify-modal");
+    const modalClassSelect = document.getElementById("modal-class-select");
+    const modalIdInput = document.getElementById("modal-id-input");
+    const modalStudentName = document.getElementById("modal-student-name");
+    const modalStatusBadge = document.getElementById("modal-status-badge");
+    const modalCountdown = document.getElementById("modal-countdown");
+    const modalBtnConfirm = document.getElementById("modal-btn-confirm");
+    const modalBtnRetake = document.getElementById("modal-btn-retake");
+    const modalBtnClose = document.getElementById("modal-btn-close");
+
+    function lookupRosterName(cls, idStr) {
+      if (!cls || !idStr) return "";
+      const sid = parseInt(idStr, 10);
+      if (isNaN(sid) || sid <= 0) return "";
+      if (typeof getStudentName === "function") {
+        return getStudentName(cls, sid) || "";
+      }
+      if (window.RosterModule && typeof window.RosterModule.getStudentName === "function") {
+        return window.RosterModule.getStudentName(cls, sid) || "";
+      }
+      return "";
+    }
+
+    function updateModalStudentInfo() {
+      const cls = modalClassSelect.value.trim();
+      const sid = modalIdInput.value.trim();
+
+      if (!cls && !sid) {
+        modalStudentName.innerText = "（空白卷 / 未填塗）";
+        modalStatusBadge.className = "status-tag unfilled";
+        modalStatusBadge.innerText = "空白卷";
+        return;
+      }
+
+      const sname = lookupRosterName(cls, sid);
+      if (sname) {
+        modalStudentName.innerText = sname;
+        modalStatusBadge.className = "status-tag verified";
+        modalStatusBadge.innerText = "已核對花名冊";
+      } else {
+        modalStudentName.innerText = sid ? `學生_${sid}（未在名冊）` : "未完成填塗";
+        modalStatusBadge.className = "status-tag unknown";
+        modalStatusBadge.innerText = "需人工核實";
+      }
+    }
+
+    function cancelModalCountdown() {
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+      modalCountdown.innerText = "";
+    }
+
+    function openVerificationModal(omrResult, warpCanvas) {
+      pendingScan = { omr: omrResult, canvas: warpCanvas };
+
+      // Crop bubble preview region (x: 240..1540, y: 50..310)
+      const cropCanvas = document.getElementById("crop-preview-canvas");
+      cropCanvas.width = 1300;
+      cropCanvas.height = 260;
+      const cropCtx = cropCanvas.getContext("2d");
+      cropCtx.drawImage(warpCanvas, 240, 50, 1300, 260, 0, 0, 1300, 260);
+
+      // Populate input values
+      modalClassSelect.value = omrResult.classID || "";
+      modalIdInput.value = omrResult.studentID || "";
+      updateModalStudentInfo();
+
+      // Start 5-second countdown auto-confirm
+      cancelModalCountdown();
+      countdownRemaining = 5;
+      modalCountdown.innerText = `(${countdownRemaining}s)`;
+      countdownInterval = setInterval(() => {
+        countdownRemaining--;
+        if (countdownRemaining <= 0) {
+          cancelModalCountdown();
+          executeUploadFromModal();
+        } else {
+          modalCountdown.innerText = `(${countdownRemaining}s)`;
+        }
+      }, 1000);
+
+      verifyModal.style.display = "flex";
+    }
+
+    function closeVerificationModal() {
+      cancelModalCountdown();
+      verifyModal.style.display = "none";
+      pendingScan = null;
+    }
+
+    // Pause countdown if user interacts with inputs
+    modalClassSelect.addEventListener("change", () => {
+      cancelModalCountdown();
+      updateModalStudentInfo();
+    });
+    modalIdInput.addEventListener("input", () => {
+      cancelModalCountdown();
+      updateModalStudentInfo();
+    });
+    modalIdInput.addEventListener("focus", cancelModalCountdown);
+
+    modalBtnClose.addEventListener("click", closeVerificationModal);
+    modalBtnRetake.addEventListener("click", () => {
+      closeVerificationModal();
+      showToast("已取消，請重新對齊答題卡");
+    });
+    modalBtnConfirm.addEventListener("click", () => {
+      cancelModalCountdown();
+      executeUploadFromModal();
+    });
+
+    function executeUploadFromModal() {
+      if (!pendingScan) return;
+      const warpCanvas = pendingScan.canvas;
+
+      const finalClass = modalClassSelect.value.trim();
+      const finalID = modalIdInput.value.trim();
+      const finalName = lookupRosterName(finalClass, finalID) || (finalID ? `學生_${finalID}` : "未填塗");
+
+      const now = new Date();
+      const ts = now.getFullYear().toString() +
+        String(now.getMonth() + 1).padStart(2, '0') +
+        String(now.getDate()).padStart(2, '0') + "_" +
+        String(now.getHours()).padStart(2, '0') +
+        String(now.getMinutes()).padStart(2, '0') +
+        String(now.getSeconds()).padStart(2, '0');
+
+      const fileName = finalClass 
+        ? `4CD@1030-${finalClass}-${finalID || '0'}-${ts}.jpg`
+        : `4CD@1030-BLANK-${ts}.jpg`;
+
+      const base64Data = warpCanvas.toDataURL("image/jpeg", 0.92).split(",")[1];
+
+      enqueueUpload({
+        fileName: fileName,
+        classID: finalClass ? `4CD@1030-${finalClass}` : "4CD@1030-BLANK",
+        detectedClass: finalClass,
+        studentID: finalID || "0",
+        studentName: finalName,
+        tag: "EX",
+        timestamp: ts,
+        base64: base64Data
+      });
+
+      scannedCount++;
+      updateBadges();
+      showToast(`✅ 已確認: ${finalClass ? finalClass + "班 " : ""}${finalID ? finalID + "號 " : ""}${finalName}`);
+      closeVerificationModal();
+    }
+
+    // Frame Processing Trigger
+    function processImageFrame(source) {
+      const workCanvas = document.getElementById("work-canvas");
+      const ctx = workCanvas.getContext("2d", { willReadFrequently: true });
+      
+      const sW = source.videoWidth || source.naturalWidth || source.width;
+      const sH = source.videoHeight || source.naturalHeight || source.height;
+      if (!sW || !sH) return;
+
+      workCanvas.width = sW;
+      workCanvas.height = sH;
+      ctx.drawImage(source, 0, 0, sW, sH);
+
+      // Marker Detection
+      let corners = detectFourCornerMarkers(ctx, sW, sH);
+      if (!corners) {
+        if (liveQuad) {
+          corners = liveQuad;
+        } else {
+          corners = getGuideBoxQuadInImage(sW, sH);
+        }
+      }
+
+      // Rectify into standard canonical canvas
+      const warpCanvas = document.getElementById("warp-canvas");
+      warpQuadToCanonical(workCanvas, warpCanvas, corners);
+
+      // Calibrated OMR recognition
+      const omrResult = decodeOMRBubbles(warpCanvas);
+
+      // Open R3 Verification Dialog
+      openVerificationModal(omrResult, warpCanvas);
+    }
+
+    // Snap Button Trigger
+    document.getElementById("btn-snap").addEventListener("click", () => {
+      if (!videoEl.videoWidth) return;
+      processImageFrame(videoEl);
+    });
+
+    // File Input Trigger
+    document.getElementById("file-input").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const img = new Image();
+        img.onload = () => processImageFrame(img);
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
 
     // Silent Upload Queue via Google Apps Script
     function enqueueUpload(payload) {
@@ -921,8 +1312,7 @@
           image: item.base64
         });
 
-        // Use text/plain to avoid preflight OPTIONS CORS issue
-        const resp = await fetch(GAS_UPLOAD_URL, {
+        await fetch(GAS_UPLOAD_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: bodyPayload
@@ -931,7 +1321,6 @@
         successCount++;
       } catch (err) {
         console.error("Upload error, re-enqueuing:", err);
-        // Retry
         uploadQueue.push(item);
       } finally {
         isUploading = false;
@@ -942,14 +1331,119 @@
       }
     }
 
-    // Real-time Viewfinder loop
+    // Real-time Viewfinder Loop & Visual Reticle Feedback
     function tick() {
-      if (videoEl.readyState === videoEl.HAVE_ENOUGH_DATA) {
-        const overlay = document.getElementById("overlay-canvas");
-        overlay.width = overlay.clientWidth;
-        overlay.height = overlay.clientHeight;
-        const octx = overlay.getContext("2d");
-        octx.clearRect(0, 0, overlay.width, overlay.height);
+      if (videoEl.readyState >= videoEl.HAVE_CURRENT_DATA && videoEl.videoWidth > 0) {
+        const cW = overlayCanvas.clientWidth;
+        const cH = overlayCanvas.clientHeight;
+        if (overlayCanvas.width !== cW || overlayCanvas.height !== cH) {
+          overlayCanvas.width = cW;
+          overlayCanvas.height = cH;
+        }
+
+        const now = Date.now();
+        // Run live detection every ~150ms
+        if (now - lastDetectionTime > 150 && verifyModal.style.display !== "flex") {
+          lastDetectionTime = now;
+          const liveCanvas = document.getElementById("live-canvas");
+          const vW = videoEl.videoWidth;
+          const vH = videoEl.videoHeight;
+          const scale = Math.min(1.0, 640 / Math.max(vW, vH));
+          const lW = Math.floor(vW * scale);
+          const lH = Math.floor(vH * scale);
+          liveCanvas.width = lW;
+          liveCanvas.height = lH;
+          const lctx = liveCanvas.getContext("2d", { willReadFrequently: true });
+          lctx.drawImage(videoEl, 0, 0, lW, lH);
+
+          const q = detectFourCornerMarkers(lctx, lW, lH);
+          if (q) {
+            liveQuad = {
+              tl: { x: q.tl.x / scale, y: q.tl.y / scale },
+              tr: { x: q.tr.x / scale, y: q.tr.y / scale },
+              bl: { x: q.bl.x / scale, y: q.bl.y / scale },
+              br: { x: q.br.x / scale, y: q.br.y / scale },
+              type: q.type
+            };
+          } else {
+            liveQuad = null;
+          }
+        }
+
+        // Render visual reticle feedback on overlay canvas
+        octx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+        if (liveQuad) {
+          guideBox.classList.add("detected");
+          promptEl.classList.add("locked");
+          promptEl.innerText = "🟢 已鎖定答題卡，可點擊拍照";
+
+          const vW = videoEl.videoWidth;
+          const vH = videoEl.videoHeight;
+          const vAspect = vW / vH;
+          const cAspect = cW / cH;
+
+          let rW, rH, oX, oY;
+          if (cAspect > vAspect) {
+            rW = cW;
+            rH = cW / vAspect;
+            oX = 0;
+            oY = (cH - rH) / 2;
+          } else {
+            rH = cH;
+            rW = cH * vAspect;
+            oX = (cW - rW) / 2;
+            oY = 0;
+          }
+
+          function toScreen(pt) {
+            return {
+              x: oX + (pt.x / vW) * rW,
+              y: oY + (pt.y / vH) * rH
+            };
+          }
+
+          const s_tl = toScreen(liveQuad.tl);
+          const s_tr = toScreen(liveQuad.tr);
+          const s_br = toScreen(liveQuad.br);
+          const s_bl = toScreen(liveQuad.bl);
+
+          // Draw quadrilateral lock polygon
+          octx.strokeStyle = "#4ade80";
+          octx.lineWidth = 3;
+          octx.fillStyle = "rgba(74, 222, 128, 0.12)";
+          octx.beginPath();
+          octx.moveTo(s_tl.x, s_tl.y);
+          octx.lineTo(s_tr.x, s_tr.y);
+          octx.lineTo(s_br.x, s_br.y);
+          octx.lineTo(s_bl.x, s_bl.y);
+          octx.closePath();
+          octx.fill();
+          octx.stroke();
+
+          // Draw target reticle crosshairs on corners
+          function drawReticle(pt) {
+            octx.strokeStyle = "#4ade80";
+            octx.lineWidth = 2;
+            octx.beginPath();
+            octx.arc(pt.x, pt.y, 14, 0, Math.PI * 2);
+            octx.stroke();
+
+            octx.beginPath();
+            octx.moveTo(pt.x - 20, pt.y);
+            octx.lineTo(pt.x + 20, pt.y);
+            octx.moveTo(pt.x, pt.y - 20);
+            octx.lineTo(pt.x, pt.y + 20);
+            octx.stroke();
+          }
+          drawReticle(s_tl);
+          drawReticle(s_tr);
+          drawReticle(s_br);
+          drawReticle(s_bl);
+        } else {
+          guideBox.classList.remove("detected");
+          promptEl.classList.remove("locked");
+          promptEl.innerText = "請將答題卡的 4 個黑色方塊對齊框線內";
+        }
       }
       requestAnimationFrame(tick);
     }
