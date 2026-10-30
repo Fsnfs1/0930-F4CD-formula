@@ -988,11 +988,22 @@
       const e = y3 - y0 + h * y3;
       const f = y0;
 
+      // Exact canonical alignment mapping 4-corner markers at (6.5, 6.5) .. (2084.5, 1030.5)
+      const isRect = (quad && quad.type === 'already_rectified');
+      const u_min = isRect ? 0.0 : (6.5 / 2091.0);
+      const u_max = isRect ? 1.0 : ((2091.0 - 6.5) / 2091.0);
+      const v_min = isRect ? 0.0 : (6.5 / 1037.0);
+      const v_max = isRect ? 1.0 : ((1037.0 - 6.5) / 1037.0);
+      const u_range = u_max - u_min;
+      const v_range = v_max - v_min;
+
       let dIdx = 0;
       for (let y = 0; y < dH; y++) {
-        const v = y / (dH - 1);
+        const normV = y / (dH - 1);
+        const v = (normV - v_min) / v_range;
         for (let x = 0; x < dW; x++) {
-          const u = x / (dW - 1);
+          const normU = x / (dW - 1);
+          const u = (normU - u_min) / u_range;
           const wDenom = g * u + h * v + 1.0;
           const sx = (a * u + b * v + c) / wDenom;
           const sy = (d * u + e * v + f) / wDenom;
@@ -1066,7 +1077,7 @@
           bestClass = cName;
         }
       }
-      const hasClass = maxClassDark >= 18.0;
+      const hasClass = maxClassDark >= 22.0;
 
       // ID Tens
       let bestTens = "0", maxTensDark = -999.0;
@@ -1077,7 +1088,7 @@
           bestTens = tName;
         }
       }
-      const hasTens = maxTensDark >= 18.0;
+      const hasTens = maxTensDark >= 22.0;
 
       // ID Units
       let bestUnits = "0", maxUnitsDark = -999.0;
@@ -1088,7 +1099,7 @@
           bestUnits = uName;
         }
       }
-      const hasUnits = maxUnitsDark >= 18.0;
+      const hasUnits = maxUnitsDark >= 22.0;
 
       const isBlank = (!hasClass && !hasTens && !hasUnits);
       const classID = hasClass ? bestClass : "";
@@ -1288,12 +1299,12 @@
 
       // Marker Detection
       let corners = detectFourCornerMarkers(ctx, sW, sH);
+      if (!corners && liveQuad) {
+        corners = liveQuad;
+      }
       if (!corners) {
-        if (liveQuad) {
-          corners = liveQuad;
-        } else {
-          corners = getGuideBoxQuadInImage(sW, sH);
-        }
+        showToast("⚠️ 未能偵測到答題卡 4 個定位方塊，請確認清晰度與完整度後重試");
+        return;
       }
 
       // Rectify into standard canonical canvas
@@ -1309,6 +1320,11 @@
 
     // Snap Button Trigger
     document.getElementById("btn-snap").addEventListener("click", () => {
+      if (!liveQuad) {
+        showToast("⚠️ 請將答題卡的 4 個黑色方塊對齊框線內，鎖定後再拍攝");
+        if (navigator.vibrate) navigator.vibrate([80, 50, 80]);
+        return;
+      }
       if (!videoEl.videoWidth) return;
       processImageFrame(videoEl);
     });
