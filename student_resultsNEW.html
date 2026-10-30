@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>4CD 數學大測二公式小測 — 學生刷臉查分系統</title>
+
+  <!-- External & Math Platform Face API Dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
+  <script src="js/preloaded_faces.js"></script>
+  <script src="js/face_auth.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #090d16;
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+    }
+    header {
+      width: 100%;
+      max-width: 820px;
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #1e293b;
+    }
+    h1 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    p.subtitle {
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .tab-bar {
+      display: flex;
+      background: #1e293b;
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 480px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: #0284c7;
+      color: white;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
+    }
+
+    /* Card Panels */
+    .panel-card {
+      width: 100%;
+      background: #131c2e;
+      border: 1px solid #26354a;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Camera & Face HUD */
+    .camera-wrapper {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      margin: 10px auto 20px auto;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 4px solid #38bdf8;
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.35);
+      background: #020617;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .camera-wrapper.success {
+      border-color: #22c55e;
+      box-shadow: 0 0 30px rgba(34, 197, 94, 0.5);
+    }
+    .camera-wrapper.scanning::after {
+      content: "";
+      position: absolute;
+      top: -100%;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, transparent, rgba(56, 189, 248, 0.45), transparent);
+      animation: scanAnim 2s infinite linear;
+      pointer-events: none;
+    }
+    @keyframes scanAnim {
+      0% { top: -100%; }
+      100% { top: 100%; }
+    }
+
+    video#face-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1); /* Selfie mirror */
+    }
+
+    .hud-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hud-circle {
+      width: 220px;
+      height: 220px;
+      border: 2px dashed rgba(56, 189, 248, 0.6);
+      border-radius: 50%;
+    }
+
+    .status-text {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #38bdf8;
+      text-align: center;
+      margin-bottom: 16px;
+      min-height: 24px;
+    }
+    .status-text.ok { color: #4ade80; }
+    .status-text.warn { color: #facc15; }
+    .status-text.err { color: #f87171; }
+
+    .btn {
+      width: 100%;
+      max-width: 380px;
+      background: #0284c7;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 20px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn:hover { background: #0369a1; }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+    .btn-secondary { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; margin-top: 10px; }
+    .btn-secondary:hover { background: #334155; }
+
+    /* Form controls */
+    .form-group {
+      width: 100%;
+      max-width: 420px;
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+    input, select {
+      width: 100%;
+      background: #0b1120;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 1rem;
+      color: #f8fafc;
+      outline: none;
+    }
+    input:focus, select:focus { border-color: #38bdf8; }
+
+    /* Result View */
+    #result-view {
+      display: none;
+      width: 100%;
+      max-width: 820px;
+      text-align: center;
+    }
+    .score-banner {
+      background: #131c2e;
+      border: 1px solid #38bdf8;
+      border-radius: 16px;
+      padding: 18px 24px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(56, 189, 248, 0.15);
+    }
+    .score-title { font-size: 1.25rem; font-weight: 800; color: #f8fafc; }
+    .score-chip {
+      background: #1e293b;
+      border: 1px solid #22c55e;
+      color: #4ade80;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .card-img-wrapper {
+      position: relative;
+      background: #020617;
+      border: 2px solid #334155;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+    }
+    .card-img {
+      width: 100%;
+      display: block;
+      border-radius: 14px;
+    }
+    .badge-bar {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1><span>✨ 4CD 數學大測二公式小測</span></h1>
+    <p class="subtitle">AI 刷臉身分認證 · 瀏覽器內存端對端安全解密 · 專屬個人留痕答題卡</p>
+  </header>
+
+  <div class="container">
+    <!-- Tab Selector -->
+    <div class="tab-bar">
+      <button id="tab-btn-face" class="tab-btn active" onclick="switchLoginMode('face')">
+        <span>📸 刷臉登入 (推薦)</span>
+      </button>
+      <button id="tab-btn-key" class="tab-btn" onclick="switchLoginMode('key')">
+        <span>🔑 口令密鑰登入</span>
+      </button>
+    </div>
+
+    <!-- Panel 1: Face Recognition Login -->
+    <div id="panel-face" class="panel-card">
+      <div id="camera-box" class="camera-wrapper scanning">
+        <video id="face-video" autoplay playsinline muted></video>
+        <div class="hud-overlay">
+          <div class="hud-circle"></div>
+        </div>
+      </div>
+
+      <div id="face-status" class="status-text">⏳ 正在載入人臉識別神經網絡模型...</div>
+
+      <button id="btn-face-action" class="btn" onclick="triggerFaceCapture()">
+        <span>🔍 拍照識別身分</span>
+      </button>
+
+      <button id="btn-camera-toggle" class="btn btn-secondary" onclick="toggleCamera()">
+        <span>📷 重啟相機</span>
+      </button>
+
+      <div class="badge-bar">
+        <span>🛡️ 68 位同學特徵庫已本地裝載</span>
+        <span>·</span>
+        <span>零雲端上傳面孔隱私</span>
+      </div>
+    </div>
+
+    <!-- Panel 2: Passcode Fallback Login -->
+    <div id="panel-key" class="panel-card" style="display: none;">
+      <div class="form-group">
+        <label for="input-class">選擇班別</label>
+        <select id="input-class">
+          <option value="4C">高二 4C 班</option>
+          <option value="4D">高二 4D 班</option>
+          <option value="5B">高三 5B 班</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="input-id">學生學號</label>
+        <input type="number" id="input-id" placeholder="例如: 29 或 15" min="1" max="39">
+      </div>
+
+      <div class="form-group">
+        <label for="input-key">查詢口令密鑰</label>
+        <input type="password" id="input-key" placeholder="例如: 4C29-KSZW">
+      </div>
+
+      <div id="key-status" class="status-text warn" style="display: none;"></div>
+
+      <button id="btn-key-login" class="btn" onclick="manualKeyLogin()">
+        <span>🔓 解密查看答題卡</span>
+      </button>
+    </div>
+
+    <!-- Panel 3: Decrypted Result Card View -->
+    <div id="result-view">
+      <div class="score-banner">
+        <div>
+          <div class="score-title" id="res-name-title">4C 班 29 號 譚欣 同學</div>
+          <div style="font-size: 0.9rem; color: #94a3b8; text-align: left; margin-top: 4px;">
+            身分核驗方式: <span id="res-auth-method" style="color: #38bdf8;">人臉特徵匹配</span>
+          </div>
+        </div>
+        <div class="score-chip">✅ 密鑰驗證通過</div>
+      </div>
+
+      <div class="card-img-wrapper">
+        <img id="card-image" class="card-img" src="" alt="解密後的留痕答題卡">
+      </div>
+
+      <button class="btn btn-secondary" style="max-width: 260px; margin: 0 auto;" onclick="logoutAndReset()">
+        <span>⬅️ 登出並返回</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // --- 4CD Credentials Database (Preloaded for Decryption Keys) ---
+    const CREDENTIALS_4CD = [
+      { classID: "4C", studentID: 1, name: "古永晴", key: "4C01-X33C" },
+      { classID: "4C", studentID: 2, name: "王嘉熙", key: "4C02-B3MW" },
+      { classID: "4C", studentID: 3, name: "宋榛", key: "4C03-G3HH" },
+      { classID: "4C", studentID: 4, name: "周子謙", key: "4C04-JH4E" },
+      { classID: "4C", studentID: 5, name: "李藝彤", key: "4C05-KCDG" },
+      { classID: "4C", studentID: 6, name: "谷雨", key: "4C06-A3A6" },
+      { classID: "4C", studentID: 7, name: "冼周蔚", key: "4C07-62MR" },
+      { classID: "4C", studentID: 8, name: "林國榮", key: "4C08-2RY7" },
+      { classID: "4C", studentID: 9, name: "林晨欣", key: "4C09-7ACC" },
+      { classID: "4C", studentID: 10, name: "徐浟", key: "4C10-4D29" },
+      { classID: "4C", studentID: 11, name: "曹爵先", key: "4C11-PZ4E" },
+      { classID: "4C", studentID: 12, name: "梁寶娟", key: "4C12-WAMY" },
+      { classID: "4C", studentID: 14, name: "莫芷瑤", key: "4C14-BJSB" },
+      { classID: "4C", studentID: 15, name: "陳子豪", key: "4C15-64KW" },
+      { classID: "4C", studentID: 16, name: "陳心怡", key: "4C16-VQJN" },
+      { classID: "4C", studentID: 17, name: "陳芷澄", key: "4C17-YZCZ" },
+      { classID: "4C", studentID: 18, name: "陳穎彤", key: "4C18-3E8A" },
+      { classID: "4C", studentID: 19, name: "陸恩希", key: "4C19-YJGW" },
+      { classID: "4C", studentID: 20, name: "麥曉楠", key: "4C20-UZXM" },
+      { classID: "4C", studentID: 21, name: "溫愛嫦", key: "4C21-3D7A" },
+      { classID: "4C", studentID: 22, name: "葉峰", key: "4C22-ZY4S" },
+      { classID: "4C", studentID: 23, name: "趙政熹", key: "4C23-YAW6" },
+      { classID: "4C", studentID: 24, name: "劉卓盈", key: "4C24-6T5A" },
+      { classID: "4C", studentID: 25, name: "蔡清琰", key: "4C25-TVSV" },
+      { classID: "4C", studentID: 26, name: "謝嘉瑩", key: "4C26-UCAA" },
+      { classID: "4C", studentID: 27, name: "譚梓鈞", key: "4C27-AYHH" },
+      { classID: "4C", studentID: 28, name: "譚志坤", key: "4C28-9AVS" },
+      { classID: "4C", studentID: 29, name: "譚欣", key: "4C29-KSZW" },
+      { classID: "4C", studentID: 30, name: "羅清璋", key: "4C30-JKZR" },
+      { classID: "4D", studentID: 1, name: "洪佳佳", key: "4D01-4ZXP" },
+      { classID: "4D", studentID: 2, name: "王偉德", key: "4D02-V9GA" },
+      { classID: "4D", studentID: 3, name: "王煜鑫", key: "4D03-85HF" },
+      { classID: "4D", studentID: 4, name: "甘俊誠", key: "4D04-7466" },
+      { classID: "4D", studentID: 5, name: "余浩賢", key: "4D05-B6UX" },
+      { classID: "4D", studentID: 6, name: "李青霞", key: "4D06-WUVP" },
+      { classID: "4D", studentID: 7, name: "李語鵑", key: "4D07-EW6N" },
+      { classID: "4D", studentID: 8, name: "李樂瞳", key: "4D08-SZRU" },
+      { classID: "4D", studentID: 9, name: "李穎欣", key: "4D09-47TC" },
+      { classID: "4D", studentID: 10, name: "李臻斌", key: "4D10-WBZP" },
+      { classID: "4D", studentID: 11, name: "周梓霖", key: "4D11-393M" },
+      { classID: "4D", studentID: 12, name: "林川雲", key: "4D12-JKYJ" },
+      { classID: "4D", studentID: 13, name: "施舒晨", key: "4D13-GAHZ" },
+      { classID: "4D", studentID: 14, name: "徐芷瑤", key: "4D14-67GQ" },
+      { classID: "4D", studentID: 15, name: "翁淮洋", key: "4D15-67G4" },
+      { classID: "4D", studentID: 16, name: "馬雨彤", key: "4D16-AF7U" },
+      { classID: "4D", studentID: 17, name: "張博聰", key: "4D17-KNFN" },
+      { classID: "4D", studentID: 18, name: "曾浚恩", key: "4D18-B2T6" },
+      { classID: "4D", studentID: 19, name: "黃悅軒", key: "4D19-7HUJ" },
+      { classID: "4D", studentID: 20, name: "黃梓建", key: "4D20-JJFN" },
+      { classID: "4D", studentID: 21, name: "黃嫣然", key: "4D21-V3EG" },
+      { classID: "4D", studentID: 22, name: "董清霞", key: "4D22-6F2G" },
+      { classID: "4D", studentID: 23, name: "劉付穎", key: "4D23-PVD6" },
+      { classID: "4D", studentID: 24, name: "劉泳欣", key: "4D24-DAKQ" },
+      { classID: "4D", studentID: 25, name: "鄭佩芝", key: "4D25-8C9W" },
+      { classID: "4D", studentID: 26, name: "鄭東沅", key: "4D26-K6N6" },
+      { classID: "4D", studentID: 27, name: "盧肇琪", key: "4D27-2FEZ" },
+      { classID: "4D", studentID: 28, name: "賴君華", key: "4D28-VXGP" },
+      { classID: "4D", studentID: 29, name: "譚佩泳", key: "4D29-E2EN" },
+      { classID: "4D", studentID: 30, name: "鄭梓浩", key: "4D30-FH9V" },
+      { classID: "4D", studentID: 31, name: "鄭國樺", key: "4D31-HC9Q" }
+    ];
+
+    function getStudentPasscode(classID, studentID) {
+      const match = CREDENTIALS_4CD.find(s => s.classID === classID && parseInt(s.studentID, 10) === parseInt(studentID, 10));
+      if (match) return match.key;
+      // 5B or default fallback
+      return `${classID}${String(studentID).padStart(2, '0')}-KEY`;
+    }
+
+    // --- State Variables ---
+    let isModelReady = false;
+    let isScanning = false;
+    let autoScanTimer = null;
+    let studentProfiles = [];
+    const videoEl = document.getElementById("face-video");
+    const statusEl = document.getElementById("face-status");
+    const cameraBox = document.getElementById("camera-box");
+
+    // --- Build Profile Array from PRELOADED_STUDENT_FACES ---
+    function initProfiles() {
+      const preloaded = window.PRELOADED_STUDENT_FACES;
+      studentProfiles = [];
+      if (preloaded && typeof preloaded === "object") {
+        for (const k in preloaded) {
+          const item = preloaded[k];
+          if (item && item.classID && item.studentID && item.vector) {
+            // Find student real name from CREDENTIALS_4CD
+            const cred = CREDENTIALS_4CD.find(c => c.classID === item.classID && c.studentID === item.studentID);
+            const realName = cred ? cred.name : (item.name || `學生 ${item.studentID}`);
+            studentProfiles.push({
+              classID: String(item.classID).trim().toUpperCase(),
+              studentID: parseInt(item.studentID, 10),
+              name: realName,
+              vector: new Float32Array(item.vector)
+            });
+          }
+        }
+      }
+      console.log(`[FaceInit] Loaded ${studentProfiles.length} student face profiles.`);
+    }
+
+    // --- Start Face API & Camera ---
+    async function initSystem() {
+      initProfiles();
+      try {
+        statusEl.innerText = "⏳ 正在載入神經網絡模型 (TinyFace / Recognition)...";
+        if (window.FaceAuthModule && window.FaceAuthModule.initFaceApi) {
+          await window.FaceAuthModule.initFaceApi("https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/");
+        } else if (window.faceapi) {
+          const uri = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
+          await Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri(uri),
+            faceapi.nets.faceLandmark68TinyNet.loadFromUri(uri),
+            faceapi.nets.faceRecognitionNet.loadFromUri(uri)
+          ]);
+        }
+        isModelReady = true;
+        statusEl.innerText = "📷 模型就緒，正在啟動相機...";
+        await startCamera();
+      } catch (err) {
+        console.error("Init failed:", err);
+        statusEl.className = "status-text warn";
+        statusEl.innerText = "⚠️ 相機或模型載入受阻，可切換至「口令密鑰登入」";
+      }
+    }
+
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: false
+        });
+        videoEl.srcObject = stream;
+        await videoEl.play();
+        statusEl.className = "status-text";
+        statusEl.innerText = "🟢 請正面面向鏡頭，系統正在辨識中...";
+        startAutoScanLoop();
+      } catch (e) {
+        console.warn("Camera start blocked:", e);
+        statusEl.className = "status-text warn";
+        statusEl.innerText = "⚠️ 請點擊「📷 重啟相機」或允許瀏覽器相機權限";
+      }
+    }
+
+    function toggleCamera() {
+      if (videoEl.srcObject) {
+        videoEl.srcObject.getTracks().forEach(t => t.stop());
+      }
+      startCamera();
+    }
+
+    // --- Auto Scanning Loop ---
+    function startAutoScanLoop() {
+      if (autoScanTimer) clearInterval(autoScanTimer);
+      autoScanTimer = setInterval(async () => {
+        if (!isModelReady || isScanning || !videoEl || videoEl.paused || videoEl.ended) return;
+        await triggerFaceCapture(true);
+      }, 800);
+    }
+
+    // --- Face Capture and 1:N Identification ---
+    async function triggerFaceCapture(isAuto = false) {
+      if (isScanning || !isModelReady || !videoEl || videoEl.readyState < 2) return;
+      isScanning = true;
+
+      if (!isAuto) {
+        statusEl.className = "status-text";
+        statusEl.innerText = "⏳ 正在提取人臉特徵向量...";
+      }
+
+      try {
+        const detection = await faceapi.detectSingleFace(
+          videoEl,
+          new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })
+        ).withFaceLandmarks(true).withFaceDescriptor();
+
+        if (detection && detection.descriptor) {
+          const desc = detection.descriptor;
+          
+          // Call 1:N Centered Cosine Similarity Engine
+          let matchResult = null;
+          if (window.FaceAuthModule && window.FaceAuthModule.identifyFace1toN) {
+            matchResult = window.FaceAuthModule.identifyFace1toN(desc, studentProfiles, 0.78);
+          } else {
+            // Built-in cosine similarity fallback
+            matchResult = fallback1toN(desc, studentProfiles);
+          }
+
+          if (matchResult && matchResult.isMatch && matchResult.bestMatch) {
+            clearInterval(autoScanTimer);
+            cameraBox.classList.remove("scanning");
+            cameraBox.classList.add("success");
+            
+            const stu = matchResult.bestMatch;
+            const pct = matchResult.percentage || Math.round(matchResult.similarity * 100);
+            
+            statusEl.className = "status-text ok";
+            statusEl.innerText = `✅ 辨識成功！${stu.classID} 班 ${stu.studentID} 號 ${stu.name} 同學 (${pct}%)`;
+
+            // Retrieve secret key & decrypt student result
+            const passcode = getStudentPasscode(stu.classID, stu.studentID);
+            await decryptAndRenderCard(stu.classID, stu.studentID, stu.name, passcode, "AI 人臉特徵匹配");
+            return;
+          } else if (!isAuto) {
+            statusEl.className = "status-text warn";
+            statusEl.innerText = "🔍 未比對到相符學生特徵，請調整光線正面對準鏡頭";
+          }
+        } else if (!isAuto) {
+          statusEl.className = "status-text warn";
+          statusEl.innerText = "🟡 未偵測到人臉，請將面部置於圓形取景框內";
+        }
+      } catch (err) {
+        console.error("Scan error:", err);
+      } finally {
+        isScanning = false;
+      }
+    }
+
+    // Centered Cosine Fallback
+    function fallback1toN(candVec, profiles) {
+      let best = null, maxSim = -1;
+      for (const p of profiles) {
+        const target = p.vector;
+        let dot = 0, nA = 0, nB = 0;
+        for (let i = 0; i < 128; i++) {
+          dot += candVec[i] * target[i];
+          nA += candVec[i] * candVec[i];
+          nB += target[i] * target[i];
+        }
+        const sim = dot / (Math.sqrt(nA) * Math.sqrt(nB));
+        if (sim > maxSim) {
+          maxSim = sim;
+          best = p;
+        }
+      }
+      return {
+        isMatch: maxSim >= 0.78,
+        bestMatch: best,
+        similarity: maxSim,
+        percentage: Math.round(maxSim * 100)
+      };
+    }
+
+    // --- Decrypt Card via Native Web Crypto AES-256-GCM ---
+    async function decryptAndRenderCard(classID, studentID, studentName, passcode, authMethod) {
+      try {
+        const encUrl = `quiz_results/${classID}_${studentID}.enc?t=${Date.now()}`;
+        const resp = await fetch(encUrl);
+        if (!resp.ok) {
+          throw new Error(`找不到 ${classID} 班 ${studentID} 號的加密考卷檔案，或批改尚未發布！`);
+        }
+        const encBuffer = await resp.arrayBuffer();
+        if (encBuffer.byteLength < 28) throw new Error("加密考卷數據長度損壞！");
+
+        const iv = encBuffer.slice(0, 12);
+        const ciphertext = encBuffer.slice(12);
+
+        // Derive AES-256 Key
+        const saltStr = `F4CD_1030_SECRET_${classID}_${studentID}_${passcode}`;
+        const keyHash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(saltStr));
+        const cryptoKey = await crypto.subtle.importKey("raw", keyHash, { name: "AES-GCM" }, false, ["decrypt"]);
+
+        const decryptedBuffer = await crypto.subtle.decrypt(
+          { name: "AES-GCM", iv: new Uint8Array(iv) },
+          cryptoKey,
+          ciphertext
+        );
+
+        const blob = new Blob([decryptedBuffer], { type: "image/jpeg" });
+        const imgUrl = URL.createObjectURL(blob);
+
+        // Render to UI
+        document.getElementById("card-image").src = imgUrl;
+        document.getElementById("res-name-title").innerText = `${classID} 班 ${studentID} 號 ${studentName} 同學 — 留痕答題卡`;
+        document.getElementById("res-auth-method").innerText = authMethod;
+
+        // Hide Panels, Show Result
+        document.getElementById("panel-face").style.display = "none";
+        document.getElementById("panel-key").style.display = "none";
+        document.querySelector(".tab-bar").style.display = "none";
+        document.getElementById("result-view").style.display = "block";
+
+        // Stop Camera
+        if (videoEl.srcObject) {
+          videoEl.srcObject.getTracks().forEach(t => t.stop());
+        }
+      } catch (err) {
+        console.error("Decryption error:", err);
+        statusEl.className = "status-text err";
+        statusEl.innerText = `❌ 解密失敗：${err.message}`;
+      }
+    }
+
+    // --- Manual Passcode Login Fallback ---
+    async function manualKeyLogin() {
+      const cls = document.getElementById("input-class").value;
+      const sid = document.getElementById("input-id").value.trim();
+      const key = document.getElementById("input-key").value.trim();
+      const statusBox = document.getElementById("key-status");
+
+      if (!sid || !key) {
+        statusBox.innerText = "請輸入學號與密鑰！";
+        statusBox.style.display = "block";
+        return;
+      }
+      statusBox.style.display = "none";
+
+      const btn = document.getElementById("btn-key-login");
+      btn.innerText = "⏳ 正在驗證並解密...";
+      btn.disabled = true;
+
+      try {
+        const cred = CREDENTIALS_4CD.find(c => c.classID === cls && parseInt(c.studentID, 10) === parseInt(sid, 10));
+        const sName = cred ? cred.name : `學生 ${sid}`;
+        await decryptAndRenderCard(cls, sid, sName, key, "個人口令密鑰認證");
+      } catch (e) {
+        statusBox.innerText = `❌ 驗證失敗：${e.message}`;
+        statusBox.style.display = "block";
+      } finally {
+        btn.innerText = "🔓 解密查看答題卡";
+        btn.disabled = false;
+      }
+    }
+
+    // --- Switch UI Tabs ---
+    function switchLoginMode(mode) {
+      document.getElementById("tab-btn-face").classList.toggle("active", mode === "face");
+      document.getElementById("tab-btn-key").classList.toggle("active", mode === "key");
+      document.getElementById("panel-face").style.display = (mode === "face") ? "flex" : "none";
+      document.getElementById("panel-key").style.display = (mode === "key") ? "flex" : "none";
+      
+      if (mode === "face") {
+        startCamera();
+      } else {
+        if (videoEl.srcObject) {
+          videoEl.srcObject.getTracks().forEach(t => t.stop());
+        }
+        clearInterval(autoScanTimer);
+      }
+    }
+
+    function logoutAndReset() {
+      document.getElementById("result-view").style.display = "none";
+      document.querySelector(".tab-bar").style.display = "flex";
+      switchLoginMode("face");
+    }
+
+    window.addEventListener("DOMContentLoaded", initSystem);
+  </script>
+</body>
+</html>

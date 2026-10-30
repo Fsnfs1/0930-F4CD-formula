@@ -4,10 +4,10 @@
     "studentID": "29",
     "name": "譚欣",
     "score": 100,
-    "timestamp": "2026-10-30 01:39:42",
+    "timestamp": "2026-10-30 02:49:46",
     "file": "4C_29.enc",
-    "iv": "CvLFYkIL8OpRx4Co",
-    "tag": "Gi0YDL+29a+nZYT7sjfneQ==",
+    "iv": "xnq9egJI4sc83iIk",
+    "tag": "e2rtiTmpg/5ucLs2Zb3Fmg==",
     "cipherLength": 351079
   },
   {
@@ -15,10 +15,10 @@
     "studentID": "15",
     "name": "翁淮洋",
     "score": 84,
-    "timestamp": "2026-10-30 01:39:58",
+    "timestamp": "2026-10-30 02:50:02",
     "file": "4D_15.enc",
-    "iv": "YLvcjXiYyXrik46p",
-    "tag": "pbfzDC2aUBOAm5lPZwWNIQ==",
+    "iv": "uI9ef3WFBIrXYBZT",
+    "tag": "az8lzU7Ddj3NsEaw9GplVQ==",
     "cipherLength": 351797
   }
 ]
