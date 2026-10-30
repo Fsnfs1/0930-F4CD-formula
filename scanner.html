@@ -610,8 +610,8 @@
       const adj_bl = sampleAreaMean(30, h - 20, 70, h - 5);
       const adj_br = sampleAreaMean(w - 70, h - 20, w - 30, h - 5);
 
-      if (adj_tl - c_tl > 40 && adj_tr - c_tr > 40 && adj_bl - c_bl > 40 && adj_br - c_br > 40 &&
-          adj_tl > 180 && adj_tr > 180 && adj_bl > 180 && adj_br > 180) {
+      if (adj_tl - c_tl > 30 && adj_tr - c_tr > 30 && adj_bl - c_bl > 30 && adj_br - c_br > 30 &&
+          adj_tl > 140 && adj_tr > 140 && adj_bl > 140 && adj_br > 140) {
         return {
           tl: { x: 6.5, y: 6.5 },
           tr: { x: w - 6.5, y: 6.5 },
@@ -742,7 +742,7 @@
             if (bw >= 4 && bw <= 65 && bh >= 4 && bh <= 55 && area >= 16 && area <= 2500) {
               const ar = bw / bh;
               const fill = area / (bw * bh);
-              if (ar >= 0.40 && ar <= 3.8 && fill >= 0.40) {
+              if (ar >= 0.35 && ar <= 4.0 && fill >= 0.35) {
                 rawCands.push({
                   x: ((minX + maxX) / 2.0) / scale,
                   y: ((minY + maxY) / 2.0) / scale,
@@ -782,7 +782,7 @@
           const outerMean = sampleAreaMean(x0_o, y0_o, x1_o, y1_o);
 
           const contrast = outerMean - innerMean;
-          if (contrast > 15) {
+          if (contrast > 10) {
             merged.push({ x: c.x, y: c.y, contrast: contrast });
           }
         }
@@ -803,46 +803,65 @@
         return count > 0 ? (sum / count) : 255.0;
       }
 
-      // Combinatorial 4-Corner Search
-      merged.sort((a, b) => b.contrast - a.contrast);
-      const candList = merged.slice(0, 45);
+      // Fast Quadrant-Partitioned 4-Corner Combinatorial Search
+      const midX = w / 2.0;
+      const midY = h / 2.0;
+      const cands_tl = [];
+      const cands_tr = [];
+      const cands_bl = [];
+      const cands_br = [];
+
+      for (let i = 0; i < merged.length; i++) {
+        const c = merged[i];
+        if (c.x < midX && c.y < midY) cands_tl.push(c);
+        else if (c.x >= midX && c.y < midY) cands_tr.push(c);
+        else if (c.x < midX && c.y >= midY) cands_bl.push(c);
+        else cands_br.push(c);
+      }
+
+      cands_tl.sort((a, b) => b.contrast - a.contrast);
+      cands_tr.sort((a, b) => b.contrast - a.contrast);
+      cands_bl.sort((a, b) => b.contrast - a.contrast);
+      cands_br.sort((a, b) => b.contrast - a.contrast);
+
+      const top_tl = cands_tl.slice(0, 16);
+      const top_tr = cands_tr.slice(0, 16);
+      const top_bl = cands_bl.slice(0, 16);
+      const top_br = cands_br.slice(0, 16);
+
       let bestQuad = null;
       let bestScore = -1e9;
-      const numCands = candList.length;
 
-      for (let i = 0; i < numCands; i++) {
-        for (let j = 0; j < numCands; j++) {
-          if (i === j) continue;
-          const c_tl = candList[i];
-          const c_tr = candList[j];
+      for (let i = 0; i < top_tl.length; i++) {
+        const c_tl = top_tl[i];
+        for (let j = 0; j < top_tr.length; j++) {
+          const c_tr = top_tr[j];
           const dx_top = c_tr.x - c_tl.x;
           const dy_top = c_tr.y - c_tl.y;
-          if (dx_top < w * 0.35) continue;
+          if (dx_top < w * 0.25) continue;
           const top_len = Math.sqrt(dx_top * dx_top + dy_top * dy_top);
-          if (Math.abs(dy_top) / dx_top > 0.35) continue;
+          if (Math.abs(dy_top) / dx_top > 0.60) continue;
 
-          for (let k = 0; k < numCands; k++) {
-            if (k === i || k === j) continue;
-            const c_bl = candList[k];
+          for (let k = 0; k < top_bl.length; k++) {
+            const c_bl = top_bl[k];
             const dx_left = c_bl.x - c_tl.x;
             const dy_left = c_bl.y - c_tl.y;
-            if (dy_left < h * 0.20) continue;
+            if (dy_left < h * 0.12) continue;
             const left_len = Math.sqrt(dx_left * dx_left + dy_left * dy_left);
-            if (Math.abs(dx_left) / dy_left > 0.35) continue;
+            if (Math.abs(dx_left) / dy_left > 0.60) continue;
 
             const exp_br_x = c_tr.x + dx_left;
             const exp_br_y = c_tr.y + dy_left;
 
-            for (let m = 0; m < numCands; m++) {
-              if (m === i || m === j || m === k) continue;
-              const c_br = candList[m];
+            for (let m = 0; m < top_br.length; m++) {
+              const c_br = top_br[m];
               const dist_to_exp = Math.sqrt((c_br.x - exp_br_x) * (c_br.x - exp_br_x) + (c_br.y - exp_br_y) * (c_br.y - exp_br_y));
-              if (dist_to_exp > top_len * 0.25) continue;
+              if (dist_to_exp > top_len * 0.35) continue;
 
               const dx_bot = c_br.x - c_bl.x;
               const dy_bot = c_br.y - c_bl.y;
               const bot_len = Math.sqrt(dx_bot * dx_bot + dy_bot * dy_bot);
-              if (dx_bot < w * 0.35) continue;
+              if (dx_bot < w * 0.25) continue;
 
               const dx_right = c_br.x - c_tr.x;
               const dy_right = c_br.y - c_tr.y;
@@ -850,15 +869,15 @@
 
               const len_ratio_w = Math.min(top_len, bot_len) / Math.max(top_len, bot_len);
               const len_ratio_h = Math.min(left_len, right_len) / Math.max(left_len, right_len);
-              if (len_ratio_w < 0.70 || len_ratio_h < 0.70) continue;
+              if (len_ratio_w < 0.65 || len_ratio_h < 0.65) continue;
 
               const avg_w = (top_len + bot_len) / 2.0;
               const avg_h = (left_len + right_len) / 2.0;
               const aspect = avg_w / avg_h;
-              if (aspect < 1.4 || aspect > 4.2) continue;
+              if (aspect < 1.2 || aspect > 4.5) continue;
 
               const card_area = avg_w * avg_h;
-              if (card_area < (w * h * 0.12)) continue;
+              if (card_area < (w * h * 0.08)) continue;
 
               const border_darkness = (
                 lineDarkness(c_tl, c_tr) + lineDarkness(c_bl, c_br) +
@@ -874,11 +893,11 @@
 
               const score = (
                 marker_contrast * 40.0 +
-                area_ratio * 4000.0 +
+                area_ratio * 6000.0 +
                 symmetry * 2000.0 +
-                parallelogram_score * 1000.0 +
+                parallelogram_score * 1500.0 +
                 border_score * 10.0 -
-                aspect_diff * 400.0
+                aspect_diff * 300.0
               );
 
               if (score > bestScore) {
@@ -893,7 +912,7 @@
       return bestQuad;
     }
 
-    // Guide Box Fallback Quad
+    // Guide Box Fallback Quad with exact object-fit: cover inverse projection
     function getGuideBoxQuadInImage(imgW, imgH) {
       const container = document.getElementById("viewfinder-container");
       const cW = container.clientWidth;
@@ -901,16 +920,36 @@
       const gb = guideBox.getBoundingClientRect();
       const cb = container.getBoundingClientRect();
 
-      const relL = (gb.left - cb.left) / cW;
-      const relT = (gb.top - cb.top) / cH;
-      const relW = gb.width / cW;
-      const relH = gb.height / cH;
+      const cAspect = cW / cH;
+      const vAspect = imgW / imgH;
+      let rW, rH, oX, oY;
+      if (cAspect > vAspect) {
+        rW = cW;
+        rH = cW / vAspect;
+        oX = 0;
+        oY = (cH - rH) / 2;
+      } else {
+        rH = cH;
+        rW = cH * vAspect;
+        oX = (cW - rW) / 2;
+        oY = 0;
+      }
+
+      const sx0 = gb.left - cb.left;
+      const sy0 = gb.top - cb.top;
+      const sx1 = sx0 + gb.width;
+      const sy1 = sy0 + gb.height;
+
+      const ix0 = Math.max(0, Math.min(imgW, (sx0 - oX) * (imgW / rW)));
+      const iy0 = Math.max(0, Math.min(imgH, (sy0 - oY) * (imgH / rH)));
+      const ix1 = Math.max(0, Math.min(imgW, (sx1 - oX) * (imgW / rW)));
+      const iy1 = Math.max(0, Math.min(imgH, (sy1 - oY) * (imgH / rH)));
 
       return {
-        tl: { x: relL * imgW, y: relT * imgH },
-        tr: { x: (relL + relW) * imgW, y: relT * imgH },
-        bl: { x: relL * imgW, y: (relT + relH) * imgH },
-        br: { x: (relL + relW) * imgW, y: (relT + relH) * imgH },
+        tl: { x: ix0, y: iy0 },
+        tr: { x: ix1, y: iy0 },
+        bl: { x: ix0, y: iy1 },
+        br: { x: ix1, y: iy1 },
         type: 'guide_box_fallback'
       };
     }
@@ -1026,7 +1065,7 @@
           bestClass = cName;
         }
       }
-      const hasClass = maxClassDark >= 25.0;
+      const hasClass = maxClassDark >= 18.0;
 
       // ID Tens
       let bestTens = "0", maxTensDark = -999.0;
@@ -1037,7 +1076,7 @@
           bestTens = tName;
         }
       }
-      const hasTens = maxTensDark >= 25.0;
+      const hasTens = maxTensDark >= 18.0;
 
       // ID Units
       let bestUnits = "0", maxUnitsDark = -999.0;
@@ -1048,7 +1087,7 @@
           bestUnits = uName;
         }
       }
-      const hasUnits = maxUnitsDark >= 25.0;
+      const hasUnits = maxUnitsDark >= 18.0;
 
       const isBlank = (!hasClass && !hasTens && !hasUnits);
       const classID = hasClass ? bestClass : "";
