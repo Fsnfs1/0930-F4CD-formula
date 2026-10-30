@@ -1211,19 +1211,29 @@
       let innerSum = 0, innerCount = 0;
       let outerSum = 0, outerCount = 0;
 
-      for (let dy = -28; dy <= 28; dy += 2) {
+      for (let dy = -36; dy <= 36; dy++) {
         const py = cy + dy;
         if (py < 0 || py >= h) continue;
         const rowOffset = py * w;
-        for (let dx = -28; dx <= 28; dx += 2) {
+        for (let dx = -36; dx <= 36; dx++) {
           const px = cx + dx;
           if (px < 0 || px >= w) continue;
           const d2 = dx * dx + dy * dy;
           const val = gray[rowOffset + px];
-          if (d2 <= 64) { // r <= 8: strictly inside inner core
+          if (d2 <= 64) { // r <= 8: inner core
             innerSum += val;
             innerCount++;
-          } else if (d2 >= 400 && d2 <= 900) { // 20 <= r <= 30: outer background paper
+          } else if (d2 >= 576 && d2 <= 1296) { // 24 <= r <= 36: outer background ring
+            outerSum += val;
+            outerCount++;
+          }
+        }
+      }
+      if (innerCount === 0 || outerCount === 0) return 0.0;
+      return (outerSum / outerCount) - (innerSum / innerCount);
+    }
+
+    // 20 <= r <= 30: outer background paper
             outerSum += val;
             outerCount++;
           }
@@ -1252,7 +1262,7 @@
           bestClass = cName;
         }
       }
-      let hasClass = maxClassDark >= 20.0;
+      let hasClass = maxClassDark >= 22.0;
 
       // If Teacher locked batch class (4C, 4D, 5B), override with 100% certainty!
       if (window.selectedBatchClass && window.selectedBatchClass !== "AUTO") {
