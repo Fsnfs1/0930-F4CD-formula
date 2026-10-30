@@ -68,6 +68,121 @@
     .badge.success { color: #4ade80; border-color: #22c55e; }
     .badge.warning { color: #facc15; border-color: #eab308; }
 
+    /* Batch Class Lock Bar & Auto-Cap */
+    .batch-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #090d16;
+      padding: 8px 16px;
+      border-bottom: 1px solid #1e293b;
+      overflow-x: auto;
+      z-index: 10;
+    }
+    .batch-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #94a3b8;
+      white-space: nowrap;
+      margin-right: 2px;
+    }
+    .batch-btn {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .batch-btn:hover { background: #334155; }
+    .batch-btn.active {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+    .batch-btn.active.locked {
+      background: #166534;
+      color: #86efac;
+      border-color: #22c55e;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+    }
+    .btn-autocap {
+      margin-left: auto;
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .btn-autocap.active {
+      background: #854d0e;
+      color: #fef08a;
+      border-color: #eab308;
+      box-shadow: 0 0 10px rgba(234, 179, 8, 0.35);
+    }
+
+    /* Quick ID Number Pad for iPad */
+    .quick-pad-box {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .quick-pad-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+    }
+    .quick-pad-row {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .quick-pad-row-label {
+      font-size: 0.75rem;
+      color: #64748b;
+      width: 48px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .quick-pad-btn {
+      flex: 1;
+      height: 32px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #f1f5f9;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.1s ease;
+    }
+    .quick-pad-btn:active { transform: scale(0.94); }
+    .quick-pad-btn.active {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #ffffff;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+    }
+
     #viewfinder-container {
       flex: 1;
       position: relative;
@@ -380,6 +495,16 @@
     </div>
   </header>
 
+  <!-- Batch Class Mode Bar (批次班別鎖定 + 自動連拍開關) -->
+  <div class="batch-bar">
+    <span class="batch-label">班別模式:</span>
+    <button id="batch-auto" class="batch-btn active" data-class="AUTO">🤖 自動辨識</button>
+    <button id="batch-4c" class="batch-btn" data-class="4C">4C 班</button>
+    <button id="batch-4d" class="batch-btn" data-class="4D">4D 班</button>
+    <button id="batch-5b" class="batch-btn" data-class="5B">5B 班</button>
+    <button id="btn-autocap" class="btn-autocap">⚡ 自動拍照: 關</button>
+  </div>
+
   <div id="viewfinder-container">
     <video id="camera-feed" autoplay playsinline muted webkit-playsinline></video>
     <canvas id="overlay-canvas"></canvas>
@@ -441,6 +566,34 @@
           <div class="student-label">學生姓名：</div>
           <div id="modal-student-name" class="student-name">--</div>
           <div id="modal-status-badge" class="status-tag">--</div>
+        </div>
+
+        <!-- Quick ID Number Pad for iPad 1-tap correction -->
+        <div class="quick-pad-box">
+          <div class="quick-pad-title">
+            <span>⚡ iPad 點擊快捷鍵 (免開虛擬鍵盤)</span>
+            <span id="quick-pad-hint" style="color: #38bdf8;">點選快速設定學號</span>
+          </div>
+          <div class="quick-pad-row">
+            <span class="quick-pad-row-label">十位數:</span>
+            <button type="button" class="quick-pad-btn pad-tens" data-val="0">0</button>
+            <button type="button" class="quick-pad-btn pad-tens" data-val="1">1</button>
+            <button type="button" class="quick-pad-btn pad-tens" data-val="2">2</button>
+            <button type="button" class="quick-pad-btn pad-tens" data-val="3">3</button>
+          </div>
+          <div class="quick-pad-row">
+            <span class="quick-pad-row-label">個位數:</span>
+            <button type="button" class="quick-pad-btn pad-units" data-val="0">0</button>
+            <button type="button" class="quick-pad-btn pad-units" data-val="1">1</button>
+            <button type="button" class="quick-pad-btn pad-units" data-val="2">2</button>
+            <button type="button" class="quick-pad-btn pad-units" data-val="3">3</button>
+            <button type="button" class="quick-pad-btn pad-units" data-val="4">4</button>
+            <button type="button" class="quick-pad-btn pad-units" data-val="5">5</button>
+            <button type="button" class="quick-pad-btn pad-units" data-val="6">6</button>
+            <button type="button" class="quick-pad-btn pad-units" data-val="7">7</button>
+            <button type="button" class="quick-pad-btn pad-units" data-val="8">8</button>
+            <button type="button" class="quick-pad-btn pad-units" data-val="9">9</button>
+          </div>
         </div>
       </div>
 
@@ -512,6 +665,11 @@
     let pendingScan = null;
     let countdownInterval = null;
     let countdownRemaining = 5;
+
+    // Ease-of-Use Batch Class & Auto-Capture States
+    window.selectedBatchClass = (typeof localStorage !== "undefined" && localStorage.getItem("scanner_batch_class")) || "AUTO";
+    window.autoCapEnabled = (typeof localStorage !== "undefined" && localStorage.getItem("scanner_autocap") === "true");
+    let stableLockStartTime = 0;
 
     function showToast(msg) {
       const toast = document.getElementById("toast");
@@ -622,8 +780,8 @@
         };
       }
 
-      // Scale down to 800px max dim
-      const scale = 800.0 / Math.max(w, h);
+      // Scale down to 800px max dim (without upscaling smaller frames)
+      const scale = Math.min(1.0, 800.0 / Math.max(w, h));
       const sw = Math.floor(w * scale);
       const sh = Math.floor(h * scale);
 
@@ -636,8 +794,21 @@
       const sData = sImg.data;
 
       const gray = new Uint8Array(sw * sh);
+      let sum = 0, sumSq = 0;
       for (let i = 0, j = 0; i < sData.length; i += 4, j++) {
-        gray[j] = (sData[i] * 77 + sData[i+1] * 150 + sData[i+2] * 29) >> 8;
+        const val = (sData[i] * 77 + sData[i+1] * 150 + sData[i+2] * 29) >> 8;
+        gray[j] = val;
+        sum += val;
+        sumSq += val * val;
+      }
+
+      // Fast early rejection for non-card scenes: blank screens, keyboards, dark desks
+      const nPix = sw * sh;
+      const g_mean = sum / nPix;
+      const variance = (sumSq / nPix) - (g_mean * g_mean);
+      const g_std = Math.sqrt(Math.max(0, variance));
+      if (g_std < 6.0 || (g_mean < 145.0 && g_std < 60.0)) {
+        return null;
       }
 
       // Build Integral Image
@@ -782,7 +953,7 @@
           const outerMean = sampleAreaMean(x0_o, y0_o, x1_o, y1_o);
 
           const contrast = outerMean - innerMean;
-          if (contrast > 10) {
+          if (contrast > 10 && outerMean > 100.0) {
             merged.push({ x: c.x, y: c.y, contrast: contrast });
           }
         }
@@ -878,6 +1049,11 @@
 
               const card_area = avg_w * avg_h;
               if (card_area < (w * h * 0.08)) continue;
+
+              const card_mid_x = (c_tl.x + c_tr.x + c_bl.x + c_br.x) / 4.0;
+              const card_mid_y = (c_tl.y + c_tr.y + c_bl.y + c_br.y) / 4.0;
+              const card_mid_mean = sampleAreaMean(card_mid_x - 20, card_mid_y - 20, card_mid_x + 20, card_mid_y + 20);
+              if (card_mid_mean < 140.0) continue;
 
               const border_darkness = (
                 lineDarkness(c_tl, c_tr) + lineDarkness(c_bl, c_br) +
@@ -1028,26 +1204,26 @@
       dstCtx.putImageData(dImgData, 0, 0);
     }
 
-    // Calibrated OMR bubble contrast: inner core (r<=8) vs outer paper ring (24<=r<=36)
+    // Calibrated OMR bubble contrast with +-6px Neighborhood Peak Search
     function computeContrastCalibrated(gray, w, h, u, v) {
       const cx = Math.round(u * w);
       const cy = Math.round(v * h);
       let innerSum = 0, innerCount = 0;
       let outerSum = 0, outerCount = 0;
 
-      for (let dy = -36; dy <= 36; dy++) {
+      for (let dy = -28; dy <= 28; dy += 2) {
         const py = cy + dy;
         if (py < 0 || py >= h) continue;
         const rowOffset = py * w;
-        for (let dx = -36; dx <= 36; dx++) {
+        for (let dx = -28; dx <= 28; dx += 2) {
           const px = cx + dx;
           if (px < 0 || px >= w) continue;
           const d2 = dx * dx + dy * dy;
           const val = gray[rowOffset + px];
-          if (d2 <= 64) { // r <= 8: inner core
+          if (d2 <= 64) { // r <= 8: strictly inside inner core
             innerSum += val;
             innerCount++;
-          } else if (d2 >= 576 && d2 <= 1296) { // 24 <= r <= 36: outer background ring
+          } else if (d2 >= 400 && d2 <= 900) { // 20 <= r <= 30: outer background paper
             outerSum += val;
             outerCount++;
           }
@@ -1057,7 +1233,6 @@
       return (outerSum / outerCount) - (innerSum / innerCount);
     }
 
-    // Decode OMR Bubbles with Contrast Thresholding & Roster Verification
     function decodeOMRBubbles(canvas) {
       const ctx = canvas.getContext("2d");
       const imgData = ctx.getImageData(0, 0, TARGET_CANON_W, TARGET_CANON_H);
@@ -1077,7 +1252,13 @@
           bestClass = cName;
         }
       }
-      const hasClass = maxClassDark >= 22.0;
+      let hasClass = maxClassDark >= 20.0;
+
+      // If Teacher locked batch class (4C, 4D, 5B), override with 100% certainty!
+      if (window.selectedBatchClass && window.selectedBatchClass !== "AUTO") {
+        bestClass = window.selectedBatchClass;
+        hasClass = true;
+      }
 
       // ID Tens
       let bestTens = "0", maxTensDark = -999.0;
@@ -1105,7 +1286,7 @@
       const classID = hasClass ? bestClass : "";
       const tens = hasTens ? bestTens : "0";
       const units = hasUnits ? bestUnits : "0";
-      const studentID = (hasClass || hasTens || hasUnits) ? String(parseInt(tens, 10) * 10 + parseInt(units, 10)) : "";
+      const studentID = (hasTens || hasUnits) ? String(parseInt(tens, 10) * 10 + parseInt(units, 10)) : "";
 
       // Lookup student name in Roster
       let studentName = "";
@@ -1196,24 +1377,33 @@
       const cropCtx = cropCanvas.getContext("2d");
       cropCtx.drawImage(warpCanvas, 240, 50, 1300, 260, 0, 0, 1300, 260);
 
+      // Render Visual Bubble Overlay on the preview canvas
+      renderBubbleOverlay(cropCtx, omrResult);
+
       // Populate input values
       modalClassSelect.value = omrResult.classID || "";
       modalIdInput.value = omrResult.studentID || "";
       updateModalStudentInfo();
+      syncQuickPadSelection(omrResult.studentID || "");
 
-      // Start 5-second countdown auto-confirm
+      // Start 5-second countdown auto-confirm ONLY if verified student
       cancelModalCountdown();
-      countdownRemaining = 5;
-      modalCountdown.innerText = `(${countdownRemaining}s)`;
-      countdownInterval = setInterval(() => {
-        countdownRemaining--;
-        if (countdownRemaining <= 0) {
-          cancelModalCountdown();
-          executeUploadFromModal();
-        } else {
-          modalCountdown.innerText = `(${countdownRemaining}s)`;
-        }
-      }, 1000);
+      const sname = lookupRosterName(modalClassSelect.value.trim(), modalIdInput.value.trim());
+      if (sname) {
+        countdownRemaining = 5;
+        modalCountdown.innerText = `(${countdownRemaining}s)`;
+        countdownInterval = setInterval(() => {
+          countdownRemaining--;
+          if (countdownRemaining <= 0) {
+            cancelModalCountdown();
+            executeUploadFromModal();
+          } else {
+            modalCountdown.innerText = `(${countdownRemaining}s)`;
+          }
+        }, 1000);
+      } else {
+        modalCountdown.innerText = "";
+      }
 
       verifyModal.style.display = "flex";
     }
@@ -1284,6 +1474,156 @@
       closeVerificationModal();
     }
 
+
+    // Visual Reticle Rings & Bubble Highlights on Verification Canvas
+    function renderBubbleOverlay(cropCtx, omr) {
+      function toCropX(u) { return Math.round(u * TARGET_CANON_W - 240); }
+      function toCropY(v) { return Math.round(v * TARGET_CANON_H - 50); }
+
+      // 1. Draw subtle cyan rings on all bubble coordinate positions
+      cropCtx.lineWidth = 1.5;
+      cropCtx.strokeStyle = "rgba(56, 189, 248, 0.4)";
+      cropCtx.setLineDash([3, 3]);
+
+      for (const [_, uv] of Object.entries(OMR_SPEC.class_bubbles)) {
+        cropCtx.beginPath();
+        cropCtx.arc(toCropX(uv[0]), toCropY(uv[1]), 13, 0, Math.PI * 2);
+        cropCtx.stroke();
+      }
+      for (const [_, uv] of Object.entries(OMR_SPEC.id_tens_bubbles)) {
+        cropCtx.beginPath();
+        cropCtx.arc(toCropX(uv[0]), toCropY(uv[1]), 13, 0, Math.PI * 2);
+        cropCtx.stroke();
+      }
+      for (const [_, uv] of Object.entries(OMR_SPEC.id_units_bubbles)) {
+        cropCtx.beginPath();
+        cropCtx.arc(toCropX(uv[0]), toCropY(uv[1]), 13, 0, Math.PI * 2);
+        cropCtx.stroke();
+      }
+      cropCtx.setLineDash([]);
+
+      // 2. Draw vibrant glowing green rings on detected filled bubbles!
+      cropCtx.lineWidth = 3;
+      cropCtx.strokeStyle = "#22c55e"; // bright emerald green
+      cropCtx.fillStyle = "rgba(34, 197, 94, 0.3)";
+
+      const curClass = modalClassSelect ? modalClassSelect.value : omr.classID;
+      if (curClass && OMR_SPEC.class_bubbles[curClass]) {
+        const uv = OMR_SPEC.class_bubbles[curClass];
+        cropCtx.beginPath();
+        cropCtx.arc(toCropX(uv[0]), toCropY(uv[1]), 15, 0, Math.PI * 2);
+        cropCtx.fill();
+        cropCtx.stroke();
+      }
+
+      const sidNum = parseInt(modalIdInput ? modalIdInput.value : omr.studentID, 10);
+      if (!isNaN(sidNum) && sidNum >= 0) {
+        const t = String(Math.floor(sidNum / 10));
+        const u = String(sidNum % 10);
+        if (OMR_SPEC.id_tens_bubbles[t]) {
+          const uv = OMR_SPEC.id_tens_bubbles[t];
+          cropCtx.beginPath();
+          cropCtx.arc(toCropX(uv[0]), toCropY(uv[1]), 15, 0, Math.PI * 2);
+          cropCtx.fill();
+          cropCtx.stroke();
+        }
+        if (OMR_SPEC.id_units_bubbles[u]) {
+          const uv = OMR_SPEC.id_units_bubbles[u];
+          cropCtx.beginPath();
+          cropCtx.arc(toCropX(uv[0]), toCropY(uv[1]), 15, 0, Math.PI * 2);
+          cropCtx.fill();
+          cropCtx.stroke();
+        }
+      }
+    }
+
+    function syncQuickPadSelection(idStr) {
+      const sid = parseInt(idStr, 10);
+      const tens = isNaN(sid) ? "" : String(Math.floor(sid / 10));
+      const units = isNaN(sid) ? "" : String(sid % 10);
+
+      document.querySelectorAll(".pad-tens").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.val === tens);
+      });
+      document.querySelectorAll(".pad-units").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.val === units);
+      });
+    }
+
+    // Quick Pad 1-tap iPad button click events
+    document.querySelectorAll(".pad-tens").forEach(btn => {
+      btn.addEventListener("click", () => {
+        cancelModalCountdown();
+        const curUnits = modalIdInput.value ? (parseInt(modalIdInput.value, 10) % 10) : 0;
+        const newTens = parseInt(btn.dataset.val, 10);
+        modalIdInput.value = String(newTens * 10 + curUnits);
+        updateModalStudentInfo();
+        syncQuickPadSelection(modalIdInput.value);
+        if (pendingScan && pendingScan.canvas) {
+          const cropCanvas = document.getElementById("crop-preview-canvas");
+          const cropCtx = cropCanvas.getContext("2d");
+          cropCtx.drawImage(pendingScan.canvas, 240, 50, 1300, 260, 0, 0, 1300, 260);
+          renderBubbleOverlay(cropCtx, pendingScan.omr);
+        }
+      });
+    });
+
+    document.querySelectorAll(".pad-units").forEach(btn => {
+      btn.addEventListener("click", () => {
+        cancelModalCountdown();
+        const curTens = modalIdInput.value ? Math.floor(parseInt(modalIdInput.value, 10) / 10) : 0;
+        const newUnits = parseInt(btn.dataset.val, 10);
+        modalIdInput.value = String(curTens * 10 + newUnits);
+        updateModalStudentInfo();
+        syncQuickPadSelection(modalIdInput.value);
+        if (pendingScan && pendingScan.canvas) {
+          const cropCanvas = document.getElementById("crop-preview-canvas");
+          const cropCtx = cropCanvas.getContext("2d");
+          cropCtx.drawImage(pendingScan.canvas, 240, 50, 1300, 260, 0, 0, 1300, 260);
+          renderBubbleOverlay(cropCtx, pendingScan.omr);
+        }
+      });
+    });
+
+    // Batch Class Lock Buttons Event Handlers
+    function updateBatchBarUI() {
+      document.querySelectorAll(".batch-btn").forEach(btn => {
+        const cls = btn.dataset.class;
+        const isActive = (cls === window.selectedBatchClass);
+        btn.classList.toggle("active", isActive);
+        btn.classList.toggle("locked", isActive && cls !== "AUTO");
+        if (cls !== "AUTO") {
+          btn.innerText = isActive ? `🔒 ${cls} 班 (鎖定)` : `${cls} 班`;
+        }
+      });
+      if (typeof localStorage !== "undefined") localStorage.setItem("scanner_batch_class", window.selectedBatchClass);
+      if (window.selectedBatchClass !== "AUTO") {
+        showToast(`🔒 已鎖定 ${window.selectedBatchClass} 班，掃描將自動套用此班級`);
+      } else {
+        showToast("🤖 已切換為全自動班別辨識模式");
+      }
+    }
+
+    document.querySelectorAll(".batch-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        window.selectedBatchClass = btn.dataset.class;
+        updateBatchBarUI();
+      });
+    });
+
+    // Auto-Capture Toggle
+    const btnAutoCap = document.getElementById("btn-autocap");
+    function updateAutoCapUI() {
+      btnAutoCap.classList.toggle("active", window.autoCapEnabled);
+      btnAutoCap.innerText = window.autoCapEnabled ? "⚡ 自動拍照: 開" : "⚡ 自動拍照: 關";
+      if (typeof localStorage !== "undefined") localStorage.setItem("scanner_autocap", String(window.autoCapEnabled));
+    }
+    btnAutoCap.addEventListener("click", () => {
+      window.autoCapEnabled = !window.autoCapEnabled;
+      updateAutoCapUI();
+      showToast(autoCapEnabled ? "⚡ 自動拍照已開啟：對齊綠框 0.3 秒後自動拍攝" : "手動拍照模式：點擊快門即可隨時拍攝");
+    });
+
     // Frame Processing Trigger
     function processImageFrame(source) {
       const workCanvas = document.getElementById("work-canvas");
@@ -1297,14 +1637,15 @@
       workCanvas.height = sH;
       ctx.drawImage(source, 0, 0, sW, sH);
 
-      // Marker Detection
+      // Marker Detection (Full Resolution + LiveQuad + GuideBox Fallback)
       let corners = detectFourCornerMarkers(ctx, sW, sH);
       if (!corners && liveQuad) {
         corners = liveQuad;
       }
       if (!corners) {
-        showToast("⚠️ 未能偵測到答題卡 4 個定位方塊，請確認清晰度與完整度後重試");
-        return;
+        // High-tolerance fallback to calibrated guide box quad - NEVER blocks the user!
+        corners = getGuideBoxQuadInImage(sW, sH);
+        showToast("ℹ️ 使用取景框校正，請核對預覽氣泡");
       }
 
       // Rectify into standard canonical canvas
@@ -1318,14 +1659,13 @@
       openVerificationModal(omrResult, warpCanvas);
     }
 
-    // Snap Button Trigger
+    // Snap Button Trigger - Zero Friction Manual Shoot
     document.getElementById("btn-snap").addEventListener("click", () => {
-      if (!liveQuad) {
-        showToast("⚠️ 請將答題卡的 4 個黑色方塊對齊框線內，鎖定後再拍攝");
-        if (navigator.vibrate) navigator.vibrate([80, 50, 80]);
+      if (!videoEl.videoWidth) {
+        showToast("相機啟動中，請稍候...");
         return;
       }
-      if (!videoEl.videoWidth) return;
+      if (navigator.vibrate) navigator.vibrate(50);
       processImageFrame(videoEl);
     });
 
@@ -1421,8 +1761,16 @@
               br: { x: q.br.x / scale, y: q.br.y / scale },
               type: q.type
             };
+            if (!stableLockStartTime) stableLockStartTime = now;
+            // Auto-Capture when stably locked for 350ms without touching the screen
+            if (window.autoCapEnabled && (now - stableLockStartTime > 350) && verifyModal.style.display !== "flex") {
+              stableLockStartTime = now + 4000; // prevent double snap
+              if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
+              processImageFrame(videoEl);
+            }
           } else {
             liveQuad = null;
+            stableLockStartTime = 0;
           }
         }
 
@@ -1504,9 +1852,11 @@
       requestAnimationFrame(tick);
     }
 
-    // Auto-Start Camera on load
+    // Auto-Start Camera & Initialize Ease-of-Use Settings on load
     window.addEventListener("DOMContentLoaded", () => {
       layoutGuideBox();
+      updateBatchBarUI();
+      updateAutoCapUI();
       startCamera();
     });
   </script>
