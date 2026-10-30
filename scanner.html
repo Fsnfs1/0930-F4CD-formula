@@ -189,13 +189,175 @@
       border-radius: 30px;
       font-size: 0.95rem;
       font-weight: 600;
-      z-index: 100;
+      z-index: 1100;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
       opacity: 0;
       transition: opacity 0.3s ease;
       pointer-events: none;
     }
     #toast.show { opacity: 1; }
+
+    /* R3 Instant Verification Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 18px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-header {
+      padding: 14px 20px;
+      background: #0f172a;
+      border-bottom: 1px solid #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h3 {
+      font-size: 1.1rem;
+      color: #38bdf8;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-close {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.6rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 4px;
+    }
+    .btn-close:hover { color: #f8fafc; }
+    .preview-box {
+      padding: 12px 18px 8px;
+      background: #090d16;
+      border-bottom: 1px solid #334155;
+    }
+    .preview-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+    #crop-preview-canvas {
+      width: 100%;
+      height: auto;
+      max-height: 135px;
+      object-fit: contain;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      background: #ffffff;
+      display: block;
+    }
+    .modal-body {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .form-row {
+      display: flex;
+      gap: 12px;
+    }
+    .form-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .form-group label {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+    .form-control {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #f8fafc;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-control:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+    }
+    .student-info-row {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px 14px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .student-label {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+    .student-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #38bdf8;
+      flex: 1;
+      padding-left: 8px;
+    }
+    .status-tag {
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-weight: 600;
+      background: #334155;
+      color: #cbd5e1;
+    }
+    .status-tag.verified { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
+    .status-tag.unfilled { background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid #eab308; }
+    .status-tag.unknown { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+    .modal-actions {
+      padding: 12px 20px 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-top: 1px solid #334155;
+    }
+    .btn-primary {
+      background: #0284c7;
+      color: #ffffff;
+      flex: 2;
+      justify-content: center;
+    }
+    .btn-primary:hover { background: #0369a1; }
+    #modal-btn-retake {
+      flex: 1;
+      justify-content: center;
+    }
   </style>
 </head>
 <body>
@@ -236,6 +398,56 @@
 
   <div id="toast"></div>
 
+  <!-- Instant Verification Modal (R3) -->
+  <div id="verify-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>📋 答題卡辨識確認</h3>
+        <button id="modal-btn-close" class="btn-close" title="取消重拍">&times;</button>
+      </div>
+      
+      <!-- Bubble Crop Preview -->
+      <div class="preview-box">
+        <div class="preview-label">氣泡填塗特寫預覽 (班別 / 學號)</div>
+        <canvas id="crop-preview-canvas"></canvas>
+      </div>
+
+      <!-- Form Info & Manual Adjustment -->
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="modal-class-select">班別</label>
+            <select id="modal-class-select" class="form-control">
+              <option value="">（未填塗）</option>
+              <option value="4C">4C 班</option>
+              <option value="4D">4D 班</option>
+              <option value="5B">5B 班</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="modal-id-input">學號 (1~35)</label>
+            <input type="number" id="modal-id-input" class="form-control" min="1" max="35" placeholder="學號">
+          </div>
+        </div>
+
+        <div class="form-row student-info-row">
+          <div class="student-label">學生姓名：</div>
+          <div id="modal-student-name" class="student-name">--</div>
+          <div id="modal-status-badge" class="status-tag">--</div>
+        </div>
+      </div>
+
+      <!-- Modal Actions -->
+      <div class="modal-actions">
+        <button id="modal-btn-retake" class="btn btn-secondary">🔄 重拍</button>
+        <button id="modal-btn-confirm" class="btn btn-primary">
+          <span>✅ 確認上傳</span>
+          <span id="modal-countdown">(5s)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Offscreen Processing Canvas -->
   <canvas id="work-canvas" style="display: none;"></canvas>
   <canvas id="warp-canvas" width="2091" height="1037" style="display: none;"></canvas>
@@ -247,30 +459,30 @@
     const TARGET_CANON_H = 1037;
     const CARD_ASPECT = TARGET_CANON_W / TARGET_CANON_H; // ~2.016
 
-    // Geometry Specification Coordinates from survey_spec_miner (verified against Page 2 PDF)
+    // Calibrated OMR bubble coordinates in standard 2091 x 1037
     const OMR_SPEC = {
       class_bubbles: {
-        "4C": [0.28577, 0.10473],
-        "4D": [0.39385, 0.10473],
-        "5B": [0.50193, 0.10473]
+        "4C": [0.28575, 0.10174],
+        "4D": [0.39383, 0.10174],
+        "5B": [0.50191, 0.10174]
       },
       id_tens_bubbles: {
-        "0": [0.15533, 0.17930],
-        "1": [0.26018, 0.17930],
-        "2": [0.36492, 0.17930],
-        "3": [0.46965, 0.17930]
+        "0": [0.15519, 0.17695],
+        "1": [0.25992, 0.17695],
+        "2": [0.36466, 0.17695],
+        "3": [0.46939, 0.17695]
       },
       id_units_bubbles: {
-        "0": [0.15533, 0.24898],
-        "1": [0.21583, 0.24898],
-        "2": [0.27620, 0.24898],
-        "3": [0.33670, 0.24898],
-        "4": [0.39708, 0.24898],
-        "5": [0.45758, 0.24898],
-        "6": [0.51795, 0.24898],
-        "7": [0.57849, 0.24898],
-        "8": [0.63887, 0.24898],
-        "9": [0.69937, 0.24898]
+        "0": [0.15519, 0.24638],
+        "1": [0.21545, 0.24638],
+        "2": [0.27618, 0.24638],
+        "3": [0.33644, 0.24638],
+        "4": [0.39670, 0.24638],
+        "5": [0.45744, 0.24638],
+        "6": [0.51769, 0.24638],
+        "7": [0.57843, 0.24638],
+        "8": [0.63869, 0.24638],
+        "9": [0.69895, 0.24638]
       }
     };
 
