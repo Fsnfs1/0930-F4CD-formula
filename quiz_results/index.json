@@ -6,8 +6,8 @@
     "score": 64,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_1.enc",
-    "iv": "CzD4OFmZqSb0aDao",
-    "tag": "sMILGzCgsd4jo4oNOe0zGg==",
+    "iv": "62xNaD3BEu5l9ZiL",
+    "tag": "PUq822QIw8TGNRI65zHRHA==",
     "cipherLength": 403928
   },
   {
@@ -17,8 +17,8 @@
     "score": 32,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_10.enc",
-    "iv": "yEKyR1nZPutblm4l",
-    "tag": "3ARPh80RXzJPl12jHaMAZA==",
+    "iv": "BUF/m5UVrEgJ2zYE",
+    "tag": "HG2h5t3mqZuIMAHuCFhCYw==",
     "cipherLength": 381025
   },
   {
@@ -28,8 +28,8 @@
     "score": 8,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_11.enc",
-    "iv": "KgKfHcwQCSLrZo5x",
-    "tag": "/gcbpGNPISZ9K+18BTkiOQ==",
+    "iv": "IdzVrnnm4sr0BR8T",
+    "tag": "Ew3Rj9w90JPYg3lyGBhYKA==",
     "cipherLength": 357657
   },
   {
@@ -39,8 +39,8 @@
     "score": 28,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_12.enc",
-    "iv": "QkLcoCLrcc1jfCpd",
-    "tag": "ecGo20sjO0d+m/93pFT1aQ==",
+    "iv": "AdLmu8/ExGqWuoLG",
+    "tag": "Jm2UtI+oppv0leaVZLj3aA==",
     "cipherLength": 383505
   },
   {
@@ -50,8 +50,8 @@
     "score": 40,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_14.enc",
-    "iv": "800HWSPhCyAiXKNa",
-    "tag": "A1eG0GOGYupz6c4RUMj8Iw==",
+    "iv": "r6r2iTkFROKCRk61",
+    "tag": "PxrE3xh770JNH3gxab+fuA==",
     "cipherLength": 437570
   },
   {
@@ -61,8 +61,8 @@
     "score": 80,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_15.enc",
-    "iv": "8WoZEYvsql3/Fsxb",
-    "tag": "2Q9jKq6xRCsuGUyZA+1FOQ==",
+    "iv": "6hEdEsPiAo7l/IcP",
+    "tag": "Q4QYg9lu/M7x5mFQtlrBfw==",
     "cipherLength": 446502
   },
   {
@@ -72,20 +72,20 @@
     "score": 36,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_16.enc",
-    "iv": "1IShXvbFTrF6DER1",
-    "tag": "ueMfNVi+q60995yJMs/a+g==",
+    "iv": "0VsFYTaJW8jKzEkF",
+    "tag": "RQZ573QFSR3rJtt9WpLEaA==",
     "cipherLength": 349601
   },
   {
     "classID": "4C",
     "studentID": "17",
     "name": "陳芷澄",
-    "score": 28,
+    "score": 32,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_17.enc",
-    "iv": "W0RZwqmle1zcP7C3",
-    "tag": "12yZEMALybtRkLZEH6Svpw==",
-    "cipherLength": 340515
+    "iv": "FcHoEshra3d5HRlT",
+    "tag": "gvOWGzlgxJGx2gNrfqkEuA==",
+    "cipherLength": 339943
   },
   {
     "classID": "4C",
@@ -94,8 +94,8 @@
     "score": 32,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_18.enc",
-    "iv": "eF391r83wjIeA9CR",
-    "tag": "EZBjjz9LvmLUb6QEBi0Kbw==",
+    "iv": "J1veCr/CSkjsYyDI",
+    "tag": "0LvmTrPmPm/tk5bnDucjkw==",
     "cipherLength": 362336
   },
   {
@@ -105,20 +105,20 @@
     "score": 24,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_19.enc",
-    "iv": "Fx3Hk1OdYYvMEjVQ",
-    "tag": "zSCyitfZDJJ/J2fciA83Uw==",
+    "iv": "kl7R4rnxpJa+TgRT",
+    "tag": "FoIMeszR14/PgUT5xj/Y7w==",
     "cipherLength": 340514
   },
   {
     "classID": "4C",
     "studentID": "2",
     "name": "王嘉熙",
-    "score": 64,
+    "score": 68,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_2.enc",
-    "iv": "+V+9uscZDQG7vT0M",
-    "tag": "hwrH0L8Jex6f3Lr7Jj83Yw==",
-    "cipherLength": 399539
+    "iv": "MsKH0PbNyXQO3J2n",
+    "tag": "xzVBsew84DmJ0Q1auHvsXw==",
+    "cipherLength": 399618
   },
   {
     "classID": "4C",
@@ -127,8 +127,8 @@
     "score": 20,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_20.enc",
-    "iv": "K2gTptinIslJcfQn",
-    "tag": "YPIAmYg0c21lHN/V0M85BA==",
+    "iv": "eEQmNZqUBjm/DmtH",
+    "tag": "a1fAuzQz6L5OvNbqhq46xg==",
     "cipherLength": 367895
   },
   {
@@ -138,8 +138,8 @@
     "score": 28,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_21.enc",
-    "iv": "loF7Wwx9y19DxrU3",
-    "tag": "RGqwbpkonRCHi+I+Qi02Jw==",
+    "iv": "ZGmhf7Gw01pAT9y8",
+    "tag": "wo50ZP5TCyJFk+8xOQR0+g==",
     "cipherLength": 361961
   },
   {
@@ -149,8 +149,8 @@
     "score": 28,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_22.enc",
-    "iv": "6YclUTnzLyF+lPR8",
-    "tag": "jblcJvoNwGuSlDn37n1o0w==",
+    "iv": "bofygfvl5C67C2JU",
+    "tag": "RYogLBSa3nAQ6HhienbXGg==",
     "cipherLength": 391211
   },
   {
@@ -160,8 +160,8 @@
     "score": 16,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_23.enc",
-    "iv": "iVWWrk0qyaN0fhz0",
-    "tag": "lkUz7FccnqTsuZMEt6Vz1g==",
+    "iv": "EyaLFos6eIy1Hbvi",
+    "tag": "FpjWfISGyUB819YZhSrg0Q==",
     "cipherLength": 357922
   },
   {
@@ -171,8 +171,8 @@
     "score": 28,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_24.enc",
-    "iv": "1/8ZdGsJS8gxoFor",
-    "tag": "BxJuEMq+hAlzocWlDCp8Pg==",
+    "iv": "Gi3WS1PIQ0ofMuGC",
+    "tag": "oTKtICXZJSuyWJ523KStMw==",
     "cipherLength": 398376
   },
   {
@@ -182,8 +182,8 @@
     "score": 32,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_25.enc",
-    "iv": "A6lqTa4uobkLiijs",
-    "tag": "vpmPtTzXdbB0qicIZU5N4A==",
+    "iv": "85ODjNqn7ltfmYMe",
+    "tag": "m22cdGHxuWapO1nJQI2hpQ==",
     "cipherLength": 372443
   },
   {
@@ -193,8 +193,8 @@
     "score": 64,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_26.enc",
-    "iv": "77pkhDs27HzXhNbU",
-    "tag": "JMNBueQgGOmTJ7Jxf/0yTA==",
+    "iv": "wYeWMH6puvv1nMjp",
+    "tag": "Uz1I+O4KeDSku8SkYMuUpw==",
     "cipherLength": 381971
   },
   {
@@ -204,8 +204,8 @@
     "score": 32,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_27.enc",
-    "iv": "6qBRKSlKJkVZy9tu",
-    "tag": "rm0TbuNetN9shtLYicruwA==",
+    "iv": "mDpSm+H9Qu6KXZGR",
+    "tag": "NL3sVRJV/IAQ/tU95ofd9A==",
     "cipherLength": 388653
   },
   {
@@ -215,8 +215,8 @@
     "score": 8,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_28.enc",
-    "iv": "p8s4/fXzWw2YzMFV",
-    "tag": "1cLZllXRFnTemiNtcUCHrg==",
+    "iv": "EHXiLsoXXOlsmJJz",
+    "tag": "4CRvhlf5zx+yHUkOnQECOg==",
     "cipherLength": 334522
   },
   {
@@ -226,8 +226,8 @@
     "score": 56,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_29.enc",
-    "iv": "gKLec/HCSjnH5dTs",
-    "tag": "ZMhEsC5GvHJbl8mw44UJfg==",
+    "iv": "jkngdxdqnZv8rhm6",
+    "tag": "61Oq5Y1VPxbCfeIZlUp+TA==",
     "cipherLength": 414438
   },
   {
@@ -237,8 +237,8 @@
     "score": 8,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_3.enc",
-    "iv": "LPx6Np6ZRzlt5rdX",
-    "tag": "fUgYjW6kuE+HUOr995CExw==",
+    "iv": "dIPaWVb01lqrvkLS",
+    "tag": "R1uAqKlaVB9VfFSJ2P2lvA==",
     "cipherLength": 367364
   },
   {
@@ -248,8 +248,8 @@
     "score": 36,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_4.enc",
-    "iv": "pVUJ7cHWBGqtF+Hy",
-    "tag": "v18IUD1sdoUPuUjX6Oz51Q==",
+    "iv": "50sK2N7kTezmOfDV",
+    "tag": "u0uPxQ7pVwQ60eJIFKSk4A==",
     "cipherLength": 373812
   },
   {
@@ -259,8 +259,8 @@
     "score": 12,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_5.enc",
-    "iv": "7XHuiYKjBsFy2xSE",
-    "tag": "kjpqbjG4BA66Vl6jxdTt4w==",
+    "iv": "QLAlatMCmx+EI3ic",
+    "tag": "isGWgD386SRZ/EAs0NP5bA==",
     "cipherLength": 340466
   },
   {
@@ -270,8 +270,8 @@
     "score": 72,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_6.enc",
-    "iv": "QuT+awD1bLHhcfgQ",
-    "tag": "AYBlG5Bz4JETppz2nShY9A==",
+    "iv": "k6Eo+o52NC9f6MvY",
+    "tag": "MqXzTfQJxFHC4Q5AGLh5Sg==",
     "cipherLength": 411138
   },
   {
@@ -281,8 +281,8 @@
     "score": 68,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_7.enc",
-    "iv": "3auULDnz6Q1jnCQS",
-    "tag": "jWe13BJ3xk2ZWn61znMFNg==",
+    "iv": "xs2q82g+2gD6CIrT",
+    "tag": "eaAmiB1suNSULwmZL60ggA==",
     "cipherLength": 428630
   },
   {
@@ -292,8 +292,8 @@
     "score": 24,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_8.enc",
-    "iv": "iMRdTDzHzrD0XW7h",
-    "tag": "MZ9Q3tyvn7Y9kwGK7BJTww==",
+    "iv": "rUd9u2CoNqQLQONM",
+    "tag": "RYvAUEjUJpH+9l1+u6srbw==",
     "cipherLength": 363223
   },
   {
@@ -303,8 +303,8 @@
     "score": 12,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4C_9.enc",
-    "iv": "y5cYnYPwSq8Qvp/8",
-    "tag": "27h+zrXJPtiedBiMPD5jRQ==",
+    "iv": "6vYThLLx80ed9kpu",
+    "tag": "wFfjdjJqcg6+gfIkpg2Z6g==",
     "cipherLength": 382949
   },
   {
@@ -314,8 +314,8 @@
     "score": 68,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4D_1.enc",
-    "iv": "M/vOcYGyMrT5QTxT",
-    "tag": "uPaYTsFVMca42haFwTiYyA==",
+    "iv": "HG/02Ifnj1IdRRvy",
+    "tag": "WLjRsxsGkjZC7QmzuJNCJw==",
     "cipherLength": 477072
   },
   {
@@ -325,8 +325,8 @@
     "score": 32,
     "timestamp": "2026-10-30 19:34:22",
     "file": "4D_10.enc",
-    "iv": "mRoohbNvouiqwUa0",
-    "tag": "YfzXawko3tjC8QYvaZBlRQ==",
+    "iv": "Qb/ceT6wTwN0fkz1",
+    "tag": "nJcxQpyi+N3kauiJL0pE/w==",
     "cipherLength": 398000
   },
   {
@@ -336,8 +336,8 @@
     "score": 48,
     "timestamp": "2026-10-30 19:34:22",
     "file": "4D_13.enc",
-    "iv": "hq3d/T4LeuRKGnnO",
-    "tag": "O7jbgfUau1UhSlKe/2H3GA==",
+    "iv": "EICrOTTf+LEh6L8v",
+    "tag": "T40o2+H4C7Ock6WMPwH6lw==",
     "cipherLength": 363480
   },
   {
@@ -347,8 +347,8 @@
     "score": 44,
     "timestamp": "2026-10-30 19:34:22",
     "file": "4D_14.enc",
-    "iv": "6x5fESAroBXqsXrF",
-    "tag": "eAwpRSYOaBZB7nM0npidcA==",
+    "iv": "YmjOHz21e2dl9b6a",
+    "tag": "yKpP7NXYrGBXeOee63mREg==",
     "cipherLength": 466184
   },
   {
@@ -358,8 +358,8 @@
     "score": 40,
     "timestamp": "2026-10-30 19:34:22",
     "file": "4D_17.enc",
-    "iv": "DYja9sQOm5dq/rjP",
-    "tag": "CUX83FS4FdFOaXdEK5VaxQ==",
+    "iv": "MRtD14WGkxrjpidc",
+    "tag": "LEbplcjQBG/wVfrXN8y0xA==",
     "cipherLength": 442208
   },
   {
@@ -369,8 +369,8 @@
     "score": 12,
     "timestamp": "2026-10-30 19:34:22",
     "file": "4D_19.enc",
-    "iv": "oJiq2C2pFxCwTEah",
-    "tag": "0wCnUyq3+6l0wiP2u8+jAw==",
+    "iv": "ONfCqxB6wZRBJcoV",
+    "tag": "+zahBfdltDyHFjOXQOdx7g==",
     "cipherLength": 376108
   },
   {
@@ -380,8 +380,8 @@
     "score": 20,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4D_2.enc",
-    "iv": "AVHMeovE0rHJt8Zz",
-    "tag": "gZ74dj3jjQPQyquGerUV3Q==",
+    "iv": "UL7NKthC+/CwC/ID",
+    "tag": "Y2hXyBvugEjOjIV82tTBKQ==",
     "cipherLength": 372703
   },
   {
@@ -391,8 +391,8 @@
     "score": 28,
     "timestamp": "2026-10-30 19:34:22",
     "file": "4D_20.enc",
-    "iv": "LLJ9+zFDh5y/M9uj",
-    "tag": "nrI9MkpDM+4CYqmh9uyxPg==",
+    "iv": "dDQehz95AGaBzX5h",
+    "tag": "qOdVZ0Lm/Etkf0Sv8tKhZA==",
     "cipherLength": 421092
   },
   {
@@ -402,8 +402,8 @@
     "score": 32,
     "timestamp": "2026-10-30 19:34:22",
     "file": "4D_21.enc",
-    "iv": "XXUuDo/LPjJJ7WUB",
-    "tag": "wrrR0k+fFhWzLvMjg9zTng==",
+    "iv": "JstU/LhlrOglq2r2",
+    "tag": "Fcd16TlHkIq1M5haBY4l2A==",
     "cipherLength": 349291
   },
   {
@@ -413,8 +413,8 @@
     "score": 20,
     "timestamp": "2026-10-30 19:34:22",
     "file": "4D_22.enc",
-    "iv": "p8uDetGyCDeBvJde",
-    "tag": "RlX3i273iTDpLJno5Z6Xmg==",
+    "iv": "sMCJSrdJRPS9s309",
+    "tag": "N1FYDiZIOfn8HgpiBF9/bg==",
     "cipherLength": 372617
   },
   {
@@ -424,8 +424,8 @@
     "score": 36,
     "timestamp": "2026-10-30 19:34:22",
     "file": "4D_23.enc",
-    "iv": "4dTTngki5tyMn+K/",
-    "tag": "cMmNyP08m7cUnZGzcwfxJQ==",
+    "iv": "EVzaGqPlFjQKzfiv",
+    "tag": "T29X56ZfvaKAtu34qg9Xog==",
     "cipherLength": 393342
   },
   {
@@ -435,8 +435,8 @@
     "score": 8,
     "timestamp": "2026-10-30 19:34:22",
     "file": "4D_24.enc",
-    "iv": "0ppqV21JDsKd2wnA",
-    "tag": "OGAPf/wgpfbWqdmsnJlqdA==",
+    "iv": "qx5wGApUD8kagehx",
+    "tag": "mg+23ArS9VujLvDmf0kUAg==",
     "cipherLength": 432512
   },
   {
@@ -446,8 +446,8 @@
     "score": 12,
     "timestamp": "2026-10-30 19:34:22",
     "file": "4D_25.enc",
-    "iv": "M4rVEfp/yQjbC6ot",
-    "tag": "P4K8qSzKnfm2Jg2qQ6fMZw==",
+    "iv": "ybE3RS6pV7r6fUSk",
+    "tag": "oxA6WfbRhj3WyGd7m8tJ7Q==",
     "cipherLength": 433563
   },
   {
@@ -457,8 +457,8 @@
     "score": 56,
     "timestamp": "2026-10-30 19:34:22",
     "file": "4D_26.enc",
-    "iv": "PDOhBCitYKL3WYUL",
-    "tag": "xv/Y8q0kIKaflRfKXyf5Nw==",
+    "iv": "Yvdb+F2bP/uwX/TE",
+    "tag": "DtnKfUN8ddCPpUTPV/85MA==",
     "cipherLength": 502448
   },
   {
@@ -468,8 +468,8 @@
     "score": 48,
     "timestamp": "2026-10-30 19:34:22",
     "file": "4D_28.enc",
-    "iv": "NpeHZ7vQsjjs/Zqd",
-    "tag": "wNniUouiakJYubts5VVBEg==",
+    "iv": "+JO4bjb8KMo8Ly2g",
+    "tag": "AShYQM8YOuLOmEzJhOMd+A==",
     "cipherLength": 452682
   },
   {
@@ -479,8 +479,8 @@
     "score": 36,
     "timestamp": "2026-10-30 19:34:22",
     "file": "4D_29.enc",
-    "iv": "m1gXSBwgnXQ09GIj",
-    "tag": "5ctAbAh2cqNu/GNAsU5K3g==",
+    "iv": "kwziq3UaZx0ol+XJ",
+    "tag": "vHU7KQ8kNwIuvtDgueNSkw==",
     "cipherLength": 460058
   },
   {
@@ -490,8 +490,8 @@
     "score": 44,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4D_3.enc",
-    "iv": "I+fWsg04EpCL++oL",
-    "tag": "KMWGntT5gK3hwd3VZq/Feg==",
+    "iv": "oc933BHLGmSkNdk9",
+    "tag": "Q2K8LSdCIc24FC7lH6BgYg==",
     "cipherLength": 469689
   },
   {
@@ -501,8 +501,8 @@
     "score": 28,
     "timestamp": "2026-10-30 19:34:22",
     "file": "4D_30.enc",
-    "iv": "tDN0AJ+Os8i2RK8G",
-    "tag": "A1O48r97TChopJEmTrZywQ==",
+    "iv": "zV8tprNoi2FMYKmA",
+    "tag": "tXjdWhthD82rFzEk60h2dQ==",
     "cipherLength": 406120
   },
   {
@@ -512,8 +512,8 @@
     "score": 40,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4D_5.enc",
-    "iv": "xXcDsns2nlbwOcR9",
-    "tag": "whMPPfFQL0ymgLbglB/niQ==",
+    "iv": "GCFOEAq3VKBQ5MaW",
+    "tag": "MKu/aVwwOHpD12/G/quxwg==",
     "cipherLength": 460648
   },
   {
@@ -523,8 +523,8 @@
     "score": 40,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4D_6.enc",
-    "iv": "4LU0ytHF2IrLRWUN",
-    "tag": "FV/3LuGRdT1ZQhd4w+yy1A==",
+    "iv": "TYW1+yLX0mGQD3Ei",
+    "tag": "vQ26RWxNTCsmvPyUsP3Xwg==",
     "cipherLength": 393020
   },
   {
@@ -534,20 +534,20 @@
     "score": 48,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4D_7.enc",
-    "iv": "kUNlp9UDhAQ3E3nC",
-    "tag": "1VGlfNketmYMyWrvy9L5nQ==",
+    "iv": "cl9Gd8KufDux0Yjx",
+    "tag": "0li3uYfAMPzL3nGbw10tDA==",
     "cipherLength": 494748
   },
   {
     "classID": "4D",
     "studentID": "8",
     "name": "李樂瞳",
-    "score": 44,
+    "score": 48,
     "timestamp": "2026-10-30 19:34:21",
     "file": "4D_8.enc",
-    "iv": "lYYEMK3yj+oP8HPa",
-    "tag": "tMyEBl7tSAGpCwVfzVHQnA==",
-    "cipherLength": 457770
+    "iv": "mpsyVwzu3gakXLMJ",
+    "tag": "ajQdwJvhTk5GqmnSVwY2mg==",
+    "cipherLength": 457842
   },
   {
     "classID": "4D",
@@ -556,8 +556,8 @@
     "score": 0,
     "timestamp": "2026-10-30 19:34:22",
     "file": "4D_9.enc",
-    "iv": "/NGmzWA9/egNZkK2",
-    "tag": "4scC1w+ScgFZxFGmHC+ojQ==",
+    "iv": "1i8t3JYZVdbu+MWU",
+    "tag": "ezi/KpfBEIZNMq5R6CrAfg==",
     "cipherLength": 312409
   }
 ]
