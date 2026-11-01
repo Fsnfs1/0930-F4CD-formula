@@ -1,720 +1,1053 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>4CD 數學大測二公式小測 — 學生刷臉查分系統</title>
-
-  <!-- External & Math Platform Face API Dependencies -->
-  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
-  <script src="js/preloaded_faces.js"></script>
-  <script src="js/face_auth.js"></script>
-
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: #090d16;
-      color: #f8fafc;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 16px;
-    }
-    header {
-      width: 100%;
-      max-width: 820px;
-      text-align: center;
-      margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #1e293b;
-    }
-    h1 {
-      font-size: 1.45rem;
-      font-weight: 800;
-      color: #38bdf8;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 6px;
-    }
-    p.subtitle {
-      font-size: 0.9rem;
-      color: #94a3b8;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 680px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .tab-bar {
-      display: flex;
-      background: #1e293b;
-      padding: 4px;
-      border-radius: 12px;
-      border: 1px solid #334155;
-      margin-bottom: 20px;
-      width: 100%;
-      max-width: 480px;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 10px 16px;
-      border: none;
-      background: transparent;
-      color: #94a3b8;
-      font-size: 0.95rem;
-      font-weight: 700;
-      border-radius: 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.2s;
-    }
-    .tab-btn.active {
-      background: #0284c7;
-      color: white;
-      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
-    }
-
-    /* Card Panels */
-    .panel-card {
-      width: 100%;
-      background: #131c2e;
-      border: 1px solid #26354a;
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    /* Camera & Face HUD */
-    .camera-wrapper {
-      position: relative;
-      width: 280px;
-      height: 280px;
-      margin: 10px auto 20px auto;
-      border-radius: 50%;
-      overflow: hidden;
-      border: 4px solid #38bdf8;
-      box-shadow: 0 0 25px rgba(56, 189, 248, 0.35);
-      background: #020617;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .camera-wrapper.success {
-      border-color: #22c55e;
-      box-shadow: 0 0 30px rgba(34, 197, 94, 0.5);
-    }
-    .camera-wrapper.scanning::after {
-      content: "";
-      position: absolute;
-      top: -100%;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(to bottom, transparent, rgba(56, 189, 248, 0.45), transparent);
-      animation: scanAnim 2s infinite linear;
-      pointer-events: none;
-    }
-    @keyframes scanAnim {
-      0% { top: -100%; }
-      100% { top: 100%; }
-    }
-
-    video#face-video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transform: scaleX(-1); /* Selfie mirror */
-    }
-
-    .hud-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .hud-circle {
-      width: 220px;
-      height: 220px;
-      border: 2px dashed rgba(56, 189, 248, 0.6);
-      border-radius: 50%;
-    }
-
-    .status-text {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #38bdf8;
-      text-align: center;
-      margin-bottom: 16px;
-      min-height: 24px;
-    }
-    .status-text.ok { color: #4ade80; }
-    .status-text.warn { color: #facc15; }
-    .status-text.err { color: #f87171; }
-
-    .btn {
-      width: 100%;
-      max-width: 380px;
-      background: #0284c7;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 13px 20px;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: background 0.15s, transform 0.1s;
-    }
-    .btn:hover { background: #0369a1; }
-    .btn:active { transform: scale(0.97); }
-    .btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
-    .btn-secondary { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; margin-top: 10px; }
-    .btn-secondary:hover { background: #334155; }
-
-    /* Form controls */
-    .form-group {
-      width: 100%;
-      max-width: 420px;
-      margin-bottom: 16px;
-    }
-    label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #94a3b8;
-      margin-bottom: 6px;
-    }
-    input, select {
-      width: 100%;
-      background: #0b1120;
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 12px 14px;
-      font-size: 1rem;
-      color: #f8fafc;
-      outline: none;
-    }
-    input:focus, select:focus { border-color: #38bdf8; }
-
-    /* Result View */
-    #result-view {
-      display: none;
-      width: 100%;
-      max-width: 820px;
-      text-align: center;
-    }
-    .score-banner {
-      background: #131c2e;
-      border: 1px solid #38bdf8;
-      border-radius: 16px;
-      padding: 18px 24px;
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 10px 30px rgba(56, 189, 248, 0.15);
-    }
-    .score-title { font-size: 1.25rem; font-weight: 800; color: #f8fafc; }
-    .score-chip {
-      background: #1e293b;
-      border: 1px solid #22c55e;
-      color: #4ade80;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-weight: 700;
-      font-size: 0.95rem;
-    }
-    .card-img-wrapper {
-      position: relative;
-      background: #020617;
-      border: 2px solid #334155;
-      border-radius: 16px;
-      overflow: hidden;
-      margin-bottom: 20px;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.7);
-    }
-    .card-img {
-      width: 100%;
-      display: block;
-      border-radius: 14px;
-    }
-    .badge-bar {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      font-size: 0.85rem;
-      color: #94a3b8;
-      margin-top: 10px;
-    }
-  </style>
-</head>
-<body>
-
-  <header>
-    <h1><span>✨ 4CD 數學大測二公式小測</span></h1>
-    <p class="subtitle">AI 刷臉身分認證 · 瀏覽器內存端對端安全解密 · 專屬個人留痕答題卡</p>
-  </header>
-
-  <div class="container">
-    <!-- Tab Selector -->
-    <div class="tab-bar">
-      <button id="tab-btn-face" class="tab-btn active" onclick="switchLoginMode('face')">
-        <span>📸 刷臉登入 (推薦)</span>
-      </button>
-      <button id="tab-btn-key" class="tab-btn" onclick="switchLoginMode('key')">
-        <span>🔑 口令密鑰登入</span>
-      </button>
-    </div>
-
-    <!-- Panel 1: Face Recognition Login -->
-    <div id="panel-face" class="panel-card">
-      <div id="camera-box" class="camera-wrapper scanning">
-        <video id="face-video" autoplay playsinline muted></video>
-        <div class="hud-overlay">
-          <div class="hud-circle"></div>
-        </div>
-      </div>
-
-      <div id="face-status" class="status-text">⏳ 正在載入人臉識別神經網絡模型...</div>
-
-      <button id="btn-face-action" class="btn" onclick="triggerFaceCapture()">
-        <span>🔍 拍照識別身分</span>
-      </button>
-
-      <button id="btn-camera-toggle" class="btn btn-secondary" onclick="toggleCamera()">
-        <span>📷 重啟相機</span>
-      </button>
-
-      <div class="badge-bar">
-        <span>🛡️ 68 位同學特徵庫已本地裝載</span>
-        <span>·</span>
-        <span>零雲端上傳面孔隱私</span>
-      </div>
-    </div>
-
-    <!-- Panel 2: Passcode Fallback Login -->
-    <div id="panel-key" class="panel-card" style="display: none;">
-      <div class="form-group">
-        <label for="input-class">選擇班別</label>
-        <select id="input-class">
-          <option value="4C">高二 4C 班</option>
-          <option value="4D">高二 4D 班</option>
-          <option value="5B">高三 5B 班</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="input-id">學生學號</label>
-        <input type="number" id="input-id" placeholder="例如: 29 或 15" min="1" max="39">
-      </div>
-
-      <div class="form-group">
-        <label for="input-key">查詢口令密鑰</label>
-        <input type="password" id="input-key" placeholder="例如: 4C29-KSZW">
-      </div>
-
-      <div id="key-status" class="status-text warn" style="display: none;"></div>
-
-      <button id="btn-key-login" class="btn" onclick="manualKeyLogin()">
-        <span>🔓 解密查看答題卡</span>
-      </button>
-    </div>
-
-    <!-- Panel 3: Decrypted Result Card View -->
-    <div id="result-view">
-      <div class="score-banner">
-        <div>
-          <div class="score-title" id="res-name-title">4C 班 29 號 譚欣 同學</div>
-          <div style="font-size: 0.9rem; color: #94a3b8; text-align: left; margin-top: 4px;">
-            身分核驗方式: <span id="res-auth-method" style="color: #38bdf8;">人臉特徵匹配</span>
-          </div>
-        </div>
-        <div class="score-chip">✅ 密鑰驗證通過</div>
-      </div>
-
-      <div class="card-img-wrapper">
-        <img id="card-image" class="card-img" src="" alt="解密後的留痕答題卡">
-      </div>
-
-      <button class="btn btn-secondary" style="max-width: 260px; margin: 0 auto;" onclick="logoutAndReset()">
-        <span>⬅️ 登出並返回</span>
-      </button>
-    </div>
-  </div>
-
-  <script>
-    // --- 4CD Credentials Database (Preloaded for Decryption Keys) ---
-    const CREDENTIALS_4CD = [
-      { classID: "4C", studentID: 1, name: "古永晴", key: "4C01-X33C" },
-      { classID: "4C", studentID: 2, name: "王嘉熙", key: "4C02-B3MW" },
-      { classID: "4C", studentID: 3, name: "宋榛", key: "4C03-G3HH" },
-      { classID: "4C", studentID: 4, name: "周子謙", key: "4C04-JH4E" },
-      { classID: "4C", studentID: 5, name: "李藝彤", key: "4C05-KCDG" },
-      { classID: "4C", studentID: 6, name: "谷雨", key: "4C06-A3A6" },
-      { classID: "4C", studentID: 7, name: "冼周蔚", key: "4C07-62MR" },
-      { classID: "4C", studentID: 8, name: "林國榮", key: "4C08-2RY7" },
-      { classID: "4C", studentID: 9, name: "林晨欣", key: "4C09-7ACC" },
-      { classID: "4C", studentID: 10, name: "徐浟", key: "4C10-4D29" },
-      { classID: "4C", studentID: 11, name: "曹爵先", key: "4C11-PZ4E" },
-      { classID: "4C", studentID: 12, name: "梁寶娟", key: "4C12-WAMY" },
-      { classID: "4C", studentID: 14, name: "莫芷瑤", key: "4C14-BJSB" },
-      { classID: "4C", studentID: 15, name: "陳子豪", key: "4C15-64KW" },
-      { classID: "4C", studentID: 16, name: "陳心怡", key: "4C16-VQJN" },
-      { classID: "4C", studentID: 17, name: "陳芷澄", key: "4C17-YZCZ" },
-      { classID: "4C", studentID: 18, name: "陳穎彤", key: "4C18-3E8A" },
-      { classID: "4C", studentID: 19, name: "陸恩希", key: "4C19-YJGW" },
-      { classID: "4C", studentID: 20, name: "麥曉楠", key: "4C20-UZXM" },
-      { classID: "4C", studentID: 21, name: "溫愛嫦", key: "4C21-3D7A" },
-      { classID: "4C", studentID: 22, name: "葉峰", key: "4C22-ZY4S" },
-      { classID: "4C", studentID: 23, name: "趙政熹", key: "4C23-YAW6" },
-      { classID: "4C", studentID: 24, name: "劉卓盈", key: "4C24-6T5A" },
-      { classID: "4C", studentID: 25, name: "蔡清琰", key: "4C25-TVSV" },
-      { classID: "4C", studentID: 26, name: "謝嘉瑩", key: "4C26-UCAA" },
-      { classID: "4C", studentID: 27, name: "譚梓鈞", key: "4C27-AYHH" },
-      { classID: "4C", studentID: 28, name: "譚志坤", key: "4C28-9AVS" },
-      { classID: "4C", studentID: 29, name: "譚欣", key: "4C29-KSZW" },
-      { classID: "4C", studentID: 30, name: "羅清璋", key: "4C30-JKZR" },
-      { classID: "4D", studentID: 1, name: "洪佳佳", key: "4D01-4ZXP" },
-      { classID: "4D", studentID: 2, name: "王偉德", key: "4D02-V9GA" },
-      { classID: "4D", studentID: 3, name: "王煜鑫", key: "4D03-85HF" },
-      { classID: "4D", studentID: 4, name: "甘俊誠", key: "4D04-7466" },
-      { classID: "4D", studentID: 5, name: "余浩賢", key: "4D05-B6UX" },
-      { classID: "4D", studentID: 6, name: "李青霞", key: "4D06-WUVP" },
-      { classID: "4D", studentID: 7, name: "李語鵑", key: "4D07-EW6N" },
-      { classID: "4D", studentID: 8, name: "李樂瞳", key: "4D08-SZRU" },
-      { classID: "4D", studentID: 9, name: "李穎欣", key: "4D09-47TC" },
-      { classID: "4D", studentID: 10, name: "李臻斌", key: "4D10-WBZP" },
-      { classID: "4D", studentID: 11, name: "周梓霖", key: "4D11-393M" },
-      { classID: "4D", studentID: 12, name: "林川雲", key: "4D12-JKYJ" },
-      { classID: "4D", studentID: 13, name: "施舒晨", key: "4D13-GAHZ" },
-      { classID: "4D", studentID: 14, name: "徐芷瑤", key: "4D14-67GQ" },
-      { classID: "4D", studentID: 15, name: "翁淮洋", key: "4D15-67G4" },
-      { classID: "4D", studentID: 16, name: "馬雨彤", key: "4D16-AF7U" },
-      { classID: "4D", studentID: 17, name: "張博聰", key: "4D17-KNFN" },
-      { classID: "4D", studentID: 18, name: "曾浚恩", key: "4D18-B2T6" },
-      { classID: "4D", studentID: 19, name: "黃悅軒", key: "4D19-7HUJ" },
-      { classID: "4D", studentID: 20, name: "黃梓建", key: "4D20-JJFN" },
-      { classID: "4D", studentID: 21, name: "黃嫣然", key: "4D21-V3EG" },
-      { classID: "4D", studentID: 22, name: "董清霞", key: "4D22-6F2G" },
-      { classID: "4D", studentID: 23, name: "劉付穎", key: "4D23-PVD6" },
-      { classID: "4D", studentID: 24, name: "劉泳欣", key: "4D24-DAKQ" },
-      { classID: "4D", studentID: 25, name: "鄭佩芝", key: "4D25-8C9W" },
-      { classID: "4D", studentID: 26, name: "鄭東沅", key: "4D26-K6N6" },
-      { classID: "4D", studentID: 27, name: "盧肇琪", key: "4D27-2FEZ" },
-      { classID: "4D", studentID: 28, name: "賴君華", key: "4D28-VXGP" },
-      { classID: "4D", studentID: 29, name: "譚佩泳", key: "4D29-E2EN" },
-      { classID: "4D", studentID: 30, name: "鄭梓浩", key: "4D30-FH9V" },
-      { classID: "4D", studentID: 31, name: "鄭國樺", key: "4D31-HC9Q" }
-    ];
-
-    function getStudentPasscode(classID, studentID) {
-      const match = CREDENTIALS_4CD.find(s => s.classID === classID && parseInt(s.studentID, 10) === parseInt(studentID, 10));
-      if (match) return match.key;
-      // 5B or default fallback
-      return `${classID}${String(studentID).padStart(2, '0')}-KEY`;
-    }
-
-    // --- State Variables ---
-    let isModelReady = false;
-    let isScanning = false;
-    let autoScanTimer = null;
-    let studentProfiles = [];
-    const videoEl = document.getElementById("face-video");
-    const statusEl = document.getElementById("face-status");
-    const cameraBox = document.getElementById("camera-box");
-
-    // --- Build Profile Array from PRELOADED_STUDENT_FACES ---
-    function initProfiles() {
-      const preloaded = window.PRELOADED_STUDENT_FACES;
-      studentProfiles = [];
-      if (preloaded && typeof preloaded === "object") {
-        for (const k in preloaded) {
-          const item = preloaded[k];
-          if (item && item.classID && item.studentID && item.vector) {
-            // Find student real name from CREDENTIALS_4CD
-            const cred = CREDENTIALS_4CD.find(c => c.classID === item.classID && c.studentID === item.studentID);
-            const realName = cred ? cred.name : (item.name || `學生 ${item.studentID}`);
-            studentProfiles.push({
-              classID: String(item.classID).trim().toUpperCase(),
-              studentID: parseInt(item.studentID, 10),
-              name: realName,
-              vector: new Float32Array(item.vector)
-            });
-          }
-        }
-      }
-      console.log(`[FaceInit] Loaded ${studentProfiles.length} student face profiles.`);
-    }
-
-    // --- Start Face API & Camera ---
-    async function initSystem() {
-      initProfiles();
-      try {
-        statusEl.innerText = "⏳ 正在載入神經網絡模型 (TinyFace / Recognition)...";
-        if (window.FaceAuthModule && window.FaceAuthModule.initFaceApi) {
-          await window.FaceAuthModule.initFaceApi("https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/");
-        } else if (window.faceapi) {
-          const uri = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
-          await Promise.all([
-            faceapi.nets.tinyFaceDetector.loadFromUri(uri),
-            faceapi.nets.faceLandmark68TinyNet.loadFromUri(uri),
-            faceapi.nets.faceRecognitionNet.loadFromUri(uri)
-          ]);
-        }
-        isModelReady = true;
-        statusEl.innerText = "📷 模型就緒，正在啟動相機...";
-        await startCamera();
-      } catch (err) {
-        console.error("Init failed:", err);
-        statusEl.className = "status-text warn";
-        statusEl.innerText = "⚠️ 相機或模型載入受阻，可切換至「口令密鑰登入」";
-      }
-    }
-
-    async function startCamera() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
-          audio: false
-        });
-        videoEl.srcObject = stream;
-        await videoEl.play();
-        statusEl.className = "status-text";
-        statusEl.innerText = "🟢 請正面面向鏡頭，系統正在辨識中...";
-        startAutoScanLoop();
-      } catch (e) {
-        console.warn("Camera start blocked:", e);
-        statusEl.className = "status-text warn";
-        statusEl.innerText = "⚠️ 請點擊「📷 重啟相機」或允許瀏覽器相機權限";
-      }
-    }
-
-    function toggleCamera() {
-      if (videoEl.srcObject) {
-        videoEl.srcObject.getTracks().forEach(t => t.stop());
-      }
-      startCamera();
-    }
-
-    // --- Auto Scanning Loop ---
-    function startAutoScanLoop() {
-      if (autoScanTimer) clearInterval(autoScanTimer);
-      autoScanTimer = setInterval(async () => {
-        if (!isModelReady || isScanning || !videoEl || videoEl.paused || videoEl.ended) return;
-        await triggerFaceCapture(true);
-      }, 800);
-    }
-
-    // --- Face Capture and 1:N Identification ---
-    async function triggerFaceCapture(isAuto = false) {
-      if (isScanning || !isModelReady || !videoEl || videoEl.readyState < 2) return;
-      isScanning = true;
-
-      if (!isAuto) {
-        statusEl.className = "status-text";
-        statusEl.innerText = "⏳ 正在提取人臉特徵向量...";
-      }
-
-      try {
-        const detection = await faceapi.detectSingleFace(
-          videoEl,
-          new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })
-        ).withFaceLandmarks(true).withFaceDescriptor();
-
-        if (detection && detection.descriptor) {
-          const desc = detection.descriptor;
-          
-          // Call 1:N Centered Cosine Similarity Engine
-          let matchResult = null;
-          if (window.FaceAuthModule && window.FaceAuthModule.identifyFace1toN) {
-            matchResult = window.FaceAuthModule.identifyFace1toN(desc, studentProfiles, 0.78);
-          } else {
-            // Built-in cosine similarity fallback
-            matchResult = fallback1toN(desc, studentProfiles);
-          }
-
-          if (matchResult && matchResult.isMatch && matchResult.bestMatch) {
-            clearInterval(autoScanTimer);
-            cameraBox.classList.remove("scanning");
-            cameraBox.classList.add("success");
-            
-            const stu = matchResult.bestMatch;
-            const pct = matchResult.percentage || Math.round(matchResult.similarity * 100);
-            
-            statusEl.className = "status-text ok";
-            statusEl.innerText = `✅ 辨識成功！${stu.classID} 班 ${stu.studentID} 號 ${stu.name} 同學 (${pct}%)`;
-
-            // Retrieve secret key & decrypt student result
-            const passcode = getStudentPasscode(stu.classID, stu.studentID);
-            await decryptAndRenderCard(stu.classID, stu.studentID, stu.name, passcode, "AI 人臉特徵匹配");
-            return;
-          } else if (!isAuto) {
-            statusEl.className = "status-text warn";
-            statusEl.innerText = "🔍 未比對到相符學生特徵，請調整光線正面對準鏡頭";
-          }
-        } else if (!isAuto) {
-          statusEl.className = "status-text warn";
-          statusEl.innerText = "🟡 未偵測到人臉，請將面部置於圓形取景框內";
-        }
-      } catch (err) {
-        console.error("Scan error:", err);
-      } finally {
-        isScanning = false;
-      }
-    }
-
-    // Centered Cosine Fallback
-    function fallback1toN(candVec, profiles) {
-      let best = null, maxSim = -1;
-      for (const p of profiles) {
-        const target = p.vector;
-        let dot = 0, nA = 0, nB = 0;
-        for (let i = 0; i < 128; i++) {
-          dot += candVec[i] * target[i];
-          nA += candVec[i] * candVec[i];
-          nB += target[i] * target[i];
-        }
-        const sim = dot / (Math.sqrt(nA) * Math.sqrt(nB));
-        if (sim > maxSim) {
-          maxSim = sim;
-          best = p;
-        }
-      }
-      return {
-        isMatch: maxSim >= 0.78,
-        bestMatch: best,
-        similarity: maxSim,
-        percentage: Math.round(maxSim * 100)
-      };
-    }
-
-    // --- Decrypt Card via Native Web Crypto AES-256-GCM ---
-    async function decryptAndRenderCard(classID, studentID, studentName, passcode, authMethod) {
-      try {
-        const encUrl = `quiz_results/${classID}_${studentID}.enc?t=${Date.now()}`;
-        const resp = await fetch(encUrl);
-        if (!resp.ok) {
-          throw new Error(`找不到 ${classID} 班 ${studentID} 號的加密考卷檔案，或批改尚未發布！`);
-        }
-        const encBuffer = await resp.arrayBuffer();
-        if (encBuffer.byteLength < 28) throw new Error("加密考卷數據長度損壞！");
-
-        const iv = encBuffer.slice(0, 12);
-        const ciphertext = encBuffer.slice(12);
-
-        // Derive AES-256 Key
-        const saltStr = `F4CD_1030_SECRET_${classID}_${studentID}_${passcode}`;
-        const keyHash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(saltStr));
-        const cryptoKey = await crypto.subtle.importKey("raw", keyHash, { name: "AES-GCM" }, false, ["decrypt"]);
-
-        const decryptedBuffer = await crypto.subtle.decrypt(
-          { name: "AES-GCM", iv: new Uint8Array(iv) },
-          cryptoKey,
-          ciphertext
-        );
-
-        const blob = new Blob([decryptedBuffer], { type: "image/jpeg" });
-        const imgUrl = URL.createObjectURL(blob);
-
-        // Render to UI
-        document.getElementById("card-image").src = imgUrl;
-        document.getElementById("res-name-title").innerText = `${classID} 班 ${studentID} 號 ${studentName} 同學 — 留痕答題卡`;
-        document.getElementById("res-auth-method").innerText = authMethod;
-
-        // Hide Panels, Show Result
-        document.getElementById("panel-face").style.display = "none";
-        document.getElementById("panel-key").style.display = "none";
-        document.querySelector(".tab-bar").style.display = "none";
-        document.getElementById("result-view").style.display = "block";
-
-        // Stop Camera
-        if (videoEl.srcObject) {
-          videoEl.srcObject.getTracks().forEach(t => t.stop());
-        }
-      } catch (err) {
-        console.error("Decryption error:", err);
-        statusEl.className = "status-text err";
-        statusEl.innerText = `❌ 解密失敗：${err.message}`;
-      }
-    }
-
-    // --- Manual Passcode Login Fallback ---
-    async function manualKeyLogin() {
-      const cls = document.getElementById("input-class").value;
-      const sid = document.getElementById("input-id").value.trim();
-      const key = document.getElementById("input-key").value.trim();
-      const statusBox = document.getElementById("key-status");
-
-      if (!sid || !key) {
-        statusBox.innerText = "請輸入學號與密鑰！";
-        statusBox.style.display = "block";
-        return;
-      }
-      statusBox.style.display = "none";
-
-      const btn = document.getElementById("btn-key-login");
-      btn.innerText = "⏳ 正在驗證並解密...";
-      btn.disabled = true;
-
-      try {
-        const cred = CREDENTIALS_4CD.find(c => c.classID === cls && parseInt(c.studentID, 10) === parseInt(sid, 10));
-        const sName = cred ? cred.name : `學生 ${sid}`;
-        await decryptAndRenderCard(cls, sid, sName, key, "個人口令密鑰認證");
-      } catch (e) {
-        statusBox.innerText = `❌ 驗證失敗：${e.message}`;
-        statusBox.style.display = "block";
-      } finally {
-        btn.innerText = "🔓 解密查看答題卡";
-        btn.disabled = false;
-      }
-    }
-
-    // --- Switch UI Tabs ---
-    function switchLoginMode(mode) {
-      document.getElementById("tab-btn-face").classList.toggle("active", mode === "face");
-      document.getElementById("tab-btn-key").classList.toggle("active", mode === "key");
-      document.getElementById("panel-face").style.display = (mode === "face") ? "flex" : "none";
-      document.getElementById("panel-key").style.display = (mode === "key") ? "flex" : "none";
-      
-      if (mode === "face") {
-        startCamera();
-      } else {
-        if (videoEl.srcObject) {
-          videoEl.srcObject.getTracks().forEach(t => t.stop());
-        }
-        clearInterval(autoScanTimer);
-      }
-    }
-
-    function logoutAndReset() {
-      document.getElementById("result-view").style.display = "none";
-      document.querySelector(".tab-bar").style.display = "flex";
-      switchLoginMode("face");
-    }
-
-    window.addEventListener("DOMContentLoaded", initSystem);
-  </script>
-</body>
-</html>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>4CD 數學大測二 · 學生留痕答題卡查分系統 (1023門禁強化版)</title>
+
+  <!-- External & Math Platform Face API & Roster Dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
+  <script src="js/preloaded_faces.js"></script>
+  <script src="js/face_auth.js"></script>
+  <script src="js/roster.js"></script>
+  <script src="js/persistence.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #090d16;
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+    }
+    header {
+      width: 100%;
+      max-width: 820px;
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #1e293b;
+    }
+    h1 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    p.subtitle {
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .tab-bar {
+      display: flex;
+      background: #1e293b;
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 480px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active {
+      background: #0284c7;
+      color: white;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+    }
+
+    .panel-card {
+      width: 100%;
+      background: #111827;
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    /* Camera Viewport */
+    .camera-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      aspect-ratio: 4 / 3;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #000;
+      margin-bottom: 18px;
+      border: 2px solid #334155;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    }
+    .camera-wrapper.scanning {
+      border-color: #38bdf8;
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
+    }
+    .camera-wrapper.ambiguous {
+      border-color: #f59e0b;
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
+    }
+    .camera-wrapper.success {
+      border-color: #22c55e;
+      box-shadow: 0 0 25px rgba(34, 197, 94, 0.4);
+    }
+
+    #face-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+
+    .hud-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hud-circle {
+      width: 220px;
+      height: 220px;
+      border: 2px dashed rgba(56, 189, 248, 0.6);
+      border-radius: 50%;
+    }
+
+    .status-text {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #38bdf8;
+      text-align: center;
+      margin-bottom: 16px;
+      min-height: 24px;
+    }
+    .status-text.ok { color: #4ade80; }
+    .status-text.warn { color: #facc15; }
+    .status-text.err { color: #f87171; }
+
+    .btn {
+      width: 100%;
+      max-width: 380px;
+      background: #0284c7;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 20px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn:hover { background: #0369a1; }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+    .btn-secondary { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; margin-top: 10px; }
+    .btn-secondary:hover { background: #334155; }
+
+    /* Form controls */
+    .form-group {
+      width: 100%;
+      max-width: 420px;
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+    input, select {
+      width: 100%;
+      background: #0b1120;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 1rem;
+      color: #f8fafc;
+      outline: none;
+    }
+    input:focus, select:focus { border-color: #38bdf8; }
+
+    /* Result View */
+    #result-view {
+      display: none;
+      width: 100%;
+      max-width: 820px;
+      text-align: center;
+    }
+    .score-banner {
+      background: #131c2e;
+      border: 1px solid #38bdf8;
+      border-radius: 16px;
+      padding: 18px 24px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(56, 189, 248, 0.15);
+    }
+    .score-title { font-size: 1.25rem; font-weight: 800; color: #f8fafc; }
+    .score-chip {
+      background: #1e293b;
+      border: 1px solid #22c55e;
+      color: #4ade80;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .card-img-wrapper {
+      position: relative;
+      background: #020617;
+      border: 2px solid #334155;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+    }
+    .card-img {
+      width: 100%;
+      display: block;
+      border-radius: 14px;
+    }
+    .badge-bar {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-top: 10px;
+    }
+
+    /* 1023 Gatekeeper Modal Styling */
+    .auth-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.90);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 16px;
+      box-sizing: border-box;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .auth-modal-card {
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 16px;
+      max-width: 440px;
+      width: 100%;
+      padding: 24px 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+      color: #f8fafc;
+      box-sizing: border-box;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .cand-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 11px 14px;
+      background: #0f172a;
+      border: 1.5px solid #334155;
+      border-radius: 8px;
+      color: #f8fafc;
+      font-size: 13.5px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+    .cand-btn:hover {
+      border-color: #38bdf8;
+      background: #16243b;
+    }
+    .cand-btn.selected {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.18);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+    }
+    .cand-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(56, 189, 248, 0.2);
+      color: #38bdf8;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1><span>✨ 4CD 數學大測二公式小測</span></h1>
+    <p class="subtitle">AI 刷臉身分認證 · 1023 門禁防串卡保護 · 專屬個人留痕答題卡</p>
+  </header>
+
+  <div class="container">
+    <!-- Tab Selector -->
+    <div class="tab-bar">
+      <button id="tab-btn-face" class="tab-btn active" onclick="switchLoginMode('face')">
+        <span>📸 刷臉登入 (推薦)</span>
+      </button>
+      <button id="tab-btn-key" class="tab-btn" onclick="switchLoginMode('key')">
+        <span>🔑 口令密鑰登入</span>
+      </button>
+    </div>
+
+    <!-- Panel 1: Face Recognition Login -->
+    <div id="panel-face" class="panel-card">
+      <div id="camera-box" class="camera-wrapper scanning">
+        <video id="face-video" autoplay playsinline muted></video>
+        <div class="hud-overlay">
+          <div class="hud-circle"></div>
+        </div>
+      </div>
+
+      <div id="face-status" class="status-text">⏳ 正在載入人臉識別神經網絡模型...</div>
+
+      <button id="btn-face-action" class="btn" onclick="triggerFaceCapture()">
+        <span>🔍 拍照識別身分</span>
+      </button>
+
+      <button id="btn-camera-toggle" class="btn btn-secondary" onclick="toggleCamera()">
+        <span>📷 重啟相機</span>
+      </button>
+
+      <button id="btn-open-gatekeeper" class="btn btn-secondary" onclick="openManualGatekeeper()" style="border-color: #6366f1; color: #a5b4fc; margin-top: 10px;">
+        <span>🔐 1023 門禁：手動選擇候選人與密碼驗證</span>
+      </button>
+
+      <div class="badge-bar">
+        <span>🛡️ 68 位同學特徵庫已本地裝載</span>
+        <span>·</span>
+        <span>1023 門禁防串卡保護</span>
+      </div>
+    </div>
+
+    <!-- Panel 2: Passcode Fallback Login -->
+    <div id="panel-key" class="panel-card" style="display: none;">
+      <div class="form-group">
+        <label for="input-class">選擇班別</label>
+        <select id="input-class">
+          <option value="4C">高二 4C 班</option>
+          <option value="4D">高二 4D 班</option>
+          <option value="5B">高三 5B 班</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="input-id">學生學號</label>
+        <input type="number" id="input-id" placeholder="例如: 29 或 15" min="1" max="39">
+      </div>
+
+      <div class="form-group">
+        <label for="input-key">查詢口令密鑰</label>
+        <input type="password" id="input-key" placeholder="例如: 4C29-KSZW 或預設密碼 1234">
+      </div>
+
+      <div id="key-status" class="status-text warn" style="display: none;"></div>
+
+      <button id="btn-key-login" class="btn" onclick="manualKeyLogin()">
+        <span>🔓 解密查看答題卡</span>
+      </button>
+    </div>
+
+    <!-- Panel 3: Decrypted Result Card View -->
+    <div id="result-view">
+      <div class="score-banner">
+        <div>
+          <div class="score-title" id="res-name-title">4C 班 29 號 譚欣 同學</div>
+          <div style="font-size: 0.9rem; color: #94a3b8; text-align: left; margin-top: 4px;">
+            身分核驗方式: <span id="res-auth-method" style="color: #38bdf8;">1023 門禁：鄰近特徵+密碼雙重驗證</span>
+          </div>
+        </div>
+        <div class="score-chip">✅ 密鑰驗證通過</div>
+      </div>
+
+      <div class="card-img-wrapper">
+        <img id="card-image" class="card-img" src="" alt="解密後的留痕答題卡" style="cursor: zoom-in;" onclick="window.open(this.src, '_blank')" title="點擊在新視窗查看超高清原圖">
+      </div>
+      <p style="font-size: 13px; color: #94a3b8; margin-top: -12px; margin-bottom: 20px;">💡 提示：點擊答題卡圖片可在新分頁查看超高清原圖或長按儲存</p>
+
+      <button class="btn btn-secondary" style="max-width: 260px; margin: 0 auto;" onclick="logoutAndReset()">
+        <span>⬅️ 登出並返回</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: 1023 Password Auth Gatekeeper for Ambiguous Matches -->
+  <div id="modalPasswordAuth" class="auth-modal-overlay" style="display: none;">
+    <div class="auth-modal-card">
+      <div style="font-size: 38px; text-align: center; margin-bottom: 8px;">🔐</div>
+      <h3 id="authModalTitle" style="text-align: center; margin-bottom: 6px; font-size: 18px; font-weight: 700; color: #f8fafc;">
+        密碼二次身分驗證 (1023 門禁系統)
+      </h3>
+      <p id="authModalSubtitle" style="text-align: center; font-size: 13px; color: #94a3b8; margin-bottom: 14px; line-height: 1.5;">
+        人臉特徵差異較小或未能唯一鎖定。請選擇最相符的本人身分，並輸入密碼（預設 1234 或個人密鑰）以安全解密查分。
+      </p>
+
+      <!-- Candidate list container -->
+      <div id="authCandidateSection" style="margin-bottom: 14px; text-align: left;">
+        <label class="form-label" style="font-size: 13px; color: #cbd5e1; margin-bottom: 8px; display: block; font-weight: 600;">
+          🎯 偵測到的鄰近特徵候選學生：
+        </label>
+        <div id="authCandidateList" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;"></div>
+        <div style="text-align: right; margin-bottom: 8px;">
+          <a href="javascript:void(0)" id="linkAuthManualSelect" onclick="toggleManualSelectFields()" style="font-size: 12.5px; color: #60a5fa; text-decoration: underline;">
+            非以上候選人？手動選擇其他學生 ▾
+          </a>
+        </div>
+        <div id="authManualSelectFields" style="display: none; padding: 12px; background: rgba(15, 23, 42, 0.7); border-radius: 8px; border: 1px solid #334155; margin-bottom: 10px;">
+          <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+            <select id="authClassSelect" onchange="onAuthClassChange()" style="flex: 1; padding: 8px; font-size: 13px; background: #0f172a; color: #f8fafc; border: 1px solid #334155; border-radius: 6px;">
+              <option value="" disabled selected>-- 選擇班別 --</option>
+              <option value="4C">高二 4C 班</option>
+              <option value="4D">高二 4D 班</option>
+              <option value="5B">高三 5B 班</option>
+            </select>
+            <select id="authStudentSelect" disabled onchange="onAuthStudentChange()" style="flex: 1.5; padding: 8px; font-size: 13px; background: #0f172a; color: #f8fafc; border: 1px solid #334155; border-radius: 6px;">
+              <option value="" disabled selected>-- 選擇學生 --</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="authStudentInfo" style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.35); padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; font-size: 14px; text-align: center; font-weight: 700; color: #a5b4fc;">
+        請點選上方候選人或手動選擇身分
+      </div>
+
+      <div id="alertPasswordAuthError" style="display: none; margin-bottom: 12px; font-size: 13px; padding: 10px; border-radius: 6px; background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4);"></div>
+
+      <div class="form-group" style="margin-bottom: 16px; text-align: left; max-width: 100%;">
+        <label for="inputAuthPassword" style="font-size: 13px; margin-bottom: 6px; display: block; color: #cbd5e1; font-weight: 600;">驗證密碼</label>
+        <div style="position: relative;">
+          <input type="password" id="inputAuthPassword" placeholder="輸入個人密碼（預設 1234 或個人密鑰）" autocomplete="off" style="width: 100%; box-sizing: border-box; background: #0f172a; color: #f8fafc; border: 1px solid #334155; padding: 11px 40px 11px 12px; border-radius: 8px; font-size: 14px;">
+          <button type="button" onclick="toggleAuthPasswordVisibility()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 16px;" title="顯示/隱藏密碼">👁️</button>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button id="btnCancelPasswordAuth" class="btn btn-secondary" onclick="closePasswordAuthModal()" style="flex: 1; padding: 11px; margin-top: 0;">取消</button>
+        <button id="btnSubmitPasswordAuth" class="btn btn-primary" onclick="submitPasswordAuth()" style="flex: 2; padding: 11px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #38bdf8);">🔒 驗證並解密考卷</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- 4CD Credentials Database (Preloaded for Decryption Keys) ---
+    const CREDENTIALS_4CD = [
+      { classID: "4C", studentID: 1, name: "古永晴", key: "4C01-X33C" },
+      { classID: "4C", studentID: 2, name: "王嘉熙", key: "4C02-B3MW" },
+      { classID: "4C", studentID: 3, name: "宋榛", key: "4C03-G3HH" },
+      { classID: "4C", studentID: 4, name: "周子謙", key: "4C04-JH4E" },
+      { classID: "4C", studentID: 5, name: "李藝彤", key: "4C05-KCDG" },
+      { classID: "4C", studentID: 6, name: "谷雨", key: "4C06-A3A6" },
+      { classID: "4C", studentID: 7, name: "冼周蔚", key: "4C07-62MR" },
+      { classID: "4C", studentID: 8, name: "林國榮", key: "4C08-2RY7" },
+      { classID: "4C", studentID: 9, name: "林晨欣", key: "4C09-7ACC" },
+      { classID: "4C", studentID: 10, name: "徐浟", key: "4C10-4D29" },
+      { classID: "4C", studentID: 11, name: "曹爵先", key: "4C11-PZ4E" },
+      { classID: "4C", studentID: 12, name: "梁寶娟", key: "4C12-WAMY" },
+      { classID: "4C", studentID: 14, name: "莫芷瑤", key: "4C14-BJSB" },
+      { classID: "4C", studentID: 15, name: "陳子豪", key: "4C15-64KW" },
+      { classID: "4C", studentID: 16, name: "陳心怡", key: "4C16-VQJN" },
+      { classID: "4C", studentID: 17, name: "陳芷澄", key: "4C17-YZCZ" },
+      { classID: "4C", studentID: 18, name: "陳穎彤", key: "4C18-3E8A" },
+      { classID: "4C", studentID: 19, name: "陸恩希", key: "4C19-YJGW" },
+      { classID: "4C", studentID: 20, name: "麥曉楠", key: "4C20-UZXM" },
+      { classID: "4C", studentID: 21, name: "溫愛嫦", key: "4C21-3D7A" },
+      { classID: "4C", studentID: 22, name: "葉峰", key: "4C22-ZY4S" },
+      { classID: "4C", studentID: 23, name: "趙政熹", key: "4C23-YAW6" },
+      { classID: "4C", studentID: 24, name: "劉卓盈", key: "4C24-6T5A" },
+      { classID: "4C", studentID: 25, name: "蔡清琰", key: "4C25-TVSV" },
+      { classID: "4C", studentID: 26, name: "謝嘉瑩", key: "4C26-UCAA" },
+      { classID: "4C", studentID: 27, name: "譚梓鈞", key: "4C27-AYHH" },
+      { classID: "4C", studentID: 28, name: "譚志坤", key: "4C28-9AVS" },
+      { classID: "4C", studentID: 29, name: "譚欣", key: "4C29-KSZW" },
+      { classID: "4C", studentID: 30, name: "羅清璋", key: "4C30-JKZR" },
+      { classID: "4D", studentID: 1, name: "洪佳佳", key: "4D01-4ZXP" },
+      { classID: "4D", studentID: 2, name: "王偉德", key: "4D02-V9GA" },
+      { classID: "4D", studentID: 3, name: "王煜鑫", key: "4D03-85HF" },
+      { classID: "4D", studentID: 4, name: "甘俊誠", key: "4D04-7466" },
+      { classID: "4D", studentID: 5, name: "余浩賢", key: "4D05-B6UX" },
+      { classID: "4D", studentID: 6, name: "李青霞", key: "4D06-WUVP" },
+      { classID: "4D", studentID: 7, name: "李語鵑", key: "4D07-EW6N" },
+      { classID: "4D", studentID: 8, name: "李樂瞳", key: "4D08-SZRU" },
+      { classID: "4D", studentID: 9, name: "李穎欣", key: "4D09-47TC" },
+      { classID: "4D", studentID: 10, name: "李臻斌", key: "4D10-WBZP" },
+      { classID: "4D", studentID: 11, name: "周梓霖", key: "4D11-393M" },
+      { classID: "4D", studentID: 12, name: "林川雲", key: "4D12-JKYJ" },
+      { classID: "4D", studentID: 13, name: "施舒晨", key: "4D13-GAHZ" },
+      { classID: "4D", studentID: 14, name: "徐芷瑤", key: "4D14-67GQ" },
+      { classID: "4D", studentID: 15, name: "翁淮洋", key: "4D15-67G4" },
+      { classID: "4D", studentID: 16, name: "馬雨彤", key: "4D16-AF7U" },
+      { classID: "4D", studentID: 17, name: "張博聰", key: "4D17-KNFN" },
+      { classID: "4D", studentID: 18, name: "曾浚恩", key: "4D18-B2T6" },
+      { classID: "4D", studentID: 19, name: "黃悅軒", key: "4D19-7HUJ" },
+      { classID: "4D", studentID: 20, name: "黃梓建", key: "4D20-JJFN" },
+      { classID: "4D", studentID: 21, name: "黃嫣然", key: "4D21-V3EG" },
+      { classID: "4D", studentID: 22, name: "董清霞", key: "4D22-6F2G" },
+      { classID: "4D", studentID: 23, name: "劉付穎", key: "4D23-PVD6" },
+      { classID: "4D", studentID: 24, name: "劉泳欣", key: "4D24-DAKQ" },
+      { classID: "4D", studentID: 25, name: "鄭佩芝", key: "4D25-8C9W" },
+      { classID: "4D", studentID: 26, name: "鄭東沅", key: "4D26-K6N6" },
+      { classID: "4D", studentID: 27, name: "盧肇琪", key: "4D27-2FEZ" },
+      { classID: "4D", studentID: 28, name: "賴君華", key: "4D28-VXGP" },
+      { classID: "4D", studentID: 29, name: "譚佩泳", key: "4D29-E2EN" },
+      { classID: "4D", studentID: 30, name: "鄭梓浩", key: "4D30-FH9V" },
+      { classID: "4D", studentID: 31, name: "鄭國樺", key: "4D31-HC9Q" }
+    ];
+
+    function getStudentPasscode(classID, studentID) {
+      const match = CREDENTIALS_4CD.find(s => s.classID === classID && parseInt(s.studentID, 10) === parseInt(studentID, 10));
+      if (match) return match.key;
+      return `${classID}${String(studentID).padStart(2, '0')}-KEY`;
+    }
+
+    // --- State Variables ---
+    let isModelReady = false;
+    let isScanning = false;
+    let autoScanTimer = null;
+    let studentProfiles = [];
+    let currentCandidates = [];
+    let selectedCandidate = null;
+
+    const videoEl = document.getElementById("face-video");
+    const statusEl = document.getElementById("face-status");
+    const cameraBox = document.getElementById("camera-box");
+
+    // --- Build Profile Array from PRELOADED_STUDENT_FACES ---
+    function initProfiles() {
+      const preloaded = window.PRELOADED_STUDENT_FACES;
+      studentProfiles = [];
+      if (preloaded && typeof preloaded === "object") {
+        for (const k in preloaded) {
+          const item = preloaded[k];
+          if (item && item.classID && item.studentID && item.vector) {
+            const cred = CREDENTIALS_4CD.find(c => c.classID === item.classID && c.studentID === item.studentID);
+            const realName = cred ? cred.name : (item.name || `學生 ${item.studentID}`);
+            studentProfiles.push({
+              classID: String(item.classID).trim().toUpperCase(),
+              studentID: parseInt(item.studentID, 10),
+              name: realName,
+              key: cred ? cred.key : `${item.classID}${item.studentID}-KEY`,
+              vector: new Float32Array(item.vector)
+            });
+          }
+        }
+      }
+      console.log(`[FaceInit] Loaded ${studentProfiles.length} student face profiles.`);
+    }
+
+    // --- Start Face API & Camera ---
+    async function initSystem() {
+      initProfiles();
+      try {
+        statusEl.innerText = "⏳ 正在載入神經網絡模型 (TinyFace / Recognition)...";
+        if (window.FaceAuthModule && window.FaceAuthModule.initFaceApi) {
+          await window.FaceAuthModule.initFaceApi("https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/");
+        } else if (window.faceapi) {
+          const uri = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
+          await Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri(uri),
+            faceapi.nets.faceLandmark68TinyNet.loadFromUri(uri),
+            faceapi.nets.faceRecognitionNet.loadFromUri(uri)
+          ]);
+        }
+        isModelReady = true;
+        statusEl.innerText = "📷 模型就緒，正在啟動相機...";
+        await startCamera();
+      } catch (err) {
+        console.error("Init failed:", err);
+        statusEl.className = "status-text warn";
+        statusEl.innerText = "⚠️ 相機或模型載入受阻，可切換至「口令密鑰登入」或使用「1023 門禁」";
+      }
+    }
+
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: false
+        });
+        videoEl.srcObject = stream;
+        await videoEl.play();
+        cameraBox.className = "camera-wrapper scanning";
+        statusEl.className = "status-text";
+        statusEl.innerText = "🟢 請正面面向鏡頭，系統正在辨識中...";
+        startAutoScanLoop();
+      } catch (e) {
+        console.warn("Camera start blocked:", e);
+        statusEl.className = "status-text warn";
+        statusEl.innerText = "⚠️ 請點擊「📷 重啟相機」或允許瀏覽器相機權限";
+      }
+    }
+
+    function toggleCamera() {
+      if (videoEl.srcObject) {
+        videoEl.srcObject.getTracks().forEach(t => t.stop());
+      }
+      startCamera();
+    }
+
+    // --- Auto Scanning Loop ---
+    function startAutoScanLoop() {
+      if (autoScanTimer) clearInterval(autoScanTimer);
+      autoScanTimer = setInterval(async () => {
+        if (!isModelReady || isScanning || !videoEl || videoEl.paused || videoEl.ended) return;
+        await triggerFaceCapture(true);
+      }, 800);
+    }
+
+    // --- Face Capture and 1:N Identification with 1023 Gatekeeper ---
+    async function triggerFaceCapture(isAuto = false) {
+      if (isScanning || !isModelReady || !videoEl || videoEl.readyState < 2) return;
+      isScanning = true;
+
+      if (!isAuto) {
+        statusEl.className = "status-text";
+        statusEl.innerText = "⏳ 正在提取人臉特徵向量...";
+      }
+
+      try {
+        const detection = await faceapi.detectSingleFace(
+          videoEl,
+          new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })
+        ).withFaceLandmarks(true).withFaceDescriptor();
+
+        if (detection && detection.descriptor) {
+          const desc = detection.descriptor;
+          
+          // Calculate similarity across all profiles
+          const scoredList = [];
+          for (const p of studentProfiles) {
+            let sim = 0;
+            if (window.FaceAuthModule && window.FaceAuthModule.computeCenteredSimilarity) {
+              sim = window.FaceAuthModule.computeCenteredSimilarity(desc, p.vector);
+            } else {
+              let dot = 0, nA = 0, nB = 0;
+              for (let i = 0; i < 128; i++) {
+                dot += desc[i] * p.vector[i];
+                nA += desc[i] * desc[i];
+                nB += p.vector[i] * p.vector[i];
+              }
+              sim = dot / (Math.sqrt(nA) * Math.sqrt(nB));
+            }
+            scoredList.push({
+              profile: p,
+              similarity: sim,
+              percentage: Math.round(Math.max(0, sim) * 1000) / 10
+            });
+          }
+
+          scoredList.sort((a, b) => b.similarity - a.similarity);
+
+          if (scoredList.length > 0) {
+            const top1 = scoredList[0];
+            const top2 = scoredList.length > 1 ? scoredList[1] : null;
+            const delta = top2 ? (top1.similarity - top2.similarity) : 1.0;
+
+            console.log(`[Face1toN] Top1: ${top1.profile.classID}_${top1.profile.studentID} (${top1.percentage}%), Top2: ${top2 ? top2.profile.classID + '_' + top2.profile.studentID : 'None'} (${top2 ? top2.percentage : 0}%), Delta: ${delta.toFixed(3)}`);
+
+            // RULE 1023 門禁系統:
+            // Delta < 0.08: Ambiguous margin (競態候選人特徵差異較小)
+            // Top similarity in [0.65, 0.85): Borderline zone
+            // Top similarity >= 0.85 AND Delta >= 0.08: Single Unambiguous Match (無密碼直通)
+            const isAmbiguous = (top1.similarity >= 0.65 && delta < 0.08) ||
+                                (top1.similarity >= 0.65 && top1.similarity < 0.85);
+
+            if (isAmbiguous) {
+              // Pause auto-scan and camera
+              clearInterval(autoScanTimer);
+              cameraBox.className = "camera-wrapper ambiguous";
+              statusEl.className = "status-text warn";
+              statusEl.innerText = `⚠️ 偵測到鄰近特徵候選人 (特徵差異 ${Math.round(delta * 100)}%)，啟動 1023 門禁驗證...`;
+
+              openPasswordAuthModal(scoredList.slice(0, 4));
+              return;
+            } else if (top1.similarity >= 0.85 && delta >= 0.08) {
+              // Single Unambiguous Match -> Direct Login
+              clearInterval(autoScanTimer);
+              cameraBox.className = "camera-wrapper success";
+              const stu = top1.profile;
+              statusEl.className = "status-text ok";
+              statusEl.innerText = `✅ 辨識成功！${stu.classID} 班 ${stu.studentID} 號 ${stu.name} 同學 (${top1.percentage}%)`;
+
+              const passcode = getStudentPasscode(stu.classID, stu.studentID);
+              await decryptAndRenderCard(stu.classID, stu.studentID, stu.name, passcode, "AI 人臉特徵匹配 (高置信度免密直通)");
+              return;
+            } else if (top1.similarity < 0.65) {
+              if (!isAuto) {
+                statusEl.className = "status-text warn";
+                statusEl.innerText = "🔍 特徵相似度不足（低於 65%），請調整光線面向鏡頭，或點擊下方「1023 門禁」手動驗證";
+              }
+            }
+          }
+
+          if (!isAuto) {
+            statusEl.className = "status-text warn";
+            statusEl.innerText = "🔍 未比對到高度相符學生特徵，請點擊下方「1023 門禁」手動驗證";
+          }
+        } else if (!isAuto) {
+          statusEl.className = "status-text warn";
+          statusEl.innerText = "🟡 未偵測到人臉，請將面部置於圓形取景框內";
+        }
+      } catch (err) {
+        console.error("Scan error:", err);
+      } finally {
+        isScanning = false;
+      }
+    }
+
+    // --- 1023 Gatekeeper Modal Implementation ---
+    function openPasswordAuthModal(candidates) {
+      const modal = document.getElementById("modalPasswordAuth");
+      const listEl = document.getElementById("authCandidateList");
+      const infoEl = document.getElementById("authStudentInfo");
+      const pwdInput = document.getElementById("inputAuthPassword");
+      const alertBox = document.getElementById("alertPasswordAuthError");
+
+      if (!modal) return;
+      currentCandidates = candidates || [];
+      selectedCandidate = currentCandidates.length > 0 ? currentCandidates[0].profile : null;
+
+      if (alertBox) { alertBox.style.display = "none"; alertBox.innerHTML = ""; }
+      if (pwdInput) pwdInput.value = "";
+
+      // Populate candidate buttons
+      if (listEl) {
+        listEl.innerHTML = "";
+        currentCandidates.slice(0, 4).forEach((cand, idx) => {
+          const prof = cand.profile || cand;
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = `cand-btn ${idx === 0 ? "selected" : ""}`;
+          btn.innerHTML = `
+            <span><strong>${prof.classID} 班 ${prof.studentID} 號 ${prof.name}</strong></span>
+            <span class="cand-badge">${cand.percentage}% 相似度</span>
+          `;
+          btn.onclick = () => {
+            selectedCandidate = prof;
+            listEl.querySelectorAll(".cand-btn").forEach(b => b.classList.remove("selected"));
+            btn.classList.add("selected");
+            if (infoEl) infoEl.textContent = `已選擇：${prof.classID} 班 ${prof.studentID} 號 ${prof.name} 同學`;
+          };
+          listEl.appendChild(btn);
+        });
+      }
+
+      if (selectedCandidate && infoEl) {
+        infoEl.textContent = `已選擇：${selectedCandidate.classID} 班 ${selectedCandidate.studentID} 號 ${selectedCandidate.name} 同學`;
+      }
+
+      // Hide manual select section initially
+      const manualFields = document.getElementById("authManualSelectFields");
+      if (manualFields) manualFields.style.display = "none";
+
+      modal.style.display = "flex";
+
+      // Pause video when modal is active
+      if (videoEl && !videoEl.paused) {
+        videoEl.pause();
+      }
+    }
+
+    function openManualGatekeeper() {
+      clearInterval(autoScanTimer);
+      if (currentCandidates.length === 0 && studentProfiles.length > 0) {
+        currentCandidates = studentProfiles.slice(0, 4).map(p => ({
+          profile: p,
+          similarity: 0.85,
+          percentage: 85.0
+        }));
+      }
+      openPasswordAuthModal(currentCandidates);
+    }
+
+    function closePasswordAuthModal() {
+      const modal = document.getElementById("modalPasswordAuth");
+      if (modal) modal.style.display = "none";
+      cameraBox.className = "camera-wrapper scanning";
+      statusEl.className = "status-text";
+      statusEl.innerText = "🟢 請正面面向鏡頭，系統正在辨識中...";
+      if (videoEl && videoEl.paused) {
+        videoEl.play();
+      }
+      startAutoScanLoop();
+    }
+
+    function toggleManualSelectFields() {
+      const fields = document.getElementById("authManualSelectFields");
+      if (!fields) return;
+      const isVisible = fields.style.display !== "none";
+      fields.style.display = isVisible ? "none" : "block";
+
+      if (!isVisible) {
+        // Init class select
+        const clsSel = document.getElementById("authClassSelect");
+        if (clsSel && !clsSel.value) {
+          clsSel.value = "4C";
+          onAuthClassChange();
+        }
+      }
+    }
+
+    function onAuthClassChange() {
+      const cls = document.getElementById("authClassSelect").value;
+      const stuSel = document.getElementById("authStudentSelect");
+      if (!stuSel) return;
+
+      stuSel.innerHTML = '<option value="" disabled selected>-- 選擇學生 --</option>';
+      const students = CREDENTIALS_4CD.filter(c => c.classID === cls);
+      students.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.studentID;
+        opt.textContent = `${s.studentID} 號 ${s.name}`;
+        stuSel.appendChild(opt);
+      });
+      stuSel.disabled = false;
+    }
+
+    function onAuthStudentChange() {
+      const cls = document.getElementById("authClassSelect").value;
+      const sid = parseInt(document.getElementById("authStudentSelect").value, 10);
+      const match = CREDENTIALS_4CD.find(c => c.classID === cls && c.studentID === sid);
+      if (match) {
+        selectedCandidate = match;
+        const listEl = document.getElementById("authCandidateList");
+        if (listEl) {
+          listEl.querySelectorAll(".cand-btn").forEach(b => b.classList.remove("selected"));
+        }
+        const infoEl = document.getElementById("authStudentInfo");
+        if (infoEl) {
+          infoEl.textContent = `已選擇（手動指定）：${cls} 班 ${sid} 號 ${match.name} 同學`;
+        }
+      }
+    }
+
+    function toggleAuthPasswordVisibility() {
+      const input = document.getElementById("inputAuthPassword");
+      if (input) {
+        input.type = input.type === "password" ? "text" : "password";
+      }
+    }
+
+    async function submitPasswordAuth() {
+      const alertBox = document.getElementById("alertPasswordAuthError");
+      const pwdInput = document.getElementById("inputAuthPassword");
+      if (alertBox) alertBox.style.display = "none";
+
+      if (!selectedCandidate) {
+        if (alertBox) {
+          alertBox.style.display = "block";
+          alertBox.textContent = "請先點選您的身分候選人！";
+        }
+        return;
+      }
+
+      const pwd = pwdInput ? pwdInput.value.trim() : "";
+      if (!pwd) {
+        if (alertBox) {
+          alertBox.style.display = "block";
+          alertBox.textContent = "請輸入密碼（預設 1234 或個人密鑰）！";
+        }
+        return;
+      }
+
+      const prof = selectedCandidate;
+      const cls = prof.classID;
+      const sid = prof.studentID;
+
+      // Verification Logic:
+      // 1. Default password 1234
+      // 2. Official 4CD key (e.g. 4C02-B3MW, case-insensitive) or suffix (B3MW)
+      // 3. Student ID match (e.g. "4C02" or "2")
+      // 4. Salted hash password via PersistenceModule / LocalStorage
+      let isValid = false;
+      const correctKey = getStudentPasscode(cls, sid);
+
+      if (pwd === "1234") {
+        isValid = true;
+      } else if (correctKey && (pwd.toUpperCase() === correctKey.toUpperCase() || (correctKey.includes("-") && pwd.toUpperCase() === correctKey.split("-")[1]))) {
+        isValid = true;
+      } else if (prof.key && (pwd.toUpperCase() === prof.key.toUpperCase() || (prof.key.includes("-") && pwd.toUpperCase() === prof.key.split("-")[1]))) {
+        isValid = true;
+      } else if (pwd === String(sid) || pwd.toUpperCase() === `${cls}${sid}` || pwd.toUpperCase() === `${cls}${String(sid).padStart(2, '0')}`) {
+        isValid = true;
+      } else if (window.verifyStudentPassword) {
+        isValid = window.verifyStudentPassword(cls, sid, pwd);
+      }
+
+      if (isValid) {
+        const modal = document.getElementById("modalPasswordAuth");
+        if (modal) modal.style.display = "none";
+
+        const passcode = getStudentPasscode(cls, sid);
+        await decryptAndRenderCard(cls, sid, prof.name, passcode, "1023 門禁：鄰近特徵+密碼雙重驗證");
+      } else {
+        if (alertBox) {
+          alertBox.style.display = "block";
+          alertBox.innerHTML = `❌ 密碼錯誤，請重新輸入！<br><span style="font-size:12px;color:#cbd5e1;">提示：可使用預設密碼 <strong>1234</strong>，或輸入您在 4CD.CSV 的個人查詢密鑰。</span>`;
+        }
+      }
+    }
+
+    // --- Decrypt Card via Native Web Crypto AES-256-GCM ---
+    async function decryptAndRenderCard(classID, studentID, studentName, passcode, authMethod) {
+      try {
+        const encUrl = `quiz_results/${classID}_${studentID}.enc?t=${Date.now()}`;
+        const resp = await fetch(encUrl);
+        if (!resp.ok) {
+          throw new Error(`找不到 ${classID} 班 ${studentID} 號的加密考卷檔案，或批改尚未發布！`);
+        }
+        const encBuffer = await resp.arrayBuffer();
+        if (encBuffer.byteLength < 28) throw new Error("加密考卷數據長度損壞！");
+
+        const iv = encBuffer.slice(0, 12);
+        const ciphertext = encBuffer.slice(12);
+
+        // Derive AES-256 Key
+        const saltStr = `F4CD_1030_SECRET_${classID}_${studentID}_${passcode}`;
+        const keyHash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(saltStr));
+        const cryptoKey = await crypto.subtle.importKey("raw", keyHash, { name: "AES-GCM" }, false, ["decrypt"]);
+
+        const decryptedBuffer = await crypto.subtle.decrypt(
+          { name: "AES-GCM", iv: new Uint8Array(iv) },
+          cryptoKey,
+          ciphertext
+        );
+
+        const blob = new Blob([decryptedBuffer], { type: "image/jpeg" });
+        const imgUrl = URL.createObjectURL(blob);
+
+        // Render to UI
+        document.getElementById("card-image").src = imgUrl;
+        document.getElementById("res-name-title").innerText = `${classID} 班 ${studentID} 號 ${studentName} 同學 — 留痕答題卡`;
+        document.getElementById("res-auth-method").innerText = authMethod;
+
+        // Hide Panels, Show Result
+        document.getElementById("panel-face").style.display = "none";
+        document.getElementById("panel-key").style.display = "none";
+        document.querySelector(".tab-bar").style.display = "none";
+        document.getElementById("result-view").style.display = "block";
+
+        // Stop Camera
+        if (videoEl.srcObject) {
+          videoEl.srcObject.getTracks().forEach(t => t.stop());
+        }
+      } catch (err) {
+        console.error("Decryption error:", err);
+        statusEl.className = "status-text err";
+        statusEl.innerText = `❌ 解密失敗：${err.message}`;
+      }
+    }
+
+    // --- Manual Passcode Login Fallback ---
+    async function manualKeyLogin() {
+      const cls = document.getElementById("input-class").value;
+      const sid = document.getElementById("input-id").value.trim();
+      const key = document.getElementById("input-key").value.trim();
+      const statusBox = document.getElementById("key-status");
+
+      if (!sid || !key) {
+        statusBox.innerText = "請輸入學號與密鑰！";
+        statusBox.style.display = "block";
+        return;
+      }
+      statusBox.style.display = "none";
+
+      const btn = document.getElementById("btn-key-login");
+      btn.innerText = "⏳ 正在驗證並解密...";
+      btn.disabled = true;
+
+      try {
+        const cred = CREDENTIALS_4CD.find(c => c.classID === cls && parseInt(c.studentID, 10) === parseInt(sid, 10));
+        const sName = cred ? cred.name : `學生 ${sid}`;
+        const pass = (key === "1234" && cred) ? cred.key : key;
+        await decryptAndRenderCard(cls, sid, sName, pass, "個人口令密鑰認證");
+      } catch (e) {
+        statusBox.innerText = `❌ 驗證失敗：${e.message}`;
+        statusBox.style.display = "block";
+      } finally {
+        btn.innerText = "🔓 解密查看答題卡";
+        btn.disabled = false;
+      }
+    }
+
+    // --- Switch UI Tabs ---
+    function switchLoginMode(mode) {
+      document.getElementById("tab-btn-face").classList.toggle("active", mode === "face");
+      document.getElementById("tab-btn-key").classList.toggle("active", mode === "key");
+      document.getElementById("panel-face").style.display = (mode === "face") ? "flex" : "none";
+      document.getElementById("panel-key").style.display = (mode === "key") ? "flex" : "none";
+      
+      if (mode === "face") {
+        startCamera();
+      } else {
+        if (videoEl.srcObject) {
+          videoEl.srcObject.getTracks().forEach(t => t.stop());
+        }
+        clearInterval(autoScanTimer);
+      }
+    }
+
+    function logoutAndReset() {
+      document.getElementById("result-view").style.display = "none";
+      document.querySelector(".tab-bar").style.display = "flex";
+      switchLoginMode("face");
+    }
+
+    window.addEventListener("DOMContentLoaded", initSystem);
+  </script>
+</body>
+</html>
