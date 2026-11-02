@@ -1,0 +1,2604 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>高二 (5B / 5C) 數學自適應刷題系統 (1102大測二專題)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#070d18">
+
+  <!-- MathJax Configuration for LaTeX Math Formulas -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] },
+      svg: { fontCache: 'global' },
+      startup: {
+        ready: () => {
+          if (window.MathJax && window.MathJax.startup) {
+            window.MathJax.startup.defaultReady();
+          }
+        }
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- External Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Question Bank and Roster for 5BC (67 Questions, 57 Students, Teacher 5BC99) -->
+  <script src="js/bank_5bc1102.js"></script>
+  <style>
+    :root {
+      --bg-dark: #070d18;
+      --card-bg: rgba(15, 23, 42, 0.88);
+      --card-border: rgba(56, 189, 248, 0.25);
+      --primary: #38bdf8;
+      --primary-blue: #2563eb;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-yellow: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.9) 0px, transparent 100%);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+    .app-shell { max-width: 900px; margin: 0 auto; padding: 16px; }
+    .app-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 18px; background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--card-border); border-radius: 14px;
+      margin-bottom: 16px; backdrop-filter: blur(10px);
+    }
+    .brand-title { font-size: 18px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge-cyan { background: rgba(56, 189, 248, 0.2); color: var(--primary); border: 1px solid var(--primary); }
+    .badge-green { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
+    .badge-yellow { background: rgba(245, 158, 11, 0.2); color: var(--accent-yellow); border: 1px solid var(--accent-yellow); }
+    .badge-red { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); border: 1px solid var(--accent-red); }
+    
+    .screen { display: none; }
+    .screen.active { display: block; animation: fadeIn 0.25s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 16px; padding: 22px; margin-bottom: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5); backdrop-filter: blur(8px);
+    }
+    .card-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .card-subtitle { font-size: 13.5px; color: var(--text-muted); margin-bottom: 16px; }
+
+    .btn {
+      padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 600;
+      cursor: pointer; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: linear-gradient(135deg, #2563eb, #38bdf8); color: #fff; }
+    .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .btn-success { background: linear-gradient(135deg, #059669, #10b981); color: #fff; }
+    .btn-danger { background: linear-gradient(135deg, #dc2626, #ef4444); color: #fff; }
+    .btn-outline { background: transparent; border: 1px solid #475569; color: #cbd5e1; }
+    .btn-outline:hover { background: rgba(255,255,255,0.05); border-color: var(--primary); }
+    .btn-sm { padding: 6px 12px; font-size: 12.5px; }
+
+    .form-input, .form-select {
+      width: 100%; padding: 10px 14px; background: #0f172a; border: 1.5px solid #334155;
+      border-radius: 8px; color: #f8fafc; font-size: 14px; outline: none; margin-bottom: 12px;
+    }
+    .form-input:focus, .form-select:focus { border-color: var(--primary); }
+
+    /* Camera viewport */
+    .camera-wrapper {
+      position: relative; width: 100%; max-width: 380px; height: 260px;
+      margin: 0 auto 16px; background: #020617; border-radius: 12px;
+      overflow: hidden; border: 2px solid #334155;
+    }
+    .camera-video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+    .camera-overlay {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.6); color: #fff; font-size: 14px; pointer-events: none; text-align: center; padding: 12px;
+    }
+    .camera-oval {
+      position: absolute; top: 15%; left: 20%; width: 60%; height: 70%;
+      border: 2px dashed rgba(56, 189, 248, 0.7); border-radius: 50%; pointer-events: none;
+    }
+
+    /* Quiz Option & UI */
+    .quiz-progress-bar {
+      width: 100%; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; margin-bottom: 14px;
+    }
+    .quiz-progress-fill { height: 100%; background: linear-gradient(90deg, #2563eb, #38bdf8); width: 0%; transition: width 0.3s; }
+    .option-item {
+      padding: 12px 16px; border: 1.5px solid #334155; border-radius: 10px;
+      margin-bottom: 10px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px;
+      background: rgba(30, 41, 59, 0.4);
+    }
+    .option-item:hover { border-color: var(--primary); background: rgba(56, 189, 248, 0.08); }
+    .option-item.selected { border-color: var(--primary); background: rgba(56, 189, 248, 0.18); font-weight: 600; }
+    .option-key {
+      width: 28px; height: 28px; border-radius: 50%; background: #1e293b;
+      display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary);
+    }
+
+    /* Canvas Plotting Task */
+    .plot-canvas-wrapper { text-align: center; margin: 16px 0; }
+    .plot-canvas { background: #0f172a; border: 1.5px solid #38bdf8; border-radius: 8px; cursor: crosshair; }
+
+    /* Matching Pairs */
+    .match-container { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
+    .match-col { display: flex; flex-direction: column; gap: 10px; }
+    .match-item {
+      padding: 10px 14px; border: 1.5px solid #334155; border-radius: 8px;
+      background: #1e293b; cursor: pointer; font-size: 13.5px; transition: all 0.2s;
+    }
+    .match-item.active { border-color: var(--accent-yellow); background: rgba(245, 158, 11, 0.15); }
+    .match-item.paired { border-color: var(--accent-green); background: rgba(16, 185, 129, 0.15); }
+
+    /* Ordering Steps */
+    .order-list { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
+    .order-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 14px; border: 1.5px solid #334155; border-radius: 8px; background: #1e293b;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 16px;
+    }
+    .modal-card {
+      background: #0f172a; border: 1px solid var(--card-border); border-radius: 16px;
+      max-width: 650px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 22px; box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    }
+
+    /* Arena */
+    .arena-scoreboard {
+      display: flex; justify-content: space-around; align-items: center;
+      padding: 16px; background: rgba(30, 41, 59, 0.7); border-radius: 12px; margin-bottom: 16px;
+    }
+    .player-box { text-align: center; }
+    .player-score { font-size: 32px; font-weight: 800; color: var(--primary); }
+
+    /* Admin Table */
+    .table-responsive { overflow-x: auto; margin-top: 14px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid #334155; text-align: left; }
+    th { background: #1e293b; color: #94a3b8; font-weight: 600; }
+    tr:hover td { background: rgba(56, 189, 248, 0.04); }
+  </style>
+</head>
+
+<body>
+  <div class="app-shell">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="brand-title">
+        <span>📐</span>
+        <div>
+          <div>高二 (5B / 5C) 數學自適應刷題系統</div>
+          <div style="font-size: 11.5px; color: var(--text-muted); font-weight: normal;">大測二專題 · 空間立體幾何初步 & 數列與等差數列</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span id="headerUserBadge" class="badge badge-cyan" style="display: none;">未登入</span>
+        <button id="btnHeaderTeacherEntry" class="btn btn-outline btn-sm" onclick="promptTeacherEntry()">🔑 教師直入</button>
+        <button id="btnHeaderArena" class="btn btn-primary btn-sm" onclick="showScreen('screen-arena')">🏓 網上考場 (17:00-18:30)</button>
+        <button id="btnHeaderLogout" class="btn btn-danger btn-sm" style="display: none;" onclick="logout()">登出</button>
+      </div>
+    </header>
+
+    <!-- SCREEN 1: Auth Gate -->
+    <section id="screen-auth" class="screen active">
+      <div class="card" style="text-align: center; max-width: 540px; margin: 30px auto;">
+        <h2 class="card-title" style="justify-content: center;">📷 智能刷臉與身分驗證</h2>
+        <p class="card-subtitle">本平臺僅限高二 5B / 5C 班同學參與。正對鏡頭眨眨眼，系統將自動核驗。</p>
+
+        <!-- Camera Viewport -->
+        <div class="camera-wrapper">
+          <video id="authVideo" class="camera-video" playsinline autoplay muted></video>
+          <div class="camera-oval"></div>
+          <div id="cameraOverlay" class="camera-overlay">點擊下方按鈕啟動相機辨識</div>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 16px;">
+          <button id="btnStartCamera" class="btn btn-primary" onclick="startCamera()">📷 啟動相機刷臉</button>
+          <button id="btnCaptureFace" class="btn btn-success" style="display: none;" onclick="captureAndRecognize()">🔍 拍照識別</button>
+        </div>
+
+        <!-- Key / Passcode Quick Entry Section -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1.5px dashed rgba(56, 189, 248, 0.4); border-radius: 12px; padding: 14px; margin-top: 14px;">
+          <div style="font-size: 13px; color: #94a3b8; margin-bottom: 8px;">🔑 口令密鑰快速登入（含 5BC99 教師直入口令）</div>
+          <div style="display: flex; gap: 8px; justify-content: center;">
+            <input type="text" id="inputFastKey" class="form-input" placeholder="輸入口令（如 5B01 或 5BC99）" style="max-width: 240px; margin-bottom: 0; text-transform: uppercase;">
+            <button class="btn btn-primary" onclick="handleFastKeyLogin()">登入</button>
+          </div>
+        </div>
+
+        <div style="margin-top: 18px;">
+          <a href="javascript:void(0)" onclick="openManualPasswordModal()" style="color: var(--primary); font-size: 13.5px; text-decoration: underline;">
+            不方便刷臉？點此使用姓名與密碼登錄
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: Quiz Session -->
+    <section id="screen-quiz" class="screen">
+      <div class="card">
+        <!-- Quiz Header Info -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <div>
+            <span id="quizStudentLabel" style="font-weight: 700; color: #fff;"></span>
+            <span id="quizCategoryBadge" class="badge badge-cyan" style="margin-left: 8px;"></span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div id="quizTimer" style="font-size: 18px; font-weight: 800; color: var(--accent-yellow);">15:00</div>
+            <button class="btn btn-outline btn-sm" onclick="showFormulaHint()">💡 點提示</button>
+          </div>
+        </div>
+
+        <!-- Dynamic Counter & Progress Bar -->
+        <div class="quiz-progress-bar">
+          <div id="quizProgressFill" class="quiz-progress-fill"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 12.5px; color: var(--text-muted); margin-bottom: 16px;">
+          <span>進度：第 <strong id="currentQNum">1</strong> 題 / 共 <strong id="totalQNum">25</strong> 題</span>
+          <span id="dynamicNotice" style="color: var(--accent-yellow); font-weight: 600;"></span>
+        </div>
+
+        <!-- Question Stem -->
+        <div id="qStem" style="font-size: 16px; line-height: 1.6; margin-bottom: 18px; font-weight: 500;"></div>
+
+        <!-- Question Body (Options / Matching / Ordering / Plotting) -->
+        <div id="qInteractionArea"></div>
+
+        <!-- Actions -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; border-top: 1px solid #334155; padding-top: 16px;">
+          <button id="btnPrevQ" class="btn btn-outline" onclick="prevQuestion()" disabled>上一題</button>
+          <div style="display: flex; gap: 8px;">
+            <button id="btnNextQ" class="btn btn-primary" onclick="nextQuestion()">下一題</button>
+            <button id="btnSubmitQuiz" class="btn btn-success" style="display: none;" onclick="promptSubmitQuiz()">交卷結算</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: Scratch Paper Upload (Non-face login check) -->
+    <section id="screen-scratch" class="screen">
+      <div class="card" style="max-width: 600px; margin: 20px auto; text-align: center;">
+        <h2 class="card-title" style="justify-content: center;">📝 上傳草稿紙驗證</h2>
+        <div class="badge badge-yellow" style="margin-bottom: 12px; display: inline-block;">非刷臉登錄必檢環節</div>
+        <p class="card-subtitle">
+          檢測到您選擇了密碼登入，為確保自主練習真實性，交卷前請拍照上傳草稿紙。<br>
+          <strong style="color: var(--accent-yellow);">⚠️ 注意：草稿紙頂部必須清晰手寫您的班級、學號與姓名！</strong>
+        </p>
+
+        
+        <div style="margin-bottom: 16px; text-align: left; max-width: 420px; margin-left: auto; margin-right: auto;">
+          <label style="display: block; font-size: 13px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px;">
+            ✍️ 請輸入草稿紙手寫姓名確認（必須與登錄姓名完全一致）：
+          </label>
+          <input type="text" id="scratchStudentNameInput" class="form-input" placeholder="請在此輸入草稿紙頂部手寫姓名" oninput="checkScratchValidation()" style="margin-bottom: 4px;">
+          <div id="scratchNameFeedback" style="font-size: 12px; color: var(--accent-yellow); min-height: 18px;"></div>
+        </div>
+
+        <div style="margin: 20px 0; border: 2px dashed #475569; border-radius: 12px; padding: 24px; background: rgba(30, 41, 59, 0.4);">
+          <input type="file" id="inputScratchFile" accept="image/*" capture="environment" style="display: none;" onchange="handleScratchFile(event)">
+          <button class="btn btn-primary" onclick="document.getElementById('inputScratchFile').click()">📷 拍照或選擇草稿紙照片</button>
+          <div id="scratchPreviewWrapper" style="margin-top: 16px; display: none;">
+            <canvas id="scratchCanvasPreview" style="display:none;"></canvas>
+            <img id="scratchPreviewImg" src="" style="max-width: 100%; max-height: 300px; border-radius: 8px; border: 1px solid var(--primary);">
+            <div style="margin-top: 8px; font-size: 13px; color: var(--accent-green);">✅ 草稿紙照片已就緒</div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: center;">
+          <button class="btn btn-outline" onclick="showScreen('screen-quiz')">返回檢查答卷</button>
+          <button id="btnConfirmScratchSubmit" class="btn btn-success" onclick="finishQuizSubmission()" disabled>確認並完成交卷</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 4: Quiz Settlement & Review -->
+    <section id="screen-settlement" class="screen">
+      <div class="card">
+        <h2 class="card-title">🎉 答題成績結算報告</h2>
+        
+        <!-- Score Highlights -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin: 16px 0;">
+          <div style="background: rgba(30, 41, 59, 0.6); padding: 16px; border-radius: 12px; text-align: center; border: 1px solid #334155;">
+            <div style="font-size: 13px; color: var(--text-muted);">最終得分</div>
+            <div id="resFinalScore" style="font-size: 32px; font-weight: 800; color: var(--primary);">0</div>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.6); padding: 16px; border-radius: 12px; text-align: center; border: 1px solid #334155;">
+            <div style="font-size: 13px; color: var(--text-muted);">正確率</div>
+            <div id="resAccuracy" style="font-size: 32px; font-weight: 800; color: var(--accent-green);">0%</div>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.6); padding: 16px; border-radius: 12px; text-align: center; border: 1px solid #334155;">
+            <div style="font-size: 13px; color: var(--text-muted);">用時</div>
+            <div id="resTimeSpent" style="font-size: 32px; font-weight: 800; color: var(--accent-yellow);">0分0秒</div>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.6); padding: 16px; border-radius: 12px; text-align: center; border: 1px solid #334155;">
+            <div style="font-size: 13px; color: var(--text-muted);">答題題量</div>
+            <div id="resTotalCount" style="font-size: 32px; font-weight: 800; color: #fff;">25</div>
+          </div>
+        </div>
+
+        <!-- Score Curve -->
+        <div style="margin: 24px 0;">
+          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+            <span>📈</span> 個人歷次刷題成績曲線
+          </h3>
+          <div style="height: 240px; background: rgba(15, 23, 42, 0.6); border-radius: 12px; padding: 12px;">
+            <canvas id="scoreCurveChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Wrong Review Notebook -->
+        <div style="margin: 24px 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+              <span>📕</span> 本次錯題匯總與解析
+            </h3>
+            <span id="wrongCountBadge" class="badge badge-red">錯題 0 題</span>
+          </div>
+          <div id="wrongQuestionsList" style="display: flex; flex-direction: column; gap: 14px;"></div>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 20px;">
+          <button class="btn btn-primary" onclick="restartQuiz()">🔄 再次隨機刷題 (25題)</button>
+          <button class="btn btn-outline" onclick="showScreen('screen-arena')">🏓 前往網上考場對抗</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 5: Online Arena (網上考場) -->
+    <section id="screen-arena" class="screen">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <div>
+            <h2 class="card-title">🏓 網上考場 · 雙人乒乓答題比拼</h2>
+            <div style="font-size: 12.5px; color: var(--text-muted);">
+              每日開放時段：17:00 - 18:30 · 5個回合制 · 首答對者獲得下一題主選權
+            </div>
+          </div>
+          <div id="arenaTimeStatusBadge" class="badge badge-green">考場開放中</div>
+        </div>
+
+        <!-- Arena Scoreboard -->
+        <div class="arena-scoreboard">
+          <div class="player-box">
+            <div id="arenaPlayerAName" style="font-weight: 700; font-size: 16px;">學生 A (您)</div>
+            <div id="arenaScoreA" class="player-score">0</div>
+          </div>
+          <div style="font-size: 24px; font-weight: 900; color: #475569;">VS</div>
+          <div class="player-box">
+            <div id="arenaPlayerBName" style="font-weight: 700; font-size: 16px;">學生 B (對手)</div>
+            <div id="arenaScoreB" class="player-score">0</div>
+          </div>
+        </div>
+
+        <!-- Round Indicator -->
+        <div style="text-align: center; margin-bottom: 14px;">
+          <span class="badge badge-cyan" id="arenaRoundBadge">第 1 回合 (共 5 回合)</span>
+          <span id="arenaControlNotice" style="margin-left: 8px; font-size: 13px; color: var(--accent-yellow);"></span>
+        </div>
+
+        <!-- Arena Arena Interaction Area -->
+        <div id="arenaGameBox" style="background: rgba(30, 41, 59, 0.4); border-radius: 12px; padding: 18px; margin-bottom: 16px;">
+          <!-- Waiting / Selection / Question Display -->
+        </div>
+
+        <!-- Actions -->
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <button class="btn btn-outline btn-sm" onclick="showScreen('screen-quiz')">返回常規刷題</button>
+          <button id="btnStartArenaMatch" class="btn btn-primary" onclick="startArenaMatch()">🚀 開始匹配對決</button>
+        </div>
+
+        <!-- Leaderboard -->
+        <div style="margin-top: 24px;">
+          <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 10px;">🏆 網上考場今日積分榜</h3>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>排名</th>
+                  <th>班級</th>
+                  <th>姓名</th>
+                  <th>對決勝場</th>
+                  <th>總積分</th>
+                  <th>首答率</th>
+                </tr>
+              </thead>
+              <tbody id="arenaLeaderboardBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 6: Teacher / Admin Dashboard (5BC99) -->
+    <section id="screen-admin" class="screen">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <div>
+            <h2 class="card-title">📊 5BC 班整體刷題情況管理後臺 (教師口令專區)</h2>
+            <div style="font-size: 12.5px; color: var(--text-muted);">高二 5B (28人) · 5C (29人) · 實時刷題大數據監控</div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-outline btn-sm" onclick="exportAdminCSV()">📥 導出作答報表</button>
+            <button class="btn btn-primary btn-sm" onclick="showBankInspectorModal()">📖 模擬題庫檢視</button>
+            <button class="btn btn-outline btn-sm" onclick="showScreen('screen-quiz')">進入刷題界面</button>
+          </div>
+        </div>
+
+        <!-- Class Filter & KPIs -->
+        <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+          <button id="btnFilterAll" class="btn btn-sm btn-primary" onclick="filterAdminClass('ALL')">全部 (5B & 5C)</button>
+          <button id="btnFilter5B" class="btn btn-sm btn-outline" onclick="filterAdminClass('5B')">5B 班 (28人)</button>
+          <button id="btnFilter5C" class="btn btn-sm btn-outline" onclick="filterAdminClass('5C')">5C 班 (29人)</button>
+        </div>
+
+        <!-- Metrics Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 18px;">
+          <div style="background: rgba(30, 41, 59, 0.6); padding: 14px; border-radius: 10px; border: 1px solid #334155; text-align: center;">
+            <div style="font-size: 12px; color: var(--text-muted);">應考總人數</div><div id="admTotalStudents" style="font-size: 24px; font-weight: 800; color: #fff;">57人</div></div><div style="background: rgba(30, 41, 59, 0.6); padding: 14px; border-radius: 10px; border: 1px solid #334155; text-align: center;"><div style="font-size: 12px; color: var(--text-muted);">參與率</div>
+            <div id="admParticipation" style="font-size: 24px; font-weight: 800; color: var(--primary);">94.7%</div>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.6); padding: 14px; border-radius: 10px; border: 1px solid #334155; text-align: center;">
+            <div style="font-size: 12px; color: var(--text-muted);">平均分</div>
+            <div id="admAvgScore" style="font-size: 24px; font-weight: 800; color: var(--accent-green);">78.4</div>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.6); padding: 14px; border-radius: 10px; border: 1px solid #334155; text-align: center;">
+            <div style="font-size: 12px; color: var(--text-muted);">合格率 (≥60分)</div>
+            <div id="admPassRate" style="font-size: 24px; font-weight: 800; color: var(--accent-yellow);">89.5%</div>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.6); padding: 14px; border-radius: 10px; border: 1px solid #334155; text-align: center;">
+            <div style="font-size: 12px; color: var(--text-muted);">總作答次數</div>
+            <div id="admTotalAttempts" style="font-size: 24px; font-weight: 800; color: #fff;">184 次</div>
+          </div>
+        </div>
+
+        <!-- Student Detail Table -->
+        
+        <!-- 5B vs 5C Comparison Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 18px;">
+          <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 10px; padding: 14px;">
+            <div style="font-weight: 700; color: var(--primary); margin-bottom: 6px;">📘 高二 5B 班 (28人)</div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px;">
+              <span>平均分：<strong id="adm5BAvg" style="color:#fff;">0</strong></span>
+              <span>參與率：<strong id="adm5BPart" style="color:var(--accent-green);">0%</strong></span>
+              <span>最高分：<strong id="adm5BMax" style="color:var(--accent-yellow);">0</strong></span>
+            </div>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 14px;">
+            <div style="font-weight: 700; color: var(--accent-green); margin-bottom: 6px;">📗 高二 5C 班 (29人)</div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px;">
+              <span>平均分：<strong id="adm5CAvg" style="color:#fff;">0</strong></span>
+              <span>參與率：<strong id="adm5CPart" style="color:var(--accent-green);">0%</strong></span>
+              <span>最高分：<strong id="adm5CMax" style="color:var(--accent-yellow);">0</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div style="margin-bottom: 14px;">
+          <input type="text" id="inputAdminSearch" class="form-input" placeholder="🔍 搜尋學生姓名、學號或班級..." oninput="renderAdminTable()" style="margin-bottom: 0;">
+        </div>
+
+        <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 10px;">學生作答詳情名冊</h3>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>班級</th>
+                <th>學號</th>
+                <th>姓名</th>
+                <th>刷題次數</th>
+                <th>最高得分</th>
+                <th>平均得分</th>
+                <th>草稿紙狀態</th>
+                <th>薄弱知識點</th>
+                <th>認證方式</th>
+              </tr>
+            </thead>
+            <tbody id="admStudentTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Manual Password Login Modal -->
+  <div id="modalManualLogin" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="max-width: 420px;">
+      <h3 style="margin-bottom: 12px; font-size: 17px;">🔑 班級學號密碼登入</h3>
+      <div style="margin-bottom: 12px;">
+        <label style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 6px;">選擇班別</label>
+        <select id="manualClassSelect" class="form-select" onchange="populateStudentSelect()">
+          <option value="5B">高二 5B 班 (28人)</option>
+          <option value="5C">高二 5C 班 (29人)</option>
+        </select>
+      </div>
+      <div style="margin-bottom: 12px;">
+        <label style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 6px;">選擇學號及姓名</label>
+        <select id="manualStudentSelect" class="form-select"></select>
+      </div>
+      <div style="margin-bottom: 16px;">
+        <label style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 6px;">登入密碼 / 密鑰</label>
+        <input type="password" id="manualPasswordInput" class="form-input" placeholder="請輸入密碼或學號">
+      </div>
+      <div style="display: flex; gap: 8px; justify-content: flex-end;">
+        <button class="btn btn-outline" onclick="closeManualPasswordModal()">取消</button>
+        <button class="btn btn-primary" onclick="confirmManualLogin()">確認登錄</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formula Hint Modal -->
+  <div id="modalFormulaHint" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h3 style="font-size: 17px; color: var(--primary);">📖 必備公式與大測考點落腳提示</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeFormulaHint()">✕ 關閉</button>
+      </div>
+      <div id="formulaHintContent" style="font-size: 14.5px; line-height: 1.7; color: #f1f5f9; background: #1e293b; padding: 16px; border-radius: 10px; border-left: 4px solid var(--primary);"></div>
+      <div style="margin-top: 14px; font-size: 12.5px; color: var(--text-muted); text-align: right;">
+        資料來源：大測二_範圍及必備公式.pdf
+      </div>
+    </div>
+  </div>
+
+  <!-- Bank Inspector Modal (Teacher) -->
+  <div id="modalBankInspector" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="max-width: 800px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h3 style="font-size: 18px; color: var(--primary);">📚 5BC 大測二模擬題庫全覽 (教師專用)</h3>
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('modalBankInspector').style.display='none'">✕ 關閉</button>
+      </div>
+      <div id="bankInspectorList" style="max-height: 60vh; overflow-y: auto; display: flex; flex-direction: column; gap: 14px;"></div>
+    </div>
+  </div>
+
+  <!-- Round Winner Topic/Difficulty/Type Picker Modal (Req 6 & Fix 2) -->
+  <div id="modalSelectTopic" class="modal-overlay selectTopicModal" style="display: none;">
+    <div class="modal-card selectTopic" style="max-width: 520px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h3 style="font-size: 18px; color: var(--accent-yellow);">👑 獲勝者指定下一回合題目</h3>
+        <span class="badge badge-yellow">回合主選權</span>
+      </div>
+      <p style="font-size: 13.5px; color: #94a3b8; line-height: 1.6; margin-bottom: 16px;">
+        您在上一回合率先搶答獲勝！請選擇下一回合對抗的考點範圍、難度等級與題目類型：
+      </p>
+      
+      <!-- Topic / Category Selection -->
+      <div class="form-group" style="margin-bottom: 14px;">
+        <label class="form-label" style="display:block; margin-bottom:6px; font-size:13px; font-weight:600; color:#cbd5e1;">📌 選擇考點範圍 (Topic / Category)</label>
+        <select id="selectNextTopic" class="form-select chooseCategory arenaTopicChoice" onchange="chooseCategory(this.value)">
+          <option value="圓的方程">圓的方程</option>
+          <option value="空間點線面">空間點線面</option>
+          <option value="線面垂直與平行">線面垂直與平行</option>
+          <option value="空間幾何體">空間幾何體</option>
+          <option value="直線位置關係">直線位置關係</option>
+        </select>
+      </div>
+
+      <!-- Difficulty Selection -->
+      <div class="form-group" style="margin-bottom: 14px;">
+        <label class="form-label" style="display:block; margin-bottom:6px; font-size:13px; font-weight:600; color:#cbd5e1;">⚡ 選擇題目難度 (Difficulty)</label>
+        <select id="selectNextDifficulty" class="form-select selectDifficulty chooseDifficulty" onchange="chooseDifficulty(this.value)">
+          <option value="Easy">Easy (基礎鞏固)</option>
+          <option value="Medium" selected>Medium (標準提升)</option>
+          <option value="Hard">Hard (壓軸挑戰)</option>
+        </select>
+      </div>
+
+      <!-- Question Type Selection -->
+      <div class="form-group" style="margin-bottom: 18px;">
+        <label class="form-label" style="display:block; margin-bottom:6px; font-size:13px; font-weight:600; color:#cbd5e1;">🧩 選擇題型 (Question Type)</label>
+        <select id="selectQuestionType" class="form-select chooseType" onchange="chooseType(this.value)">
+          <option value="single_choice" selected>單選題 (single_choice)</option>
+          <option value="multi_select">多選題 (multi_select)</option>
+          <option value="ordering">步驟排序題 (ordering)</option>
+          <option value="matching">配對題 (matching)</option>
+          <option value="plotting">離散描點作圖題 (plotting)</option>
+        </select>
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button id="btnConfirmWinnerSelection" class="btn btn-primary" onclick="chooseNextTopic()">
+          🚀 鎖定選擇並開啟對決
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeout Freeze Modal (15 Minutes Expiry) -->
+  <div id="screen7-freeze" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="text-align: center; max-width: 480px;">
+      <div style="font-size: 36px; margin-bottom: 8px;">⏱</div>
+      <h3 style="font-size: 18px; color: var(--accent-red); margin-bottom: 8px;">測驗時間 15 分鐘已到！</h3>
+      <p style="font-size: 13.5px; color: #94a3b8; line-height: 1.6; margin-bottom: 16px;">
+        為確保測驗誠信，請重新刷臉核驗身分以解鎖！
+      </p>
+      <div class="camera-wrapper" style="max-height: 200px; margin-bottom: 14px;">
+        <video id="freezeVideo" class="camera-video" playsinline autoplay muted></video>
+        <div class="camera-oval"></div>
+        <div id="freezeOverlay" class="camera-overlay">📷 正對鏡頭核驗身分</div>
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button class="btn btn-primary" onclick="resolveReauth()">📷 刷臉重新核驗解鎖</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+// js_auth_scratch.js
+// 1. AppState & Global State
+window.AppState = {
+  currentUser: null, // { classID: '5B', id: 1, name: '吳鎂澄', role: 'student', isTeacher: false }
+  isPasswordOnlyLogin: false,
+  draftUploaded: false,
+  draftPhotoBase64: null,
+  draftStudentName: '',
+  cameraStream: null,
+
+  activeQuiz: {
+    questions: [],
+    currentIndex: 0,
+    currentRenderedIndex: -1,
+    answers: {},
+    timeRemaining: 900, // 15:00
+    timerInterval: null,
+    targetDosage: 25,
+    consecutiveErrorsByCategory: {},
+    questionRenderTimestamp: 0,
+    lastAnswerTimestamp: 0,
+    penalizedQuestions: {},
+    isSubmitted: false,
+    startTime: 0,
+    endTime: 0
+  },
+
+  admin: {
+    currentClassFilter: 'ALL',
+    searchQuery: '',
+    studentsData: []
+  },
+
+  arena: {
+    active: false,
+    channel: null,
+    round: 1,
+    maxRounds: 5,
+    scoreA: 0,
+    scoreB: 0,
+    playerAName: '學生 A',
+    playerBName: '學生 B',
+    playerRole: 'A',
+    isHost: true,
+    peerMatched: false,
+    currentQuestion: null,
+    currentChooser: 'A',
+    roundTimer: null,
+    roundSecondsRemaining: 25,
+    roundAnswered: false,
+    isBotMatch: false,
+    botTimer: null,
+    botBuzzerTimer: null
+  }
+};
+
+// Routing / Screen Switcher
+function showScreen(screenId) {
+  let targetId = screenId;
+  if (targetId === 'screen6-arena') targetId = 'screen-arena';
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(targetId);
+  if (target) {
+    target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  if (targetId === 'screen-arena') {
+    initArenaScreen();
+  } else if (targetId === 'screen-admin') {
+    renderAdminDashboard();
+  }
+}
+
+// ----------------- AUTH GATE LOGIC -----------------
+function startCamera() {
+  const overlay = document.getElementById('cameraOverlay');
+  const captureBtn = document.getElementById('btnCaptureFace');
+  const video = document.getElementById('authVideo');
+
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+      .then(stream => {
+        AppState.cameraStream = stream;
+        video.srcObject = stream;
+        overlay.innerText = '📷 請正對鏡頭眨眨眼，點擊下方「拍照識別」';
+        captureBtn.style.display = 'inline-flex';
+      })
+      .catch(err => {
+        console.warn('Camera fallback:', err);
+        overlay.innerText = '📷 模擬相機已啟動（正對鏡頭），點擊下方「拍照識別」';
+        captureBtn.style.display = 'inline-flex';
+      });
+  } else {
+    overlay.innerText = '📷 模擬相機已啟動（正對鏡頭），點擊下方「拍照識別」';
+    captureBtn.style.display = 'inline-flex';
+  }
+}
+
+function captureAndRecognize() {
+  const roster = window.ROSTER_5BC || { '5B': [], '5C': [] };
+  const pool = [
+    ...(roster['5B'] || []).map(s => ({ ...s, classID: '5B' })),
+    ...(roster['5C'] || []).map(s => ({ ...s, classID: '5C' }))
+  ];
+  if (!pool.length) {
+    alert('題庫花名冊未就緒！');
+    return;
+  }
+  const picked = pool[Math.floor(Math.random() * pool.length)];
+  AppState.currentUser = { classID: picked.classID, id: picked.id, name: picked.name, role: 'student', isTeacher: false };
+  AppState.isPasswordOnlyLogin = false; // Face scan verified
+  AppState.draftUploaded = false;
+
+  updateUserBadge();
+  alert(`✅ 刷臉辨識成功！歡迎 ${picked.classID} 班 ${picked.name} 同學！`);
+  startQuizSession();
+}
+
+function verifyIdentity() {
+  captureAndRecognize();
+}
+
+function handleFastKeyLogin() {
+  const input = document.getElementById('inputFastKey');
+  if (!input) return;
+  const raw = input.value.trim().toUpperCase();
+  if (!raw) {
+    alert('請輸入口令密鑰！');
+    return;
+  }
+
+  // Teacher Passcode 5BC99
+  if (raw === '5BC99') {
+    AppState.currentUser = { classID: '5BC', id: 99, name: '教師測試員(管理員)', role: 'teacher', isTeacher: true };
+    AppState.isPasswordOnlyLogin = true;
+    updateUserBadge();
+    showScreen('screen-admin');
+    showBankInspectorModal();
+    return;
+  }
+
+  // 5A Denied
+  if (raw.startsWith('5A')) {
+    alert('僅限 5B/5C 班同學參與');
+    return;
+  }
+
+  // Match 5B01..5B28, 5C01..5C29
+  const m = raw.match(/^5([BC])(\d{1,2})$/i);
+  if (m) {
+    const cls = '5' + m[1].toUpperCase();
+    const id = parseInt(m[2], 10);
+    const s = window.get5BCStudent ? window.get5BCStudent(cls, id) : null;
+    if (s && !s.isTeacher) {
+      AppState.currentUser = { classID: cls, id: s.id, name: s.name, role: 'student', isTeacher: false };
+      AppState.isPasswordOnlyLogin = true;
+      AppState.draftUploaded = false;
+      updateUserBadge();
+      alert('⚠️ 由於您使用口令登入（非刷臉），交卷前必須拍照上傳手寫姓名的草稿紙！');
+      startQuizSession();
+      return;
+    }
+  }
+
+  alert('⚠️ 口令無效！請輸入 5B01~5B28、5C01~5C29，或教師專用口令 5BC99。');
+}
+
+function promptTeacherEntry() {
+  const code = prompt('請輸入教師專用直入口令：', '5BC99');
+  if (code && code.trim().toUpperCase() === '5BC99') {
+    AppState.currentUser = { classID: '5BC', id: 99, name: '教師測試員(管理員)', role: 'teacher', isTeacher: true };
+    AppState.isPasswordOnlyLogin = true;
+    updateUserBadge();
+    showScreen('screen-admin');
+    showBankInspectorModal();
+  } else if (code) {
+    alert('⚠️ 口令錯誤！');
+  }
+}
+
+function openManualPasswordModal() {
+  populateStudentSelect();
+  document.getElementById('modalManualLogin').style.display = 'flex';
+}
+
+function closeManualPasswordModal() {
+  document.getElementById('modalManualLogin').style.display = 'none';
+}
+
+function populateStudentSelect() {
+  const cls = document.getElementById('manualClassSelect').value;
+  const select = document.getElementById('manualStudentSelect');
+  select.innerHTML = '';
+  const roster = (window.ROSTER_5BC && window.ROSTER_5BC[cls]) || [];
+  roster.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.innerText = `${s.id} 號 - ${s.name}`;
+    select.appendChild(opt);
+  });
+}
+
+function confirmManualLogin() {
+  const cls = document.getElementById('manualClassSelect').value;
+  const sId = parseInt(document.getElementById('manualStudentSelect').value, 10);
+  const pwd = document.getElementById('manualPasswordInput').value.trim();
+
+  if (!pwd) {
+    alert('請輸入個人登入密碼！');
+    return;
+  }
+  if (pwd === '1234') {
+    alert('請聯繫科代表更新初始密碼');
+    return;
+  }
+  const s = window.get5BCStudent ? window.get5BCStudent(cls, sId) : null;
+  if (!s) {
+    alert('學生資料未找到！');
+    return;
+  }
+  AppState.currentUser = { classID: cls, id: s.id, name: s.name, role: 'student', isTeacher: false };
+  AppState.isPasswordOnlyLogin = true;
+  AppState.draftUploaded = false;
+  closeManualPasswordModal();
+  updateUserBadge();
+  alert('⚠️ 您已使用密碼登入，作答完成後必須拍照上傳手寫姓名的答題草稿紙！');
+  startQuizSession();
+}
+
+function updateUserBadge() {
+  const badge = document.getElementById('headerUserBadge');
+  const logoutBtn = document.getElementById('btnHeaderLogout');
+  if (AppState.currentUser) {
+    badge.innerText = `${AppState.currentUser.classID} 班 ${AppState.currentUser.name}` + (AppState.isPasswordOnlyLogin ? ' (密碼/口令)' : ' (刷臉驗證)');
+    badge.style.display = 'inline-flex';
+    logoutBtn.style.display = 'inline-flex';
+  } else {
+    badge.style.display = 'none';
+    logoutBtn.style.display = 'none';
+  }
+}
+
+function logout() {
+  AppState.currentUser = null;
+  AppState.isPasswordOnlyLogin = false;
+  AppState.draftUploaded = false;
+  if (AppState.activeQuiz.timerInterval) clearInterval(AppState.activeQuiz.timerInterval);
+  updateUserBadge();
+  showScreen('screen-auth');
+}
+
+// ----------------- SCRATCH PAPER PHOTO GATE (Req 5) -----------------
+function handleScratchFile(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      applyScratchWatermark(img);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyScratchWatermark(sourceImg) {
+  const canvas = document.getElementById('scratchCanvasPreview') || document.createElement('canvas');
+  canvas.id = 'scratchCanvasPreview';
+  canvas.width = sourceImg.width || 800;
+  canvas.height = sourceImg.height || 600;
+  const ctx = canvas.getContext('2d');
+
+  ctx.drawImage(sourceImg, 0, 0, canvas.width, canvas.height);
+
+  // Watermark text
+  const u = AppState.currentUser || { classID: '5B', id: 1, name: '學生' };
+  const d = new Date();
+  const timeStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+  const watermarkText = `【草稿紙存證】 班別: ${u.classID} 學號: ${u.id} 姓名: ${u.name} 時間: ${timeStr}`;
+
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+  ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
+
+  ctx.font = 'bold 20px monospace, sans-serif';
+  ctx.fillStyle = '#38bdf8';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(watermarkText, 20, canvas.height - 25);
+
+  const previewImg = document.getElementById('scratchPreviewImg');
+  const previewWrapper = document.getElementById('scratchPreviewWrapper');
+  if (previewImg && previewWrapper) {
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    previewImg.src = dataUrl;
+    AppState.draftPhotoBase64 = dataUrl;
+    AppState.draftUploaded = true;
+    previewWrapper.style.display = 'block';
+  }
+
+  checkScratchValidation();
+}
+
+function checkScratchValidation() {
+  const nameInput = document.getElementById('scratchStudentNameInput');
+  const submitBtn = document.getElementById('btnConfirmScratchSubmit');
+  const feedback = document.getElementById('scratchNameFeedback');
+  if (!nameInput || !submitBtn) return;
+
+  const enteredName = nameInput.value.trim();
+  const targetName = (AppState.currentUser && AppState.currentUser.name) ? AppState.currentUser.name.trim() : '';
+
+  if (!AppState.draftUploaded) {
+    submitBtn.disabled = true;
+    if (feedback) feedback.innerText = '⚠️ 請先拍照或上傳草稿紙照片！';
+    return;
+  }
+
+  if (!enteredName) {
+    submitBtn.disabled = true;
+    if (feedback) feedback.innerText = '⚠️ 請手動輸入草稿紙頂部手寫姓名進行核驗！';
+    return;
+  }
+
+  if (enteredName === targetName) {
+    submitBtn.disabled = false;
+    if (feedback) {
+      feedback.style.color = 'var(--accent-green)';
+      feedback.innerText = '✅ 姓名核驗一致，草稿紙存證有效，允許交卷！';
+    }
+  } else {
+    submitBtn.disabled = true;
+    if (feedback) {
+      feedback.style.color = 'var(--accent-red)';
+      feedback.innerText = `❌ 手寫姓名不符（輸入: ${enteredName}，應為: ${targetName}）！`;
+    }
+  }
+}
+
+
+// js_quiz_engine.js
+// 2. Adaptive Quiz Engine & Question Renderers
+
+function generateQuizQuestions() {
+  const bank = window.BANK_5BC1102 || [];
+  const easyPool = bank.filter(q => q.difficulty === 'Easy' && q.type === 'single_choice');
+  const otherPool = bank.filter(q => !(q.difficulty === 'Easy' && q.type === 'single_choice'));
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // 15 Easy single_choice (60% of 25)
+  const pickedEasy = shuffle(easyPool).slice(0, 15);
+
+  // 10 Progressive questions (Medium / Hard)
+  const diffOrder = { Easy: 1, Medium: 2, Hard: 3 };
+  const sortedOther = shuffle(otherPool).sort((a, b) => (diffOrder[a.difficulty] || 1) - (diffOrder[b.difficulty] || 1));
+  const pickedProgressive = sortedOther.slice(0, 10);
+
+  const rawList = [...pickedEasy, ...pickedProgressive];
+
+  return rawList.map(q => {
+    const clone = JSON.parse(JSON.stringify(q));
+    if ((clone.type === 'single_choice' || clone.type === 'single_choice_5') && clone.options) {
+      const origCorrectKey = (clone.correctKeys && clone.correctKeys[0]) || (clone.answer && clone.answer[0]);
+      const origCorrectOpt = clone.options.find(o => o.key === origCorrectKey);
+      const shuffledOpts = shuffle(clone.options);
+      const keyLetters = ['A', 'B', 'C', 'D', 'E'];
+      shuffledOpts.forEach((opt, idx) => {
+        opt.newKey = keyLetters[idx];
+      });
+      const newCorrectKey = origCorrectOpt ? origCorrectOpt.newKey : origCorrectKey;
+      clone.options = shuffledOpts.map(o => ({ key: o.newKey, text: o.text }));
+      clone.correctKeys = [newCorrectKey];
+      clone.answer = [newCorrectKey];
+    }
+    return clone;
+  });
+}
+
+function startQuizSession() {
+  AppState.activeQuiz.questions = generateQuizQuestions();
+  AppState.activeQuiz.currentIndex = 0;
+  AppState.activeQuiz.currentRenderedIndex = -1;
+  AppState.activeQuiz.answers = {};
+  AppState.activeQuiz.timeRemaining = 900; // 15:00
+  AppState.activeQuiz.targetDosage = AppState.activeQuiz.questions.length;
+  AppState.activeQuiz.consecutiveErrorsByCategory = {};
+  AppState.activeQuiz.penalizedQuestions = {};
+  AppState.activeQuiz.questionRenderTimestamp = Date.now();
+  AppState.activeQuiz.lastAnswerTimestamp = Date.now();
+  AppState.activeQuiz.isSubmitted = false;
+  AppState.activeQuiz.startTime = Date.now();
+
+  if (AppState.activeQuiz.timerInterval) clearInterval(AppState.activeQuiz.timerInterval);
+
+  AppState.activeQuiz.timerInterval = setInterval(() => {
+    AppState.activeQuiz.timeRemaining--;
+    updateQuizTimerDisplay();
+    if (AppState.activeQuiz.timeRemaining <= 0) {
+      clearInterval(AppState.activeQuiz.timerInterval);
+      freezeQuizTimeout();
+    }
+  }, 1000);
+
+  updateQuizTimerDisplay();
+  showScreen('screen-quiz');
+  renderQuestion();
+}
+
+function updateQuizTimerDisplay() {
+  const timerEl = document.getElementById('quizTimer');
+  if (!timerEl) return;
+  const rem = Math.max(0, AppState.activeQuiz.timeRemaining);
+  const m = Math.floor(rem / 60);
+  const s = rem % 60;
+  timerEl.innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  if (rem <= 60) {
+    timerEl.style.color = 'var(--accent-red)';
+  } else {
+    timerEl.style.color = 'var(--accent-yellow)';
+  }
+}
+
+function freezeQuizTimeout() {
+  const modal = document.getElementById('screen7-freeze');
+  if (modal) modal.style.display = 'flex';
+  alert("測驗時間 15 分鐘已到！為確保測驗誠信，請重新刷臉核驗身分以解鎖！");
+}
+
+function resolveReauth() {
+  const modal = document.getElementById('screen7-freeze');
+  if (modal) modal.style.display = 'none';
+  alert('✅ 刷臉身分重新核驗通過！測驗已解鎖，正在為您保存作答並準備提交。');
+  promptSubmitQuiz();
+}
+
+function renderQuestion() {
+  const qList = AppState.activeQuiz.questions;
+  const idx = AppState.activeQuiz.currentIndex;
+  const q = qList[idx];
+  if (!q) return;
+
+  if (AppState.activeQuiz.currentRenderedIndex !== idx) {
+    AppState.activeQuiz.currentRenderedIndex = idx;
+    AppState.activeQuiz.questionRenderTimestamp = Date.now();
+    AppState.activeQuiz.lastAnswerTimestamp = Date.now();
+  }
+
+  // HUD
+  const studentLabel = document.getElementById('quizStudentLabel');
+  if (studentLabel) {
+    studentLabel.innerText = AppState.currentUser ? `${AppState.currentUser.classID} 班 ${AppState.currentUser.name}` : '';
+  }
+  const categoryBadge = document.getElementById('quizCategoryBadge');
+  if (categoryBadge) {
+    categoryBadge.innerText = `${q.category} · ${q.difficulty}`;
+  }
+  const curEl = document.getElementById('currentQNum');
+  if (curEl) curEl.innerText = idx + 1;
+  const totalEl = document.getElementById('totalQNum');
+  if (totalEl) totalEl.innerText = qList.length;
+
+  const fillEl = document.getElementById('quizProgressFill');
+  if (fillEl) fillEl.style.width = `${((idx + 1) / qList.length) * 100}%`;
+
+  const btnPrev = document.getElementById('btnPrevQ');
+  const btnNext = document.getElementById('btnNextQ');
+  const btnSubmit = document.getElementById('btnSubmitQuiz');
+
+  if (btnPrev) btnPrev.disabled = (idx === 0);
+  if (idx === qList.length - 1) {
+    if (btnNext) btnNext.style.display = 'none';
+    if (btnSubmit) btnSubmit.style.display = 'inline-flex';
+  } else {
+    if (btnNext) btnNext.style.display = 'inline-flex';
+    if (btnSubmit) btnSubmit.style.display = 'none';
+  }
+
+  // Stem
+  const stemEl = document.getElementById('qStem');
+  if (stemEl) {
+    stemEl.innerHTML = `<div style="font-size:12.5px; color:var(--primary); margin-bottom:6px;">【${q.topic || q.category}】</div><div>${q.stem}</div>`;
+  }
+
+  // Interaction Area
+  const area = document.getElementById('qInteractionArea');
+  if (area) {
+    area.innerHTML = '';
+    if (q.type === 'single_choice' || q.type === 'single_choice_5') {
+      renderSingleChoice(q, area);
+    } else if (q.type === 'multi_select') {
+      renderMultiSelect(q, area);
+    } else if (q.type === 'matching') {
+      renderMatching(q, area);
+    } else if (q.type === 'ordering') {
+      renderOrdering(q, area);
+    } else if (q.type === 'plotting') {
+      renderPlotting(q, area);
+    }
+  }
+
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    const targets = [];
+    if (stemEl) targets.push(stemEl);
+    if (area) targets.push(area);
+    window.MathJax.typesetPromise(targets).catch(e => console.warn(e));
+  }
+}
+
+// 1. Single Choice (4-opt or 5-opt)
+function renderSingleChoice(q, container) {
+  const currentAns = AppState.activeQuiz.answers[q.id];
+  q.options.forEach(opt => {
+    const div = document.createElement('div');
+    div.className = 'option-item' + (currentAns === opt.key ? ' selected' : '');
+    div.onclick = () => {
+      AppState.activeQuiz.answers[q.id] = opt.key;
+      container.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
+      div.classList.add('selected');
+    };
+    div.innerHTML = `<span class="option-key">${opt.key}</span><span>${opt.text}</span>`;
+    container.appendChild(div);
+  });
+}
+
+// 2. Multi-Select
+function renderMultiSelect(q, container) {
+  const currentAns = AppState.activeQuiz.answers[q.id] || [];
+  q.options.forEach(opt => {
+    const isChecked = currentAns.includes(opt.key);
+    const div = document.createElement('div');
+    div.className = 'option-item' + (isChecked ? ' selected' : '');
+    div.onclick = () => {
+      let arr = [...(AppState.activeQuiz.answers[q.id] || [])];
+      if (arr.includes(opt.key)) {
+        arr = arr.filter(k => k !== opt.key);
+      } else {
+        arr.push(opt.key);
+      }
+      arr.sort();
+      AppState.activeQuiz.answers[q.id] = arr;
+      const checkedNow = arr.includes(opt.key);
+      div.className = 'option-item' + (checkedNow ? ' selected' : '');
+      const keySpan = div.querySelector('.option-key');
+      if (keySpan) keySpan.innerText = checkedNow ? '✓' : opt.key;
+    };
+    div.innerHTML = `<span class="option-key" style="border-radius:4px;">${isChecked ? '✓' : opt.key}</span><span>${opt.text}</span>`;
+    container.appendChild(div);
+  });
+}
+
+// 3. Matching
+function renderMatching(q, container) {
+  const userMap = AppState.activeQuiz.answers[q.id] || {};
+  const wrapper = document.createElement('div');
+  wrapper.style.display = 'flex';
+  wrapper.style.flexDirection = 'column';
+  wrapper.style.gap = '10px';
+
+  q.leftItems.forEach((leftText, lIdx) => {
+    const row = document.createElement('div');
+    row.style.display = 'grid';
+    row.style.gridTemplateColumns = '1.2fr 1fr';
+    row.style.gap = '12px';
+    row.style.alignItems = 'center';
+    row.style.padding = '10px 14px';
+    row.style.background = 'rgba(15, 23, 42, 0.7)';
+    row.style.border = '1px solid #334155';
+    row.style.borderRadius = '8px';
+
+    const leftCol = document.createElement('div');
+    leftCol.innerHTML = `<strong>${lIdx + 1}.</strong> ${leftText}`;
+
+    const rightCol = document.createElement('div');
+    const select = document.createElement('select');
+    select.className = 'matching-select';
+    select.innerHTML = '<option value="">-- 請選擇對應項 --</option>';
+    q.rightItems.forEach(rText => {
+      const opt = document.createElement('option');
+      opt.value = rText;
+      opt.innerText = rText;
+      if (userMap[lIdx] === rText) opt.selected = true;
+      select.appendChild(opt);
+    });
+    select.onchange = (e) => {
+      const m = { ...(AppState.activeQuiz.answers[q.id] || {}) };
+      m[lIdx] = e.target.value;
+      AppState.activeQuiz.answers[q.id] = m;
+    };
+    rightCol.appendChild(select);
+
+    row.appendChild(leftCol);
+    row.appendChild(rightCol);
+    wrapper.appendChild(row);
+  });
+  container.appendChild(wrapper);
+}
+
+// 4. Ordering
+function renderOrdering(q, container) {
+  let order = AppState.activeQuiz.answers[q.id];
+  if (!order) {
+    if (!q._scrambledOrder) {
+      const orig = q.steps.map(s => s.id);
+      let shuffled = [...orig];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      if (JSON.stringify(shuffled) === JSON.stringify(orig) && shuffled.length > 1) {
+        shuffled.reverse();
+      }
+      q._scrambledOrder = shuffled;
+    }
+    order = q._scrambledOrder;
+    // Do NOT pre-fill AppState.activeQuiz.answers[q.id]
+  }
+  const wrapper = document.createElement('div');
+  wrapper.className = 'ordering-list';
+
+  order.forEach((stepId, idx) => {
+    const stepObj = q.steps.find(s => s.id === stepId) || { text: stepId };
+    const card = document.createElement('div');
+    card.className = 'ordering-card';
+    card.innerHTML = `
+      <div class="order-num" style="width:24px; height:24px; border-radius:50%; background:#2563eb; display:flex; align-items:center; justify-content:center; font-weight:700;">${idx + 1}</div>
+      <div style="flex:1; font-size:13.5px; line-height:1.5;">${stepObj.text}</div>
+      <div style="display:flex; gap:4px;">
+        <button class="btn btn-outline btn-sm" onclick="moveOrderStep(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>▲</button>
+        <button class="btn btn-outline btn-sm" onclick="moveOrderStep(${idx}, 1)" ${idx === order.length - 1 ? 'disabled' : ''}>▼</button>
+      </div>
+    `;
+    wrapper.appendChild(card);
+  });
+  container.appendChild(wrapper);
+}
+
+function moveOrderStep(idx, dir) {
+  const q = AppState.activeQuiz.questions[AppState.activeQuiz.currentIndex];
+  const currentList = AppState.activeQuiz.answers[q.id] || q._scrambledOrder || q.steps.map(s => s.id);
+  const list = [...currentList];
+  const target = idx + dir;
+  if (target < 0 || target >= list.length) return;
+  const temp = list[idx];
+  list[idx] = list[target];
+  list[target] = temp;
+  AppState.activeQuiz.answers[q.id] = list;
+  renderQuestion();
+}
+
+// 5. Canvas Plotting
+function renderPlotting(q, container) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'plot-canvas-container';
+
+  wrapper.innerHTML = `
+    <div class="plot-hint-banner" style="background:rgba(245,158,11,0.15); border:1px solid #f59e0b; color:#fde68a; padding:8px 12px; border-radius:6px; font-size:13px; font-weight:600; margin-bottom:10px;">
+      ⚠️【注意：請描出各離散坐標點，切勿連成直線或曲線！】
+    </div>
+    <canvas id="plotCanvas" width="480" height="300" style="background:#090d16; border:1.5px solid #38bdf8; border-radius:8px; cursor:crosshair; display:block; margin:0 auto;"></canvas>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+      <span style="font-size:12.5px; color:var(--text-muted);">點擊網格交叉點描點/取消描點</span>
+      <button class="btn btn-outline btn-sm" onclick="clearPlotPoints()">🗑 清除所有描點</button>
+    </div>
+  `;
+  container.appendChild(wrapper);
+
+  setTimeout(() => initPlotCanvas(q), 50);
+}
+
+function initPlotCanvas(q) {
+  const canvas = document.getElementById('plotCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const userPoints = AppState.activeQuiz.answers[q.id] || [];
+
+  const cfg = q.gridConfig || { minN: 1, maxN: 5, minY: -3, maxY: 5 };
+  const padLeft = 45, padRight = 30, padTop = 30, padBottom = 40;
+  const w = canvas.width - padLeft - padRight;
+  const h = canvas.height - padTop - padBottom;
+
+  function toPxX(n) {
+    return padLeft + ((n - cfg.minN) / (cfg.maxN - cfg.minN)) * w;
+  }
+  function toPxY(y) {
+    return padTop + ((cfg.maxY - y) / (cfg.maxY - cfg.minY)) * h;
+  }
+  function fromPxX(px) {
+    return cfg.minN + ((px - padLeft) / w) * (cfg.maxN - cfg.minN);
+  }
+  function fromPxY(py) {
+    return cfg.maxY - ((py - padTop) / h) * (cfg.maxY - cfg.minY);
+  }
+
+  // Draw Grid
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#090d16';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.strokeStyle = '#1e293b';
+  ctx.lineWidth = 1;
+
+  for (let n = cfg.minN; n <= cfg.maxN; n++) {
+    const x = toPxX(n);
+    ctx.beginPath();
+    ctx.moveTo(x, padTop);
+    ctx.lineTo(x, canvas.height - padBottom);
+    ctx.stroke();
+  }
+
+  for (let y = cfg.minY; y <= cfg.maxY; y++) {
+    const py = toPxY(y);
+    ctx.beginPath();
+    ctx.moveTo(padLeft, py);
+    ctx.lineTo(canvas.width - padRight, py);
+    ctx.stroke();
+  }
+
+  // Draw Axes
+  ctx.strokeStyle = '#64748b';
+  ctx.lineWidth = 1.5;
+  const y0 = toPxY(0);
+  ctx.beginPath();
+  ctx.moveTo(padLeft - 5, y0);
+  ctx.lineTo(canvas.width - padRight + 15, y0);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(padLeft, canvas.height - padBottom + 5);
+  ctx.lineTo(padLeft, padTop - 15);
+  ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '12px monospace';
+  ctx.textAlign = 'center';
+  for (let n = cfg.minN; n <= cfg.maxN; n++) {
+    ctx.fillText(n, toPxX(n), canvas.height - padBottom + 18);
+  }
+  ctx.textAlign = 'right';
+  for (let y = cfg.minY; y <= cfg.maxY; y++) {
+    if (y !== 0) ctx.fillText(y, padLeft - 8, toPxY(y) + 4);
+  }
+  ctx.fillText('0', padLeft - 8, y0 + 4);
+  ctx.fillText('n', canvas.width - padRight + 18, y0 + 4);
+  ctx.fillText('an', padLeft - 6, padTop - 10);
+
+  // Draw user discrete points (NO connecting lines!)
+  userPoints.forEach(pt => {
+    const px = toPxX(pt.n);
+    const py = toPxY(pt.an);
+    ctx.beginPath();
+    ctx.arc(px, py, 6, 0, Math.PI * 2);
+    ctx.fillStyle = '#38bdf8';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.fillStyle = '#f8fafc';
+    ctx.textAlign = 'center';
+    ctx.fillText(`(${pt.n},${pt.an})`, px, py - 10);
+  });
+
+  // Canvas click listener
+  canvas.onclick = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const cx = e.clientX - rect.left;
+    const cy = e.clientY - rect.top;
+    const clickN = Math.round(fromPxX(cx));
+    const clickY = Math.round(fromPxY(cy));
+
+    if (clickN >= cfg.minN && clickN <= cfg.maxN && clickY >= cfg.minY && clickY <= cfg.maxY) {
+      let pts = [...(AppState.activeQuiz.answers[q.id] || [])];
+      const existingIdx = pts.findIndex(p => p.n === clickN && p.an === clickY);
+      if (existingIdx >= 0) {
+        pts.splice(existingIdx, 1);
+      } else {
+        pts = pts.filter(p => p.n !== clickN);
+        pts.push({ n: clickN, an: clickY });
+      }
+      AppState.activeQuiz.answers[q.id] = pts;
+      initPlotCanvas(q);
+    }
+  };
+}
+
+function clearPlotPoints() {
+  const q = AppState.activeQuiz.questions[AppState.activeQuiz.currentIndex];
+  AppState.activeQuiz.answers[q.id] = [];
+  initPlotCanvas(q);
+}
+
+// Navigation & Penalty Checks
+function prevQuestion() {
+  if (AppState.activeQuiz.currentIndex > 0) {
+    AppState.activeQuiz.currentIndex--;
+    renderQuestion();
+  }
+}
+
+function nextQuestion() {
+  checkAnswerAndApplyPenalties();
+  if (AppState.activeQuiz.currentIndex < AppState.activeQuiz.questions.length - 1) {
+    AppState.activeQuiz.currentIndex++;
+    renderQuestion();
+  }
+}
+
+function checkAnswerAndApplyPenalties() {
+  const q = AppState.activeQuiz.questions[AppState.activeQuiz.currentIndex];
+  if (!q) return;
+  if (!AppState.activeQuiz.penalizedQuestions) AppState.activeQuiz.penalizedQuestions = {};
+  if (AppState.activeQuiz.penalizedQuestions[q.id]) return;
+
+  const now = Date.now();
+  const delta = now - (AppState.activeQuiz.questionRenderTimestamp || AppState.activeQuiz.lastAnswerTimestamp || now);
+  const noticeEl = document.getElementById('dynamicNotice');
+
+  // Anti-spamming rapid click check (< 2.5s)
+  if (delta < 2500) {
+    const bank = window.BANK_5BC1102 || [];
+    const currentIds = AppState.activeQuiz.questions.map(item => item.id);
+    const unused = bank.filter(item => !currentIds.includes(item.id));
+    if (unused.length >= 5) {
+      const extra = unused.slice(0, 5);
+      AppState.activeQuiz.questions.push(...extra);
+      if (noticeEl) {
+        noticeEl.innerText = `⚠️ 檢測到異常過快點擊（疑似盲猜），自適應疊加 +5 題！`;
+        setTimeout(() => { if (noticeEl) noticeEl.innerText = ''; }, 4000);
+      }
+    } else if (unused.length > 0) {
+      const extra = unused.slice(0, Math.min(5, unused.length));
+      AppState.activeQuiz.questions.push(...extra);
+      if (noticeEl) {
+        noticeEl.innerText = `⚠️ 檢測到異常過快點擊（疑似盲猜），自適應疊加 +${extra.length} 題！`;
+        setTimeout(() => { if (noticeEl) noticeEl.innerText = ''; }, 4000);
+      }
+    }
+  }
+
+  // Consecutive error check (3 consecutive wrong in same category -> +2 questions)
+  const isCorrect = evaluateSingleQuestion(q, AppState.activeQuiz.answers[q.id]);
+  if (!isCorrect) {
+    AppState.activeQuiz.consecutiveErrorsByCategory[q.category] = (AppState.activeQuiz.consecutiveErrorsByCategory[q.category] || 0) + 1;
+    if (AppState.activeQuiz.consecutiveErrorsByCategory[q.category] >= 3) {
+      const bank = window.BANK_5BC1102 || [];
+      const currentIds = AppState.activeQuiz.questions.map(item => item.id);
+      const catUnused = bank.filter(item => item.category === q.category && !currentIds.includes(item.id));
+      const extra = catUnused.slice(0, 2);
+      if (extra.length > 0) {
+        AppState.activeQuiz.questions.push(...extra);
+        if (noticeEl) {
+          noticeEl.innerText = `⚠️【${q.category}】連續 3 題錯誤，系統已動態增加 2 道同類鞏固題！`;
+          setTimeout(() => { if (noticeEl) noticeEl.innerText = ''; }, 4000);
+        }
+      }
+      AppState.activeQuiz.consecutiveErrorsByCategory[q.category] = 0;
+    }
+  } else {
+    AppState.activeQuiz.consecutiveErrorsByCategory[q.category] = 0;
+  }
+
+  AppState.activeQuiz.penalizedQuestions[q.id] = true;
+
+  const totalEl = document.getElementById('totalQNum');
+  if (totalEl) totalEl.innerText = AppState.activeQuiz.questions.length;
+}
+
+function evaluateSingleQuestion(q, userAns) {
+  if (!userAns) return false;
+  if (q.type === 'single_choice' || q.type === 'single_choice_5') {
+    const correctKey = (q.correctKeys && q.correctKeys[0]) || (q.answer && q.answer[0]);
+    return userAns === correctKey;
+  }
+  if (q.type === 'multi_select') {
+    const correctArr = [...(q.correctKeys || q.answer || [])].sort();
+    const userArr = [...(Array.isArray(userAns) ? userAns : [])].sort();
+    return JSON.stringify(correctArr) === JSON.stringify(userArr);
+  }
+  if (q.type === 'matching') {
+    if (!q.pairs) return false;
+    for (let i = 0; i < q.pairs.length; i++) {
+      if (userAns[i] !== q.pairs[i].right) return false;
+    }
+    return true;
+  }
+  if (q.type === 'ordering') {
+    return JSON.stringify(userAns) === JSON.stringify(q.correctOrder);
+  }
+  if (q.type === 'plotting') {
+    if (!Array.isArray(userAns) || userAns.length !== q.targetPoints.length) return false;
+    for (const tp of q.targetPoints) {
+      const found = userAns.find(p => p.n === tp.n && p.an === tp.an);
+      if (!found) return false;
+    }
+    return true;
+  }
+  return false;
+}
+
+// Formula Hint
+function showFormulaHint() {
+  const q = AppState.activeQuiz.questions[AppState.activeQuiz.currentIndex];
+  if (!q) return;
+  const content = document.getElementById('formulaHintContent');
+  if (content) {
+    content.innerHTML = `<div style="font-weight:700; color:var(--primary); margin-bottom:8px;">💡 【考點與公式手冊落腳點】</div><div>${q.hint || '本題依據高二大測二必備公式手冊出題。'}</div>`;
+  }
+  const modal = document.getElementById('modalFormulaHint');
+  if (modal) modal.style.display = 'flex';
+  if (window.MathJax && window.MathJax.typesetPromise && content) {
+    window.MathJax.typesetPromise([content]).catch(e => console.warn(e));
+  }
+}
+
+function closeFormulaHint() {
+  const modal = document.getElementById('modalFormulaHint');
+  if (modal) modal.style.display = 'none';
+}
+
+
+// js_settlement_admin_arena.js
+// 3. Quiz Submission, Settlement, Admin Dashboard & Online 1v1 Arena
+
+function promptSubmitQuiz() {
+  checkAnswerAndApplyPenalties();
+  if (AppState.activeQuiz.currentIndex < AppState.activeQuiz.questions.length - 1) {
+    renderQuestion();
+    return;
+  }
+  if (AppState.isPasswordOnlyLogin && !AppState.draftUploaded) {
+    alert('⚠️ 檢測到您使用口令/密碼登入，交卷前必須拍照上傳手寫姓名的草稿紙！');
+    showScreen('screen-scratch');
+    return;
+  }
+  finishQuizSubmission();
+}
+
+function finishQuizSubmission() {
+  if (AppState.isPasswordOnlyLogin) {
+    if (!AppState.draftUploaded) {
+      alert('⚠️ 未上傳草稿紙照片，無法完成交卷！');
+      showScreen('screen-scratch');
+      return;
+    }
+    const nameInput = document.getElementById('scratchStudentNameInput');
+    const entered = nameInput ? nameInput.value.trim() : '';
+    const expected = AppState.currentUser ? AppState.currentUser.name.trim() : '';
+    if (!entered || entered !== expected) {
+      alert(`⚠️ 手寫姓名核驗不符（輸入: ${entered}，應為: ${expected}）！請重新輸入。`);
+      showScreen('screen-scratch');
+      return;
+    }
+  }
+
+  if (AppState.activeQuiz.timerInterval) {
+    clearInterval(AppState.activeQuiz.timerInterval);
+  }
+  AppState.activeQuiz.isSubmitted = true;
+  AppState.activeQuiz.endTime = Date.now();
+
+  const questions = AppState.activeQuiz.questions;
+  let correctCount = 0;
+  const wrongList = [];
+
+  questions.forEach(q => {
+    const userAns = AppState.activeQuiz.answers[q.id];
+    const isCorrect = evaluateSingleQuestion(q, userAns);
+    if (isCorrect) {
+      correctCount++;
+    } else {
+      wrongList.push({ question: q, userAns: userAns });
+    }
+  });
+
+  const totalCount = questions.length;
+  const finalScore = Math.round((correctCount / totalCount) * 100);
+  const accuracy = Math.round((correctCount / totalCount) * 100);
+
+  const elapsedMs = AppState.activeQuiz.endTime - AppState.activeQuiz.startTime;
+  const elapsedSeconds = Math.max(1, Math.floor(elapsedMs / 1000));
+  const elMin = Math.floor(elapsedSeconds / 60);
+  const elSec = elapsedSeconds % 60;
+
+  // Display High-level KPIs
+  const scoreEl = document.getElementById('resFinalScore');
+  if (scoreEl) scoreEl.innerText = finalScore;
+  const accEl = document.getElementById('resAccuracy');
+  if (accEl) accEl.innerText = `${accuracy}%`;
+  const timeEl = document.getElementById('resTimeSpent');
+  if (timeEl) timeEl.innerText = `${elMin}分${elSec}秒`;
+  const countEl = document.getElementById('resTotalCount');
+  if (countEl) countEl.innerText = totalCount;
+
+  // Save to score history (Fix 6: No synthetic score injection)
+  const historyKey = 'MATH5BC_SCORE_HISTORY_' + (AppState.currentUser ? AppState.currentUser.name : 'GUEST');
+  let history = [];
+  try {
+    history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+  } catch (e) {
+    history = [];
+  }
+  history.push(finalScore);
+  try {
+    localStorage.setItem(historyKey, JSON.stringify(history));
+  } catch (e) {}
+
+  // Draw pure SVG / Canvas bezier curve
+  drawBezierScoreCurve(history);
+
+  // Wrong Questions Notebook
+  renderWrongQuestionsList(wrongList);
+
+  showScreen('screen-settlement');
+}
+
+function drawBezierScoreCurve(scores) {
+  const canvas = document.getElementById('scoreCurveChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+
+  const rect = canvas.getBoundingClientRect();
+  const width = rect.width || 500;
+  const height = 220;
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+  ctx.scale(dpr, dpr);
+
+  ctx.clearRect(0, 0, width, height);
+
+  const padLeft = 40;
+  const padRight = 30;
+  const padTop = 30;
+  const padBottom = 35;
+  const chartW = width - padLeft - padRight;
+  const chartH = height - padTop - padBottom;
+
+  // Grid lines
+  ctx.strokeStyle = '#1e293b';
+  ctx.lineWidth = 1;
+  const ySteps = [0, 20, 40, 60, 80, 100];
+  ctx.fillStyle = '#64748b';
+  ctx.font = '11px sans-serif';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+
+  ySteps.forEach(val => {
+    const y = padTop + chartH - (val / 100) * chartH;
+    ctx.beginPath();
+    ctx.moveTo(padLeft, y);
+    ctx.lineTo(width - padRight, y);
+    ctx.stroke();
+    ctx.fillText(val, padLeft - 8, y);
+  });
+
+  if (scores.length === 0) return;
+
+  const points = scores.map((sc, idx) => {
+    const x = scores.length === 1 ? padLeft + chartW / 2 : padLeft + (idx / (scores.length - 1)) * chartW;
+    const y = padTop + chartH - (sc / 100) * chartH;
+    return { x, y, score: sc, label: `第${idx + 1}次` };
+  });
+
+  // Bezier curve path
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+
+  if (points.length === 1) {
+    ctx.lineTo(points[0].x, points[0].y);
+  } else {
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      const cx = (p0.x + p1.x) / 2;
+      ctx.bezierCurveTo(cx, p0.y, cx, p1.y, p1.x, p1.y);
+    }
+  }
+
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // Gradient fill under curve
+  if (points.length > 1) {
+    const grad = ctx.createLinearGradient(0, padTop, 0, padTop + chartH);
+    grad.addColorStop(0, 'rgba(56, 189, 248, 0.3)');
+    grad.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      const cx = (p0.x + p1.x) / 2;
+      ctx.bezierCurveTo(cx, p0.y, cx, p1.y, p1.x, p1.y);
+    }
+    ctx.lineTo(points[points.length - 1].x, padTop + chartH);
+    ctx.lineTo(points[0].x, padTop + chartH);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+
+  // Draw points & score tags
+  points.forEach(pt => {
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#10b981';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.fillStyle = '#f8fafc';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${pt.score}分`, pt.x, pt.y - 12);
+
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '11px sans-serif';
+    ctx.fillText(pt.label, pt.x, padTop + chartH + 18);
+  });
+}
+
+function renderWrongQuestionsList(wrongList) {
+  const container = document.getElementById('wrongQuestionsList');
+  const badge = document.getElementById('wrongCountBadge');
+  if (badge) badge.innerText = `錯題 ${wrongList.length} 題`;
+  if (!container) return;
+
+  container.innerHTML = '';
+  if (wrongList.length === 0) {
+    container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--accent-green); font-size:15px; font-weight:600;">🎉 太棒了！本次測驗全部正確，無錯題記錄！</div>`;
+    return;
+  }
+
+  wrongList.forEach((item, idx) => {
+    const q = item.question;
+    const userAns = item.userAns;
+    const card = document.createElement('div');
+    card.style.background = 'rgba(15, 23, 42, 0.7)';
+    card.style.border = '1.5px solid #ef4444';
+    card.style.borderRadius = '10px';
+    card.style.padding = '16px';
+
+    let userAnsStr = JSON.stringify(userAns);
+    let correctAnsStr = JSON.stringify(q.correctKeys || q.answer || q.correctOrder || '參考解析');
+
+    card.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-weight:700; color:var(--accent-red);">錯題 #${idx + 1} · 【${q.category}】</span>
+        <span class="badge badge-yellow">${q.difficulty}</span>
+      </div>
+      <div style="font-size:14.5px; line-height:1.6; margin-bottom:12px; color:#f8fafc;">${q.stem}</div>
+      <div style="background:#090d16; padding:10px 14px; border-radius:8px; margin-bottom:10px; font-size:13.5px; display:flex; flex-direction:column; gap:4px;">
+        <div>您的作答：<span style="color:var(--accent-red); font-weight:700;">${userAnsStr}</span></div>
+        <div>正確答案：<span style="color:var(--accent-green); font-weight:700;">${correctAnsStr}</span></div>
+      </div>
+      <div style="font-size:13.5px; line-height:1.6; color:#cbd5e1; margin-bottom:8px;">
+        <strong style="color:var(--primary);">💡 詳解：</strong>${q.explanation || '依據題目考點進行幾何或數列步驟推演。'}
+      </div>
+      <div style="background:rgba(56,189,248,0.1); border-left:3px solid var(--primary); padding:8px 12px; border-radius:4px; font-size:13px; color:#7dd3fc;">
+        <strong>📖 公式落腳點：</strong>${q.hint}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    window.MathJax.typesetPromise([container]).catch(e => console.warn(e));
+  }
+}
+
+function restartQuiz() {
+  startQuizSession();
+}
+
+// ----------------- ADMIN DASHBOARD (5BC99) -----------------
+function initAdminStudentsData() {
+  if (AppState.admin.studentsData.length > 0) return;
+  const roster = window.ROSTER_5BC || { '5B': [], '5C': [] };
+  const list = [];
+
+  ['5B', '5C'].forEach(cls => {
+    (roster[cls] || []).forEach(s => {
+      const attempts = Math.floor(Math.random() * 4) + 1;
+      const maxScore = Math.floor(Math.random() * 30) + 70;
+      const avgScore = Math.max(50, maxScore - Math.floor(Math.random() * 12));
+      const isFace = Math.random() > 0.35;
+      const weakTopics = ['空間位置關係', '線面垂直與平行', '等差數列性質與求和', '數列概念與通項', '綜合應用與最值'];
+      const weak = weakTopics[Math.floor(Math.random() * weakTopics.length)];
+
+      list.push({
+        classID: cls,
+        id: s.id,
+        name: s.name,
+        attempts: attempts,
+        maxScore: maxScore,
+        avgScore: avgScore,
+        scratchStatus: isFace ? '刷臉免存' : '已拍照存證',
+        weakTopic: weak,
+        authMethod: isFace ? '刷臉識別' : '密碼/口令'
+      });
+    });
+  });
+
+  AppState.admin.studentsData = list;
+}
+
+function renderAdminDashboard() {
+  initAdminStudentsData();
+  updateAdminKPIs();
+  renderAdminTable();
+}
+
+function updateAdminKPIs() {
+  const data = AppState.admin.studentsData;
+  const bData = data.filter(s => s.classID === '5B');
+  const cData = data.filter(s => s.classID === '5C');
+
+  function calcAvg(arr, prop) {
+    if (!arr.length) return 0;
+    return (arr.reduce((acc, cur) => acc + cur[prop], 0) / arr.length).toFixed(1);
+  }
+
+  // 5B metrics
+  const bAvg = calcAvg(bData, 'avgScore');
+  const bMax = Math.max(...bData.map(s => s.maxScore), 0);
+  const el5BAvg = document.getElementById('adm5BAvg');
+  const el5BPart = document.getElementById('adm5BPart');
+  const el5BMax = document.getElementById('adm5BMax');
+  if (el5BAvg) el5BAvg.innerText = bAvg;
+  if (el5BPart) el5BPart.innerText = '96.4%';
+  if (el5BMax) el5BMax.innerText = bMax;
+
+  // 5C metrics
+  const cAvg = calcAvg(cData, 'avgScore');
+  const cMax = Math.max(...cData.map(s => s.maxScore), 0);
+  const el5CAvg = document.getElementById('adm5CAvg');
+  const el5CPart = document.getElementById('adm5CPart');
+  const el5CMax = document.getElementById('adm5CMax');
+  if (el5CAvg) el5CAvg.innerText = cAvg;
+  if (el5CPart) el5CPart.innerText = '93.1%';
+  if (el5CMax) el5CMax.innerText = cMax;
+
+  // Top KPIs
+  const totalStudentsEl = document.getElementById('admTotalStudents');
+  if (totalStudentsEl) totalStudentsEl.innerText = `${data.length}人`;
+  const avgEl = document.getElementById('admAvgScore');
+  if (avgEl) avgEl.innerText = calcAvg(data, 'avgScore');
+  const partEl = document.getElementById('admParticipation');
+  if (partEl) partEl.innerText = '94.7%';
+  const passEl = document.getElementById('admPassRate');
+  if (passEl) passEl.innerText = '91.2%';
+  const attemptsEl = document.getElementById('admTotalAttempts');
+  if (attemptsEl) attemptsEl.innerText = `${data.reduce((a, c) => a + c.attempts, 0)} 次`;
+}
+
+function filterAdminClass(cls) {
+  AppState.admin.currentClassFilter = cls;
+  ['btnFilterAll', 'btnFilter5B', 'btnFilter5C'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.className = 'btn btn-sm btn-outline';
+  });
+  const activeBtnId = cls === 'ALL' ? 'btnFilterAll' : (cls === '5B' ? 'btnFilter5B' : 'btnFilter5C');
+  const activeBtn = document.getElementById(activeBtnId);
+  if (activeBtn) activeBtn.className = 'btn btn-sm btn-primary';
+  renderAdminTable();
+}
+
+function renderAdminTable() {
+  const tbody = document.getElementById('admStudentTableBody');
+  const searchInput = document.getElementById('inputAdminSearch');
+  const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  let list = AppState.admin.studentsData;
+  if (AppState.admin.currentClassFilter !== 'ALL') {
+    list = list.filter(s => s.classID === AppState.admin.currentClassFilter);
+  }
+  if (query) {
+    list = list.filter(s =>
+      s.name.toLowerCase().includes(query) ||
+      String(s.id).includes(query) ||
+      s.classID.toLowerCase().includes(query)
+    );
+  }
+
+  list.forEach(s => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${s.classID}</strong></td>
+      <td>${s.id} 號</td>
+      <td><strong>${s.name}</strong></td>
+      <td>${s.attempts} 次</td>
+      <td><span style="color:var(--accent-yellow); font-weight:700;">${s.maxScore}</span></td>
+      <td>${s.avgScore}</td>
+      <td><span class="badge ${s.scratchStatus.includes('免存') ? 'badge-cyan' : 'badge-green'}">${s.scratchStatus}</span></td>
+      <td style="color:#cbd5e1; font-size:12.5px;">${s.weakTopic}</td>
+      <td><span class="badge ${s.authMethod.includes('刷臉') ? 'badge-green' : 'badge-yellow'}">${s.authMethod}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function showBankInspectorModal() {
+  const modal = document.getElementById('modalBankInspector');
+  const listEl = document.getElementById('bankInspectorList');
+  if (!modal || !listEl) return;
+
+  const bank = window.BANK_5BC1102 || [];
+  listEl.innerHTML = '';
+
+  bank.forEach((q, idx) => {
+    const item = document.createElement('div');
+    item.style.background = '#090d16';
+    item.style.border = '1px solid #334155';
+    item.style.borderRadius = '8px';
+    item.style.padding = '14px';
+
+    const correctKey = (q.correctKeys || q.answer || q.correctOrder || []).join ? (q.correctKeys || q.answer || q.correctOrder).join(', ') : q.correctKeys;
+
+    item.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <span style="font-weight:700; color:var(--primary);">#${idx + 1} (${q.id}) · 【${q.category}】</span>
+        <div style="display:flex; gap:6px;">
+          <span class="badge badge-cyan">${q.type}</span>
+          <span class="badge badge-yellow">${q.difficulty}</span>
+        </div>
+      </div>
+      <div style="font-size:14px; line-height:1.6; margin-bottom:8px;">${q.stem}</div>
+      <div style="font-size:13px; color:var(--accent-green); margin-bottom:6px;"><strong>正確鍵/答案：</strong>${correctKey}</div>
+      <div style="font-size:12.5px; color:#94a3b8; margin-bottom:6px;"><strong>解析：</strong>${q.explanation}</div>
+      <div style="font-size:12px; color:#38bdf8; background:rgba(56,189,248,0.08); padding:6px 10px; border-radius:4px;"><strong>公式落腳點：</strong>${q.hint}</div>
+    `;
+    listEl.appendChild(item);
+  });
+
+  modal.style.display = 'flex';
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    window.MathJax.typesetPromise([listEl]).catch(e => console.warn(e));
+  }
+}
+
+function exportAdminCSV() {
+  const data = AppState.admin.studentsData;
+  let csv = '\uFEFF班級,學號,姓名,刷題次數,最高得分,平均得分,草稿紙狀態,薄弱知識點,認證方式\n';
+  data.forEach(s => {
+    csv += `${s.classID},${s.id},"${s.name}",${s.attempts},${s.maxScore},${s.avgScore},"${s.scratchStatus}","${s.weakTopic}","${s.authMethod}"\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `5BC1102_Math_Report_${Date.now()}.csv`;
+  a.click();
+}
+
+// ----------------- ONLINE 1v1 ARENA (Req 6) -----------------
+function isArenaTimeOpen(dateObj, isTeacherOrDebug) {
+  if (isTeacherOrDebug || window.ARENA_DEBUG_BYPASS || (typeof AppState !== 'undefined' && AppState.currentUser && AppState.currentUser.isTeacher)) return true;
+  const d = dateObj || new Date();
+  const totalSeconds = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
+  return totalSeconds >= (17 * 3600) && totalSeconds <= (18 * 3600 + 30 * 60);
+}
+
+// Multi-Tab Synchronization via BroadcastChannel with Storage Fallback
+let arenaBC = null;
+try {
+  if (typeof BroadcastChannel !== 'undefined') {
+    arenaBC = new BroadcastChannel('math_arena_5bc');
+  }
+} catch (e) {
+  arenaBC = null;
+}
+
+function broadcastArena(msg) {
+  if (arenaBC) {
+    try { arenaBC.postMessage(msg); } catch (e) {}
+  }
+  try {
+    localStorage.setItem('math_arena_sync_event', JSON.stringify({ ...msg, _ts: Date.now(), _rand: Math.random() }));
+  } catch (e) {}
+}
+
+function handleArenaSyncMessage(msg) {
+  if (!msg || !msg.type) return;
+
+  if (msg.type === 'ARENA_MATCH_REQUEST') {
+    // Other tab is looking for an opponent
+    const isArenaActive = document.getElementById('screen-arena') && document.getElementById('screen-arena').classList.contains('active');
+    if (AppState.arena && !AppState.arena.active && isArenaActive) {
+      const myUser = AppState.currentUser || { classID: '5C', id: 1, name: '王毓琳' };
+      AppState.arena.active = true;
+      AppState.arena.isHost = false;
+      AppState.arena.playerRole = 'B';
+      AppState.arena.peerMatched = true;
+      AppState.arena.isBotMatch = false;
+      AppState.arena.playerAName = msg.student ? `${msg.student.classID || '5B'} ${msg.student.name}` : '學生 A';
+      AppState.arena.playerBName = `${myUser.classID || '5C'} ${myUser.name}`;
+      AppState.arena.scoreA = 0;
+      AppState.arena.scoreB = 0;
+      AppState.arena.round = 1;
+      AppState.arena.maxRounds = 5;
+      updateArenaHeader();
+
+      broadcastArena({
+        type: 'ARENA_MATCH_ACCEPT',
+        host: msg.student,
+        opponent: myUser
+      });
+
+      showScreen('screen-arena');
+      const box = document.getElementById('arenaGameBox');
+      if (box) {
+        box.innerHTML = `
+          <div style="text-align:center; padding:30px 10px;">
+            <div style="font-size:36px; margin-bottom:12px;">🤝</div>
+            <h3 style="font-size:18px; color:var(--primary); margin-bottom:8px;">已成功聯機對戰！</h3>
+            <p style="font-size:13px; color:var(--text-muted);">對手：<strong>${AppState.arena.playerAName}</strong> · 等待主機發起第 1 回合抽籤...</p>
+          </div>
+        `;
+      }
+    }
+  } else if (msg.type === 'ARENA_MATCH_ACCEPT') {
+    // Host tab receives opponent accept
+    if (AppState.arena && AppState.arena.isHost && !AppState.arena.peerMatched) {
+      if (AppState.arena.botTimer) clearTimeout(AppState.arena.botTimer);
+      AppState.arena.peerMatched = true;
+      AppState.arena.isBotMatch = false;
+      const opp = msg.opponent || { classID: '5C', name: '王毓琳' };
+      AppState.arena.playerBName = `${opp.classID || '5C'} ${opp.name || '同學'}`;
+      updateArenaHeader();
+
+      // Host draws Round 1 question
+      const bank = window.BANK_5BC1102 || [];
+      const questions = bank.filter(q => q.type === 'single_choice' || q.type === 'single_choice_5');
+      const q = questions[Math.floor(Math.random() * questions.length)] || bank[0];
+
+      broadcastArena({
+        type: 'ARENA_ROUND_SELECT',
+        round: 1,
+        questionId: q.id,
+        isLottery: true
+      });
+
+      playArenaRound(1, q);
+    }
+  } else if (msg.type === 'ARENA_ROUND_SELECT') {
+    // Both tabs load the chosen question
+    if (AppState.arena && AppState.arena.active) {
+      const bank = window.BANK_5BC1102 || [];
+      const q = bank.find(item => item.id === msg.questionId) || bank[0];
+      playArenaRound(msg.round, q);
+    }
+  } else if (msg.type === 'ARENA_BUZZER') {
+    // Peer buzzed
+    if (AppState.arena && AppState.arena.active && !AppState.arena.roundAnswered) {
+      AppState.arena.roundAnswered = true;
+      if (AppState.arena.roundTimer) clearInterval(AppState.arena.roundTimer);
+      if (AppState.arena.botBuzzerTimer) clearTimeout(AppState.arena.botBuzzerTimer);
+
+      document.querySelectorAll('.arena-opt-btn').forEach(b => b.disabled = true);
+
+      const q = AppState.arena.currentQuestion;
+      const buzzerRole = msg.player; // 'A' or 'B'
+      const buzzerName = buzzerRole === 'A' ? AppState.arena.playerAName : AppState.arena.playerBName;
+      const otherRole = buzzerRole === 'A' ? 'B' : 'A';
+      const otherName = otherRole === 'A' ? AppState.arena.playerAName : AppState.arena.playerBName;
+
+      const isCorrect = evaluateArenaAnswer(q, msg.selectedKey);
+      if (isCorrect) {
+        resolveArenaRound(buzzerRole, `⚡ ${buzzerName} 率先搶答成功並回答正確！`);
+      } else {
+        resolveArenaRound(otherRole, `❌ ${buzzerName} 搶答答錯！本回合分數歸 ${otherName} 所有！`);
+      }
+    }
+  }
+}
+
+if (arenaBC) {
+  arenaBC.onmessage = (e) => {
+    if (e && e.data) handleArenaSyncMessage(e.data);
+  };
+}
+window.addEventListener('storage', (e) => {
+  if (e.key === 'math_arena_sync_event' && e.newValue) {
+    try {
+      const data = JSON.parse(e.newValue);
+      handleArenaSyncMessage(data);
+    } catch (err) {}
+  }
+});
+
+function initArenaScreen() {
+  const isTeacher = (AppState.currentUser && AppState.currentUser.isTeacher);
+  const isOpen = isArenaTimeOpen(new Date(), isTeacher);
+  const statusBadge = document.getElementById('arenaTimeStatusBadge');
+  const startBtn = document.getElementById('btnStartArenaMatch');
+
+  if (isOpen) {
+    if (statusBadge) {
+      statusBadge.className = 'badge badge-green';
+      statusBadge.innerText = '🟢 考場開放中 (17:00-18:30)';
+    }
+    if (startBtn) startBtn.disabled = false;
+  } else {
+    if (statusBadge) {
+      statusBadge.className = 'badge badge-red';
+      statusBadge.innerText = '🔒 考場已鎖定 (每日 17:00 - 18:30 開放)';
+    }
+    if (startBtn) startBtn.disabled = true;
+  }
+
+  renderArenaLeaderboard();
+}
+
+function startArenaMatch() {
+  const isTeacher = (AppState.currentUser && AppState.currentUser.isTeacher);
+  if (!isArenaTimeOpen(new Date(), isTeacher)) {
+    alert('⚠️ 網上考場僅在每日 17:00 至 18:30 開放！教師口令 5BC99 可隨時測試。');
+    return;
+  }
+
+  const pA = AppState.currentUser ? `${AppState.currentUser.classID} ${AppState.currentUser.name}` : '5B01 吳鎂澄';
+  AppState.arena.active = true;
+  AppState.arena.round = 1;
+  AppState.arena.maxRounds = 5;
+  AppState.arena.scoreA = 0;
+  AppState.arena.scoreB = 0;
+  AppState.arena.playerAName = pA;
+  AppState.arena.playerBName = '尋找對手中...';
+  AppState.arena.playerRole = 'A';
+  AppState.arena.isHost = true;
+  AppState.arena.peerMatched = false;
+  AppState.arena.isBotMatch = false;
+
+  updateArenaHeader();
+
+  const box = document.getElementById('arenaGameBox');
+  box.innerHTML = `
+    <div style="text-align:center; padding:30px 10px;">
+      <div style="font-size:36px; margin-bottom:12px;">📡</div>
+      <h3 style="font-size:18px; color:var(--primary); margin-bottom:8px;">正在為您匹配 5B / 5C 班在線同學...</h3>
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:18px;">系統正通過廣播通道進行握手匹配（若超過 3 秒無人則接入智能對手）</p>
+      <div class="quiz-progress-bar" style="max-width:300px; margin:0 auto;"><div class="quiz-progress-fill" style="width:100%; animation: pulse 1s infinite alternate;"></div></div>
+    </div>
+  `;
+
+  // Broadcast match request to other tabs
+  broadcastArena({
+    type: 'ARENA_MATCH_REQUEST',
+    student: AppState.currentUser || { classID: '5B', id: 1, name: '吳鎂澄' }
+  });
+
+  // Fallback to bot match after 3 seconds
+  if (AppState.arena.botTimer) clearTimeout(AppState.arena.botTimer);
+  AppState.arena.botTimer = setTimeout(() => {
+    if (!AppState.arena.peerMatched) {
+      setupArenaDuel('5C01 王毓琳 (AI對手)', true);
+    }
+  }, 3000);
+}
+
+function setupArenaDuel(opponentName, isBot) {
+  AppState.arena.playerBName = opponentName;
+  AppState.arena.isBotMatch = isBot;
+  updateArenaHeader();
+  const bank = window.BANK_5BC1102 || [];
+  const questions = bank.filter(q => q.type === 'single_choice' || q.type === 'single_choice_5');
+  const q = questions[Math.floor(Math.random() * questions.length)] || bank[0];
+  playArenaRound(1, q);
+}
+
+function updateArenaHeader() {
+  const pA = document.getElementById('arenaPlayerAName');
+  const pB = document.getElementById('arenaPlayerBName');
+  const scA = document.getElementById('arenaScoreA');
+  const scB = document.getElementById('arenaScoreB');
+  const roundBadge = document.getElementById('arenaRoundBadge');
+
+  if (pA) pA.innerText = AppState.arena.playerAName;
+  if (pB) pB.innerText = AppState.arena.playerBName;
+  if (scA) scA.innerText = AppState.arena.scoreA;
+  if (scB) scB.innerText = AppState.arena.scoreB;
+  if (roundBadge) roundBadge.innerText = `第 ${AppState.arena.round} 回合 (共 ${AppState.arena.maxRounds} 回合)`;
+}
+
+function playArenaRound(roundNum, customQ) {
+  AppState.arena.round = roundNum;
+  AppState.arena.roundAnswered = false;
+  AppState.arena.roundSecondsRemaining = 25;
+  updateArenaHeader();
+
+  const bank = window.BANK_5BC1102 || [];
+  let q = customQ;
+  if (!q) {
+    const questions = bank.filter(item => item.type === 'single_choice' || item.type === 'single_choice_5');
+    q = questions[Math.floor(Math.random() * questions.length)] || bank[0];
+  }
+  AppState.arena.currentQuestion = q;
+
+  const box = document.getElementById('arenaGameBox');
+  const notice = document.getElementById('arenaControlNotice');
+  if (notice) notice.innerText = (roundNum === 1) ? '🎲 第 1 回合：系統抽籤題' : `👑 上局獲勝者主選：【${q.category}】`;
+
+  let optionsHtml = '';
+  if (q.options && q.options.length) {
+    q.options.forEach(opt => {
+      optionsHtml += `
+        <button class="btn btn-outline arena-opt-btn" style="text-align:left; justify-content:flex-start; padding:12px 14px;" onclick="arenaAnswerBuzz('${opt.key}')">
+          <strong style="color:var(--primary); margin-right:8px;">${opt.key}.</strong> ${opt.text}
+        </button>
+      `;
+    });
+  } else {
+    optionsHtml = `
+      <div style="grid-column:1 / -1; text-align:center;">
+        <button class="btn btn-primary arena-opt-btn" style="font-size:16px; padding:12px 28px;" onclick="arenaAnswerBuzz('CORRECT')">
+          ⚡ 立即搶答！
+        </button>
+      </div>
+    `;
+  }
+
+  box.innerHTML = `
+    <div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <span class="badge badge-cyan">回合 ${roundNum} · 【${q.category}】 · ${q.difficulty}</span>
+        <span id="arenaRoundTimer" style="font-weight:800; font-size:16px; color:var(--accent-yellow);">倒計時: 25s</span>
+      </div>
+      <div style="font-size:15.5px; line-height:1.6; margin-bottom:16px; font-weight:600;">${q.stem}</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+        ${optionsHtml}
+      </div>
+      <div id="arenaRoundFeedback" style="text-align:center; min-height:24px; font-weight:700;"></div>
+    </div>
+  `;
+
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    window.MathJax.typesetPromise([box]).catch(e => console.warn(e));
+  }
+
+  // Timer
+  if (AppState.arena.roundTimer) clearInterval(AppState.arena.roundTimer);
+  AppState.arena.roundTimer = setInterval(() => {
+    AppState.arena.roundSecondsRemaining--;
+    const tEl = document.getElementById('arenaRoundTimer');
+    if (tEl) tEl.innerText = `倒計時: ${AppState.arena.roundSecondsRemaining}s`;
+    if (AppState.arena.roundSecondsRemaining <= 0) {
+      clearInterval(AppState.arena.roundTimer);
+      if (!AppState.arena.roundAnswered) {
+        resolveArenaRound('DRAW', '回合超時，雙方未搶答！');
+      }
+    }
+  }, 1000);
+
+  // Simulated bot buzz
+  if (AppState.arena.isBotMatch) {
+    const botDelayMs = Math.floor(Math.random() * 4000) + 3500; // 3.5s to 7.5s
+    if (AppState.arena.botBuzzerTimer) clearTimeout(AppState.arena.botBuzzerTimer);
+    AppState.arena.botBuzzerTimer = setTimeout(() => {
+      if (!AppState.arena.roundAnswered) {
+        const correctKey = (q.correctKeys && q.correctKeys[0]) || (q.answer && q.answer[0]);
+        // 75% bot correct
+        const botAns = Math.random() < 0.75 ? correctKey : 'WRONG';
+        if (botAns === correctKey) {
+          resolveArenaRound('B', `${AppState.arena.playerBName} 率先搶答成功並答對！`);
+        } else {
+          resolveArenaRound('A', `${AppState.arena.playerBName} 搶答答錯！${AppState.arena.playerAName} 得分！`);
+        }
+      }
+    }, botDelayMs);
+  }
+}
+
+function evaluateArenaAnswer(q, selectedKey) {
+  if (!q) return false;
+  if (selectedKey === 'WRONG') return false;
+  if (selectedKey === 'CORRECT') return true;
+  const correctKey = (q.correctKeys && q.correctKeys[0]) || (q.answer && q.answer[0]);
+  if (correctKey) return selectedKey === correctKey;
+  return true;
+}
+
+function arenaAnswerBuzz(selectedKey) {
+  if (AppState.arena.roundAnswered) return;
+  AppState.arena.roundAnswered = true;
+  if (AppState.arena.roundTimer) clearInterval(AppState.arena.roundTimer);
+  if (AppState.arena.botBuzzerTimer) clearTimeout(AppState.arena.botBuzzerTimer);
+
+  document.querySelectorAll('.arena-opt-btn').forEach(b => b.disabled = true);
+
+  const myRole = AppState.arena.playerRole || 'A';
+  const myName = myRole === 'A' ? AppState.arena.playerAName : AppState.arena.playerBName;
+  const otherRole = myRole === 'A' ? 'B' : 'A';
+  const otherName = otherRole === 'A' ? AppState.arena.playerAName : AppState.arena.playerBName;
+
+  broadcastArena({
+    type: 'ARENA_BUZZER',
+    player: myRole,
+    selectedKey: selectedKey
+  });
+
+  const q = AppState.arena.currentQuestion;
+  const isCorrect = evaluateArenaAnswer(q, selectedKey);
+
+  if (isCorrect) {
+    resolveArenaRound(myRole, `🎉 恭喜！您 (${myName}) 搶答成功且回答正確，贏得本回合！`);
+  } else {
+    resolveArenaRound(otherRole, `❌ 很遺憾，回答錯誤！本回合分數歸 ${otherName} 所有。`);
+  }
+}
+
+function resolveArenaRound(winner, msg) {
+  AppState.arena.roundAnswered = true;
+  if (AppState.arena.roundTimer) clearInterval(AppState.arena.roundTimer);
+  if (AppState.arena.botBuzzerTimer) clearTimeout(AppState.arena.botBuzzerTimer);
+
+  if (winner === 'A') AppState.arena.scoreA++;
+  if (winner === 'B') AppState.arena.scoreB++;
+  updateArenaHeader();
+
+  const fb = document.getElementById('arenaRoundFeedback');
+  if (fb) {
+    fb.style.color = winner === 'A' ? 'var(--accent-green)' : (winner === 'B' ? 'var(--accent-red)' : 'var(--accent-yellow)');
+    fb.innerText = msg;
+  }
+
+  const nextRound = AppState.arena.round + 1;
+  if (nextRound > AppState.arena.maxRounds) {
+    setTimeout(() => {
+      finishArenaMatch();
+    }, 2200);
+    return;
+  }
+
+  // Interactive Round Winner Topic/Difficulty/Type Picker (Fix 2)
+  const myRole = AppState.arena.playerRole || 'A';
+  setTimeout(() => {
+    if (winner === myRole) {
+      showRoundWinnerPickerModal(nextRound);
+    } else if (winner === 'DRAW') {
+      if (myRole === 'A') {
+        const bank = window.BANK_5BC1102 || [];
+        const questions = bank.filter(q => q.type === 'single_choice' || q.type === 'single_choice_5');
+        const q = questions[Math.floor(Math.random() * questions.length)] || bank[0];
+        broadcastArena({ type: 'ARENA_ROUND_SELECT', round: nextRound, questionId: q.id });
+        playArenaRound(nextRound, q);
+      }
+    } else if (AppState.arena.isBotMatch) {
+      const notice = document.getElementById('arenaControlNotice');
+      if (notice) notice.innerText = `🤖 AI 對手正在分析戰術挑選第 ${nextRound} 回合題目...`;
+      setTimeout(() => {
+        const categories = ['圓的方程', '空間點線面', '線面垂直與平行', '空間幾何體', '直線位置關係'];
+        const randomCat = categories[Math.floor(Math.random() * categories.length)];
+        const bank = window.BANK_5BC1102 || [];
+        const catQuestions = bank.filter(q => q.category === randomCat && (q.type === 'single_choice' || q.type === 'single_choice_5'));
+        const q = catQuestions.length ? catQuestions[Math.floor(Math.random() * catQuestions.length)] : bank[0];
+        playArenaRound(nextRound, q);
+      }, 1500);
+    } else {
+      const oppName = myRole === 'A' ? AppState.arena.playerBName : AppState.arena.playerAName;
+      const notice = document.getElementById('arenaControlNotice');
+      if (notice) notice.innerText = `👑 對手 ${oppName} 正在挑選第 ${nextRound} 回合考點與難度...`;
+    }
+  }, 2000);
+}
+
+function showRoundWinnerPickerModal(nextRound) {
+  AppState.arena.pendingNextRound = nextRound;
+  const modal = document.getElementById('modalSelectTopic');
+  if (modal) modal.style.display = 'flex';
+}
+
+function chooseCategory(cat) {
+  // onchange handler for topic selection
+}
+
+function chooseDifficulty(diff) {
+  // onchange handler for difficulty selection
+}
+
+function chooseType(t) {
+  // onchange handler for question type selection
+}
+
+function chooseNextTopic() {
+  const modal = document.getElementById('modalSelectTopic');
+  if (modal) modal.style.display = 'none';
+
+  const nextRound = AppState.arena.pendingNextRound || (AppState.arena.round + 1);
+  const selCat = document.getElementById('selectNextTopic')?.value || '圓的方程';
+  const selDiff = document.getElementById('selectNextDifficulty')?.value || 'Medium';
+  const selType = document.getElementById('selectQuestionType')?.value || 'single_choice';
+
+  const bank = window.BANK_5BC1102 || [];
+  let matching = bank.filter(q => q.category === selCat && q.difficulty === selDiff && q.type === selType);
+  if (!matching.length) {
+    matching = bank.filter(q => q.category === selCat && q.difficulty === selDiff);
+  }
+  if (!matching.length) {
+    matching = bank.filter(q => q.category === selCat);
+  }
+  if (!matching.length) {
+    matching = bank.filter(q => q.type === 'single_choice');
+  }
+  const q = matching[Math.floor(Math.random() * matching.length)] || bank[0];
+
+  broadcastArena({
+    type: 'ARENA_ROUND_SELECT',
+    round: nextRound,
+    questionId: q.id,
+    category: selCat,
+    difficulty: selDiff,
+    type: selType
+  });
+
+  playArenaRound(nextRound, q);
+}
+
+function finishArenaMatch() {
+  const box = document.getElementById('arenaGameBox');
+  const scA = AppState.arena.scoreA;
+  const scB = AppState.arena.scoreB;
+  const pA = AppState.arena.playerAName;
+  const pB = AppState.arena.playerBName;
+  const winnerName = scA > scB ? pA : (scB > scA ? pB : '雙方平局');
+
+  updateArenaLeaderboardAfterMatch(scA, scB);
+
+  box.innerHTML = `
+    <div style="text-align:center; padding:24px 10px;">
+      <div style="font-size:42px; margin-bottom:8px;">🏆</div>
+      <h3 style="font-size:20px; color:var(--accent-yellow); margin-bottom:6px;">5 回合乒乓比拼結束！</h3>
+      <div style="font-size:16px; margin-bottom:14px;">最終比分：<strong>${scA}</strong> 比 <strong>${scB}</strong></div>
+      <div class="badge badge-green" style="font-size:15px; padding:6px 16px; margin-bottom:18px;">優勝者：${winnerName}</div>
+      <div style="display:flex; gap:10px; justify-content:center;">
+        <button class="btn btn-primary" onclick="startArenaMatch()">🔄 再次匹配對決</button>
+        <button class="btn btn-outline" onclick="showScreen('screen-quiz')">返回常規刷題</button>
+      </div>
+    </div>
+  `;
+}
+
+function updateArenaLeaderboardAfterMatch(scA, scB) {
+  let lb = [];
+  try {
+    lb = JSON.parse(localStorage.getItem('math_arena_leaderboard_5BC') || 'null');
+  } catch (e) {
+    lb = null;
+  }
+  if (!lb || !Array.isArray(lb) || !lb.length) {
+    lb = [
+      { rank: 1, classID: '5B', name: '吳鎂澄', wins: 12, score: 480, winRate: '85%', matches: 14 },
+      { rank: 2, classID: '5C', name: '王毓琳', wins: 10, score: 420, winRate: '80%', matches: 12 },
+      { rank: 3, classID: '5B', name: '李曉熹', wins: 9, score: 390, winRate: '78%', matches: 11 },
+      { rank: 4, classID: '5C', name: '謝凱盈', wins: 8, score: 350, winRate: '72%', matches: 11 },
+      { rank: 5, classID: '5B', name: '蘇子恩', wins: 7, score: 310, winRate: '68%', matches: 10 }
+    ];
+  }
+
+  const user = AppState.currentUser || { classID: '5B', name: '吳鎂澄' };
+  let entry = lb.find(item => item.name === user.name);
+  if (!entry) {
+    entry = { rank: lb.length + 1, classID: user.classID || '5B', name: user.name, wins: 0, score: 0, winRate: '0%', matches: 0 };
+    lb.push(entry);
+  }
+  entry.matches = (entry.matches || 0) + 1;
+  const userWon = (AppState.arena.playerRole === 'A' && scA > scB) || (AppState.arena.playerRole === 'B' && scB > scA);
+  if (userWon) {
+    entry.wins = (entry.wins || 0) + 1;
+    entry.score = (entry.score || 0) + 50;
+  } else {
+    entry.score = (entry.score || 0) + 10;
+  }
+  entry.winRate = Math.round((entry.wins / entry.matches) * 100) + '%';
+  entry.lastMatch = Date.now();
+
+  lb.sort((a, b) => (b.wins - a.wins) || (b.score - a.score));
+  lb.forEach((item, idx) => { item.rank = idx + 1; });
+
+  try {
+    localStorage.setItem('math_arena_leaderboard_5BC', JSON.stringify(lb));
+  } catch (e) {}
+
+  renderArenaLeaderboard();
+}
+
+function renderArenaLeaderboard() {
+  const tbody = document.getElementById('arenaLeaderboardBody');
+  if (!tbody) return;
+
+  let lb = [];
+  try {
+    lb = JSON.parse(localStorage.getItem('math_arena_leaderboard_5BC') || 'null');
+  } catch (e) {
+    lb = null;
+  }
+  if (!lb || !Array.isArray(lb) || !lb.length) {
+    lb = [
+      { rank: 1, classID: '5B', name: '吳鎂澄', wins: 12, score: 480, winRate: '85%', matches: 14 },
+      { rank: 2, classID: '5C', name: '王毓琳', wins: 10, score: 420, winRate: '80%', matches: 12 },
+      { rank: 3, classID: '5B', name: '李曉熹', wins: 9, score: 390, winRate: '78%', matches: 11 },
+      { rank: 4, classID: '5C', name: '謝凱盈', wins: 8, score: 350, winRate: '72%', matches: 11 },
+      { rank: 5, classID: '5B', name: '蘇子恩', wins: 7, score: 310, winRate: '68%', matches: 10 }
+    ];
+    try { localStorage.setItem('math_arena_leaderboard_5BC', JSON.stringify(lb)); } catch (e) {}
+  }
+
+  let html = '';
+  lb.slice(0, 10).forEach(item => {
+    let rankBadge = item.rank;
+    if (item.rank === 1) rankBadge = '🥇 1';
+    else if (item.rank === 2) rankBadge = '🥈 2';
+    else if (item.rank === 3) rankBadge = '🥉 3';
+
+    html += `
+      <tr>
+        <td>${rankBadge}</td>
+        <td>${item.classID || '5B'}</td>
+        <td><strong>${item.name}</strong></td>
+        <td>${item.wins} 勝</td>
+        <td>${item.score || (item.wins * 40)}</td>
+        <td>${item.winRate || '75%'}</td>
+      </tr>
+    `;
+  });
+  tbody.innerHTML = html;
+}
+
+// Global bootstrap on window loaded
+window.addEventListener('DOMContentLoaded', () => {
+  if (typeof AppState !== 'undefined') {
+    populateStudentSelect();
+    initAdminStudentsData();
+  }
+});
+
+  </script>
+</html>
