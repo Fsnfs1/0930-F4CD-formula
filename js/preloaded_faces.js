@@ -8848,7 +8848,9 @@
   "5B_99": {
     "classID": "5B",
     "studentID": 99,
-    "name": "學生 99",
+    "name": "教師測試員",
+    "isTeacher": true,
+    "isTestUser": true,
     "vector": [
       -0.0678,
       0.07,

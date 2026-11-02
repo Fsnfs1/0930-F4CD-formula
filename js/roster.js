@@ -3,10 +3,11 @@
  * High School Mobile Math Practice & Anti-Cheating Quiz Platform
  * 
  * Source: D:\2627\WEB+\StudentID.txt
- * Total: 88 students
+ * Total: 117 students
  * - 4C: 29 students (IDs: 1..12, 14..30; NOTE: Student #13 does NOT exist)
  * - 4D: 31 students (IDs: 1..31)
  * - 5B: 28 students (IDs: 1..28)
+ * - 5C: 29 students (IDs: 1..29)
  */
 
 (function (root, factory) {
@@ -125,11 +126,42 @@
       { id: 26, name: "葉棨釗", grade: 11, classID: "5B" },
       { id: 27, name: "潘子聰", grade: 11, classID: "5B" },
       { id: 28, name: "黎宛旻", grade: 11, classID: "5B" }
+    ],
+    "5C": [
+      { id: 1, name: "王毓琳", grade: 11, classID: "5C" },
+      { id: 2, name: "王韻婷", grade: 11, classID: "5C" },
+      { id: 3, name: "甘凱童", grade: 11, classID: "5C" },
+      { id: 4, name: "何健峰", grade: 11, classID: "5C" },
+      { id: 5, name: "岑子鈞", grade: 11, classID: "5C" },
+      { id: 6, name: "周浩軒", grade: 11, classID: "5C" },
+      { id: 7, name: "周楠", grade: 11, classID: "5C" },
+      { id: 8, name: "周杰靈", grade: 11, classID: "5C" },
+      { id: 9, name: "林貝莎", grade: 11, classID: "5C" },
+      { id: 10, name: "林靜瑤", grade: 11, classID: "5C" },
+      { id: 11, name: "姚念欣", grade: 11, classID: "5C" },
+      { id: 12, name: "姜嘉慧", grade: 11, classID: "5C" },
+      { id: 13, name: "柯欣榮", grade: 11, classID: "5C" },
+      { id: 14, name: "洪鍶堉", grade: 11, classID: "5C" },
+      { id: 15, name: "梁曉童", grade: 11, classID: "5C" },
+      { id: 16, name: "許惠琳", grade: 11, classID: "5C" },
+      { id: 17, name: "陳美婷", grade: 11, classID: "5C" },
+      { id: 18, name: "陳敬恩", grade: 11, classID: "5C" },
+      { id: 19, name: "傅銘瀚", grade: 11, classID: "5C" },
+      { id: 20, name: "曾浚軒", grade: 11, classID: "5C" },
+      { id: 21, name: "黃子陽", grade: 11, classID: "5C" },
+      { id: 22, name: "黃宏迅", grade: 11, classID: "5C" },
+      { id: 23, name: "黃澤凱", grade: 11, classID: "5C" },
+      { id: 24, name: "楊紫晴", grade: 11, classID: "5C" },
+      { id: 25, name: "甄浩銘", grade: 11, classID: "5C" },
+      { id: 26, name: "劉焯軒", grade: 11, classID: "5C" },
+      { id: 27, name: "歐卓言", grade: 11, classID: "5C" },
+      { id: 28, name: "戴詠茵", grade: 11, classID: "5C" },
+      { id: 29, name: "謝凱盈", grade: 11, classID: "5C" }
     ]
   };
 
   /**
-   * Return the entire flat roster of all 88 students
+   * Return the entire flat roster of all 117 students
    * @returns {Array<{classID: string, studentID: number, id: number, name: string, grade: number}>}
    */
   function getRoster() {
@@ -169,14 +201,15 @@
     if (!classID || studentID === undefined || studentID === null) return null;
     const normCls = String(classID).trim().toUpperCase();
     const strSid = String(studentID).trim();
-    if ((normCls === "5B" || normCls === "4C" || normCls === "4D") && (strSid === "99" || parseInt(studentID, 10) === 99)) {
+    if ((normCls === "5B" || normCls === "5C" || normCls === "4C" || normCls === "4D") && (strSid === "99" || parseInt(studentID, 10) === 99)) {
       return {
         classID: normCls,
         studentID: 99,
         id: 99,
         name: "教師測試員",
-        grade: (normCls === "5B") ? 11 : 10,
-        isTeacher: true
+        grade: (normCls === "5B" || normCls === "5C") ? 11 : 10,
+        isTeacher: true,
+        isTestUser: true
       };
     }
     const list = getStudentsByClass(classID);
@@ -208,7 +241,7 @@
   /**
    * Determine grade and question bank key by class ID
    * 4C, 4D -> Grade 10 (高一, bank: GRADE_10)
-   * 5B -> Grade 11 (高二, bank: GRADE_11)
+   * 5B, 5C -> Grade 11 (高二, bank: GRADE_11)
    * @param {string} classID 
    * @returns {{grade: number, gradeLevel: string, gradeName: string, bankId: string}}
    */
@@ -222,7 +255,7 @@
         bankId: "GRADE_10",
         topicTitle: "集合、常用邏輯用語與不等式"
       };
-    } else if (cls === "5B") {
+    } else if (cls === "5B" || cls === "5C") {
       return {
         grade: 11,
         gradeLevel: "F5",

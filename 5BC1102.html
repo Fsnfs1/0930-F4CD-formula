@@ -30,6 +30,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Question Bank and Roster for 5BC (67 Questions, 57 Students, Teacher 5BC99) -->
+    <!-- Question Bank, Rosters, Preloaded Faces, and Auth Modules -->
+  <script src="js/roster.js"></script>
+  <script src="js/preloaded_faces.js"></script>
+  <script src="js/persistence.js"></script>
+  <script src="js/face_auth.js"></script>
   <script src="js/bank_5bc1102.js"></script>
   <style>
     :root {
@@ -197,7 +202,7 @@
       <div style="display: flex; align-items: center; gap: 8px;">
         <span id="headerUserBadge" class="badge badge-cyan" style="display: none;">未登入</span>
         <button id="btnHeaderTeacherEntry" class="btn btn-outline btn-sm" onclick="promptTeacherEntry()">🔑 教師直入</button>
-        <button id="btnHeaderArena" class="btn btn-primary btn-sm" onclick="showScreen('screen-arena')">🏓 網上考場 (17:00-18:30)</button>
+        <button id="btnHeaderArena" class="btn btn-primary btn-sm" onclick="showScreen('screen-arena')">🏓 網絡挑戰賽 (17:00-19:30)</button>
         <button id="btnHeaderLogout" class="btn btn-danger btn-sm" style="display: none;" onclick="logout()">登出</button>
       </div>
     </header>
@@ -211,6 +216,7 @@
         <!-- Camera Viewport -->
         <div class="camera-wrapper">
           <video id="authVideo" class="camera-video" playsinline autoplay muted></video>
+          <canvas id="authCanvas" class="camera-canvas" style="display: none;" width="320" height="240"></canvas>
           <div class="camera-oval"></div>
           <div id="cameraOverlay" class="camera-overlay">點擊下方按鈕啟動相機辨識</div>
         </div>
@@ -222,9 +228,9 @@
 
         <!-- Key / Passcode Quick Entry Section -->
         <div style="background: rgba(15, 23, 42, 0.6); border: 1.5px dashed rgba(56, 189, 248, 0.4); border-radius: 12px; padding: 14px; margin-top: 14px;">
-          <div style="font-size: 13px; color: #94a3b8; margin-bottom: 8px;">🔑 口令密鑰快速登入（含 5BC99 教師直入口令）</div>
+          <div style="font-size: 13px; color: #94a3b8; margin-bottom: 8px;">🔑 口令密鑰快速登入（支持 5B99 / 5C99 教師測試通道）</div>
           <div style="display: flex; gap: 8px; justify-content: center;">
-            <input type="text" id="inputFastKey" class="form-input" placeholder="輸入口令（如 5B01 或 5BC99）" style="max-width: 240px; margin-bottom: 0; text-transform: uppercase;">
+            <input type="text" id="inputFastKey" class="form-input" placeholder="輸入口令（如 5B01、5C01 或管理密鑰）" style="max-width: 260px; margin-bottom: 0; text-transform: uppercase;">
             <button class="btn btn-primary" onclick="handleFastKeyLogin()">登入</button>
           </div>
         </div>
@@ -233,6 +239,18 @@
           <a href="javascript:void(0)" onclick="openManualPasswordModal()" style="color: var(--primary); font-size: 13.5px; text-decoration: underline;">
             不方便刷臉？點此使用姓名與密碼登錄
           </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 1.5: Password Backup Login (Fallback for Unregistered Faces) -->
+    <section id="screen-password-backup" class="screen">
+      <div class="card" style="text-align: center; max-width: 520px; margin: 30px auto;">
+        <h2 class="card-title" style="justify-content: center;">🔑 備用密碼與草稿紙登錄</h2>
+        <p class="card-subtitle">未錄入人臉特徵或刷臉不便時，請使用備用流程登入。作答交卷前必須拍照上傳手寫草稿紙。</p>
+        <div style="margin-top: 18px; display: flex; gap: 10px; justify-content: center;">
+          <button class="btn btn-primary" onclick="openManualPasswordModal()">選擇姓名並輸入密碼</button>
+          <button class="btn btn-outline" onclick="showScreen('screen-auth')">返回相機刷臉</button>
         </div>
       </div>
     </section>
@@ -362,19 +380,23 @@
 
         <div style="display: flex; gap: 12px; justify-content: center; margin-top: 20px;">
           <button class="btn btn-primary" onclick="restartQuiz()">🔄 再次隨機刷題 (25題)</button>
-          <button class="btn btn-outline" onclick="showScreen('screen-arena')">🏓 前往網上考場對抗</button>
+          <button class="btn btn-outline" onclick="showScreen('screen-arena')">🏓 前往網絡挑戰賽對抗</button>
         </div>
       </div>
     </section>
 
-    <!-- SCREEN 5: Online Arena (網上考場) -->
+    <!-- SCREEN 5: Online Arena (網絡挑戰賽) -->
     <section id="screen-arena" class="screen">
       <div class="card">
+        <!-- Macau Network Mandatory Notice -->
+        <div id="macauNoticeBanner" class="macau-notice-banner" style="background: rgba(234, 88, 12, 0.15); border: 1.5px solid #f97316; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; text-align: center; color: #fdba74; font-weight: 700; font-size: 14px;">
+          📡 是否為澳門網絡！只有澳門網絡才能連接 GAS 開始挑戰遊戲！
+        </div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
           <div>
-            <h2 class="card-title">🏓 網上考場 · 雙人乒乓答題比拼</h2>
+            <h2 class="card-title">🏓 網絡挑戰賽 · 雙人乒乓答題比拼</h2>
             <div style="font-size: 12.5px; color: var(--text-muted);">
-              每日開放時段：17:00 - 18:30 · 5個回合制 · 首答對者獲得下一題主選權
+              每日開放時段：17:00 - 19:30 · 5個回合制 · 首答對者獲得下一題主選權
             </div>
           </div>
           <div id="arenaTimeStatusBadge" class="badge badge-green">考場開放中</div>
@@ -412,7 +434,7 @@
 
         <!-- Leaderboard -->
         <div style="margin-top: 24px;">
-          <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 10px;">🏆 網上考場今日積分榜</h3>
+          <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 10px;">🏆 網絡挑戰賽今日積分榜</h3>
           <div class="table-responsive">
             <table>
               <thead>
@@ -432,12 +454,12 @@
       </div>
     </section>
 
-    <!-- SCREEN 6: Teacher / Admin Dashboard (5BC99) -->
+    <!-- SCREEN 6: Teacher / Admin Dashboard -->
     <section id="screen-admin" class="screen">
       <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
           <div>
-            <h2 class="card-title">📊 5BC 班整體刷題情況管理後臺 (教師口令專區)</h2>
+            <h2 class="card-title">📊 5BC 班整體刷題情況管理後臺 (教師專區)</h2>
             <div style="font-size: 12.5px; color: var(--text-muted);">高二 5B (28人) · 5C (29人) · 實時刷題大數據監控</div>
           </div>
           <div style="display: flex; gap: 8px;">
@@ -747,24 +769,123 @@ function startCamera() {
   }
 }
 
+// ----------------- FACE VECTOR MATCHER & AUTH GATE -----------------
+function computeVectorCosineSimilarity(vecA, vecB) {
+  if (!vecA || !vecB || vecA.length !== vecB.length) return 0;
+  let dot = 0.0, normA = 0.0, normB = 0.0;
+  for (let i = 0; i < vecA.length; i++) {
+    dot += vecA[i] * vecB[i];
+    normA += vecA[i] * vecA[i];
+    normB += vecB[i] * vecB[i];
+  }
+  if (normA === 0 || normB === 0) return 0;
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+function computeVectorEuclideanDistance(vecA, vecB) {
+  if (!vecA || !vecB || vecA.length !== vecB.length) return 999;
+  let sum = 0.0;
+  for (let i = 0; i < vecA.length; i++) {
+    const d = vecA[i] - vecB[i];
+    sum += d * d;
+  }
+  return Math.sqrt(sum);
+}
+
+function computeCenteredCosineSimilarity(vecA, vecB, meanVector) {
+  if (typeof window.computeCenteredSimilarity === 'function') {
+    return window.computeCenteredSimilarity(vecA, vecB, meanVector);
+  }
+  const mean = meanVector || (window.FaceAuthModule && window.FaceAuthModule.REFERENCE_MEAN_VECTOR);
+  if (!mean || !vecA || !vecB || vecA.length !== 128 || vecB.length !== 128) {
+    return computeVectorCosineSimilarity(vecA, vecB);
+  }
+  const cA = new Float32Array(128);
+  const cB = new Float32Array(128);
+  for (let i = 0; i < 128; i++) {
+    cA[i] = vecA[i] - mean[i];
+    cB[i] = vecB[i] - mean[i];
+  }
+  return computeVectorCosineSimilarity(cA, cB);
+}
+
+function matchFaceDescriptor(candidateDescriptor) {
+  if (!candidateDescriptor || candidateDescriptor.length !== 128) return null;
+  const preloaded = window.PRELOADED_FACES || {};
+  const meanVec = (window.FaceAuthModule && window.FaceAuthModule.REFERENCE_MEAN_VECTOR) || null;
+  let bestMatch = null;
+  let maxSimilarity = -1;
+
+  for (const [key, profile] of Object.entries(preloaded)) {
+    if (!profile || !profile.vector || profile.vector.length !== 128) continue;
+    const centeredSim = computeCenteredCosineSimilarity(candidateDescriptor, profile.vector, meanVec);
+    const dist = computeVectorEuclideanDistance(candidateDescriptor, profile.vector);
+    if (centeredSim > maxSimilarity && centeredSim >= 0.82) {
+      maxSimilarity = centeredSim;
+      bestMatch = {
+        key: key,
+        classID: profile.classID || (key.startsWith('5C') ? '5C' : '5B'),
+        id: profile.studentID || profile.id,
+        name: profile.name,
+        isTeacher: !!profile.isTeacher,
+        similarity: centeredSim,
+        distance: dist
+      };
+    }
+  }
+  return bestMatch;
+}
+
+function handleUnregisteredFaceFallback(details) {
+  const overlay = document.getElementById('cameraOverlay');
+  if (overlay) overlay.innerText = '⚠️ 未錄入人臉信息，請轉用密碼/草稿紙備用登錄';
+  alert('⚠️ 未錄入人臉信息！請使用密碼/草稿紙備用登錄流程。');
+  showScreen('screen-password-backup');
+  openManualPasswordModal();
+}
+
 function captureAndRecognize() {
-  const roster = window.ROSTER_5BC || { '5B': [], '5C': [] };
-  const pool = [
-    ...(roster['5B'] || []).map(s => ({ ...s, classID: '5B' })),
-    ...(roster['5C'] || []).map(s => ({ ...s, classID: '5C' }))
-  ];
-  if (!pool.length) {
-    alert('題庫花名冊未就緒！');
+  const video = document.getElementById('authVideo');
+  const canvas = document.getElementById('authCanvas') || document.createElement('canvas');
+  if (video && video.videoWidth > 0) {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    if (ctx) ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  }
+
+  // Extract descriptor using FaceAuthModule or candidate vector
+  let candidateDescriptor = null;
+  if (window.FaceAuthModule && typeof window.FaceAuthModule.getDemoDescriptor === 'function') {
+    candidateDescriptor = window.FaceAuthModule.getDemoDescriptor();
+  }
+
+  // Attempt vector matching against preloaded face database
+  const match = candidateDescriptor ? matchFaceDescriptor(candidateDescriptor) : null;
+
+  if (match && match.isTeacher) {
+    AppState.currentUser = { classID: match.classID, id: match.id || 99, name: match.name, role: 'teacher', isTeacher: true };
+    AppState.isPasswordOnlyLogin = false;
+    AppState.draftUploaded = false;
+    updateUserBadge();
+    alert(`✅ 教師刷臉核驗通過！歡迎 ${match.name}`);
+    showScreen('screen-admin');
+    showBankInspectorModal();
     return;
   }
-  const picked = pool[Math.floor(Math.random() * pool.length)];
-  AppState.currentUser = { classID: picked.classID, id: picked.id, name: picked.name, role: 'student', isTeacher: false };
-  AppState.isPasswordOnlyLogin = false; // Face scan verified
-  AppState.draftUploaded = false;
 
-  updateUserBadge();
-  alert(`✅ 刷臉辨識成功！歡迎 ${picked.classID} 班 ${picked.name} 同學！`);
-  startQuizSession();
+  if (match && match.name && match.classID === '5B') {
+    AppState.currentUser = { classID: match.classID, id: match.id, name: match.name, role: 'student', isTeacher: false };
+    AppState.isPasswordOnlyLogin = false;
+    AppState.draftUploaded = false;
+    updateUserBadge();
+    alert(`✅ 刷臉辨識成功！歡迎 ${match.classID} 班 ${match.name} 同學 (相似度: ${(match.similarity * 100).toFixed(1)}%)！`);
+    startQuizSession();
+    return;
+  }
+
+  // For all unregistered students (including all 5C students with 0 face vectors) or unrecognized face
+  handleUnregisteredFaceFallback('Face vector not enrolled or low similarity');
 }
 
 function verifyIdentity() {
@@ -775,14 +896,16 @@ function handleFastKeyLogin() {
   const input = document.getElementById('inputFastKey');
   if (!input) return;
   const raw = input.value.trim().toUpperCase();
+  const rawExact = input.value.trim();
   if (!raw) {
     alert('請輸入口令密鑰！');
     return;
   }
 
-  // Teacher Passcode 5BC99
-  if (raw === '5BC99') {
-    AppState.currentUser = { classID: '5BC', id: 99, name: '教師測試員(管理員)', role: 'teacher', isTeacher: true };
+  // Teacher Passcodes (5BC99, 5B99, 5C99) and Strong Admin Password (Math5BC#Admin2026!)
+  if (raw === '5BC99' || raw === '5B99' || raw === '5C99' || rawExact === 'Math5BC#Admin2026!') {
+    const cls = raw.startsWith('5C') ? '5C' : (raw.startsWith('5B') ? '5B' : '5BC');
+    AppState.currentUser = { classID: cls, id: 99, name: '教師測試員(管理員)', role: 'teacher', isTeacher: true };
     AppState.isPasswordOnlyLogin = true;
     updateUserBadge();
     showScreen('screen-admin');
@@ -813,18 +936,21 @@ function handleFastKeyLogin() {
     }
   }
 
-  alert('⚠️ 口令無效！請輸入 5B01~5B28、5C01~5C29，或教師專用口令 5BC99。');
+  alert('⚠️ 口令無效！請輸入 5B01~5B28、5C01~5C29，或教師專用口令。');
 }
 
 function promptTeacherEntry() {
-  const code = prompt('請輸入教師專用直入口令：', '5BC99');
-  if (code && code.trim().toUpperCase() === '5BC99') {
-    AppState.currentUser = { classID: '5BC', id: 99, name: '教師測試員(管理員)', role: 'teacher', isTeacher: true };
+  const code = prompt('請輸入教師專用直入口令：', '');
+  if (!code) return;
+  const trimmed = code.trim();
+  if (trimmed === 'Math5BC#Admin2026!' || trimmed.toUpperCase() === '5BC99' || trimmed.toUpperCase() === '5B99' || trimmed.toUpperCase() === '5C99') {
+    const cls = trimmed.toUpperCase().startsWith('5C') ? '5C' : (trimmed.toUpperCase().startsWith('5B') ? '5B' : '5BC');
+    AppState.currentUser = { classID: cls, id: 99, name: '教師測試員(管理員)', role: 'teacher', isTeacher: true };
     AppState.isPasswordOnlyLogin = true;
     updateUserBadge();
     showScreen('screen-admin');
     showBankInspectorModal();
-  } else if (code) {
+  } else {
     alert('⚠️ 口令錯誤！');
   }
 }
@@ -1844,23 +1970,16 @@ function initAdminStudentsData() {
 
   ['5B', '5C'].forEach(cls => {
     (roster[cls] || []).forEach(s => {
-      const attempts = Math.floor(Math.random() * 4) + 1;
-      const maxScore = Math.floor(Math.random() * 30) + 70;
-      const avgScore = Math.max(50, maxScore - Math.floor(Math.random() * 12));
-      const isFace = Math.random() > 0.35;
-      const weakTopics = ['空間位置關係', '線面垂直與平行', '等差數列性質與求和', '數列概念與通項', '綜合應用與最值'];
-      const weak = weakTopics[Math.floor(Math.random() * weakTopics.length)];
-
       list.push({
         classID: cls,
         id: s.id,
         name: s.name,
-        attempts: attempts,
-        maxScore: maxScore,
-        avgScore: avgScore,
-        scratchStatus: isFace ? '刷臉免存' : '已拍照存證',
-        weakTopic: weak,
-        authMethod: isFace ? '刷臉識別' : '密碼/口令'
+        attempts: 0,
+        maxScore: 0,
+        avgScore: '-',
+        scratchStatus: '未作答',
+        weakTopic: '待診斷',
+        authMethod: '未登入'
       });
     });
   });
@@ -1880,8 +1999,9 @@ function updateAdminKPIs() {
   const cData = data.filter(s => s.classID === '5C');
 
   function calcAvg(arr, prop) {
-    if (!arr.length) return 0;
-    return (arr.reduce((acc, cur) => acc + cur[prop], 0) / arr.length).toFixed(1);
+    const valid = arr.filter(cur => typeof cur[prop] === 'number' && cur[prop] > 0);
+    if (!valid.length) return '-';
+    return (valid.reduce((acc, cur) => acc + cur[prop], 0) / valid.length).toFixed(1);
   }
 
   // 5B metrics
@@ -1890,8 +2010,9 @@ function updateAdminKPIs() {
   const el5BAvg = document.getElementById('adm5BAvg');
   const el5BPart = document.getElementById('adm5BPart');
   const el5BMax = document.getElementById('adm5BMax');
+  const bParticipated = bData.filter(s => s.attempts > 0).length;
   if (el5BAvg) el5BAvg.innerText = bAvg;
-  if (el5BPart) el5BPart.innerText = '96.4%';
+  if (el5BPart) el5BPart.innerText = bData.length ? `${Math.round((bParticipated / bData.length) * 100)}%` : '0%';
   if (el5BMax) el5BMax.innerText = bMax;
 
   // 5C metrics
@@ -1900,8 +2021,9 @@ function updateAdminKPIs() {
   const el5CAvg = document.getElementById('adm5CAvg');
   const el5CPart = document.getElementById('adm5CPart');
   const el5CMax = document.getElementById('adm5CMax');
+  const cParticipated = cData.filter(s => s.attempts > 0).length;
   if (el5CAvg) el5CAvg.innerText = cAvg;
-  if (el5CPart) el5CPart.innerText = '93.1%';
+  if (el5CPart) el5CPart.innerText = cData.length ? `${Math.round((cParticipated / cData.length) * 100)}%` : '0%';
   if (el5CMax) el5CMax.innerText = cMax;
 
   // Top KPIs
@@ -1909,10 +2031,12 @@ function updateAdminKPIs() {
   if (totalStudentsEl) totalStudentsEl.innerText = `${data.length}人`;
   const avgEl = document.getElementById('admAvgScore');
   if (avgEl) avgEl.innerText = calcAvg(data, 'avgScore');
+  const totalParticipated = data.filter(s => s.attempts > 0).length;
   const partEl = document.getElementById('admParticipation');
-  if (partEl) partEl.innerText = '94.7%';
+  if (partEl) partEl.innerText = data.length ? `${Math.round((totalParticipated / data.length) * 100)}%` : '0%';
+  const passedStudents = data.filter(s => s.maxScore >= 60).length;
   const passEl = document.getElementById('admPassRate');
-  if (passEl) passEl.innerText = '91.2%';
+  if (passEl) passEl.innerText = totalParticipated ? `${Math.round((passedStudents / totalParticipated) * 100)}%` : '0%';
   const attemptsEl = document.getElementById('admTotalAttempts');
   if (attemptsEl) attemptsEl.innerText = `${data.reduce((a, c) => a + c.attempts, 0)} 次`;
 }
@@ -2019,12 +2143,72 @@ function exportAdminCSV() {
   a.click();
 }
 
-// ----------------- ONLINE 1v1 ARENA (Req 6) -----------------
+// ----------------- ONLINE 1v1 ARENA (網絡挑戰賽 Req 6 & Dim 7) -----------------
+const ARENA_CONFIG = {
+  gasEndpoint: "https://script.google.com/macros/s/AKfycbwNAQNxmNsNa8rWGp48qnYRrjA2WFLGIzKqSel2r8MilRp59s3ZfBJjeKXIrUfoS-Zp-g/exec",
+  googleFormUrl: "https://docs.google.com/forms/u/0/d/e/1FAIpQLSeLZ6E4kLjJ26aWrKRPRPtDdthkxRHqOPX5AOwAq8_TYiT-OQ/formResponse",
+  pollIntervalMs: 1500
+};
+
+async function probeMacauNetwork(timeoutMs) {
+  if (window.probeMacauNetwork && window.probeMacauNetwork !== probeMacauNetwork) {
+    try { return await window.probeMacauNetwork(timeoutMs); } catch (e) {}
+  }
+  const gasUrl = ARENA_CONFIG.gasEndpoint;
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs || 3500);
+    const resp = await fetch(gasUrl + '?probe=1', { method: 'GET', mode: 'no-cors', signal: controller.signal });
+    clearTimeout(timer);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+async function submitArenaFormRecord(record) {
+  if (window.submitFormRecord) {
+    try { return await window.submitFormRecord(record); } catch (e) {}
+  }
+  const formUrl = ARENA_CONFIG.googleFormUrl;
+  const formData = new URLSearchParams();
+  formData.append('entry.543502435', record.classID || '5BC');
+  formData.append('entry.1745113091', String(record.id || 1));
+  formData.append('entry.1972335137', record.dateID || new Date().toISOString());
+  formData.append('entry.2095507383', String(record.score || 0));
+  try {
+    await fetch(formUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData.toString()
+    });
+  } catch (e) {
+    console.warn('Arena Form POST fallback error:', e);
+  }
+}
+
+let arenaPollTimer = null;
+function startCrossMobileArenaPolling() {
+  if (arenaPollTimer) clearInterval(arenaPollTimer);
+  arenaPollTimer = setInterval(async () => {
+    try {
+      const resp = await fetch(ARENA_CONFIG.gasEndpoint + '?poll=arena', { mode: 'cors' });
+      if (resp.ok) {
+        const cloudData = await resp.json();
+        if (cloudData && cloudData.arenaEvent) {
+          handleArenaSyncMessage(cloudData.arenaEvent);
+        }
+      }
+    } catch (e) {}
+  }, 1500);
+}
+
 function isArenaTimeOpen(dateObj, isTeacherOrDebug) {
   if (isTeacherOrDebug || window.ARENA_DEBUG_BYPASS || (typeof AppState !== 'undefined' && AppState.currentUser && AppState.currentUser.isTeacher)) return true;
   const d = dateObj || new Date();
   const totalSeconds = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
-  return totalSeconds >= (17 * 3600) && totalSeconds <= (18 * 3600 + 30 * 60);
+  return totalSeconds >= (17 * 3600) && totalSeconds <= (19 * 3600 + 30 * 60);
 }
 
 // Multi-Tab Synchronization via BroadcastChannel with Storage Fallback
@@ -2164,24 +2348,38 @@ function initArenaScreen() {
   if (isOpen) {
     if (statusBadge) {
       statusBadge.className = 'badge badge-green';
-      statusBadge.innerText = '🟢 考場開放中 (17:00-18:30)';
+      statusBadge.innerText = '🟢 考場開放中 (17:00-19:30)';
     }
     if (startBtn) startBtn.disabled = false;
   } else {
     if (statusBadge) {
       statusBadge.className = 'badge badge-red';
-      statusBadge.innerText = '🔒 考場已鎖定 (每日 17:00 - 18:30 開放)';
+      statusBadge.innerText = '🔒 考場已鎖定 (每日 17:00 - 19:30 開放)';
     }
     if (startBtn) startBtn.disabled = true;
   }
 
+  probeMacauNetwork(3000).then(isMacau => {
+    const banner = document.getElementById('macauNoticeBanner');
+    if (banner) {
+      if (isMacau) {
+        banner.style.borderColor = '#10b981';
+        banner.style.color = '#34d399';
+        banner.innerText = '📡 已連通澳門教育網絡 (GAS 在線同步就緒)';
+      } else {
+        banner.innerText = '📡 是否為澳門網絡！只有澳門網絡才能連接 GAS 開始挑戰遊戲！';
+      }
+    }
+  });
+
   renderArenaLeaderboard();
+  startCrossMobileArenaPolling();
 }
 
 function startArenaMatch() {
   const isTeacher = (AppState.currentUser && AppState.currentUser.isTeacher);
   if (!isArenaTimeOpen(new Date(), isTeacher)) {
-    alert('⚠️ 網上考場僅在每日 17:00 至 18:30 開放！教師口令 5BC99 可隨時測試。');
+    alert('⚠️ 網絡挑戰賽僅在每日 17:00 至 19:30 開放！教師口令可隨時測試。');
     return;
   }
 
@@ -2509,21 +2707,15 @@ function finishArenaMatch() {
 function updateArenaLeaderboardAfterMatch(scA, scB) {
   let lb = [];
   try {
-    lb = JSON.parse(localStorage.getItem('math_arena_leaderboard_5BC') || 'null');
+    lb = JSON.parse(localStorage.getItem('math_arena_leaderboard_5BC') || '[]');
   } catch (e) {
-    lb = null;
+    lb = [];
   }
-  if (!lb || !Array.isArray(lb) || !lb.length) {
-    lb = [
-      { rank: 1, classID: '5B', name: '吳鎂澄', wins: 12, score: 480, winRate: '85%', matches: 14 },
-      { rank: 2, classID: '5C', name: '王毓琳', wins: 10, score: 420, winRate: '80%', matches: 12 },
-      { rank: 3, classID: '5B', name: '李曉熹', wins: 9, score: 390, winRate: '78%', matches: 11 },
-      { rank: 4, classID: '5C', name: '謝凱盈', wins: 8, score: 350, winRate: '72%', matches: 11 },
-      { rank: 5, classID: '5B', name: '蘇子恩', wins: 7, score: 310, winRate: '68%', matches: 10 }
-    ];
+  if (!lb || !Array.isArray(lb)) {
+    lb = [];
   }
 
-  const user = AppState.currentUser || { classID: '5B', name: '吳鎂澄' };
+  const user = AppState.currentUser || { classID: '5B', name: '學生' };
   let entry = lb.find(item => item.name === user.name);
   if (!entry) {
     entry = { rank: lb.length + 1, classID: user.classID || '5B', name: user.name, wins: 0, score: 0, winRate: '0%', matches: 0 };
@@ -2556,19 +2748,17 @@ function renderArenaLeaderboard() {
 
   let lb = [];
   try {
-    lb = JSON.parse(localStorage.getItem('math_arena_leaderboard_5BC') || 'null');
+    lb = JSON.parse(localStorage.getItem('math_arena_leaderboard_5BC') || '[]');
   } catch (e) {
-    lb = null;
+    lb = [];
   }
-  if (!lb || !Array.isArray(lb) || !lb.length) {
-    lb = [
-      { rank: 1, classID: '5B', name: '吳鎂澄', wins: 12, score: 480, winRate: '85%', matches: 14 },
-      { rank: 2, classID: '5C', name: '王毓琳', wins: 10, score: 420, winRate: '80%', matches: 12 },
-      { rank: 3, classID: '5B', name: '李曉熹', wins: 9, score: 390, winRate: '78%', matches: 11 },
-      { rank: 4, classID: '5C', name: '謝凱盈', wins: 8, score: 350, winRate: '72%', matches: 11 },
-      { rank: 5, classID: '5B', name: '蘇子恩', wins: 7, score: 310, winRate: '68%', matches: 10 }
-    ];
-    try { localStorage.setItem('math_arena_leaderboard_5BC', JSON.stringify(lb)); } catch (e) {}
+  if (!lb || !Array.isArray(lb)) {
+    lb = [];
+  }
+
+  if (!lb.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 18px;">尚無對戰記錄，等待今日 17:00 挑戰賽開局！</td></tr>';
+    return;
   }
 
   let html = '';
