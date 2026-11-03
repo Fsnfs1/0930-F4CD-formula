@@ -11,14 +11,14 @@ except Exception as e:
     data = []
 
 # Fallback: also load from raw_data_latest.json
-if os.path.exists('d:/2627/web+/math_platform/raw_data_latest.json'):
-    backup = json.load(open('d:/2627/web+/math_platform/raw_data_latest.json', encoding='utf-8'))
+if os.path.exists('WEB+/math_platform/raw_data_latest.json'):
+    backup = json.load(open('WEB+/math_platform/raw_data_latest.json', encoding='utf-8'))
     data = data + backup
 
 # Load roster names
 roster_names = {}
-if os.path.exists('d:/2627/web+/math_platform/js/roster.js'):
-    txt = open('d:/2627/web+/math_platform/js/roster.js', encoding='utf-8').read()
+if os.path.exists('WEB+/math_platform/js/roster.js'):
+    txt = open('WEB+/math_platform/js/roster.js', encoding='utf-8').read()
     pattern = re.compile(r'id:\s*(\d+),\s*name:\s*["\']([^"\']+)["\'],\s*grade:\s*\d+,\s*classID:\s*["\']([^"\']+)["\']')
     for m in pattern.finditer(txt):
         sid = m.group(1)
@@ -47,7 +47,10 @@ for r in data:
         k = f"{cid}_{sid}"
         if k not in students_map or ts > students_map[k]['ts']:
             vec_part = did.split('|TS:')[0]
-            vals = [float(x.strip()) for x in vec_part.split(',') if x.strip()]
+            try:
+                vals = [float(x.strip()) for x in vec_part.split(',') if x.strip()]
+            except Exception:
+                continue
             if len(vals) == 128:
                 sname = roster_names.get(k, f"學生 {sid}")
                 students_map[k] = {
@@ -59,13 +62,15 @@ for r in data:
                 }
 
 print('Compiled unique student faces count:', len(students_map))
+from collections import Counter
+print('By class:', Counter([v['classID'] for v in students_map.values()]))
 
-output_path = 'd:/2627/web+/math_platform/js/preloaded_faces.js'
+output_path = 'WEB+/math_platform/js/preloaded_faces.js'
 with open(output_path, 'w', encoding='utf-8') as f:
     f.write('/**\n * preloaded_faces.js - Pre-synchronized Facial Vectors from 1010 Platform\n')
     f.write(' * Contains all registered student face vectors from Google Sheets\n */\n\n')
-    f.write('window.PRELOADED_STUDENT_FACES = ')
+    f.write('(function(root) {\n  const faces = ')
     json.dump(students_map, f, ensure_ascii=False, indent=2)
-    f.write(';\n')
+    f.write(';\n  root.PRELOADED_STUDENT_FACES = faces;\n})(typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof self !== "undefined" ? self : this);\n')
 
 print('Saved to', output_path)

@@ -16988,6 +16988,20 @@ window.BANK_4CD_1102_ADAPTIVE = [
   }
   window.formatMathText = formatMathText;
 
+  function getEnrichedStem(q) {
+    if (!q) return '';
+    let stem = q.stem || '';
+    if (q.type === 'matching' && Array.isArray(q.leftItems) && q.leftItems.length > 0 && !stem.includes('①')) {
+      const items = q.leftItems.map((item, idx) => `<br>${['①', '②', '③', '④', '⑤', '⑥'][idx] || (idx+1)+'.'} ${item}`).join('');
+      stem += items;
+    } else if (q.type === 'ordering' && Array.isArray(q.steps) && q.steps.length > 0 && !stem.includes('①')) {
+      const steps = q.steps.map((step, idx) => `<br>${['①', '②', '③', '④', '⑤', '⑥'][idx] || (idx+1)+'.'} ${step.text || step}`).join('');
+      stem += steps;
+    }
+    return stem;
+  }
+  window.getEnrichedStem = getEnrichedStem;
+
   function triggerMathJax(targetEl) {
     const targets = targetEl ? [targetEl] : [];
     if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
@@ -17847,7 +17861,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
           <span>${typeBadge}</span>
           <span class="internal-caption-record" style="display: none; visibility: hidden; opacity: 0; height: 0; width: 0; overflow: hidden;" data-source="${q.source || ''}">題目來源: ${q.source || '1102專題題庫'}</span>
         </div>
-        <div class="stem-text math-scroll-wrapper">${formatMathText(q.stem)}</div>
+        <div class="stem-text math-scroll-wrapper">${formatMathText(getEnrichedStem(q))}</div>
       </div>
       <div class="quiz-options-grid">
         ${optionsHtml}
@@ -18716,7 +18730,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
           <strong style="color: #ef4444; font-size: 14px;">錯題 #${idx + 1} (${q.id})</strong>
           <span style="font-size: 12px; color: #94a3b8;">${q.topic || '一元二次不等式'}</span>
         </div>
-        <div style="font-size: 14px; margin-bottom: 12px; line-height: 1.5;" class="math-scroll-wrapper">${q.stem}</div>
+        <div style="font-size: 14px; margin-bottom: 12px; line-height: 1.5;" class="math-scroll-wrapper">${formatMathText(getEnrichedStem(q))}</div>
         <div style="margin-bottom: 12px;">${optsHtml}</div>
         <div style="padding: 12px; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px;">
           <div style="font-weight: 700; color: #38bdf8; font-size: 13px; margin-bottom: 4px;">📖 完整數學解析與推理步驟：</div>
@@ -20156,7 +20170,7 @@ function playArenaRound(roundNum, customQ) {
         <span class="badge badge-cyan">回合 ${roundNum} · 【${q.category}】 · ${q.difficulty}</span>
         <span id="arenaRoundTimer" style="font-weight:800; font-size:16px; color:var(--accent-yellow);">倒計時: 25s</span>
       </div>
-      <div style="font-size:15.5px; line-height:1.6; margin-bottom:16px; font-weight:600;">${formatMathText(q.stem)}</div>
+      <div style="font-size:15.5px; line-height:1.6; margin-bottom:16px; font-weight:600;">${formatMathText(getEnrichedStem(q))}</div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
         ${optionsHtml}
       </div>
