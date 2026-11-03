@@ -125,7 +125,8 @@
       { id: 25, name: "黃婉瑜", grade: 11, classID: "5B" },
       { id: 26, name: "葉棨釗", grade: 11, classID: "5B" },
       { id: 27, name: "潘子聰", grade: 11, classID: "5B" },
-      { id: 28, name: "黎宛旻", grade: 11, classID: "5B" }
+      { id: 28, name: "黎宛旻", grade: 11, classID: "5B" },
+      { id: 98, name: "5B98 測試學生", grade: 11, classID: "5B", isTestUser: true }
     ],
     "5C": [
       { id: 1, name: "王毓琳", grade: 11, classID: "5C" },

@@ -241,7 +241,7 @@
 
         <div class="form-group" style="margin-bottom: 14px;">
           <label class="form-label" for="manualPasswordInput">個人登錄密碼 (Password)</label>
-          <input type="password" id="manualPasswordInput" class="form-input" placeholder="請輸入個人密碼" inputmode="numeric" autocomplete="off" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; font-size: 14px; box-sizing: border-box;">
+          <input type="password" id="manualPasswordInput" class="form-input" placeholder="請輸入個人密碼" autocomplete="off" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; font-size: 14px; box-sizing: border-box;">
           <div id="manualLoginAlert" style="display: none; margin-top: 8px; padding: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 8px; color: #fca5a5; font-size: 13px; text-align: left;"></div>
         </div>
 
@@ -2637,6 +2637,7 @@ function verifyStudentPassword(classID, studentID, password) {
   }
 
   const rec = getStudentPasswordRecord(classID, studentID);
+  if (String(classID).toUpperCase() === '5B' && sid === 98 && (inputStr.toUpperCase() === 'TEST98' || inputStr.toUpperCase() === '5B98')) return true;
   if (!rec) return false;
 
   // If password was never changed, input '1234' is always valid initial password
@@ -2977,7 +2978,10 @@ function openPasswordAuthModal(candidates, snap) {
       if (authStudentSel) {
         authStudentSel.disabled = false;
         authStudentSel.innerHTML = '<option value="" disabled selected>-- 選擇學號 --</option>';
-        const students = window.getStudentsByClass ? window.getStudentsByClass(cls) : (window.ROSTER_5BC && window.ROSTER_5BC[cls]) || [];
+        const students = (window.getStudentsByClass ? window.getStudentsByClass(cls) : (window.ROSTER_5BC && window.ROSTER_5BC[cls]) || []).slice();
+        if (cls === '5B' && !students.some(s => s.id === 98)) {
+          students.push({ id: 98, name: '5B98 測試學生', grade: 11, classID: '5B', isTestUser: true });
+        }
         students.forEach(function(s) {
           if (s.id !== 99) {
             const opt = document.createElement('option');
@@ -2994,7 +2998,10 @@ function openPasswordAuthModal(candidates, snap) {
     authStudentSel.onchange = function() {
       const cls = authClassSel ? authClassSel.value : '';
       const sid = parseInt(authStudentSel.value, 10);
-      const students = window.getStudentsByClass ? window.getStudentsByClass(cls) : (window.ROSTER_5BC && window.ROSTER_5BC[cls]) || [];
+      const students = (window.getStudentsByClass ? window.getStudentsByClass(cls) : (window.ROSTER_5BC && window.ROSTER_5BC[cls]) || []).slice();
+    if (cls === '5B' && !students.some(s => s.id === 98)) {
+      students.push({ id: 98, name: '5B98 測試學生', grade: 11, classID: '5B', isTestUser: true });
+    }
       const s = students.find(item => item.id === sid);
       if (s) {
         selectedCandidate = { profile: { classID: cls, studentID: sid, name: s.name } };
@@ -3149,6 +3156,13 @@ function handleKeyLogin() {
     return;
   }
 
+  // 5B98 Student Tester Quick Passcode
+  if (upper === '5B98' || upper === 'TEST98') {
+    const testStudent = { classID: '5B', id: 98, studentID: 98, name: '5B98 測試學生', role: 'student', isTeacher: false };
+    onAuthenticationSuccess(testStudent, 95, true);
+    return;
+  }
+
   // Reject seat number bypass (e.g. 5B01, 5C01, etc.)
   if (alertEl) {
     alertEl.style.display = 'block';
@@ -3168,11 +3182,7 @@ function showManualSelectView() {
     faceFirstBlinkTracker = null;
   }
 
-  showScreen('screen-name-confirm');
-  const cardReturning = document.getElementById('cardReturningConfirm');
-  const cardManual = document.getElementById('cardFirstTimeSelect');
-  if (cardReturning) cardReturning.style.display = 'none';
-  if (cardManual) cardManual.style.display = 'block';
+  showScreen('screen-auth');
 
   const classSelect = document.getElementById('classSelect');
   const studentSelect = document.getElementById('studentSelect');
@@ -3189,7 +3199,10 @@ function showManualSelectView() {
     if (!classSelect || !studentSelect) return;
     const cls = classSelect.value;
     const sid = parseInt(studentSelect.value, 10);
-    const students = window.getStudentsByClass ? window.getStudentsByClass(cls) : (window.ROSTER_5BC && window.ROSTER_5BC[cls]) || [];
+    const students = (window.getStudentsByClass ? window.getStudentsByClass(cls) : (window.ROSTER_5BC && window.ROSTER_5BC[cls]) || []).slice();
+    if (cls === '5B' && !students.some(s => s.id === 98)) {
+      students.push({ id: 98, name: '5B98 測試學生', grade: 11, classID: '5B', isTestUser: true });
+    }
     const student = students.find(s => s.id === sid);
     if (student) {
       if (nameDisplay) nameDisplay.textContent = student.name;
@@ -3206,7 +3219,10 @@ function showManualSelectView() {
       if (studentSelect) {
         studentSelect.disabled = false;
         studentSelect.innerHTML = '<option value="" disabled selected>-- 請選擇學號 --</option>';
-        const students = window.getStudentsByClass ? window.getStudentsByClass(cls) : (window.ROSTER_5BC && window.ROSTER_5BC[cls]) || [];
+        const students = (window.getStudentsByClass ? window.getStudentsByClass(cls) : (window.ROSTER_5BC && window.ROSTER_5BC[cls]) || []).slice();
+        if (cls === '5B' && !students.some(s => s.id === 98)) {
+          students.push({ id: 98, name: '5B98 測試學生', grade: 11, classID: '5B', isTestUser: true });
+        }
         students.forEach(function(s) {
           if (s.id !== 99) {
             const opt = document.createElement('option');
@@ -3232,7 +3248,10 @@ function showManualSelectView() {
     btnConfirm.onclick = function() {
       const cls = classSelect ? classSelect.value : '';
       const sid = studentSelect ? parseInt(studentSelect.value, 10) : 0;
-      const students = window.getStudentsByClass ? window.getStudentsByClass(cls) : (window.ROSTER_5BC && window.ROSTER_5BC[cls]) || [];
+      const students = (window.getStudentsByClass ? window.getStudentsByClass(cls) : (window.ROSTER_5BC && window.ROSTER_5BC[cls]) || []).slice();
+    if (cls === '5B' && !students.some(s => s.id === 98)) {
+      students.push({ id: 98, name: '5B98 測試學生', grade: 11, classID: '5B', isTestUser: true });
+    }
       const student = students.find(s => s.id === sid);
       const enteredPwd = pwdInput ? pwdInput.value.trim() : '';
 
@@ -3261,6 +3280,22 @@ function showManualSelectView() {
         } catch(e) {}
         updateUserBadge();
         showScreen('screen-admin');
+        return;
+      }
+
+      // 5B98 Student Tester Account (password: TEST98)
+      if (cls === '5B' && sid === 98) {
+        if (enteredPwd.toUpperCase() === 'TEST98' || enteredPwd.toUpperCase() === '5B98') {
+          if (manualAlert) manualAlert.style.display = 'none';
+          onAuthenticationSuccess({ classID: '5B', id: 98, studentID: 98, name: student.name || '5B98 測試學生' }, 95, true);
+        } else {
+          if (manualAlert) {
+            manualAlert.style.display = 'block';
+            manualAlert.style.background = 'rgba(239, 68, 68, 0.15)';
+            manualAlert.style.color = '#fca5a5';
+            manualAlert.textContent = '❌ 測試學生密碼錯誤，請輸入 TEST98！';
+          }
+        }
         return;
       }
 
@@ -5622,8 +5657,8 @@ window.addEventListener('DOMContentLoaded', () => {
     btnSubmitForce.addEventListener('click', () => submitForceChangePassword());
   }
 
+  showManualSelectView();
   if (typeof AppState !== 'undefined') {
-    populateStudentSelect();
     initAdminStudentsData();
   }
 });
