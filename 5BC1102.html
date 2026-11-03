@@ -3319,6 +3319,12 @@ function showManualSelectView() {
         }
       }
 
+      // 5B98 Student Tester Pass Bypass
+      if (cls === '5B' && sid === 98 && (enteredPwd.toUpperCase() === 'TEST98' || enteredPwd.toUpperCase() === '5B98')) {
+        if (manualAlert) manualAlert.style.display = 'none';
+        onAuthenticationSuccess({ classID: '5B', id: 98, studentID: 98, name: (student && student.name) || '5B98 測試學生' }, 95, true);
+        return;
+      }
       const isValid = verifyStudentPassword(cls, sid, enteredPwd);
       if (isValid) {
         if (manualAlert) manualAlert.style.display = 'none';
