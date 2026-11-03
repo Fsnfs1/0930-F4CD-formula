@@ -511,9 +511,12 @@
 
     <!-- Whitelist Authorized Personnel Notice -->
     <div class="whitelist-notice">
-      <span>🔒 授權通行白名單 (7 人特許制)</span>
+      <span>🔒 授權通行白名單 (教師測試員及特許成員)</span>
       <div class="whitelist-chips">
+        <span class="whitelist-chip">4C 99 教師測試員</span>
+        <span class="whitelist-chip">4D 99 教師測試員</span>
         <span class="whitelist-chip">5B 99 教師測試員</span>
+        <span class="whitelist-chip">5C 99 教師測試員</span>
         <span class="whitelist-chip">4C 6 谷雨</span>
         <span class="whitelist-chip">4C 29 譚欣</span>
         <span class="whitelist-chip">4D 21 黃嫣然</span>
@@ -543,7 +546,10 @@
         <label for="fallbackStudentSelect">選擇白名單成員</label>
         <select id="fallbackStudentSelect" class="form-control">
           <option value="" disabled selected>-- 請選擇身份 --</option>
+          <option value="4C_99">4C 班 99 號 - 教師測試員</option>
+          <option value="4D_99">4D 班 99 號 - 教師測試員</option>
           <option value="5B_99">5B 班 99 號 - 教師測試員</option>
+          <option value="5C_99">5C 班 99 號 - 教師測試員</option>
           <option value="4C_6">4C 班 6 號 - 谷雨</option>
           <option value="4C_29">4C 班 29 號 - 譚欣</option>
           <option value="4D_21">4D 班 21 號 - 黃嫣然</option>
@@ -555,7 +561,7 @@
 
       <div class="form-group">
         <label for="fallbackPasswordInput">安全密碼</label>
-        <input type="password" id="fallbackPasswordInput" class="form-control" placeholder="請輸入 4 位以上自訂密碼" autocomplete="current-password">
+        <input type="password" id="fallbackPasswordInput" class="form-control" placeholder="請輸入密碼 (教師測試員輸入 TeaTEST1102)" autocomplete="current-password">
       </div>
 
       <div class="modal-actions">
@@ -569,9 +575,12 @@
   (function() {
     'use strict';
 
-    // 1. Strict 7-Person Whitelist Definition
+    // 1. Strict Whitelist Definition (Teacher Testers + Authorized Students)
     const AUTH_WHITELIST = {
-      '5B_99': { classID: '5B', studentID: 99, name: '教師測試員', label: '5B 班 99 號 - 教師測試員' },
+      '4C_99': { classID: '4C', studentID: 99, name: '4C 教師測試員', label: '4C 班 99 號 - 教師測試員' },
+      '4D_99': { classID: '4D', studentID: 99, name: '4D 教師測試員', label: '4D 班 99 號 - 教師測試員' },
+      '5B_99': { classID: '5B', studentID: 99, name: '5B 教師測試員', label: '5B 班 99 號 - 教師測試員' },
+      '5C_99': { classID: '5C', studentID: 99, name: '5C 教師測試員', label: '5C 班 99 號 - 教師測試員' },
       '4C_6':  { classID: '4C', studentID: 6,  name: '谷雨',       label: '4C 班 6 號 - 谷雨' },
       '4C_29': { classID: '4C', studentID: 29, name: '譚欣',       label: '4C 班 29 號 - 譚欣' },
       '4D_21': { classID: '4D', studentID: 21, name: '黃嫣然',     label: '4D 班 21 號 - 黃嫣然' },
@@ -729,6 +738,13 @@
       const enteredPwd = fallbackPasswordInput ? (fallbackPasswordInput.value || '').trim() : '';
       if (!enteredPwd) {
         showFallbackAlert("請輸入安全密碼！");
+        return;
+      }
+
+      // Teacher Tester special pass
+      if (member.studentID === 99 && enteredPwd === 'TeaTEST1102') {
+        fallbackModal.style.display = 'none';
+        onAuthSuccess(member, "password");
         return;
       }
 

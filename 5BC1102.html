@@ -35,6 +35,7 @@
   <script src="js/admin_snapshot.js"></script>
   <script src="js/preloaded_faces.js"></script>
   <script src="js/persistence.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
   <script src="js/face_auth.js"></script>
   <script src="js/bank_5bc1102.js"></script>
   <style>
@@ -464,6 +465,7 @@
             <div style="font-size: 12.5px; color: var(--text-muted);">高二 5B (28人) · 5C (29人) · 實時刷題大數據監控</div>
           </div>
           <div style="display: flex; gap: 8px;">
+            <a href="admin_dashboard.html" target="_blank" class="btn btn-warning btn-sm" style="text-decoration: none; font-weight: 700; color: #0f172a; background: #facc15; display: inline-flex; align-items: center; gap: 4px;">📊 進入管理看板 (admin_dashboard)</a>
             <button class="btn btn-outline btn-sm" onclick="exportAdminCSV()">📥 導出作答報表</button>
             <button class="btn btn-primary btn-sm" onclick="showBankInspectorModal()">📖 模擬題庫檢視</button>
             <button class="btn btn-outline btn-sm" onclick="showScreen('screen-quiz')">進入刷題界面</button>
@@ -776,32 +778,1151 @@ function showScreen(screenId) {
   }
 }
 
-// ----------------- AUTH GATE LOGIC -----------------
-function startCamera() {
-  const overlay = document.getElementById('cameraOverlay');
-  const captureBtn = document.getElementById('btnCaptureFace');
-  const video = document.getElementById('authVideo');
 
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
-      .then(stream => {
-        AppState.cameraStream = stream;
-        video.srcObject = stream;
-        overlay.innerText = '📷 請正對鏡頭眨眨眼，點擊下方「拍照識別」';
-        captureBtn.style.display = 'inline-flex';
-      })
-      .catch(err => {
-        console.warn('Camera fallback:', err);
-        overlay.innerText = '📷 模擬相機已啟動（正對鏡頭），點擊下方「拍照識別」';
-        captureBtn.style.display = 'inline-flex';
-      });
-  } else {
-    overlay.innerText = '📷 模擬相機已啟動（正對鏡頭），點擊下方「拍照識別」';
-    captureBtn.style.display = 'inline-flex';
+// ----------------- ADMIN PASSWORDS SNAPSHOT -----------------
+window.ADMIN_STUDENT_PASSWORDS = {
+  "4C_1": {
+    "classID": "4C",
+    "studentID": 1,
+    "name": "古永晴",
+    "salt": "MATH_SALT_4C_1",
+    "hash": "091b49988b99736d97951d7197374ce504a2143a10d261dc73230913e4565b29",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_2": {
+    "classID": "4C",
+    "studentID": 2,
+    "name": "王嘉熙",
+    "salt": "MATH_SALT_4C_2",
+    "hash": "aac39a05e260d86d765f72bed964705371c8f0186140e62820cb598a2c93a789",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_3": {
+    "classID": "4C",
+    "studentID": 3,
+    "name": "宋榛",
+    "salt": "MATH_SALT_4C_3",
+    "hash": "06e2fbe707213272f4d417515b086caba9162cf59cda8da5d04a1ebb2ab6839e",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_4": {
+    "classID": "4C",
+    "studentID": 4,
+    "name": "周子謙",
+    "salt": "MATH_SALT_4C_4",
+    "hash": "bcbbb5d6085c844e0737252f1854720702555a596a5c7c15ce9cb31dd3dd53c6",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_5": {
+    "classID": "4C",
+    "studentID": 5,
+    "name": "李藝彤",
+    "salt": "MATH_SALT_4C_5",
+    "hash": "36f6f0b9877368dbf41403e22ac4d994de5d3d8cd171fa54146f69d41b667ca3",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_6": {
+    "classID": "4C",
+    "studentID": 6,
+    "name": "谷雨",
+    "salt": "MATH_SALT_4C_6",
+    "hash": "d2610483dd3743cad846a9a2e2524810ea07dc76a8ad8b753f2a9521817711bd",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_7": {
+    "classID": "4C",
+    "studentID": 7,
+    "name": "冼周蔚",
+    "salt": "MATH_SALT_4C_7",
+    "hash": "0aeab03477ce71bec95c31e159db2d30424b0d08a17a2bff279d6f3cb5735c21",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_8": {
+    "classID": "4C",
+    "studentID": 8,
+    "name": "林國榮",
+    "salt": "MATH_SALT_4C_8",
+    "hash": "489c8864c7b130066e919dc5244f279ad131cbabe967ec324b94d5060ee51ff1",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_9": {
+    "classID": "4C",
+    "studentID": 9,
+    "name": "林晨欣",
+    "salt": "MATH_SALT_4C_9",
+    "hash": "521e54b0b5e3bf1a6e4dfa30ac9bb27c9b09fb4462647f2e732326ed67724c40",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_10": {
+    "classID": "4C",
+    "studentID": 10,
+    "name": "徐浟",
+    "salt": "MATH_SALT_4C_10",
+    "hash": "22a7238581029627128f227fa86d98ccf38fbddc80ac8f1f7fc38601de9a1446",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_11": {
+    "classID": "4C",
+    "studentID": 11,
+    "name": "曹爵先",
+    "salt": "MATH_SALT_4C_11",
+    "hash": "49a4864faeb25827a6570621031836a1d10d24587aeb21d35ab73b66e187569f",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_12": {
+    "classID": "4C",
+    "studentID": 12,
+    "name": "梁寶娟",
+    "salt": "MATH_SALT_4C_12",
+    "hash": "e62cf312f1f00fb105f80f42d9aab2f21053dd23431f615a1a16d93b9a094363",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_14": {
+    "classID": "4C",
+    "studentID": 14,
+    "name": "莫芷瑤",
+    "salt": "MATH_SALT_4C_14",
+    "hash": "dcccfd456e26daf639c51fb92d0ea0116e69aaf8ff8c7e00451da2b00b7a203c",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_15": {
+    "classID": "4C",
+    "studentID": 15,
+    "name": "陳子豪",
+    "salt": "MATH_SALT_4C_15",
+    "hash": "510a23164584d8697ba76323d9e6147469f30e33e868a11933c17c279c377fc6",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_16": {
+    "classID": "4C",
+    "studentID": 16,
+    "name": "陳心怡",
+    "salt": "MATH_SALT_4C_16",
+    "hash": "1ddc26b709f30dd44d7b54e5e6009b9df761bf908d663e0e2c998da2ff218614",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_17": {
+    "classID": "4C",
+    "studentID": 17,
+    "name": "陳芷澄",
+    "salt": "MATH_SALT_4C_17",
+    "hash": "7f9c5d4c3369e18642d12fd64646c8e4efba48113d414f7b21717c28ed649cb1",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_18": {
+    "classID": "4C",
+    "studentID": 18,
+    "name": "陳穎彤",
+    "salt": "MATH_SALT_4C_18",
+    "hash": "0d967ff9510bc2dcd39a5aff05d335e0e7889fb7c07c5227f414324d21f19320",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_19": {
+    "classID": "4C",
+    "studentID": 19,
+    "name": "陸恩希",
+    "salt": "MATH_SALT_4C_19",
+    "hash": "13d5cdd967f2224412dec5cd5584d9f0684a82c3d2c35a546573806bad3aabf2",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_20": {
+    "classID": "4C",
+    "studentID": 20,
+    "name": "麥曉楠",
+    "salt": "MATH_SALT_4C_20",
+    "hash": "3913cb5aafac0731f4af144d3e7429959743d55469e88bb030687e37f593493b",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_21": {
+    "classID": "4C",
+    "studentID": 21,
+    "name": "溫愛嫦",
+    "salt": "MATH_SALT_4C_21",
+    "hash": "86795812dd8c467992e14f0129a49025afd51e7f168bd481a1944380474737ea",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_22": {
+    "classID": "4C",
+    "studentID": 22,
+    "name": "葉峰",
+    "salt": "MATH_SALT_4C_22",
+    "hash": "56e608ab6f64d82cf3986a89a9a088e387e93626c6046cfb7bcab343e379fb31",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_23": {
+    "classID": "4C",
+    "studentID": 23,
+    "name": "趙政熹",
+    "salt": "MATH_SALT_4C_23",
+    "hash": "ec8cebd965e9f1c8611636c577a7f802b370bbc4cc1b9e6a0582ffdf1fd546f9",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_24": {
+    "classID": "4C",
+    "studentID": 24,
+    "name": "劉卓盈",
+    "salt": "MATH_SALT_4C_24",
+    "hash": "3220f05fc999edb8b1f684f89056a7b57978695297ea451bb2f07c8f38a4a5be",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_25": {
+    "classID": "4C",
+    "studentID": 25,
+    "name": "蔡清琰",
+    "salt": "MATH_SALT_4C_25",
+    "hash": "40501c594cb4b7b0978bb1b31f8512daf601f7b0ead2ebb84af418b30fa80dde",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_26": {
+    "classID": "4C",
+    "studentID": 26,
+    "name": "謝嘉瑩",
+    "salt": "MATH_SALT_4C_26",
+    "hash": "31f9f38710af090dc6c00f7f1b83367e10af704dab35702a58b9668110dab74b",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_27": {
+    "classID": "4C",
+    "studentID": 27,
+    "name": "譚梓鈞",
+    "salt": "MATH_SALT_4C_27",
+    "hash": "a5425b131f36f212b2782e53cdbc2842a7a7472e5b4fc28b26d1668b33c6ba2a",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_28": {
+    "classID": "4C",
+    "studentID": 28,
+    "name": "譚志坤",
+    "salt": "MATH_SALT_4C_28",
+    "hash": "f75f934e9746532f46548166c566fc9522e377553dfd22e34dd4195e85608908",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_29": {
+    "classID": "4C",
+    "studentID": 29,
+    "name": "譚欣",
+    "salt": "MATH_SALT_4C_29",
+    "hash": "baf66aaea1ddd6289d6243d9e127712e763bafb1c3e968b3c968836afe23e2cf",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4C_30": {
+    "classID": "4C",
+    "studentID": 30,
+    "name": "羅清璋",
+    "salt": "MATH_SALT_4C_30",
+    "hash": "5b0b09fa11c9d270a56edbc7438aa8c2ca77de49d9d84fce1092afcbb9d5543e",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_1": {
+    "classID": "4D",
+    "studentID": 1,
+    "name": "洪佳佳",
+    "salt": "MATH_SALT_4D_1",
+    "hash": "64cf7f7cb5534a9004644cba5d38d63649d426223dea8fefddb38e8878e7208c",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_2": {
+    "classID": "4D",
+    "studentID": 2,
+    "name": "王偉德",
+    "salt": "MATH_SALT_4D_2",
+    "hash": "6b60449c71fd1ff45b9630421328e52078ca4e9e28f7022bc3d41f7f7796d1c5",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_3": {
+    "classID": "4D",
+    "studentID": 3,
+    "name": "王煜鑫",
+    "salt": "MATH_SALT_4D_3",
+    "hash": "9dd1293609381a7d379bcf5b4a2dba34587db89dacaa85dfa2d55c847695fbc3",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_4": {
+    "classID": "4D",
+    "studentID": 4,
+    "name": "甘俊誠",
+    "salt": "MATH_SALT_4D_4",
+    "hash": "f1ea84d6a023ae3db156cc4046a8e9ad1dcbc7451fac922f868299469482147b",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_5": {
+    "classID": "4D",
+    "studentID": 5,
+    "name": "余浩賢",
+    "salt": "MATH_SALT_4D_5",
+    "hash": "ed53b3c38e3b521aac911eb109fe5651681ecf123a84661f5ae7989451fb8ee5",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_6": {
+    "classID": "4D",
+    "studentID": 6,
+    "name": "李青霞",
+    "salt": "MATH_SALT_4D_6",
+    "hash": "f8af13e0d9ef577eb99a07115477e9809280b9788c32c4c803e73184531af779",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_7": {
+    "classID": "4D",
+    "studentID": 7,
+    "name": "李語鵑",
+    "salt": "MATH_SALT_4D_7",
+    "hash": "7c2b9ada0813772067a7add2bd55816209ec61b91d56b5a4dc3612766ddb4215",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_8": {
+    "classID": "4D",
+    "studentID": 8,
+    "name": "李樂瞳",
+    "salt": "MATH_SALT_4D_8",
+    "hash": "0ab3cb46d5876bcf3fcd78c77c9b8712efb68b121236bb6eef6c52e78d16d0a6",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_9": {
+    "classID": "4D",
+    "studentID": 9,
+    "name": "李穎欣",
+    "salt": "MATH_SALT_4D_9",
+    "hash": "c76100e94b48f5a4ba7aa66eb2525a62d8b818070899e20d1f29edad20ac09f4",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_10": {
+    "classID": "4D",
+    "studentID": 10,
+    "name": "李臻斌",
+    "salt": "MATH_SALT_4D_10",
+    "hash": "169233a6615519b11d21f5328b2e384ff9b8a27ec418366066f5b5faeffee3c7",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_11": {
+    "classID": "4D",
+    "studentID": 11,
+    "name": "周梓霖",
+    "salt": "MATH_SALT_4D_11",
+    "hash": "0ab66410455ba1f41ab5300730af928005f4806941ffd7479588680c2d4e0d08",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_12": {
+    "classID": "4D",
+    "studentID": 12,
+    "name": "林川雲",
+    "salt": "MATH_SALT_4D_12",
+    "hash": "e97064986e36a9c95d168a5432430209adbea49e9718648010105d7052bfd5a6",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_13": {
+    "classID": "4D",
+    "studentID": 13,
+    "name": "施舒晨",
+    "salt": "MATH_SALT_4D_13",
+    "hash": "45b80fa1579c72f686cce10c15744543ddfb6539281a79545bcd2ca571b13016",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_14": {
+    "classID": "4D",
+    "studentID": 14,
+    "name": "徐芷瑤",
+    "salt": "MATH_SALT_4D_14",
+    "hash": "0585ea1ede4bfa52d733fd7772477ed542fc1e6eeea86742267b2adb114d95c8",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_15": {
+    "classID": "4D",
+    "studentID": 15,
+    "name": "翁淮洋",
+    "salt": "MATH_SALT_4D_15",
+    "hash": "ea4b61027b3987f451ae6394d5daed1ef443db10711f3716cd66aac1f86968d1",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_16": {
+    "classID": "4D",
+    "studentID": 16,
+    "name": "馬雨彤",
+    "salt": "MATH_SALT_4D_16",
+    "hash": "154c7e66eafbb70c92f3f8b49f54610144f37c789ac51942c9bebb930218ee96",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_17": {
+    "classID": "4D",
+    "studentID": 17,
+    "name": "張博聰",
+    "salt": "MATH_SALT_4D_17",
+    "hash": "363068ce0093a83c4ab277c44e7ca320525e0e23ba0e814d17511a9f8d4090d7",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_18": {
+    "classID": "4D",
+    "studentID": 18,
+    "name": "曾浚恩",
+    "salt": "MATH_SALT_4D_18",
+    "hash": "38d5e1efe725d11c645015e022b07f0b82a66a59282f0ff3ad4e57a5dd4788c8",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_19": {
+    "classID": "4D",
+    "studentID": 19,
+    "name": "黃悅軒",
+    "salt": "MATH_SALT_4D_19",
+    "hash": "e563a54fbeeddb597c6848b93ebf4c250307bbcaa94d663e76da830fe912a09a",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_20": {
+    "classID": "4D",
+    "studentID": 20,
+    "name": "黃梓建",
+    "salt": "MATH_SALT_4D_20",
+    "hash": "26d3d45b7474db4b3dabf51b639804f4271105e99eb494dc0e498dce90e01845",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_21": {
+    "classID": "4D",
+    "studentID": 21,
+    "name": "黃嫣然",
+    "salt": "MATH_SALT_4D_21",
+    "hash": "49636c28ed966b4e7f057e1d757f72825d47d8cc192eaef782a0fab79d871ae7",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_22": {
+    "classID": "4D",
+    "studentID": 22,
+    "name": "董清霞",
+    "salt": "MATH_SALT_4D_22",
+    "hash": "ae91ecff07d3c8ce8176e6fc2eafe84606ecc201a80ed27c67715d4ebcbdbfee",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_23": {
+    "classID": "4D",
+    "studentID": 23,
+    "name": "劉付穎",
+    "salt": "MATH_SALT_4D_23",
+    "hash": "852fc9d72c4b21150c505125425f0a214c241a89c844571b262db726bd875d14",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_24": {
+    "classID": "4D",
+    "studentID": 24,
+    "name": "劉泳欣",
+    "salt": "MATH_SALT_4D_24",
+    "hash": "a3d78bd4098fbfa07fd177561b95535b32aa404bd6a6e14512655000108df6d7",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_25": {
+    "classID": "4D",
+    "studentID": 25,
+    "name": "鄭佩芝",
+    "salt": "MATH_SALT_4D_25",
+    "hash": "339e602e23d9ab67d7e71c18679c318364e4ca5cda12b9fd1caffa01b248a2c5",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_26": {
+    "classID": "4D",
+    "studentID": 26,
+    "name": "鄭東沅",
+    "salt": "MATH_SALT_4D_26",
+    "hash": "60200d7729d6a3230cb74e4e4833c52275bdc2f24c4eff092ab98433ed48c0fa",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_27": {
+    "classID": "4D",
+    "studentID": 27,
+    "name": "盧肇琪",
+    "salt": "MATH_SALT_4D_27",
+    "hash": "252d5a8850484d3134664a1ed93e0bebf25c1b800a30a0b567cef91877d91bec",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_28": {
+    "classID": "4D",
+    "studentID": 28,
+    "name": "賴君華",
+    "salt": "MATH_SALT_4D_28",
+    "hash": "13448a52e4ce97e895adfbd5ee8f8f81de4b157006baefc8969d2fcf01047e76",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_29": {
+    "classID": "4D",
+    "studentID": 29,
+    "name": "譚佩泳",
+    "salt": "MATH_SALT_4D_29",
+    "hash": "94437faa665388a257d9c7e69ae3546417466bfc361dc061d730503de843bf4c",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_30": {
+    "classID": "4D",
+    "studentID": 30,
+    "name": "鄭梓浩",
+    "salt": "MATH_SALT_4D_30",
+    "hash": "0b7e87d7b83fa6fb067a3e0f3dfc829ddf7e8a4c3848acc1644a0beb60c81006",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "4D_31": {
+    "classID": "4D",
+    "studentID": 31,
+    "name": "鄭國樺",
+    "salt": "MATH_SALT_4D_31",
+    "hash": "fdf26b21ea77644d0dbcdd679c79d76fe017bf40691beb4356af799ebb5387fa",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_1": {
+    "classID": "5B",
+    "studentID": 1,
+    "name": "吳鎂澄",
+    "salt": "MATH_SALT_5B_1",
+    "hash": "5de42e515b65bd40853a34f6c5a94b009baa698692316bde6e28842f34ef0ce6",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_2": {
+    "classID": "5B",
+    "studentID": 2,
+    "name": "蘇子恩",
+    "salt": "MATH_SALT_5B_2",
+    "hash": "c15ab7328bfb269990d3a6068a70ef85f1873fd22711a4a62e14d2c4edf2aa76",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_3": {
+    "classID": "5B",
+    "studentID": 3,
+    "name": "李潤歌",
+    "salt": "MATH_SALT_5B_3",
+    "hash": "30c40feb990aa4eb94165b27cecd3273b56f7eb9f979baddd95cf28f702a5cf3",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_4": {
+    "classID": "5B",
+    "studentID": 4,
+    "name": "李曉熹",
+    "salt": "MATH_SALT_5B_4",
+    "hash": "56502ac4389109bf5c48bf347a9fdfa6505df672daf31de164a49bb9702f2b2c",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_5": {
+    "classID": "5B",
+    "studentID": 5,
+    "name": "周鈺燕",
+    "salt": "MATH_SALT_5B_5",
+    "hash": "9ce51fa2adbdc3005fe6e68bd94cd80920e8fb8067f0dffc1448a437c5f71b6b",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_6": {
+    "classID": "5B",
+    "studentID": 6,
+    "name": "林煜皓",
+    "salt": "MATH_SALT_5B_6",
+    "hash": "76f90316d46f1b0161a6d65e741e28177c134b5a9ceff8114ea1572350098900",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_7": {
+    "classID": "5B",
+    "studentID": 7,
+    "name": "林穎豪",
+    "salt": "MATH_SALT_5B_7",
+    "hash": "a51c14f8c2421e170ffd3764975b8cfbd8bc285f7bfa2a940727f660931f5f8d",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_8": {
+    "classID": "5B",
+    "studentID": 8,
+    "name": "柯鈺鑫",
+    "salt": "MATH_SALT_5B_8",
+    "hash": "f84917bd42e7c81fd7c9593199b654deccbf2e7622f48d7d3e0cb5e072532284",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_9": {
+    "classID": "5B",
+    "studentID": 9,
+    "name": "洪泳棋",
+    "salt": "MATH_SALT_5B_9",
+    "hash": "ee9fc5301e9315cc0b99f84204610119d722ed6d31bcae5de0731d20cf4b56d5",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_10": {
+    "classID": "5B",
+    "studentID": 10,
+    "name": "高尚禮",
+    "salt": "MATH_SALT_5B_10",
+    "hash": "392c9dc0aaf5ec49fa5c37fd680fcc3fa4cc7e26864431cde7d082e9c99cea12",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_11": {
+    "classID": "5B",
+    "studentID": 11,
+    "name": "張啟赫",
+    "salt": "MATH_SALT_5B_11",
+    "hash": "7652a24dfeeac04c85f8b11935e5eeda73668e78425315c3a7174961b7566922",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_12": {
+    "classID": "5B",
+    "studentID": 12,
+    "name": "張嘉城",
+    "salt": "MATH_SALT_5B_12",
+    "hash": "d73bad7d36b519c56c383ffd68ae798133821ca9f16fb2d2311c9da53c6791fd",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_13": {
+    "classID": "5B",
+    "studentID": 13,
+    "name": "梁泳心",
+    "salt": "MATH_SALT_5B_13",
+    "hash": "ce77500359dafcf2d53161c3abd31db7e2a936b0c0f4f395d6cac26c6e5555f2",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_14": {
+    "classID": "5B",
+    "studentID": 14,
+    "name": "梁芷韻",
+    "salt": "MATH_SALT_5B_14",
+    "hash": "328e57b824eb21b9142c7aacd345c5443c0aa77b899a2da41e6f2b34d24e93d7",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_15": {
+    "classID": "5B",
+    "studentID": 15,
+    "name": "梁偉烽",
+    "salt": "MATH_SALT_5B_15",
+    "hash": "0761575aa248810114c09908f6c2f29ffee52763c7d805e577246d625e46c252",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_16": {
+    "classID": "5B",
+    "studentID": 16,
+    "name": "姚皓然",
+    "salt": "MATH_SALT_5B_16",
+    "hash": "77356bae69b7e24fc92001f05ee70590d8b46dcd0cc075e0fe17c6c9e577930a",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_17": {
+    "classID": "5B",
+    "studentID": 17,
+    "name": "陳施攸",
+    "salt": "MATH_SALT_5B_17",
+    "hash": "629a92dff050525d1369f4c5f3e9127d5de4ffb76b8985b0b7e8ebde6277ed57",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_18": {
+    "classID": "5B",
+    "studentID": 18,
+    "name": "陳柏琳",
+    "salt": "MATH_SALT_5B_18",
+    "hash": "76c7380e29b6443eb65fa37d3d7e50dd49ab992b875718276158ca487dca17d4",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_19": {
+    "classID": "5B",
+    "studentID": 19,
+    "name": "陳國良",
+    "salt": "MATH_SALT_5B_19",
+    "hash": "43df83bf951ba35649a063ce36c331597f668dcc4dd2c44b412bd44b2d11a501",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_20": {
+    "classID": "5B",
+    "studentID": 20,
+    "name": "陳紫涵",
+    "salt": "MATH_SALT_5B_20",
+    "hash": "2bbcab5ff5571d4b1fb3fe24a860fdcdab3322b7f957973ffd4081324967e41d",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_21": {
+    "classID": "5B",
+    "studentID": 21,
+    "name": "陳鑫源",
+    "salt": "MATH_SALT_5B_21",
+    "hash": "9fe312ad72ba6cde2481f2d745ee83604dcca4cdbd8f7817da5ca081a006a607",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_22": {
+    "classID": "5B",
+    "studentID": 22,
+    "name": "彭婷婷",
+    "salt": "MATH_SALT_5B_22",
+    "hash": "27fe9c793ce84b87cada1dfc7835a88b1bbfcf214f4ebc7181ca16c34feabdb6",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_23": {
+    "classID": "5B",
+    "studentID": 23,
+    "name": "黃少彬",
+    "salt": "MATH_SALT_5B_23",
+    "hash": "fa80e7c4bd085e8c3642a0b466e93e9f6f54d83b583ad251eeff56c8b881b8ff",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_24": {
+    "classID": "5B",
+    "studentID": 24,
+    "name": "黃卓琳",
+    "salt": "MATH_SALT_5B_24",
+    "hash": "0f6eb0979dceac49de143073f06559cd4463a03eb49380973dfdb9e222f0139f",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_25": {
+    "classID": "5B",
+    "studentID": 25,
+    "name": "黃婉瑜",
+    "salt": "MATH_SALT_5B_25",
+    "hash": "a6c191e5f7a2039d2e5c0ce0f138643abf93c29c800c4abf2710d24b002be588",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_26": {
+    "classID": "5B",
+    "studentID": 26,
+    "name": "葉棨釗",
+    "salt": "MATH_SALT_5B_26",
+    "hash": "23ecf56ff5c0296c8bf0f65e46834e62c3312ab04b0061be4b84a409358c4594",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_27": {
+    "classID": "5B",
+    "studentID": 27,
+    "name": "潘子聰",
+    "salt": "MATH_SALT_5B_27",
+    "hash": "8d56df887a82872238a3dd1aa63c1797a294d926bb4d5d69315c034f40218f9d",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_28": {
+    "classID": "5B",
+    "studentID": 28,
+    "name": "黎宛旻",
+    "salt": "MATH_SALT_5B_28",
+    "hash": "7c27bb6e5c79073b8f0a5ce30b25902dd40dc8471fd46434450e742387415c51",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5B_99": {
+    "classID": "5B",
+    "studentID": 99,
+    "name": "5B 教師測試員",
+    "salt": "MATH_SALT_5B_99",
+    "hash": "58f0c4bccae1071575aa853bb1d22c7aba6ba889d8fe01adff5b7a7b8c9fd1ab",
+    "passwordChanged": true,
+    "updatedAt": 1790800000000
+  },
+  "4C_99": {
+    "classID": "4C",
+    "studentID": 99,
+    "name": "4C 教師測試員",
+    "salt": "MATH_SALT_4C_99",
+    "hash": "a263d516a4efea978a167f29d941c14a5d3021e38f3138bf9bd64b5cd353cb72",
+    "passwordChanged": true,
+    "updatedAt": 1790800000000
+  },
+  "4D_99": {
+    "classID": "4D",
+    "studentID": 99,
+    "name": "4D 教師測試員",
+    "salt": "MATH_SALT_4D_99",
+    "hash": "3454ba657703dae6d1b58ac97116c7cba54bccd22a9ade7be544bd57270caccc",
+    "passwordChanged": true,
+    "updatedAt": 1790800000000
+  },
+  "5C_99": {
+    "classID": "5C",
+    "studentID": 99,
+    "name": "5C 教師測試員",
+    "salt": "MATH_SALT_5C_99",
+    "hash": "7355c80814c0df62e5a998544e85f24f21e270c7024f25dcf919fb3ff3ea414b",
+    "passwordChanged": true,
+    "updatedAt": 1790800000000
+  },
+  "5C_1": {
+    "classID": "5C",
+    "studentID": 1,
+    "name": "王毓琳",
+    "salt": "MATH_SALT_5C_1",
+    "hash": "d0ae957ec4cde07a66995acfe774007cb067be1c408969912b192d4aef38f3a5",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_2": {
+    "classID": "5C",
+    "studentID": 2,
+    "name": "王韻婷",
+    "salt": "MATH_SALT_5C_2",
+    "hash": "6a1b09b15fc6a7078415f8f41635ef93a1650a6aed0e3c50687a854ff816ed88",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_3": {
+    "classID": "5C",
+    "studentID": 3,
+    "name": "甘凱童",
+    "salt": "MATH_SALT_5C_3",
+    "hash": "5988798fb6439fb8347002643d7b5156c530f767b0a8fdeecf6e63fc79fe091b",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_4": {
+    "classID": "5C",
+    "studentID": 4,
+    "name": "何健峰",
+    "salt": "MATH_SALT_5C_4",
+    "hash": "10699d5f45787175af83525bb7278859d47478f65fb39cbf858876d7d9d3ec96",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_5": {
+    "classID": "5C",
+    "studentID": 5,
+    "name": "岑子鈞",
+    "salt": "MATH_SALT_5C_5",
+    "hash": "4f61bb7b7d71f068d4c2c70ba940f7e36e7c7806061368a82289c61dbdf88f2a",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_6": {
+    "classID": "5C",
+    "studentID": 6,
+    "name": "周浩軒",
+    "salt": "MATH_SALT_5C_6",
+    "hash": "5616b63d5c93fccb9bd58bd7396d51bcba9f96470d0dea01b3002aeac756ec67",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_7": {
+    "classID": "5C",
+    "studentID": 7,
+    "name": "周楠",
+    "salt": "MATH_SALT_5C_7",
+    "hash": "f9854e82dc048107891c02a72155b637f2370826e768c0a0f73731b22f265ea5",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_8": {
+    "classID": "5C",
+    "studentID": 8,
+    "name": "周杰靈",
+    "salt": "MATH_SALT_5C_8",
+    "hash": "75649d281100d8577eace380284ca3fd5c47d6c03ea71932bda47a664a8c294a",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_9": {
+    "classID": "5C",
+    "studentID": 9,
+    "name": "林貝莎",
+    "salt": "MATH_SALT_5C_9",
+    "hash": "2c97bb16dce550c721d39437beff48e0ce8c03fc9088794bab308957ae0d121f",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_10": {
+    "classID": "5C",
+    "studentID": 10,
+    "name": "林靜瑤",
+    "salt": "MATH_SALT_5C_10",
+    "hash": "713e78bce06abf217f2019464e78d4200b5143c31d3b4db00ed3133049e06fcf",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_11": {
+    "classID": "5C",
+    "studentID": 11,
+    "name": "姚念欣",
+    "salt": "MATH_SALT_5C_11",
+    "hash": "d10102f0e39754ea44e7b37148d616c2a5403554bbc42abab644f641ed44eaf9",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_12": {
+    "classID": "5C",
+    "studentID": 12,
+    "name": "姜嘉慧",
+    "salt": "MATH_SALT_5C_12",
+    "hash": "f1fa0afdb47ef1cad92e1d20f48ca8cd4b760b83b5c0ca42ca56cdd126bbe08f",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_13": {
+    "classID": "5C",
+    "studentID": 13,
+    "name": "柯欣榮",
+    "salt": "MATH_SALT_5C_13",
+    "hash": "6c42165e8abb5c443e85b1d036833a248a8728d1ae4a776f75a5c5a444accc32",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_14": {
+    "classID": "5C",
+    "studentID": 14,
+    "name": "洪鍶堉",
+    "salt": "MATH_SALT_5C_14",
+    "hash": "d01f008dc8b2a8c613ab6bb39da74ac8f73cf98eed803d7c2f8efce2b36eb8eb",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_15": {
+    "classID": "5C",
+    "studentID": 15,
+    "name": "梁曉童",
+    "salt": "MATH_SALT_5C_15",
+    "hash": "df89e51cb892bfda81151375a8896636d82ae3360de84de3986a916873e8d558",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_16": {
+    "classID": "5C",
+    "studentID": 16,
+    "name": "許惠琳",
+    "salt": "MATH_SALT_5C_16",
+    "hash": "9ae11b55ef6abc082aba7adf7546056ab16b19c964503eda27246d047d3c86dd",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_17": {
+    "classID": "5C",
+    "studentID": 17,
+    "name": "陳美婷",
+    "salt": "MATH_SALT_5C_17",
+    "hash": "3c292f2feee1ef8cdc5f4a8102d52e40017b174227f27bda1800996f8e5e2fac",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_18": {
+    "classID": "5C",
+    "studentID": 18,
+    "name": "陳敬恩",
+    "salt": "MATH_SALT_5C_18",
+    "hash": "d65d7e2313dbe603d5c83b8afca3f6bd6b9ccfa491f03160bb0661bdc03e02d0",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_19": {
+    "classID": "5C",
+    "studentID": 19,
+    "name": "傅銘瀚",
+    "salt": "MATH_SALT_5C_19",
+    "hash": "edd58dd701da90778c9424357c67e71f23ed39eb0e49eded9ae1602eceb8ba2f",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_20": {
+    "classID": "5C",
+    "studentID": 20,
+    "name": "曾浚軒",
+    "salt": "MATH_SALT_5C_20",
+    "hash": "620301a65267e1417c100e7ee49ebb148643603235beb224d57acf145addf1c9",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_21": {
+    "classID": "5C",
+    "studentID": 21,
+    "name": "黃子陽",
+    "salt": "MATH_SALT_5C_21",
+    "hash": "0af8752649ed8176a8e898c195cf5ab18212415fc59abdb0e56f27bb1c1942d7",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_22": {
+    "classID": "5C",
+    "studentID": 22,
+    "name": "黃宏迅",
+    "salt": "MATH_SALT_5C_22",
+    "hash": "21590ac04401e334b2d72fb90f1f78b36d584b27197232a0f47d6e269012edfb",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_23": {
+    "classID": "5C",
+    "studentID": 23,
+    "name": "黃澤凱",
+    "salt": "MATH_SALT_5C_23",
+    "hash": "39c2707b0e5cfc26c79332b0e1ef020d359b13f395c89ad427c4ac5ca8cd3dc8",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_24": {
+    "classID": "5C",
+    "studentID": 24,
+    "name": "楊紫晴",
+    "salt": "MATH_SALT_5C_24",
+    "hash": "863d860527118ff65e6eb356e11421720eff02b4644f8265814a2466194b8a20",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_25": {
+    "classID": "5C",
+    "studentID": 25,
+    "name": "甄浩銘",
+    "salt": "MATH_SALT_5C_25",
+    "hash": "ff2240cd38ae0d96ea4f7601c8fde0f6c03b77500f3875ef0dddd86aeb3b1ab0",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_26": {
+    "classID": "5C",
+    "studentID": 26,
+    "name": "劉焯軒",
+    "salt": "MATH_SALT_5C_26",
+    "hash": "bb9dd36402e0cf6c0eb1221132ce6c17a08e28ae41634822355292d6208e05ab",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_27": {
+    "classID": "5C",
+    "studentID": 27,
+    "name": "歐卓言",
+    "salt": "MATH_SALT_5C_27",
+    "hash": "6e040191250950059b9e0446c8c24cbb51956df3b85c1fcd99ba127f366de88c",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_28": {
+    "classID": "5C",
+    "studentID": 28,
+    "name": "戴詠茵",
+    "salt": "MATH_SALT_5C_28",
+    "hash": "b0ac1b0b5b3722d3b6ef263593c7651b2f9500887d8201e57ddd70b379b3b4f0",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  },
+  "5C_29": {
+    "classID": "5C",
+    "studentID": 29,
+    "name": "謝凱盈",
+    "salt": "MATH_SALT_5C_29",
+    "hash": "ab87f1678313818256f34ecfd193aafbcdb20f4c63ebde97d8636ed10d4b3ad9",
+    "passwordChanged": false,
+    "updatedAt": 1790800000000
+  }
+};
+
+
+// ----------------- GENUINE FACE-FIRST AUTH GATEWAY (Ported & Aligned with 4cd1023) -----------------
+let faceFirstBlinkTracker = null;
+let isFaceFirstScanning = false;
+let isModelsLoaded = false;
+let isModelLoading = false;
+let activeCandidates = [];
+let capturedSnapshot = null;
+
+const DEFAULT_MODEL_URI = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+
+async function initFaceApi(modelBaseUri) {
+  if (isModelsLoaded) return true;
+  if (isModelLoading) {
+    while (isModelLoading) {
+      await new Promise(res => setTimeout(res, 100));
+    }
+    return isModelsLoaded;
+  }
+
+  const faceapi = (typeof globalThis !== 'undefined' && globalThis.faceapi) ||
+                  (typeof window !== 'undefined' && window.faceapi);
+
+  if (!faceapi) {
+    console.warn("[FaceAuth] vladmandic/face-api library not loaded in window.");
+    return false;
+  }
+
+  const uri = modelBaseUri || DEFAULT_MODEL_URI;
+  isModelLoading = true;
+
+  try {
+    if (faceapi.tf && typeof faceapi.tf.setBackend === 'function') {
+      try { await faceapi.tf.setBackend('cpu'); } catch (_) {}
+    }
+    await Promise.all([
+      faceapi.nets.tinyFaceDetector.loadFromUri(uri),
+      faceapi.nets.faceLandmark68TinyNet.loadFromUri(uri),
+      faceapi.nets.faceRecognitionNet.loadFromUri(uri)
+    ]);
+    isModelsLoaded = true;
+    console.log("[FaceAuth] @vladmandic/face-api models successfully loaded from", uri);
+    return true;
+  } catch (err) {
+    console.warn("[FaceAuth] Failed to load face-api models from CDN:", err.message);
+    return false;
+  } finally {
+    isModelLoading = false;
   }
 }
 
-// ----------------- FACE VECTOR MATCHER & AUTH GATE -----------------
 function computeVectorCosineSimilarity(vecA, vecB) {
   if (!vecA || !vecB || vecA.length !== vecB.length) return 0;
   let dot = 0.0, normA = 0.0, normB = 0.0;
@@ -841,44 +1962,290 @@ function computeCenteredCosineSimilarity(vecA, vecB, meanVector) {
   return computeVectorCosineSimilarity(cA, cB);
 }
 
-function matchFaceDescriptor(candidateDescriptor) {
-  if (!candidateDescriptor || candidateDescriptor.length !== 128) return null;
-  const preloaded = window.PRELOADED_FACES || {};
-  const meanVec = (window.FaceAuthModule && window.FaceAuthModule.REFERENCE_MEAN_VECTOR) || null;
-  let bestMatch = null;
-  let maxSimilarity = -1;
-
-  for (const [key, profile] of Object.entries(preloaded)) {
-    if (!profile || !profile.vector || profile.vector.length !== 128) continue;
-    const centeredSim = computeCenteredCosineSimilarity(candidateDescriptor, profile.vector, meanVec);
-    const dist = computeVectorEuclideanDistance(candidateDescriptor, profile.vector);
-    if (centeredSim > maxSimilarity && centeredSim >= 0.82) {
-      maxSimilarity = centeredSim;
-      bestMatch = {
-        key: key,
-        classID: profile.classID || (key.startsWith('5C') ? '5C' : '5B'),
-        id: profile.studentID || profile.id,
-        name: profile.name,
-        isTeacher: !!profile.isTeacher,
-        similarity: centeredSim,
-        distance: dist
+function getAllStudentProfiles() {
+  const profileMap = {};
+  const preloaded = (typeof window !== 'undefined' && window.PRELOADED_STUDENT_FACES) ||
+                    (typeof window !== 'undefined' && window.PRELOADED_FACES) ||
+                    (typeof window !== 'undefined' && window.PRELOADED_FACES_5BC) || {};
+  if (preloaded && typeof preloaded === 'object') {
+    for (const k in preloaded) {
+      const item = preloaded[k];
+      if (!item || !item.vector || item.vector.length !== 128) continue;
+      const cid = item.classID || (k.startsWith('5C') ? '5C' : (k.startsWith('5B') ? '5B' : '5B'));
+      const sid = item.studentID || item.id || parseInt(k.split('_')[1], 10);
+      const sName = item.name || (window.getStudentName ? window.getStudentName(cid, sid) : `學生 ${sid}`);
+      profileMap[`${cid}_${sid}`] = {
+        classID: cid,
+        studentID: sid,
+        name: sName,
+        vector: new Float32Array(item.vector),
+        isTeacher: !!item.isTeacher || sid === 99
       };
     }
   }
-  return bestMatch;
+
+  // Overlay from LocalStorage
+  if (typeof localStorage !== 'undefined') {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.indexOf('math_student_vector_') === 0) {
+        try {
+          const parts = key.replace('math_student_vector_', '').split('_');
+          const cid = parts[0];
+          const sid = parseInt(parts[1], 10);
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const vec = JSON.parse(raw);
+            if (Array.isArray(vec) && vec.length === 128) {
+              const sName = window.getStudentName ? window.getStudentName(cid, sid) : `學生 ${sid}`;
+              profileMap[`${cid}_${sid}`] = {
+                classID: cid,
+                studentID: sid,
+                name: sName,
+                vector: new Float32Array(vec),
+                isTeacher: sid === 99
+              };
+            }
+          }
+        } catch (e) {}
+      }
+    }
+  }
+  return Object.values(profileMap);
 }
 
-function handleUnregisteredFaceFallback(details) {
+async function startCamera() {
+  const overlay = document.getElementById('cameraOverlay');
+  const captureBtn = document.getElementById('btnCaptureFace');
+  const video = document.getElementById('authVideo');
+
+  if (overlay) overlay.innerText = '⏳ 正在啟動相機並載入人臉比對模型...';
+
+  try {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }
+      });
+      AppState.cameraStream = stream;
+      if (video) {
+        video.srcObject = stream;
+        await video.play().catch(() => {});
+      }
+    }
+
+    // Load vladmandic/face-api models
+    initFaceApi().catch(e => console.warn('Model loading async:', e));
+
+    if (overlay) overlay.innerText = '🟢 相機運作中 · 請面向鏡頭並眨眼以進行活體驗證';
+    if (captureBtn) captureBtn.style.display = 'inline-flex';
+
+    // Start liveness EAR blink tracker
+    startLivenessTracker();
+  } catch (err) {
+    console.warn('Camera start error:', err);
+    if (overlay) overlay.innerText = '⚠️ 無法連接相機，請允許相機權限或使用下方密碼登入';
+    if (captureBtn) captureBtn.style.display = 'inline-flex';
+  }
+}
+
+function startLivenessTracker() {
+  const video = document.getElementById('authVideo');
+  const overlay = document.getElementById('cameraOverlay');
+  if (window.FaceAuthModule && typeof window.FaceAuthModule.startBlinkDetection === 'function' && video) {
+    if (faceFirstBlinkTracker) faceFirstBlinkTracker.stop();
+    faceFirstBlinkTracker = window.FaceAuthModule.startBlinkDetection(video, {
+      onBlink: function(blinkData) {
+        console.log("[5BC FaceAuth] Blink detected! Liveness passed:", blinkData);
+        if (!isFaceFirstScanning) {
+          captureAndRecognize('liveness_loop');
+        }
+      },
+      onStatusUpdate: function(status) {
+        if (isFaceFirstScanning) return;
+        if (overlay) {
+          if (status.isFaceDetected) {
+            overlay.innerText = "🟢 偵測到面孔 · 請眨眨眼完成活體驗證";
+          } else {
+            overlay.innerText = "🟡 請將面部置於引導線中央";
+          }
+        }
+      }
+    });
+  }
+}
+
+async function captureAndRecognize(triggerSource) {
+  if (isFaceFirstScanning && triggerSource !== 'liveness_loop') {
+    isFaceFirstScanning = false;
+  }
+  if (isFaceFirstScanning) return;
+  isFaceFirstScanning = true;
+
+  const video = document.getElementById('authVideo');
+  const overlay = document.getElementById('cameraOverlay');
+  const captureBtn = document.getElementById('btnCaptureFace');
+
+  if (captureBtn) {
+    captureBtn.disabled = true;
+    captureBtn.innerText = '⏳ 比對中...';
+  }
+  if (overlay) overlay.innerText = '⏳ 正在提取人臉特徵並比對資料庫...';
+
+  try {
+    let descriptor = null;
+    let base64Data = null;
+
+    const faceapi = (typeof globalThis !== 'undefined' && globalThis.faceapi) ||
+                    (typeof window !== 'undefined' && window.faceapi);
+
+    if (faceapi && video && video.videoWidth > 0) {
+      if (!isModelsLoaded) {
+        await initFaceApi();
+      }
+      try {
+        const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 });
+        const detection = await faceapi.detectSingleFace(video, options)
+          .withFaceLandmarks(true)
+          .withFaceDescriptor();
+        if (detection && detection.descriptor) {
+          descriptor = detection.descriptor;
+        }
+      } catch (err) {
+        console.warn("[FaceAuth] detectSingleFace error:", err);
+      }
+    }
+
+    // Fallback descriptor if camera snapshot capture module available
+    if (!descriptor && window.FaceAuthModule && video) {
+      try {
+        const snap = await window.FaceAuthModule.captureFace(video);
+        if (snap && snap.descriptor && !snap.isDemo) {
+          descriptor = snap.descriptor;
+          base64Data = snap.imageBase64;
+        }
+      } catch (e) {}
+    }
+
+    if (!descriptor) {
+      if (triggerSource === 'liveness_loop') {
+        isFaceFirstScanning = false;
+        if (captureBtn) { captureBtn.disabled = false; captureBtn.innerText = '🔍 拍照識別'; }
+        return;
+      }
+      handleUnregisteredFaceFallback('未能清晰捕捉到人臉特徵，請正面面向鏡頭並眨眼重試。若為 5C 全體同學（暫未錄入特徵庫），請點擊下方密碼登入。');
+      isFaceFirstScanning = false;
+      if (captureBtn) { captureBtn.disabled = false; captureBtn.innerText = '🔍 拍照識別'; }
+      return;
+    }
+
+    capturedSnapshot = { descriptor: descriptor, imageBase64: base64Data, timestamp: Date.now() };
+
+    // 1:N Centered Cosine Similarity Match against 5B / 5C profiles
+    const profiles = getAllStudentProfiles();
+    const meanVec = (window.FaceAuthModule && window.FaceAuthModule.REFERENCE_MEAN_VECTOR) || null;
+
+    const scored = [];
+    profiles.forEach(p => {
+      if (!p.vector || p.vector.length !== 128) return;
+      const centeredSim = computeCenteredCosineSimilarity(descriptor, p.vector, meanVec);
+      const eucDist = computeVectorEuclideanDistance(descriptor, p.vector);
+      scored.push({
+        profile: p,
+        centeredSimilarity: centeredSim,
+        euclideanDistance: eucDist,
+        percentage: Math.round(centeredSim * 100)
+      });
+    });
+
+    scored.sort((a, b) => b.centeredSimilarity - a.centeredSimilarity);
+
+    if (scored.length === 0 || scored[0].centeredSimilarity < 0.70) {
+      handleUnregisteredFaceFallback('未比對到登記特徵（高二 5C 班全體同學尚未錄入人臉特徵，請直接使用密碼/草稿紙備用登錄）。');
+      isFaceFirstScanning = false;
+      if (captureBtn) { captureBtn.disabled = false; captureBtn.innerText = '🔍 拍照識別'; }
+      return;
+    }
+
+    const top1 = scored[0];
+    const top2 = scored.length > 1 ? scored[1] : null;
+    const delta = top2 ? (top1.centeredSimilarity - top2.centeredSimilarity) : 1.0;
+
+    // Teacher Channel Direct Match (5B99 / 5C99)
+    if (top1.profile.isTeacher || top1.profile.studentID === 99) {
+      const cls = top1.profile.classID;
+      const teacherName = `${cls} 教師測試員`;
+      AppState.currentUser = { classID: cls, id: 99, studentID: 99, name: teacherName, role: 'teacher', isTeacher: true };
+      AppState.isPasswordOnlyLogin = false;
+      AppState.draftUploaded = false;
+      try {
+        sessionStorage.setItem('AUTH_GATE_TOKEN', JSON.stringify({
+          classID: cls,
+          studentID: 99,
+          name: teacherName,
+          key: `${cls}_99`,
+          isTeacher: true
+        }));
+      } catch(e) {}
+      updateUserBadge();
+      alert(`✅ 教師刷臉核驗通過！歡迎 ${teacherName}！已解鎖測試通道及全級答題看板！`);
+      showScreen('screen-admin');
+      isFaceFirstScanning = false;
+      return;
+    }
+
+    // MARGIN CHECK PROTOCOL:
+    // If delta < 0.08: Ambiguous match -> Trigger Password Modal (#modalPasswordAuth)
+    if (delta < 0.08 && top2 && top1.centeredSimilarity >= 0.72) {
+      activeCandidates = [top1, top2];
+      if (scored.length > 2 && (top1.centeredSimilarity - scored[2].centeredSimilarity < 0.12)) {
+        activeCandidates.push(scored[2]);
+      }
+      if (faceFirstBlinkTracker) faceFirstBlinkTracker.stop();
+      openPasswordAuthModal(activeCandidates, capturedSnapshot);
+      isFaceFirstScanning = false;
+      if (captureBtn) { captureBtn.disabled = false; captureBtn.innerText = '🔍 拍照識別'; }
+      return;
+    }
+
+    // If delta >= 0.08 and top1 >= 0.80: Direct Passwordless Entry!
+    if (top1.centeredSimilarity >= 0.80 && delta >= 0.08) {
+      if (faceFirstBlinkTracker) faceFirstBlinkTracker.stop();
+      AppState.currentUser = {
+        classID: top1.profile.classID,
+        id: top1.profile.studentID,
+        studentID: top1.profile.studentID,
+        name: top1.profile.name,
+        role: 'student',
+        isTeacher: false
+      };
+      AppState.isPasswordOnlyLogin = false; // Exempt from scratch paper
+      AppState.draftUploaded = false;
+      updateUserBadge();
+      if (overlay) overlay.innerText = `🟢 驗證通過 · 歡迎 ${top1.profile.name} 同學`;
+      alert(`✅ 刷臉辨識成功（差異顯著免密直入，相似度: ${top1.percentage}%）！歡迎 ${top1.profile.classID} 班 ${top1.profile.name} 同學！`);
+      startQuizSession();
+      isFaceFirstScanning = false;
+      return;
+    }
+
+    // Fallback for lower similarity or 5C students
+    handleUnregisteredFaceFallback('特徵差異未達免密高置信閾值。若為 5C 同學或初次登記，請使用下方密碼登入通道。');
+    isFaceFirstScanning = false;
+    if (captureBtn) { captureBtn.disabled = false; captureBtn.innerText = '🔍 拍照識別'; }
+  } catch (err) {
+    console.error('Face recognition error:', err);
+    isFaceFirstScanning = false;
+    if (captureBtn) { captureBtn.disabled = false; captureBtn.innerText = '🔍 拍照識別'; }
+  }
+}
+
+function handleUnregisteredFaceFallback(msg) {
   const overlay = document.getElementById('cameraOverlay');
   if (overlay) overlay.innerText = '⚠️ 未錄入人臉信息，請轉用密碼/草稿紙備用登錄';
-  alert('⚠️ 未錄入人臉信息！請使用密碼/草稿紙備用登錄流程。');
+  alert('⚠️ ' + (msg || '未錄入人臉特徵！請使用密碼/草稿紙備用登錄流程。'));
   showScreen('screen-password-backup');
   openManualPasswordModal();
 }
-
-// ----------------- GENUINE FACE AUTH GATEWAY & MARGIN PROTOCOL -----------------
-let activeCandidates = [];
-let capturedSnapshot = null;
 
 function getStudentPasswordRecord(classID, studentID) {
   if (!classID || studentID === undefined || studentID === null) return null;
@@ -934,16 +2301,24 @@ function getStudentPasswordRecord(classID, studentID) {
 }
 
 function verifyStudentPassword(classID, studentID, password) {
-  const rec = getStudentPasswordRecord(classID, studentID);
-  if (!rec) return false;
+  const sid = parseInt(studentID, 10);
   const inputStr = String(password || '').trim();
   if (!inputStr) return false;
 
-  // Derive simple sha256 or match
+  // Teacher tester pass
+  if (sid === 99 && inputStr === 'TeaTEST1102') {
+    return true;
+  }
+
+  const rec = getStudentPasswordRecord(classID, studentID);
+  if (!rec) return false;
+
+  if (typeof window.FaceAuthModule !== 'undefined' && typeof window.FaceAuthModule.hashPassword === 'function') {
+    return window.FaceAuthModule.hashPassword(inputStr, rec.salt) === rec.hash;
+  }
   if (typeof window.hashPassword === 'function') {
     return window.hashPassword(inputStr, rec.salt) === rec.hash;
   }
-  // Check plain match for fallback or sha256
   return (inputStr !== '1234');
 }
 
@@ -962,121 +2337,6 @@ function enhanceStudentVector(classID, studentID, liveDescriptor, weight = 0.70)
     }
     localStorage.setItem(key, JSON.stringify(blended));
   } catch (e) {}
-}
-
-function captureAndRecognize() {
-  const video = document.getElementById('authVideo');
-  const canvas = document.getElementById('authCanvas') || document.createElement('canvas');
-  if (video && video.videoWidth > 0) {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext('2d');
-    if (ctx) ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  }
-
-  // Extract descriptor
-  let descriptor = null;
-  if (window.FaceAuthModule && typeof window.FaceAuthModule.getDemoDescriptor === 'function') {
-    descriptor = window.FaceAuthModule.getDemoDescriptor();
-  } else if (window.lastCapturedFaceDescriptor) {
-    descriptor = window.lastCapturedFaceDescriptor;
-  } else {
-    // Check 5B99 teacher vector directly from preloaded faces
-    const faces = window.PRELOADED_STUDENT_FACES || window.PRELOADED_FACES_5BC || {};
-    if (faces['5B_99'] && faces['5B_99'].vector) {
-      descriptor = faces['5B_99'].vector;
-    }
-  }
-
-  if (!descriptor || descriptor.length !== 128) {
-    handleUnregisteredFaceFallback('未檢索到臉孔特徵');
-    return;
-  }
-
-  capturedSnapshot = { descriptor: descriptor, timestamp: Date.now() };
-
-  // Collect profiles from roster & snapshot
-  const profiles = [];
-  const faces = window.PRELOADED_STUDENT_FACES || window.PRELOADED_FACES_5BC || {};
-  Object.keys(faces).forEach(key => {
-    const f = faces[key];
-    if (f && f.vector && f.vector.length === 128) {
-      profiles.push({
-        classID: f.classID,
-        studentID: f.id || f.studentID,
-        name: f.name,
-        vector: f.vector,
-        isTeacher: !!f.isTeacher
-      });
-    }
-  });
-
-  // Calculate scores for all profiles
-  const scored = [];
-  profiles.forEach(p => {
-    const eucDist = computeEuclideanDistance(descriptor, p.vector);
-    const cosSim = computeCosineSimilarity(descriptor, p.vector);
-    scored.push({
-      profile: p,
-      cosineSimilarity: cosSim,
-      euclideanDistance: eucDist,
-      percentage: Math.round(cosSim * 100)
-    });
-  });
-
-  scored.sort((a, b) => b.cosineSimilarity - a.cosineSimilarity);
-
-  if (scored.length === 0 || scored[0].cosineSimilarity < 0.65) {
-    handleUnregisteredFaceFallback('未比對到登記特徵（如 5C 全體同學或未註冊人臉者）');
-    return;
-  }
-
-  const top1 = scored[0];
-  const top2 = scored.length > 1 ? scored[1] : null;
-  const delta = top2 ? (top1.cosineSimilarity - top2.cosineSimilarity) : 1.0;
-
-  // Teacher Channel Direct Match
-  if (top1.profile.isTeacher || top1.profile.studentID === 99) {
-    AppState.currentUser = { classID: top1.profile.classID, id: 99, name: top1.profile.name, role: 'teacher', isTeacher: true };
-    AppState.isPasswordOnlyLogin = false;
-    AppState.draftUploaded = false;
-    updateUserBadge();
-    alert(`✅ 教師刷臉核驗通過！歡迎 ${top1.profile.name}`);
-    showScreen('screen-admin');
-    showBankInspectorModal();
-    return;
-  }
-
-  // Margin Check:
-  // If delta < 0.08: Ambiguous match -> Password Modal
-  if (delta < 0.08 && top2 && top1.cosineSimilarity >= 0.72) {
-    activeCandidates = [top1, top2];
-    if (scored.length > 2 && (top1.cosineSimilarity - scored[2].cosineSimilarity < 0.12)) {
-      activeCandidates.push(scored[2]);
-    }
-    openPasswordAuthModal(activeCandidates, capturedSnapshot);
-    return;
-  }
-
-  // If delta >= 0.08 and top1 >= 0.80: Direct Passwordless Entry!
-  if (top1.cosineSimilarity >= 0.80 && delta >= 0.08) {
-    AppState.currentUser = {
-      classID: top1.profile.classID,
-      id: top1.profile.studentID,
-      name: top1.profile.name,
-      role: 'student',
-      isTeacher: false
-    };
-    AppState.isPasswordOnlyLogin = false;
-    AppState.draftUploaded = false;
-    updateUserBadge();
-    alert(`✅ 刷臉辨識成功（差異顯著免密直入）！歡迎 ${top1.profile.classID} 班 ${top1.profile.name} 同學 (相似度: ${top1.percentage}%)！`);
-    startQuizSession();
-    return;
-  }
-
-  // Fallback for lower similarity
-  handleUnregisteredFaceFallback('特徵差異未達高置信閾值');
 }
 
 function openPasswordAuthModal(candidates, snap) {
@@ -1100,7 +2360,7 @@ function openPasswordAuthModal(candidates, snap) {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = `btn btn-outline w-100 ${idx === 0 ? 'btn-primary' : ''}`;
-      btn.style.cssText = 'padding: 10px 14px; text-align: left; display: flex; justify-content: space-between; align-items: center; border-radius: 8px;';
+      btn.style.cssText = 'padding: 10px 14px; text-align: left; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; margin-bottom: 6px;';
       btn.innerHTML = `<span><strong>${p.classID} 班 ${p.studentID} 號 ${p.name}</strong></span> <span class="badge badge-yellow">${cand.percentage}%</span>`;
       btn.onclick = () => {
         selectedCand = cand;
@@ -1142,6 +2402,28 @@ function confirmPasswordAuth() {
     return;
   }
 
+  // Teacher tester pass
+  if (p.studentID === 99 && pwd === 'TeaTEST1102') {
+    closePasswordAuthModal();
+    const teacherName = `${p.classID} 教師測試員`;
+    AppState.currentUser = { classID: p.classID, id: 99, studentID: 99, name: teacherName, role: 'teacher', isTeacher: true };
+    AppState.isPasswordOnlyLogin = false;
+    AppState.draftUploaded = false;
+    try {
+      sessionStorage.setItem('AUTH_GATE_TOKEN', JSON.stringify({
+        classID: p.classID,
+        studentID: 99,
+        name: teacherName,
+        key: `${p.classID}_99`,
+        isTeacher: true
+      }));
+    } catch(e) {}
+    updateUserBadge();
+    alert(`✅ 教師測試員驗證通過！歡迎 ${teacherName}！`);
+    showScreen('screen-admin');
+    return;
+  }
+
   if (pwd === '1234') {
     if (alertBox) {
       alertBox.style.display = 'block';
@@ -1156,7 +2438,7 @@ function confirmPasswordAuth() {
     if (capturedSnapshot && capturedSnapshot.descriptor) {
       enhanceStudentVector(p.classID, p.studentID, capturedSnapshot.descriptor, 0.70);
     }
-    AppState.currentUser = { classID: p.classID, id: p.studentID, name: p.name, role: 'student', isTeacher: false };
+    AppState.currentUser = { classID: p.classID, id: p.studentID, studentID: p.studentID, name: p.name, role: 'student', isTeacher: false };
     AppState.isPasswordOnlyLogin = false; // Verified via Face+Password, exempt from scratch paper
     AppState.draftUploaded = false;
     updateUserBadge();
@@ -1180,20 +2462,31 @@ function handleFastKeyLogin() {
     return;
   }
 
-  // Teacher Passcodes (5BC99, 5B99, 5C99) and Strong Admin Password (Math5BC#Admin2026!)
-  if (raw === '5BC99' || raw === '5B99' || raw === '5C99' || rawExact === 'Math5BC#Admin2026!') {
-    const cls = raw.startsWith('5C') ? '5C' : (raw.startsWith('5B') ? '5B' : '5BC');
-    AppState.currentUser = { classID: cls, id: 99, name: '教師測試員(管理員)', role: 'teacher', isTeacher: true };
-    AppState.isPasswordOnlyLogin = true;
+  // Teacher Passcodes (TeaTEST1102, 5B99, 5C99, 5BC99, 4C99, 4D99, Math5BC#Admin2026!)
+  if (rawExact === 'TeaTEST1102' || raw === '5B99' || raw === '5C99' || raw === '5BC99' || raw === '4C99' || raw === '4D99' || rawExact === 'Math5BC#Admin2026!') {
+    const cls = raw.startsWith('5C') ? '5C' : (raw.startsWith('5B') ? '5B' : '5B');
+    const teacherName = `${cls} 教師測試員`;
+    AppState.currentUser = { classID: cls, id: 99, studentID: 99, name: teacherName, role: 'teacher', isTeacher: true };
+    AppState.isPasswordOnlyLogin = false;
+    AppState.draftUploaded = false;
+    try {
+      sessionStorage.setItem('AUTH_GATE_TOKEN', JSON.stringify({
+        classID: cls,
+        studentID: 99,
+        name: teacherName,
+        key: `${cls}_99`,
+        isTeacher: true
+      }));
+    } catch(e) {}
     updateUserBadge();
+    alert(`✅ 教師測試員口令核驗通過！歡迎 ${teacherName}！已解鎖測試通道及全級答題看板！`);
     showScreen('screen-admin');
-    showBankInspectorModal();
     return;
   }
 
-  // 5A Denied
-  if (raw.startsWith('5A')) {
-    alert('僅限 5B/5C 班同學參與');
+  // Deny 5A or Grade 10
+  if (raw.startsWith('5A') || raw.startsWith('4')) {
+    alert('本平臺為高二 (5B/5C) 專屬平臺，高一同學請前往 4cd1102.html 答題！');
     return;
   }
 
@@ -1202,9 +2495,9 @@ function handleFastKeyLogin() {
   if (m) {
     const cls = '5' + m[1].toUpperCase();
     const id = parseInt(m[2], 10);
-    const s = window.get5BCStudent ? window.get5BCStudent(cls, id) : null;
+    const s = window.getStudent ? window.getStudent(cls, id) : (window.get5BCStudent ? window.get5BCStudent(cls, id) : null);
     if (s && !s.isTeacher) {
-      AppState.currentUser = { classID: cls, id: s.id, name: s.name, role: 'student', isTeacher: false };
+      AppState.currentUser = { classID: cls, id: s.id || id, studentID: s.id || id, name: s.name, role: 'student', isTeacher: false };
       AppState.isPasswordOnlyLogin = true;
       AppState.draftUploaded = false;
       updateUserBadge();
@@ -1214,44 +2507,68 @@ function handleFastKeyLogin() {
     }
   }
 
-  alert('⚠️ 口令無效！請輸入 5B01~5B28、5C01~5C29，或教師專用口令。');
+  alert('⚠️ 口令無效！請輸入 5B01~5B28、5C01~5C29，或教師測試員專用口令 TeaTEST1102。');
 }
 
 function promptTeacherEntry() {
-  const code = prompt('請輸入教師專用直入口令：', '');
+  const code = prompt('請輸入教師測試員口令 (TeaTEST1102)：', '');
   if (!code) return;
   const trimmed = code.trim();
-  if (trimmed === 'Math5BC#Admin2026!' || trimmed.toUpperCase() === '5BC99' || trimmed.toUpperCase() === '5B99' || trimmed.toUpperCase() === '5C99') {
-    const cls = trimmed.toUpperCase().startsWith('5C') ? '5C' : (trimmed.toUpperCase().startsWith('5B') ? '5B' : '5BC');
-    AppState.currentUser = { classID: cls, id: 99, name: '教師測試員(管理員)', role: 'teacher', isTeacher: true };
-    AppState.isPasswordOnlyLogin = true;
+  if (trimmed === 'TeaTEST1102' || trimmed === 'Math5BC#Admin2026!' || trimmed.toUpperCase() === '5BC99' || trimmed.toUpperCase() === '5B99' || trimmed.toUpperCase() === '5C99') {
+    const cls = trimmed.toUpperCase().startsWith('5C') ? '5C' : (trimmed.toUpperCase().startsWith('5B') ? '5B' : '5B');
+    const teacherName = `${cls} 教師測試員`;
+    AppState.currentUser = { classID: cls, id: 99, studentID: 99, name: teacherName, role: 'teacher', isTeacher: true };
+    AppState.isPasswordOnlyLogin = false;
+    AppState.draftUploaded = false;
+    try {
+      sessionStorage.setItem('AUTH_GATE_TOKEN', JSON.stringify({
+        classID: cls,
+        studentID: 99,
+        name: teacherName,
+        key: `${cls}_99`,
+        isTeacher: true
+      }));
+    } catch(e) {}
     updateUserBadge();
+    alert(`✅ 教師測試員核驗通過！歡迎 ${teacherName}！`);
     showScreen('screen-admin');
-    showBankInspectorModal();
   } else {
-    alert('⚠️ 口令錯誤！');
+    alert('❌ 教師口令錯誤！');
   }
 }
 
 function openManualPasswordModal() {
+  const modal = document.getElementById('modalManualLogin');
+  if (modal) modal.style.display = 'flex';
   populateStudentSelect();
-  document.getElementById('modalManualLogin').style.display = 'flex';
 }
 
 function closeManualPasswordModal() {
-  document.getElementById('modalManualLogin').style.display = 'none';
+  const modal = document.getElementById('modalManualLogin');
+  if (modal) modal.style.display = 'none';
 }
 
 function populateStudentSelect() {
   const cls = document.getElementById('manualClassSelect').value;
   const select = document.getElementById('manualStudentSelect');
   select.innerHTML = '';
-  const roster = (window.ROSTER_5BC && window.ROSTER_5BC[cls]) || [];
+
+  // Include Teacher Tester Option
+  const optTeacher = document.createElement('option');
+  optTeacher.value = 99;
+  optTeacher.innerText = `99 號 - ${cls} 教師測試員 (免刷臉密碼直入)`;
+  optTeacher.style.fontWeight = 'bold';
+  optTeacher.style.color = '#38bdf8';
+  select.appendChild(optTeacher);
+
+  const roster = (window.getStudentsByClass ? window.getStudentsByClass(cls) : (window.ROSTER_5BC && window.ROSTER_5BC[cls])) || [];
   roster.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.id;
-    opt.innerText = `${s.id} 號 - ${s.name}`;
-    select.appendChild(opt);
+    if (s.id !== 99) {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.innerText = `${s.id} 號 - ${s.name}`;
+      select.appendChild(opt);
+    }
   });
 }
 
@@ -1264,21 +2581,53 @@ function confirmManualLogin() {
     alert('請輸入個人登入密碼！');
     return;
   }
+
+  // Teacher Tester Pass
+  if (sId === 99 || pwd === 'TeaTEST1102') {
+    if (pwd === 'TeaTEST1102' || pwd === '1234') {
+      const teacherName = `${cls} 教師測試員`;
+      AppState.currentUser = { classID: cls, id: 99, studentID: 99, name: teacherName, role: 'teacher', isTeacher: true };
+      AppState.isPasswordOnlyLogin = false;
+      AppState.draftUploaded = false;
+      try {
+        sessionStorage.setItem('AUTH_GATE_TOKEN', JSON.stringify({
+          classID: cls,
+          studentID: 99,
+          name: teacherName,
+          key: `${cls}_99`,
+          isTeacher: true
+        }));
+      } catch(e) {}
+      closeManualPasswordModal();
+      updateUserBadge();
+      alert(`✅ 教師測試員驗證通過！歡迎 ${teacherName}！已解鎖測試通道及全級答題看板！`);
+      showScreen('screen-admin');
+      return;
+    } else {
+      alert('❌ 教師測試員密碼錯誤，請輸入正確口令：TeaTEST1102');
+      return;
+    }
+  }
+
   if (pwd === '1234') {
-    alert('請聯繫科代表更新初始密碼');
+    alert('⚠️ 請聯繫科代表更新初始登錄密碼 (请联系科代表更新初始登录密码)');
     return;
   }
-  const s = window.get5BCStudent ? window.get5BCStudent(cls, sId) : null;
-  if (!s) {
-    alert('學生資料未找到！');
+
+  const isValid = verifyStudentPassword(cls, sId, pwd);
+  if (!isValid) {
+    alert('❌ 密碼錯誤，請重新輸入！');
     return;
   }
-  AppState.currentUser = { classID: cls, id: s.id, name: s.name, role: 'student', isTeacher: false };
+
+  const s = window.getStudent ? window.getStudent(cls, sId) : (window.get5BCStudent ? window.get5BCStudent(cls, sId) : null);
+  const sName = s ? s.name : `學生 ${sId}`;
+  AppState.currentUser = { classID: cls, id: sId, studentID: sId, name: sName, role: 'student', isTeacher: false };
   AppState.isPasswordOnlyLogin = true;
   AppState.draftUploaded = false;
   closeManualPasswordModal();
   updateUserBadge();
-  alert('⚠️ 您已使用密碼登入，作答完成後必須拍照上傳手寫姓名的答題草稿紙！');
+  alert('⚠️ 您已使用密碼登入（非刷臉），交卷前必須拍照上傳手寫姓名的答題草稿紙！');
   startQuizSession();
 }
 

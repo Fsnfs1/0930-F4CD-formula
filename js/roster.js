@@ -206,7 +206,7 @@
         classID: normCls,
         studentID: 99,
         id: 99,
-        name: "教師測試員",
+        name: normCls + " 教師測試員",
         grade: (normCls === "5B" || normCls === "5C") ? 11 : 10,
         isTeacher: true,
         isTestUser: true
@@ -236,6 +236,30 @@
   function getStudentName(classID, studentID) {
     const s = getStudent(classID, studentID);
     return s ? s.name : "";
+  }
+
+  /**
+   * Retrieve student list for a given class ID (4C, 4D, 5B, 5C)
+   * @param {string} classID 
+   * @param {boolean} [includeTeacher=false]
+   * @returns {Array<{id: number, name: string, grade: number, classID: string}>}
+   */
+  function getStudentsByClass(classID, includeTeacher) {
+    if (!classID) return [];
+    const normalized = String(classID).trim().toUpperCase();
+    const list = ROSTER_DATA[normalized] ? ROSTER_DATA[normalized].slice() : [];
+    if (includeTeacher) {
+      list.push({
+        id: 99,
+        studentID: 99,
+        name: normalized + " 教師測試員",
+        grade: (normalized === "5B" || normalized === "5C") ? 11 : 10,
+        classID: normalized,
+        isTeacher: true,
+        isTestUser: true
+      });
+    }
+    return list;
   }
 
   /**
