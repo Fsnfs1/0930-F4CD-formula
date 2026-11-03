@@ -32,7 +32,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "B"
     ],
-    "explanation": "A中g(x)定義域x≠-1；B中兩函數定義域均為R且對應法則|x|=√(x^2)完全一致，為同一函數；C中g(x)定義域x≥0；D中g(x)定義域x≠0。故選B。"
+    "explanation": "A中 $g(x)$ 定義域為 $x \\neq -1$；B中兩函數定義域均為 $\\mathbb{R}$ 且對應法則 $|x| = \\sqrt{x^2}$ 完全一致，為同一函數；C中 $g(x)$ 定義域為 $x \\ge 0$；D中 $g(x)$ 定義域為 $x \\neq 0$。故選B。"
   },
   {
     "id": "AD02",
@@ -60,7 +60,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "B"
     ],
-    "explanation": "由根式非負得 2 - x ≥ 0 ⇒ x ≤ 2；分母不為零得 x + 1 ≠ 0 ⇒ x ≠ -1。故定義域為 (-∞, -1) ∪ (-1, 2]。故選B。"
+    "explanation": "由根式非負得 $2 - x \\ge 0 \\implies x \\le 2$；分母不為零得 $x + 1 \\neq 0 \\implies x \\neq -1$。故定義域為 $(-\\infty, -1) \\cup (-1, 2]$。故選B。"
   },
   {
     "id": "AD03",
@@ -88,7 +88,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "由 x ∈ [-1, 2] 得 2x + 1 的範圍為 2(-1) + 1 ≤ 2x + 1 ≤ 2(2) + 1，即 -1 ≤ 2x + 1 ≤ 5。所以 f(x) 的定義域為 [-1, 5]。故選A。"
+    "explanation": "由 $x \\in [-1, 2]$ 得 $2x + 1$ 的範圍為 $2(-1) + 1 \\le 2x + 1 \\le 2(2) + 1$，即 $-1 \\le 2x + 1 \\le 5$。所以 $f(x)$ 的定義域為 $[-1, 5]$。故選A。"
   },
   {
     "id": "AD04",
@@ -116,7 +116,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "C"
     ],
-    "explanation": "A的值域為 [0, +∞)；B的定義域與值域均為 {x|x≠0}；C為三次函數，定義域與值域均為全體實數R；D定義域值域均為 [0, +∞)。故選C。"
+    "explanation": "A的值域為 $[0, +\\infty)$；B的定義域與值域均為 $\\{x \\mid x \\neq 0\\}$；C為三次函數，定義域與值域均為全體實數 $\\mathbb{R}$；D定義域與值域均為 $[0, +\\infty)$。故選C。"
   },
   {
     "id": "AD05",
@@ -144,7 +144,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "B"
     ],
-    "explanation": "根式要求 x^2 - 4 ≥ 0 ⇒ x ≤ -2 或 x ≥ 2；零次冪要求底數非零，即 x - 3 ≠ 0 ⇒ x ≠ 3。求交集得 (-∞, -2] ∪ [2, 3) ∪ (3, +∞)。故選B。"
+    "explanation": "根式要求 $x^2 - 4 \\ge 0 \\implies x \\le -2$ 或 $x \\ge 2$；零次冪要求底數非零，即 $x - 3 \\neq 0 \\implies x \\neq 3$。求交集得 $(-\\infty, -2] \\cup [2, 3) \\cup (3, +\\infty)$。故選B。"
   },
   {
     "id": "AD06",
@@ -172,7 +172,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "B"
     ],
-    "explanation": "因為 2 > 1，所以 f(2) = 2/2 = 1。接著計算 f(1)，因為 1 ≤ 1，代入第一段 f(1) = 1^2 + 1 = 2。故選B。"
+    "explanation": "因為 $2 > 1$，所以 $f(2) = \\frac{2}{2} = 1$。接著計算 $f(1)$，因為 $1 \\le 1$，代入第一段 $f(1) = 1^2 + 1 = 2$。故選B。"
   },
   {
     "id": "AD07",
@@ -200,7 +200,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "令 t = x + 1，則 x = t - 1。代入得 f(t) = (t - 1)^2 + 3(t - 1) + 2 = t^2 - 2t + 1 + 3t - 3 + 2 = t^2 + t。故 f(x) = x^2 + x。故選A。"
+    "explanation": "令 $t = x + 1$，則 $x = t - 1$。代入得 $f(t) = (t - 1)^2 + 3(t - 1) + 2 = t^2 - 2t + 1 + 3t - 3 + 2 = t^2 + t$。故 $f(x) = x^2 + x$。故選A。"
   },
   {
     "id": "AD08",
@@ -228,7 +228,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "若 a < 1，3a - 1 = 8 ⇒ 3a = 9 ⇒ a = 3，不滿足 a < 1，捨去；若 a ≥ 1，2^a = 8 ⇒ a = 3，滿足 a ≥ 1。因此 a = 3。故選A。"
+    "explanation": "若 $a < 1$，$3a - 1 = 8 \\implies 3a = 9 \\implies a = 3$，不滿足 $a < 1$，捨去；若 $a \\ge 1$，$2^a = 8 \\implies a = 3$，滿足 $a \\ge 1$。因此 $a = 3$。故選A。"
   },
   {
     "id": "AD09",
@@ -256,7 +256,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "B"
     ],
-    "explanation": "f(x) 為公差為 2 的等差數列結構，f(5) = f(1) + 4 × 2 = 3 + 8 = 11。故選B。"
+    "explanation": "$f(x)$ 為公差為 $2$ 的等差數列結構，$f(5) = f(1) + 4 \\times 2 = 3 + 8 = 11$。故選B。"
   },
   {
     "id": "AD10",
@@ -284,7 +284,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "當 x ≤ 0 時，x + 2 ≥ 1 ⇒ x ≥ -1，故 -1 ≤ x ≤ 0；當 x > 0 時，-x + 2 ≥ 1 ⇒ x ≤ 1，故 0 < x ≤ 1。併集得 x ∈ [-1, 1]。故選A。"
+    "explanation": "當 $x \\le 0$ 時，$x + 2 \\ge 1 \\implies x \\ge -1$，故 $-1 \\le x \\le 0$；當 $x > 0$ 時，$-x + 2 \\ge 1 \\implies x \\le 1$，故 $0 < x \\le 1$。併集得 $x \\in [-1, 1]$。故選A。"
   },
   {
     "id": "AD11",
@@ -312,7 +312,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "B"
     ],
-    "explanation": "A在 (0,+∞) 上單調遞增；B為反比例函數，在 (0,+∞) 上隨x增大而減小，為嚴格單調遞減；C和D均為增函數。故選B。"
+    "explanation": "A在 $(0, +\\infty)$ 上單調遞增；B為反比例函數，在 $(0, +\\infty)$ 上隨 $x$ 增大而減小，為嚴格單調遞減；C和D均為增函數。故選B。"
   },
   {
     "id": "AD12",
@@ -325,22 +325,22 @@ window.BANK_4CD_1102_ADAPTIVE = [
       },
       {
         "key": "B",
-        "text": "最大值 $5$，最小值 $\\frac{9}{3} = 3$"
+        "text": "最大值 $3$，最小值 $5$"
       },
       {
         "key": "C",
-        "text": "最大值 $5$，最小值 $3$"
+        "text": "最大值 $5$，最小值 $1$"
       },
       {
         "key": "D",
-        "text": "最大值 $5$，最小值 $3$"
+        "text": "最大值 $7$，最小值 $3$"
       }
     ],
     "answer": "A",
     "correctKeys": [
       "A"
     ],
-    "explanation": "f(x) = [2(x-1) + 3]/(x-1) = 2 + 3/(x-1)。在 [2, 4] 上，隨 x 增大，x-1 增大，3/(x-1) 遞減，故 f(x) 單調遞減。當 x = 2 時取得最大值 f(2) = 2 + 3 = 5；當 x = 4 時取得最小值 f(4) = 2 + 3/3 = 3。故選A。"
+    "explanation": "$f(x) = \\frac{2(x - 1) + 3}{x - 1} = 2 + \\frac{3}{x - 1}$。在 $[2, 4]$ 上，隨 $x$ 增大，$x - 1$ 增大，$\\frac{3}{x - 1}$ 遞減，故 $f(x)$ 單調遞減。當 $x = 2$ 時取得最大值 $f(2) = 2 + 3 = 5$；當 $x = 4$ 時取得最小值 $f(4) = 2 + \\frac{3}{3} = 3$。故選A。"
   },
   {
     "id": "AD13",
@@ -368,7 +368,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "f(x_1) - f(x_2) = (-3x_1 + 5) - (-3x_2 + 5) = -3(x_1 - x_2) = 3(x_2 - x_1)。因為 x_1 < x_2 ⇒ x_2 - x_1 > 0，所以 3(x_2 - x_1) > 0，即 f(x_1) > f(x_2)，故為減函數。選A。"
+    "explanation": "$f(x_1) - f(x_2) = (-3x_1 + 5) - (-3x_2 + 5) = -3(x_1 - x_2) = 3(x_2 - x_1)$。因為 $x_1 < x_2 \\implies x_2 - x_1 > 0$，所以 $3(x_2 - x_1) > 0$，即 $f(x_1) > f(x_2)$，故為減函數。選A。"
   },
   {
     "id": "AD14",
@@ -396,7 +396,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "C"
     ],
-    "explanation": "二次函數對稱軸為 x = -(-4)/(2×1) = 2 ∈ [0, 3]。開口向上，故最小值在頂點 x = 2 處取得，f(2) = 4 - 8 + 3 = -1。故選C。"
+    "explanation": "二次函數對稱軸為 $x = -\\frac{-4}{2 \\times 1} = 2 \\in [0, 3]$。開口向上，故最小值在頂點 $x = 2$ 處取得，$f(2) = 4 - 8 + 3 = -1$。故選C。"
   },
   {
     "id": "AD15",
@@ -424,7 +424,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "B"
     ],
-    "explanation": "一次函數單調遞減的充要條件是斜率為負，即 2a - 1 < 0 ⇒ a < 1/2。故選B。"
+    "explanation": "一次函數單調遞減的充要條件是斜率為負，即 $2a - 1 < 0 \\implies a < \\frac{1}{2}$。故選B。"
   },
   {
     "id": "AD16",
@@ -452,7 +452,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "B"
     ],
-    "explanation": "B中 f(-x) = (-x)^3 - (-x) = -x^3 + x = -(x^3 - x) = -f(x)，且定義域為 R，故為奇函數。A非奇非偶，C與D為偶函數。故選B。"
+    "explanation": "B中 $f(-x) = (-x)^3 - (-x) = -x^3 + x = -(x^3 - x) = -f(x)$，且定義域為 $\\mathbb{R}$，故為奇函數。A非奇非偶，C與D為偶函數。故選B。"
   },
   {
     "id": "AD17",
@@ -480,7 +480,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "由偶函數性質 f(-x) = f(x)，得 f(-4) = f(4)。代入 x ≥ 0 解析式：f(4) = 2(4) - 3 = 5。故選A。"
+    "explanation": "由偶函數性質 $f(-x) = f(x)$，得 $f(-4) = f(4)$。代入 $x \\ge 0$ 解析式：$f(4) = 2(4) - 3 = 5$。故選A。"
   },
   {
     "id": "AD18",
@@ -508,7 +508,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "若奇函數 f(x) 在 x = 0 處有定義，則必滿足 f(0) = -f(0) ⇒ 2f(0) = 0 ⇒ f(0) = 0。故選A。"
+    "explanation": "若奇函數 $f(x)$ 在 $x = 0$ 處有定義，則必滿足 $f(0) = -f(0) \\implies 2f(0) = 0 \\implies f(0) = 0$。故選A。"
   },
   {
     "id": "AD19",
@@ -536,7 +536,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "B"
     ],
-    "explanation": "二次型為偶函數時，一次項係數必為 0。故 b - 1 = 0 ⇒ b = 1。故選B。"
+    "explanation": "二次型為偶函數時，一次項係數必為 $0$。故 $b - 1 = 0 \\implies b = 1$。故選B。"
   },
   {
     "id": "AD20",
@@ -564,7 +564,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "定義域為 R，關於原點對稱。f(-x) = (-x)/((-x)^2 + 1) = -x/(x^2 + 1) = -f(x)。故為奇函數。選A。"
+    "explanation": "定義域為 $\\mathbb{R}$，關於原點對稱。$f(-x) = \\frac{-x}{(-x)^2 + 1} = -\\frac{x}{x^2 + 1} = -f(x)$。故為奇函數。選A。"
   },
   {
     "id": "AD21",
@@ -592,7 +592,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "由冪函數定義，係數 m^2 - m - 1 = 1 ⇒ m^2 - m - 2 = 0 ⇒ (m - 2)(m + 1) = 0 ⇒ m = 2 或 m = -1。又在 (0, +∞) 單調遞增要求指數 m > 0，故 m = 2。選A。"
+    "explanation": "由冪函數定義，係數 $m^2 - m - 1 = 1 \\implies m^2 - m - 2 = 0 \\implies (m - 2)(m + 1) = 0 \\implies m = 2$ 或 $m = -1$。又在 $(0, +\\infty)$ 單調遞增要求指數 $m > 0$，故 $m = 2$。選A。"
   },
   {
     "id": "AD22",
@@ -620,7 +620,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "B"
     ],
-    "explanation": "對於任意實數 α，1^α = 1 恆成立，因此所有冪函數圖象必過定點 (1, 1)。故選B。"
+    "explanation": "對於任意實數 $\\alpha$，$1^\\alpha = 1$ 恆成立，因此所有冪函數圖象必過定點 $(1, 1)$。故選B。"
   },
   {
     "id": "AD23",
@@ -648,7 +648,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "構造冪函數 y = x^{0.5} = √x。因為指數 0.5 > 0，所以該函數在 (0, +∞) 上單調遞增。由 0.8 < 2 < 3 得 0.8^{0.5} < 2^{0.5} < 3^{0.5}，即 c < a < b。故選A。"
+    "explanation": "構造冪函數 $y = x^{0.5} = \\sqrt{x}$。因為指數 $0.5 > 0$，所以該函數在 $(0, +\\infty)$ 上單調遞增。由 $0.8 < 2 < 3$ 得 $0.8^{0.5} < 2^{0.5} < 3^{0.5}$，即 $c < a < b$。故選A。"
   },
   {
     "id": "AD24",
@@ -676,7 +676,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "B"
     ],
-    "explanation": "f(x) = 1/x^2，定義域為 {x|x≠0}。f(-x) = 1/(-x)^2 = 1/x^2 = f(x)，為偶函數，故圖象關於 y 軸對稱。選B。"
+    "explanation": "$f(x) = \\frac{1}{x^2}$，定義域為 $\\{x \\mid x \\neq 0\\}$。$f(-x) = \\frac{1}{(-x)^2} = \\frac{1}{x^2} = f(x)$，為偶函數，故圖象關於 $y$ 軸對稱。選B。"
   },
   {
     "id": "AD25",
@@ -704,7 +704,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "當 x > 1 時，底數大於 1，指數越大值越大。因為 2 > 1 > 1/2，所以在 x > 1 時 x^2 > x > x^{1/2}，圖象自上而下為 y_1, y_2, y_3。選A。"
+    "explanation": "當 $x > 1$ 時，底數大於 $1$，指數越大值越大。因為 $2 > 1 > \\frac{1}{2}$，所以在 $x > 1$ 時 $x^2 > x > x^{\\frac{1}{2}}$，圖象自上而下為 $y_1, y_2, y_3$。選A。"
   },
   {
     "id": "AD26",
@@ -732,7 +732,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "因式分解得 (x - 2)(x - 3) < 0。開口向上取小於 0 夾在兩根之間，故解集為 (2, 3)。選A。"
+    "explanation": "因式分解得 $(x - 2)(x - 3) < 0$。開口向上取小於 $0$ 夾在兩根之間，故解集為 $(2, 3)$。選A。"
   },
   {
     "id": "AD27",
@@ -760,7 +760,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "首項化正兩邊乘 -1：x^2 - 3x - 4 ≤ 0。因式分解 (x - 4)(x + 1) ≤ 0 ⇒ -1 ≤ x ≤ 4。解集為 [-1, 4]。選A。"
+    "explanation": "首項化正兩邊乘 $-1$：$x^2 - 3x - 4 \\le 0$。因式分解 $(x - 4)(x + 1) \\le 0 \\implies -1 \\le x \\le 4$。解集為 $[-1, 4]$。選A。"
   },
   {
     "id": "AD28",
@@ -788,7 +788,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "(x - 4)(x + 2) > 0 ⇒ x < -2 或 x > 4。與 A = [0, 5] 取交集得 (4, 5]。故選A。"
+    "explanation": "$(x - 4)(x + 2) > 0 \\implies x < -2$ 或 $x > 4$。與 $A = [0, 5]$ 取交集得 $(4, 5]$。故選A。"
   },
   {
     "id": "AD29",
@@ -816,7 +816,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "兩根為 1 和 a。因為 a > 1，所以小根為 1，大根為 a。二次項係數為 1 > 0，小於 0 取兩根之間，即 (1, a)。選A。"
+    "explanation": "兩根為 $1$ 和 $a$。因為 $a > 1$，所以小根為 $1$，大根為 $a$。二次項係數為 $1 > 0$，小於 $0$ 取兩根之間，即 $(1, a)$。選A。"
   },
   {
     "id": "AD30",
@@ -844,7 +844,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "(x - 2)^2 ≤ 0。因為完全平方式非負，(x - 2)^2 ≥ 0 恆成立，故只有 (x - 2)^2 = 0 成立，得 x = 2。解集為 {2}。選A。"
+    "explanation": "$(x - 2)^2 \\le 0$。因為完全平方式非負，$(x - 2)^2 \\ge 0$ 恆成立，故只有 $(x - 2)^2 = 0$ 成立，得 $x = 2$。解集為 $\\{2\\}$。選A。"
   },
   {
     "id": "AD31",
@@ -872,7 +872,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "二次項係數 a = 1 > 0，圖象開口向上。恆大於 0 的充要條件是判別式 Δ < 0。Δ = 2^2 - 4(1)(m) = 4 - 4m < 0 ⇒ 4m > 4 ⇒ m > 1。選A。"
+    "explanation": "二次項係數 $a = 1 > 0$，圖象開口向上。恆大於 $0$ 的充要條件是判別式 $\\Delta < 0$。$\\Delta = 2^2 - 4(1)(m) = 4 - 4m < 0 \\implies 4m > 4 \\implies m > 1$。選A。"
   },
   {
     "id": "AD32",
@@ -900,7 +900,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "Δ = (-6)^2 - 4(1)(9) = 36 - 36 = 0。頂點切於橫軸，有且僅有 1 個交點 (3, 0)。選A。"
+    "explanation": "$\\Delta = (-6)^2 - 4(1)(9) = 36 - 36 = 0$。頂點切於橫軸，有且僅有 $1$ 個交點 $(3, 0)$。選A。"
   },
   {
     "id": "AD33",
@@ -928,7 +928,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "對稱軸 x = -4 / (2 × (-2)) = 1。代入求頂點縱坐標：y = -2(1)^2 + 4(1) - 5 = -2 + 4 - 5 = -3。頂點為 (1, -3)。選A。"
+    "explanation": "對稱軸 $x = -\\frac{4}{2 \\times (-2)} = 1$。代入求頂點縱坐標：$y = -2(1)^2 + 4(1) - 5 = -2 + 4 - 5 = -3$。頂點為 $(1, -3)$。選A。"
   },
   {
     "id": "AD34",
@@ -956,7 +956,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "若 a = 0，4x - 2 < 0 不可能對全體實數恆成立，捨去；因此必為二次函數且開口向下：a < 0，且 Δ = 4^2 - 4(a)(-2) = 16 + 8a < 0 ⇒ 8a < -16 ⇒ a < -2。結合 a < 0 得 a < -2。選A。"
+    "explanation": "若 $a = 0$，$4x - 2 < 0$ 不可能對全體實數恆成立，捨去；因此必為二次函數且開口向下：$a < 0$，且 $\\Delta = 4^2 - 4(a)(-2) = 16 + 8a < 0 \\implies 8a < -16 \\implies a < -2$。結合 $a < 0$ 得 $a < -2$。選A。"
   },
   {
     "id": "AD35",
@@ -984,6 +984,6 @@ window.BANK_4CD_1102_ADAPTIVE = [
     "correctKeys": [
       "A"
     ],
-    "explanation": "開口向上，對稱軸為 x = a。函數在 [a, +∞) 上遞增。要使函數在 [1, +∞) 上單調遞增，只需對稱軸在區間左端點左側或重合，即 a ≤ 1。選A。"
+    "explanation": "開口向上，對稱軸為 $x = a$。函數在 $[a, +\\infty)$ 上遞增。要使函數在 $[1, +\\infty)$ 上單調遞增，只需對稱軸在區間左端點左側或重合，即 $a \\le 1$。選A。"
   }
 ];
