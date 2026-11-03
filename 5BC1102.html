@@ -213,7 +213,7 @@
       <div class="card" id="cardPasswordLogin" style="max-width: 520px; margin: 30px auto; padding: 24px 20px;">
         <h2 class="card-title" style="font-size: 19px; margin-bottom: 6px; justify-content: center;"><span>🔐</span> 高二 (5B / 5C) 班憑密碼登錄</h2>
         <p class="card-subtitle" style="font-size: 13px; color: #94a3b8; margin-bottom: 16px; text-align: center;">
-          請選擇您的班別與學號，輸入個人密碼（初始密碼 <strong>1234</strong>，首次登錄後須自行修改密碼，僅有 <strong>1 次</strong>修改機會）。
+          請選擇您的班別與學號，輸入個人密碼（首次登錄後須自行修改密碼，僅有 <strong>1 次</strong>修改機會）。
         </p>
 
         <div class="form-group" style="margin-bottom: 12px;">
@@ -241,7 +241,7 @@
 
         <div class="form-group" style="margin-bottom: 14px;">
           <label class="form-label" for="manualPasswordInput">個人登錄密碼 (Password)</label>
-          <input type="password" id="manualPasswordInput" class="form-input" placeholder="初設密碼為 1234，若已修改請輸入新密碼" inputmode="numeric" autocomplete="off" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; font-size: 14px; box-sizing: border-box;">
+          <input type="password" id="manualPasswordInput" class="form-input" placeholder="請輸入個人密碼" inputmode="numeric" autocomplete="off" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; font-size: 14px; box-sizing: border-box;">
           <div id="manualLoginAlert" style="display: none; margin-top: 8px; padding: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 8px; color: #fca5a5; font-size: 13px; text-align: left;"></div>
         </div>
 
@@ -256,7 +256,7 @@
           </div>
           <div style="display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap;">
             <input type="text" id="inputKeyLogin" class="form-input" 
-                   placeholder="口令密鑰 (如 5B99、5C99)" 
+                   placeholder="請輸入管理口令密鑰" 
                    maxlength="20" autocomplete="off" 
                    style="flex: 1; min-width: 150px; max-width: 200px; padding: 8px 10px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #f8fafc; font-size: 13px; text-transform: uppercase; margin-bottom: 0;">
             <button id="btnKeyLogin" class="btn btn-outline btn-sm" onclick="handleKeyLogin()" style="padding: 8px 14px; font-weight: 600;">
@@ -742,7 +742,7 @@
 
       <div class="form-group" style="margin-bottom: 14px; text-align: left;">
         <label class="form-label" for="inputAuthPassword" style="font-size: 13px; margin-bottom: 4px; display: block; color: #cbd5e1;">個人密碼</label>
-        <input type="password" id="inputAuthPassword" class="form-input" placeholder="請輸入個人密碼（預設 1234）" inputmode="numeric" maxlength="20" autocomplete="off" style="width: 100%; box-sizing: border-box; background: #0f172a; color: #f8fafc; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px;">
+        <input type="password" id="inputAuthPassword" class="form-input" placeholder="請輸入個人密碼" inputmode="numeric" maxlength="20" autocomplete="off" style="width: 100%; box-sizing: border-box; background: #0f172a; color: #f8fafc; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px;">
       </div>
 
       <div style="display: flex; gap: 10px;">
@@ -758,15 +758,15 @@
       <div style="font-size: 40px; text-align: center; margin-bottom: 8px;">🛡️</div>
       <h3 style="text-align: center; margin-bottom: 6px; font-size: 18px; font-weight: 700; color: #f8fafc;">首次登入安全修改密碼</h3>
       <p id="forcePasswordSubtitle" style="text-align: center; font-size: 13px; color: #94a3b8; margin-bottom: 16px;">
-        您的帳戶密碼為初始預設值 1234。首次登入必須修訂密碼（全學期僅有 1 次修改機會），修改完成後才能開始答題。
+        您目前使用初始密碼登入。首次登入必須修訂密碼（全學期僅有 1 次修改機會），修改完成後才能開始答題。
       </p>
       <div id="alertForcePasswordError" class="alert-box alert-danger" style="display: none; margin-bottom: 12px; font-size: 13px; padding: 10px; border-radius: 6px;"></div>
       <div class="form-group" style="margin-bottom: 10px; text-align: left;">
-        <label class="form-label" for="inputOldPassword" style="font-size: 13px; margin-bottom: 4px; display: block; color: #cbd5e1;">原密碼 (預設 1234)</label>
-        <input type="password" id="inputOldPassword" class="form-input" placeholder="原密碼 (預設 1234)" value="1234" inputmode="numeric" style="width: 100%; box-sizing: border-box; background: #0f172a; color: #f8fafc; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px;">
+        <label class="form-label" for="inputOldPassword" style="font-size: 13px; margin-bottom: 4px; display: block; color: #cbd5e1;">原登入密碼</label>
+        <input type="password" id="inputOldPassword" class="form-input" placeholder="原登入密碼" value="" inputmode="numeric" style="width: 100%; box-sizing: border-box; background: #0f172a; color: #f8fafc; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px;">
       </div>
       <div class="form-group" style="margin-bottom: 10px; text-align: left;">
-        <label class="form-label" for="inputNewPassword" style="font-size: 13px; margin-bottom: 4px; display: block; color: #cbd5e1;">自訂新密碼 (至少 4 位數字，且不能為 1234)</label>
+        <label class="form-label" for="inputNewPassword" style="font-size: 13px; margin-bottom: 4px; display: block; color: #cbd5e1;">自訂新密碼 (至少 4 位數字，且不能為初始密碼)</label>
         <input type="password" id="inputNewPassword" class="form-input" placeholder="新密碼 (至少 4 位)" inputmode="numeric" style="width: 100%; box-sizing: border-box; background: #0f172a; color: #f8fafc; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px;">
       </div>
       <div class="form-group" style="margin-bottom: 16px; text-align: left;">
@@ -2681,7 +2681,7 @@ function saveStudentPassword(classID, studentID, newPassword, passwordChanged) {
     return { success: false, reason: "密碼必須為至少 4 位純數字", message: "密碼必須為至少 4 位純數字" };
   }
   if (passwordChanged && pwdStr === DEFAULT_STUDENT_PASSWORD) {
-    return { success: false, reason: "新密碼不能與預設密碼 1234 相同", message: "新密碼不能與預設密碼 1234 相同" };
+    return { success: false, reason: "新密碼不能與初始密碼相同", message: "新密碼不能與初始密碼相同" };
   }
 
   const salt = derivePasswordSalt(cid, sid);
@@ -2748,7 +2748,7 @@ function updateStudentPassword(classID, studentID, oldPassword, newPassword) {
     return { success: false, reason: "新密碼必須至少為 4 位純數字", message: "新密碼必須至少為 4 位純數字" };
   }
   if (newPwdStr === DEFAULT_STUDENT_PASSWORD) {
-    return { success: false, reason: "新密碼不能與預設密碼 1234 相同", message: "新密碼不能與預設密碼 1234 相同" };
+    return { success: false, reason: "新密碼不能與初始密碼相同", message: "新密碼不能與初始密碼相同" };
   }
   const oldPwdStr = String(oldPassword !== undefined && oldPassword !== null ? oldPassword : "").trim();
   if (newPwdStr === oldPwdStr) {
@@ -2776,11 +2776,11 @@ function openForceChangePasswordModal(user, onCompleteCallback) {
   if (u) {
     window.forcePasswordTargetUser = u;
     if (subTitle) {
-      subTitle.innerHTML = `歡迎 <strong>${u.classID} 班 ${u.studentID || u.id} 號 ${u.name}</strong> 同學！<br>帳戶初始密碼為 <strong>1234</strong>，首次登入必須修訂密碼後才能開始答題。`;
+      subTitle.innerHTML = `歡迎 <strong>${u.classID} 班 ${u.studentID || u.id} 號 ${u.name}</strong> 同學！<br>帳戶處於初始密碼狀態，首次登入必須修訂密碼後才能開始答題。`;
     }
   }
 
-  if (oldPwdInput) oldPwdInput.value = '1234';
+  if (oldPwdInput) oldPwdInput.value = '';
   if (newPwdInput) newPwdInput.value = '';
   if (confirmPwdInput) confirmPwdInput.value = '';
   window.onForcePasswordComplete = onCompleteCallback || null;
@@ -2815,7 +2815,7 @@ function submitForceChangePassword() {
   if (!oldPwd) {
     if (alertBox) {
       alertBox.style.display = 'block';
-      alertBox.textContent = '請輸入原密碼（預設為 1234）！';
+      alertBox.textContent = '請輸入原登入密碼！';
     }
     return;
   }
@@ -2824,7 +2824,7 @@ function submitForceChangePassword() {
   if (!isOldValid) {
     if (alertBox) {
       alertBox.style.display = 'block';
-      alertBox.textContent = '❌ 原密碼不正確，預設初設密碼為 1234！';
+      alertBox.textContent = '❌ 原登入密碼不正確！';
     }
     return;
   }
@@ -2856,7 +2856,7 @@ function submitForceChangePassword() {
   if (newPwd === '1234') {
     if (alertBox) {
       alertBox.style.display = 'block';
-      alertBox.textContent = '新密碼不能與預設密碼 1234 相同！';
+      alertBox.textContent = '新密碼不能與初始密碼相同！';
     }
     return;
   }
@@ -3080,7 +3080,7 @@ function confirmPasswordAuth() {
         alertBox.style.display = 'block';
         alertBox.style.background = 'rgba(239, 68, 68, 0.2)';
         alertBox.style.color = '#fca5a5';
-        alertBox.innerHTML = '⚠️ 請聯繫科代表更新初始登錄密碼 (初設密碼為 1234，首次登入請輸入 1234 核驗後自訂新密碼)';
+        alertBox.innerHTML = '⚠️ 密碼不正確，首次登入請輸入初始密碼或聯繫科代表';
       }
       return;
     }
@@ -3154,7 +3154,7 @@ function handleKeyLogin() {
     alertEl.style.display = 'block';
     alertEl.style.background = 'rgba(239, 68, 68, 0.2)';
     alertEl.style.color = '#fca5a5';
-    alertEl.textContent = '❌ 口令密鑰無效或不存在！座號不能作為免密口令，請使用刷臉或點擊下方密碼登入。';
+    alertEl.textContent = '❌ 口令密鑰無效或不存在！座號不能作為管理口令，請使用班級密碼登入。';
   }
 }
 
@@ -3278,7 +3278,7 @@ function showManualSelectView() {
             manualAlert.style.display = 'block';
             manualAlert.style.background = 'rgba(239, 68, 68, 0.15)';
             manualAlert.style.color = '#fca5a5';
-            manualAlert.innerHTML = '⚠️ 請聯繫科代表更新初始登錄密碼 (初設密碼為 1234，首次登入請輸入 1234)';
+            manualAlert.innerHTML = '⚠️ 密碼不正確，首次登入請輸入初始密碼或聯繫科代表';
           }
           return;
         }
