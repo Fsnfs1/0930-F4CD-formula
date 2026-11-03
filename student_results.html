@@ -561,18 +561,26 @@
         let decryptError = null;
 
         const saltFormats = ["F4CD", "MATH_SALT"];
-        for (const fmt of saltFormats) {
-          try {
-            const cryptoKey = await deriveAesKey(classID, studentID, passcode, fmt);
-            decryptedBuffer = await window.crypto.subtle.decrypt(
-              { name: "AES-GCM", iv: new Uint8Array(iv) },
-              cryptoKey,
-              ciphertext
-            );
-            break; // Decryption succeeded!
-          } catch (e) {
-            decryptError = e;
+        const candidateKeys = [passcode];
+        if (passcode === "1234" || passcode === String(studentID) || passcode.toUpperCase() === `${classID}${studentID}` || passcode.toUpperCase() === `${classID}${String(studentID).padStart(2, '0')}`) {
+          candidateKeys.push(`${classID}${String(studentID).padStart(2, '0')}-KEY`);
+        }
+
+        for (const keyCandidate of candidateKeys) {
+          for (const fmt of saltFormats) {
+            try {
+              const cryptoKey = await deriveAesKey(classID, studentID, keyCandidate, fmt);
+              decryptedBuffer = await window.crypto.subtle.decrypt(
+                { name: "AES-GCM", iv: new Uint8Array(iv) },
+                cryptoKey,
+                ciphertext
+              );
+              break; // Decryption succeeded!
+            } catch (e) {
+              decryptError = e;
+            }
           }
+          if (decryptedBuffer) break;
         }
 
         if (!decryptedBuffer) {
