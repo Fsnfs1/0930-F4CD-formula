@@ -301,6 +301,73 @@
       display: none;
       line-height: 1.5;
     }
+
+    /* Mandatory Password Change Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      padding: 16px;
+    }
+    .modal-card {
+      background: #1e293b;
+      border: 1px solid #38bdf8;
+      border-radius: 16px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.6);
+      text-align: left;
+    }
+    .modal-card h3 {
+      color: #38bdf8;
+      margin-bottom: 8px;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-card p {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+    .modal-card .form-group {
+      margin-bottom: 16px;
+    }
+    .modal-card label {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+    .modal-card input {
+      padding: 10px 14px;
+      font-size: 0.95rem;
+    }
+    .modal-alert {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 14px;
+      display: none;
+    }
+    .modal-alert.error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+    }
+    .modal-alert.success {
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid #22c55e;
+      color: #86efac;
+    }
+
   </style>
 </head>
 <body>
@@ -413,6 +480,110 @@
   </div>
 
   <script>
+    
+    // --- Password Record & Forced Revision Storage Engine ---
+    let pendingLoginContext = null;
+
+    function getStudentStorageKey(classID, studentID) {
+      return `math_student_password_${String(classID).toUpperCase()}_${String(studentID)}`;
+    }
+
+    function getStoredStudentPassword(classID, studentID) {
+      try {
+        const raw = localStorage.getItem(getStudentStorageKey(classID, studentID));
+        if (raw) return JSON.parse(raw);
+      } catch (e) {
+        console.warn("[Password] Error reading localStorage:", e);
+      }
+      return null;
+    }
+
+    function saveStoredStudentPassword(classID, studentID, newPassword) {
+      const rec = {
+        classID: String(classID).toUpperCase(),
+        studentID: String(studentID),
+        password: String(newPassword).trim(),
+        passwordChanged: true,
+        updatedAt: Date.now()
+      };
+      localStorage.setItem(getStudentStorageKey(classID, studentID), JSON.stringify(rec));
+      return rec;
+    }
+
+    function showPasswordChangeModal(classID, studentID, studentName, onComplete) {
+      pendingLoginContext = { classID, studentID, studentName, onComplete };
+      const modal = document.getElementById("pwd-change-modal");
+      const desc = document.getElementById("pwd-modal-desc");
+      const alertBox = document.getElementById("modal-alert-box");
+      const newPwdInput = document.getElementById("modal-new-pwd");
+      const confirmPwdInput = document.getElementById("modal-confirm-pwd");
+
+      desc.innerHTML = `同學 <strong>${classID} 班 ${studentID} 號 (${studentName})</strong>，您好！<br>
+        您的帳戶目前為初始預設密碼 <strong>1234</strong>。<br>
+        為保障個人小測成績隱私，首次登入必須改寫為專屬新密碼後方可查詢。`;
+
+      alertBox.style.display = "none";
+      alertBox.className = "modal-alert";
+      alertBox.innerText = "";
+      newPwdInput.value = "";
+      confirmPwdInput.value = "";
+
+      modal.style.display = "flex";
+      newPwdInput.focus();
+    }
+
+    function closePasswordChangeModal() {
+      const modal = document.getElementById("pwd-change-modal");
+      modal.style.display = "none";
+      pendingLoginContext = null;
+    }
+
+    function submitPasswordChange() {
+      if (!pendingLoginContext) return;
+      const alertBox = document.getElementById("modal-alert-box");
+      const newPwd = document.getElementById("modal-new-pwd").value.trim();
+      const confirmPwd = document.getElementById("modal-confirm-pwd").value.trim();
+
+      if (!newPwd) {
+        alertBox.className = "modal-alert error";
+        alertBox.innerText = "❌ 請輸入新密碼！";
+        alertBox.style.display = "block";
+        return;
+      }
+      if (newPwd === "1234") {
+        alertBox.className = "modal-alert error";
+        alertBox.innerText = "❌ 新密碼不能與預設密碼 1234 相同！";
+        alertBox.style.display = "block";
+        return;
+      }
+      if (newPwd.length < 4) {
+        alertBox.className = "modal-alert error";
+        alertBox.innerText = "❌ 新密碼長度至少需要 4 位字元！";
+        alertBox.style.display = "block";
+        return;
+      }
+      if (newPwd !== confirmPwd) {
+        alertBox.className = "modal-alert error";
+        alertBox.innerText = "❌ 兩次輸入的新密碼不一致，請重新核對！";
+        alertBox.style.display = "block";
+        return;
+      }
+
+      // Save custom password to LocalStorage
+      const { classID, studentID, onComplete } = pendingLoginContext;
+      saveStoredStudentPassword(classID, studentID, newPwd);
+
+      alertBox.className = "modal-alert success";
+      alertBox.innerText = "✅ 密碼修改成功！正在為您安全解密答題卡...";
+      alertBox.style.display = "block";
+
+      setTimeout(() => {
+        const cb = onComplete;
+        closePasswordChangeModal();
+        if (typeof cb === "function") cb(newPwd);
+      }, 700);
+    }
+
     let currentBlobUrl = null;
     let originalImageObj = null;
     let currentZoom = 1.0;
@@ -560,10 +731,35 @@
         let decryptedBuffer = null;
         let decryptError = null;
 
+        // Check local student password record
+        const storedRec = getStoredStudentPassword(classID, studentID);
+        const isFirstLogin = !storedRec || !storedRec.passwordChanged;
+
+        // If user entered default 1234 on first login, intercept and force password change
+        if (passcode === "1234" && isFirstLogin) {
+          const sName = (studentMeta && studentMeta.name) ? studentMeta.name : "同學";
+          btn.innerText = "🔓 安全解密並查看我的答題卡";
+          btn.disabled = false;
+          showPasswordChangeModal(classID, studentID, sName, (newPassword) => {
+            document.getElementById("passcode").value = newPassword;
+            decryptAndShowResult();
+          });
+          return;
+        }
+
+        // If student previously changed password, verify against updated password
+        if (storedRec && storedRec.passwordChanged) {
+          const officialKey = `${classID}${String(studentID).padStart(2, '0')}-KEY`;
+          if (passcode !== storedRec.password && passcode.toUpperCase() !== officialKey) {
+            throw new Error("❌ 查詢密碼不正確！您先前已將預設密碼修改，請輸入自訂的新密碼。");
+          }
+        }
+
         const saltFormats = ["F4CD", "MATH_SALT"];
         const candidateKeys = [passcode];
-        if (passcode === "1234" || passcode === String(studentID) || passcode.toUpperCase() === `${classID}${studentID}` || passcode.toUpperCase() === `${classID}${String(studentID).padStart(2, '0')}`) {
-          candidateKeys.push(`${classID}${String(studentID).padStart(2, '0')}-KEY`);
+        candidateKeys.push(`${classID}${String(studentID).padStart(2, '0')}-KEY`);
+        if (storedRec && storedRec.password) {
+          candidateKeys.push(storedRec.password);
         }
 
         for (const keyCandidate of candidateKeys) {
@@ -713,5 +909,40 @@
       clearError();
     }
   </script>
+
+  <!-- Mandatory First-Login Password Change Modal -->
+  <div id="pwd-change-modal" class="modal-overlay">
+    <div class="modal-card">
+      <h3><span>🔒</span> 首次登入請改寫查詢密碼</h3>
+      <p id="pwd-modal-desc">
+        系統檢測到您正在使用初始預設密碼 <strong>1234</strong>。<br>
+        為保障個人小測成績與答題卡隱私，首次登入必須設定專屬新密碼！
+      </p>
+
+      <div id="modal-alert-box" class="modal-alert"></div>
+
+      <div class="form-group">
+        <label for="modal-old-pwd">原密碼 (預設 1234)</label>
+        <input type="password" id="modal-old-pwd" value="1234" disabled style="opacity: 0.7;">
+      </div>
+
+      <div class="form-group">
+        <label for="modal-new-pwd">自訂新查詢密碼 (至少 4 位數字，且不能為 1234)</label>
+        <input type="password" id="modal-new-pwd" placeholder="請輸入自訂新密碼 (如: 6825)">
+      </div>
+
+      <div class="form-group">
+        <label for="modal-confirm-pwd">確認新密碼</label>
+        <input type="password" id="modal-confirm-pwd" placeholder="再次輸入新密碼以核對">
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button type="button" class="btn" style="flex: 1;" onclick="submitPasswordChange()">
+          <span>✅ 保存新密碼並查看答題卡</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
