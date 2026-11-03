@@ -208,99 +208,13 @@
       </div>
     </header>
 
-    <!-- SCREEN 1: Face-First Auth Gate -->
+    <!-- SCREEN 1: 5BC Class Password Auth Gate -->
     <section id="screen-auth" class="screen active">
-      <div class="card" id="cardFaceFirstLogin" style="text-align: center; max-width: 540px; margin: 30px auto;">
-        <h2 class="card-title" style="justify-content: center;"><span>📷</span> 智能刷臉秒速登入</h2>
-        <p class="card-subtitle">本平臺僅限高二 5B / 5C 班同學參與。正對鏡頭並眨眨眼，系統將自動比對人臉特徵庫並直接登入。</p>
-
-        <!-- Camera Viewport -->
-        <div id="faceFirstCameraWrapper" class="camera-wrapper" style="max-height: 240px; margin-bottom: 12px;">
-          <video id="faceFirstVideo" class="camera-video" playsinline autoplay muted></video>
-          <canvas id="faceFirstCanvas" class="camera-canvas" style="display: none;" width="320" height="240"></canvas>
-          <div class="camera-oval-guide"></div>
-          <div id="faceFirstOverlay" class="camera-status-overlay">📷 點擊下方按鈕啟動刷臉辨識</div>
-        </div>
-
-        <!-- Realtime Status Alert -->
-        <div id="faceFirstAlert" class="alert-box" style="display: none; margin-bottom: 12px;"></div>
-
-        <!-- Action Buttons -->
-        <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px;">
-          <button id="btnFaceFirstStart" class="btn btn-primary" style="flex: 1;" onclick="startFaceFirstCamera(false)">
-            <span>📷 啟動相機識別</span>
-          </button>
-          <button id="btnFaceFirstCapture" class="btn btn-success" style="flex: 1; display: none;" onclick="executeFaceScan('manual_click')">
-            <span>🔍 拍照識別身分</span>
-          </button>
-        </div>
-
-        <!-- R4: Key Direct Entry UI (Teacher passcodes supported, seat ID bypass purged) -->
-        <div id="cardKeyLoginSection" style="margin-top: 16px; padding: 14px; background: rgba(15, 23, 42, 0.6); border: 1.5px dashed rgba(56, 189, 248, 0.45); border-radius: 12px; text-align: center;">
-          <div style="font-size: 13.5px; color: #94a3b8; margin-bottom: 8px; font-weight: 500;">
-            🔑 免刷臉密鑰快速登錄入口
-          </div>
-          <div style="display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap;">
-            <input type="text" id="inputKeyLogin" class="form-input" 
-                   placeholder="請輸入口令密鑰 (如 5B99、5C99 或管理密鑰)" 
-                   maxlength="20" autocomplete="off" 
-                   style="flex: 1; min-width: 170px; max-width: 250px; padding: 10px 12px; background: #0f172a; border: 1.5px solid #334155; border-radius: 8px; color: #f8fafc; font-size: 14px; text-transform: uppercase;">
-            <button id="btnKeyLogin" class="btn btn-primary" onclick="handleKeyLogin()"
-                    style="padding: 10px 16px; font-weight: 700; white-space: nowrap; background: linear-gradient(135deg, #2563eb, #38bdf8); border: none; border-radius: 8px; cursor: pointer; color: #ffffff;">
-              輸入密鑰XXXX，然後點登錄
-            </button>
-          </div>
-          <div id="keyLoginAlert" style="display: none; margin-top: 8px; padding: 8px 12px; border-radius: 6px; font-size: 13px; text-align: center;"></div>
-        </div>
-
-        <div style="text-align: center; margin-top: 16px;">
-          <a href="javascript:void(0)" id="linkGoToManualPage" onclick="showManualSelectView()" style="font-size: 14px; color: var(--primary); text-decoration: underline; font-weight: 500;">
-            不方便刷臉，用密碼登錄
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- SCREEN-NAME-CONFIRM: Identity Confirmation & Manual Select -->
-    <section id="screen-name-confirm" class="screen">
-      <div class="card" id="cardReturningConfirm" style="text-align: center; padding: 24px 16px; display: none; max-width: 540px; margin: 30px auto;">
-        <div style="font-size: 44px; margin-bottom: 12px;">🎉</div>
-        <h2 class="card-title" style="justify-content: center; font-size: 20px;">
-          <span>學生身分確認</span>
-        </h2>
-        <p class="card-subtitle" style="margin-bottom: 16px;">刷臉身分核驗成功！歡迎回來</p>
-
-        <div class="confirm-welcome-box" style="background: rgba(30, 41, 59, 0.8); border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-          <h3 id="confirmWelcomeGreeting" class="confirm-welcome-title" style="font-size: 17px; margin-bottom: 6px;">
-            歡迎 <span id="confirmStudentClass">5B</span> 班 <span id="confirmStudentID">1</span> 號 <span id="confirmStudentName">吳鎂澄</span> 同學！
-          </h3>
-          <p id="confirmStudentDetails" class="confirm-student-meta" style="font-size: 13px; color: var(--text-muted);">
-            1:N 人臉特徵比對通過 · 相似度良好
-          </p>
-          <div id="confirmGradeBadge" class="student-grade-badge" style="margin-top: 10px; display: inline-block;">
-            高二 1102專題二題庫
-          </div>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; text-align: left;">
-          <button id="btnEnterQuiz" class="btn btn-primary" onclick="startQuizSession()" style="width: 100%; padding: 13px; font-size: 15px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #38bdf8);">
-            <span>🚀 1. 開始答題 (1102 自適應題庫)</span>
-          </button>
-        </div>
-
-        <button id="btnManualSelectSelf" class="btn btn-outline" onclick="showManualSelectView()" style="width: 100%; padding: 12px; font-size: 14px; margin-bottom: 10px; border: 1px solid #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.08);">
-          <span id="btnNotMe">👤 不是本人？手動選擇身分</span>
-        </button>
-
-        <button id="btnConfirmNotMe" class="btn btn-secondary" onclick="showScreen('screen-auth')" style="width: 100%;">
-          <span>← 重新對準鏡頭拍照識別</span>
-        </button>
-      </div>
-
-      <!-- Manual Selection View (cardFirstTimeSelect) -->
-      <div class="card" id="cardFirstTimeSelect" style="display: none; max-width: 520px; margin: 30px auto; padding: 24px 20px;">
-        <h2 class="card-title" style="font-size: 18px; margin-bottom: 6px;"><span>👤</span> 學生身分選擇與密碼登錄</h2>
-        <p class="card-subtitle" style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">請在下方選擇您的班別與學號，輸入個人密碼後開始答題（非刷臉登錄交卷前須上傳手寫姓名草稿紙）。</p>
+      <div class="card" id="cardPasswordLogin" style="max-width: 520px; margin: 30px auto; padding: 24px 20px;">
+        <h2 class="card-title" style="font-size: 19px; margin-bottom: 6px; justify-content: center;"><span>🔐</span> 高二 (5B / 5C) 班憑密碼登錄</h2>
+        <p class="card-subtitle" style="font-size: 13px; color: #94a3b8; margin-bottom: 16px; text-align: center;">
+          請選擇您的班別與學號，輸入個人密碼（初始密碼 <strong>1234</strong>，首次登錄後須自行修改密碼，僅有 <strong>1 次</strong>修改機會）。
+        </p>
 
         <div class="form-group" style="margin-bottom: 12px;">
           <label class="form-label" for="classSelect">班別 (Class)</label>
@@ -327,7 +241,7 @@
 
         <div class="form-group" style="margin-bottom: 14px;">
           <label class="form-label" for="manualPasswordInput">個人登錄密碼 (Password)</label>
-          <input type="password" id="manualPasswordInput" class="form-input" placeholder="請輸入更新後的個人密碼" inputmode="numeric" autocomplete="off" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; font-size: 14px; box-sizing: border-box;">
+          <input type="password" id="manualPasswordInput" class="form-input" placeholder="初設密碼為 1234，若已修改請輸入新密碼" inputmode="numeric" autocomplete="off" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; font-size: 14px; box-sizing: border-box;">
           <div id="manualLoginAlert" style="display: none; margin-top: 8px; padding: 10px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 8px; color: #fca5a5; font-size: 13px; text-align: left;"></div>
         </div>
 
@@ -335,10 +249,59 @@
           <span>🔒 密碼驗證並登入</span>
         </button>
 
-        <button id="btnBackToFaceFirst" class="btn btn-secondary" onclick="showScreen('screen-auth')" style="width: 100%; margin-top: 10px;">
-          <span>← 返回第一頁刷臉</span>
+        <!-- Teacher / Admin direct entrance -->
+        <div id="cardKeyLoginSection" style="margin-top: 20px; padding: 12px; background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(56, 189, 248, 0.35); border-radius: 10px; text-align: center;">
+          <div style="font-size: 12.5px; color: #94a3b8; margin-bottom: 8px;">
+            🔑 教師 / 管理員測試口令快速通道
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap;">
+            <input type="text" id="inputKeyLogin" class="form-input" 
+                   placeholder="口令密鑰 (如 5B99、5C99)" 
+                   maxlength="20" autocomplete="off" 
+                   style="flex: 1; min-width: 150px; max-width: 200px; padding: 8px 10px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #f8fafc; font-size: 13px; text-transform: uppercase; margin-bottom: 0;">
+            <button id="btnKeyLogin" class="btn btn-outline btn-sm" onclick="handleKeyLogin()" style="padding: 8px 14px; font-weight: 600;">
+              管理登錄
+            </button>
+          </div>
+          <div id="keyLoginAlert" style="display: none; margin-top: 6px; padding: 6px 10px; border-radius: 6px; font-size: 12px; text-align: center;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN-NAME-CONFIRM: Identity Confirmation (Kept for compatibility) -->
+    <section id="screen-name-confirm" class="screen">
+      <div class="card" id="cardReturningConfirm" style="text-align: center; padding: 24px 16px; max-width: 540px; margin: 30px auto;">
+        <div style="font-size: 44px; margin-bottom: 12px;">🎉</div>
+        <h2 class="card-title" style="justify-content: center; font-size: 20px;">
+          <span>學生身分確認</span>
+        </h2>
+        <p class="card-subtitle" style="margin-bottom: 16px;">身分核驗成功！歡迎回來</p>
+
+        <div class="confirm-welcome-box" style="background: rgba(30, 41, 59, 0.8); border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+          <h3 id="confirmWelcomeGreeting" class="confirm-welcome-title" style="font-size: 17px; margin-bottom: 6px;">
+            歡迎 <span id="confirmStudentClass">5B</span> 班 <span id="confirmStudentID">1</span> 號 <span id="confirmStudentName">吳鎂澄</span> 同學！
+          </h3>
+          <p id="confirmStudentDetails" class="confirm-student-meta" style="font-size: 13px; color: var(--text-muted);">
+            身分核驗通過
+          </p>
+          <div id="confirmGradeBadge" class="student-grade-badge" style="margin-top: 10px; display: inline-block;">
+            高二 1102專題二題庫
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; text-align: left;">
+          <button id="btnEnterQuiz" class="btn btn-primary" onclick="startQuizSession()" style="width: 100%; padding: 13px; font-size: 15px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #38bdf8);">
+            <span>🚀 1. 開始答題 (1102 自適應題庫)</span>
+          </button>
+        </div>
+
+        <button id="btnConfirmNotMe" class="btn btn-secondary" onclick="showScreen('screen-auth')" style="width: 100%;">
+          <span>← 重新輸入密碼登錄</span>
         </button>
       </div>
+
+      <!-- Compatibility fallback container -->
+      <div id="cardFirstTimeSelect" style="display: none;"></div>
     </section>
 
     <!-- SCREEN 4: Navigation Portal (Dashboard) -->
@@ -356,6 +319,47 @@
         <!-- Warning banner for password-only login -->
         <div id="dashBannerPasswordOnly" class="alert-box alert-warning" style="display: none; margin-bottom: 16px; padding: 12px 16px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 8px; color: #fcd34d; font-size: 14px; line-height: 1.5;">
           ⚠️ 由於您使用密碼登錄（非刷臉），交卷前必須拍照上傳手寫姓名的答題草稿紙！
+        </div>
+
+        <!-- R5: Entrance Verification Choice Card (拍臉留痕 或 做題後拍簽名草稿紙 二選一) -->
+        <div id="dashVerificationCard" class="card" style="margin-bottom: 16px; padding: 18px; background: rgba(15, 23, 42, 0.7); border: 1.5px solid rgba(56, 189, 248, 0.4); border-radius: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="font-size: 15px; font-weight: 700; color: #38bdf8; display: flex; align-items: center; gap: 8px; margin: 0;">
+              <span>🛡️</span> 身分核驗二選一 (進入門禁後拍臉留痕 或 做題結束後拍攝帶簽名草稿紙)
+            </h3>
+            <span id="dashAuthMethodBadge" class="badge badge-yellow">草稿紙模式</span>
+          </div>
+          <p style="font-size: 13px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px;">
+            您已通過 5BC 班密碼登錄！本系統要求雙軌驗證二選一：<br>
+            <strong>選項 A：</strong>現在直接點擊「📷 立即拍臉留痕」，完成留痕後答題結束<strong>免交草稿紙</strong>直接交卷結算；<br>
+            <strong>選項 B：</strong>不拍臉留痕，答題完成交卷前<strong>拍攝帶有本人手寫簽名</strong>的答題草稿紙核驗存證。
+          </p>
+
+          <div id="dashFaceSnapBox" style="text-align: center; margin-bottom: 12px;">
+            <div id="dashFaceCameraWrapper" class="camera-wrapper" style="max-height: 220px; display: none; margin-bottom: 10px;">
+              <video id="dashFaceVideo" class="camera-video" playsinline autoplay muted></video>
+              <canvas id="dashFaceCanvas" class="camera-canvas" style="display: none;" width="320" height="240"></canvas>
+              <div class="camera-oval"></div>
+              <div id="dashFaceOverlay" class="camera-overlay">📷 面向鏡頭拍照留痕</div>
+            </div>
+
+            <div id="dashFacePreviewWrapper" style="display: none; margin-bottom: 10px;">
+              <img id="dashFacePreviewImg" src="" style="max-height: 180px; border-radius: 8px; border: 2px solid var(--accent-green); box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+              <div style="font-size: 12.5px; color: var(--accent-green); font-weight: 600; margin-top: 4px;">✅ 已完成拍臉留痕存證 · 做題結束後免交草稿紙即可直接交卷</div>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+              <button id="btnStartFaceTrace" class="btn btn-primary btn-sm" onclick="startEntranceFaceTrace()">
+                <span>📷 選擇拍臉留痕 (推薦 · 免交草稿紙)</span>
+              </button>
+              <button id="btnCaptureFaceTrace" class="btn btn-success btn-sm" style="display: none;" onclick="captureEntranceFaceTrace()">
+                <span>📸 拍照確認留痕</span>
+              </button>
+              <button id="btnChooseScratchMode" class="btn btn-outline btn-sm" onclick="selectScratchModeManual()">
+                <span>📝 選擇做題後拍攝帶簽名草稿紙</span>
+              </button>
+            </div>
+          </div>
         </div>
 
         <div style="margin-bottom: 16px;">
@@ -445,11 +449,11 @@
     <!-- SCREEN 3: Scratch Paper Upload (Non-face login check) -->
     <section id="screen-scratch" class="screen">
       <div class="card" style="max-width: 600px; margin: 20px auto; text-align: center;">
-        <h2 class="card-title" style="justify-content: center;">📝 上傳草稿紙驗證</h2>
-        <div class="badge badge-yellow" style="margin-bottom: 12px; display: inline-block;">非刷臉登錄必檢環節</div>
+        <h2 class="card-title" style="justify-content: center;">📝 上傳帶有簽名的草稿紙驗證</h2>
+        <div id="scratchGateBadge" class="badge badge-yellow" style="margin-bottom: 12px; display: inline-block;">未拍臉留痕必檢環節</div>
         <p class="card-subtitle">
-          檢測到您選擇了密碼登入，為確保自主練習真實性，交卷前請拍照上傳草稿紙。<br>
-          <strong style="color: var(--accent-yellow);">⚠️ 注意：草稿紙頂部必須清晰手寫您的班級、學號與姓名！</strong>
+          檢測到您未選擇拍臉留痕。為確保測驗真實性，交卷前請拍攝帶有<strong>手寫簽名</strong>的草稿紙。<br>
+          <strong style="color: var(--accent-yellow);">⚠️ 注意：草稿紙頂部必須清晰手寫您的班級、學號與本人簽名！</strong>
         </p>
 
         
@@ -754,7 +758,7 @@
       <div style="font-size: 40px; text-align: center; margin-bottom: 8px;">🛡️</div>
       <h3 style="text-align: center; margin-bottom: 6px; font-size: 18px; font-weight: 700; color: #f8fafc;">首次登入安全修改密碼</h3>
       <p id="forcePasswordSubtitle" style="text-align: center; font-size: 13px; color: #94a3b8; margin-bottom: 16px;">
-        您的帳戶密碼為初始預設值 1234。首次登入必須修訂密碼後才能開始答題。
+        您的帳戶密碼為初始預設值 1234。首次登入必須修訂密碼（全學期僅有 1 次修改機會），修改完成後才能開始答題。
       </p>
       <div id="alertForcePasswordError" class="alert-box alert-danger" style="display: none; margin-bottom: 12px; font-size: 13px; padding: 10px; border-radius: 6px;"></div>
       <div class="form-group" style="margin-bottom: 10px; text-align: left;">
@@ -2591,6 +2595,7 @@ function getStudentPasswordRecord(classID, studentID) {
             salt: parsed.salt || salt,
             hash: parsed.hash,
             passwordChanged: !!parsed.passwordChanged,
+            changeCount: parsed.changeCount !== undefined ? Number(parsed.changeCount) : (parsed.passwordChanged ? 1 : 0),
             updatedAt: parsed.updatedAt || 0
           };
         }
@@ -2605,6 +2610,7 @@ function getStudentPasswordRecord(classID, studentID) {
       salt: snapRec.salt || salt,
       hash: snapRec.hash,
       passwordChanged: !!snapRec.passwordChanged,
+      changeCount: snapRec.changeCount !== undefined ? Number(snapRec.changeCount) : (snapRec.passwordChanged ? 1 : 0),
       updatedAt: snapRec.updatedAt || 0
     };
   }
@@ -2615,6 +2621,7 @@ function getStudentPasswordRecord(classID, studentID) {
     salt: salt,
     hash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', // SHA-256('1234')
     passwordChanged: false,
+    changeCount: 0,
     updatedAt: 0
   };
 }
@@ -2664,6 +2671,12 @@ function saveStudentPassword(classID, studentID, newPassword, passwordChanged) {
   if (isNaN(sid)) return { success: false, reason: "無效的學生資訊", message: "無效的學生資訊" };
   const pwdStr = String(newPassword !== undefined && newPassword !== null ? newPassword : "").trim();
 
+  const existingRec = getStudentPasswordRecord(cid, sid);
+  const currentChangeCount = existingRec ? (existingRec.changeCount || (existingRec.passwordChanged ? 1 : 0)) : 0;
+  if (passwordChanged && currentChangeCount >= 1) {
+    return { success: false, reason: "您已修改過密碼（每位同學僅有 1 次改密碼的機會），無法再次修改！", message: "您已修改過密碼（每位同學僅有 1 次改密碼的機會），無法再次修改！" };
+  }
+
   if (!/^\d+$/.test(pwdStr) || pwdStr.length < 4) {
     return { success: false, reason: "密碼必須為至少 4 位純數字", message: "密碼必須為至少 4 位純數字" };
   }
@@ -2682,12 +2695,14 @@ function saveStudentPassword(classID, studentID, newPassword, passwordChanged) {
   }
 
   const now = Date.now();
+  const newChangeCount = passwordChanged ? (currentChangeCount + 1) : currentChangeCount;
   const record = {
     classID: cid,
     studentID: sid,
     salt: salt,
     hash: hash,
     passwordChanged: !!passwordChanged,
+    changeCount: newChangeCount,
     updatedAt: now
   };
 
@@ -2720,6 +2735,10 @@ function saveStudentPassword(classID, studentID, newPassword, passwordChanged) {
 }
 
 function updateStudentPassword(classID, studentID, oldPassword, newPassword) {
+  const currentRec = getStudentPasswordRecord(classID, studentID);
+  if (currentRec && (currentRec.changeCount >= 1 || (currentRec.passwordChanged && currentRec.changeCount === undefined))) {
+    return { success: false, reason: "每位同學僅有 1 次修改密碼的機會，您已使用過！", message: "每位同學僅有 1 次修改密碼的機會，您已使用過！" };
+  }
   const vRes = verifyStudentPassword(classID, studentID, oldPassword);
   if (!vRes && oldPassword !== '1234') {
     return { success: false, reason: "原密碼不正確", message: "原密碼不正確" };
@@ -2850,6 +2869,14 @@ function submitForceChangePassword() {
     return;
   }
 
+  const existingRec = getStudentPasswordRecord(cid, sid);
+  if (existingRec && existingRec.changeCount >= 1) {
+    if (alertBox) {
+      alertBox.style.display = 'block';
+      alertBox.textContent = '❌ 您已修改過密碼（每人僅限 1 次機會），無法再次修改！';
+    }
+    return;
+  }
   const res = updateStudentPassword(cid, sid, oldPwd, newPwd);
   if (!res || !res.success) {
     if (alertBox) {
@@ -3280,9 +3307,9 @@ function onAuthenticationSuccess(student, percentage, isPasswordOnly) {
   AppState.currentStudentName = student.name;
   AppState.currentStudent = student;
   AppState.isPasswordOnlyLogin = !!isPasswordOnly;
-  if (!isPasswordOnly) {
-    AppState.draftUploaded = false;
-  }
+  AppState.faceTracePhoto = null; // Reset face trace photo for new session
+  AppState.authVerificationMode = 'undecided';
+  AppState.draftUploaded = false;
 
   // Restore snapshot progress if owner matches
   if (AppState.savedProgressOwner) {
@@ -3302,13 +3329,31 @@ function onAuthenticationSuccess(student, percentage, isPasswordOnly) {
 
   updateUserBadge();
 
+  // Reset dual-choice verification UI
+  const previewWrapper = document.getElementById('dashFacePreviewWrapper');
+  const cameraWrapper = document.getElementById('dashFaceCameraWrapper');
+  const btnStartTrace = document.getElementById('btnStartFaceTrace');
+  const btnCaptureTrace = document.getElementById('btnCaptureFaceTrace');
+  const badgeTrace = document.getElementById('dashAuthMethodBadge');
+  if (previewWrapper) previewWrapper.style.display = 'none';
+  if (cameraWrapper) cameraWrapper.style.display = 'none';
+  if (btnCaptureTrace) btnCaptureTrace.style.display = 'none';
+  if (btnStartTrace) {
+    btnStartTrace.style.display = 'inline-block';
+    btnStartTrace.innerHTML = '<span>📷 選擇拍臉留痕 (推薦 · 免交草稿紙)</span>';
+  }
+  if (badgeTrace) {
+    badgeTrace.className = 'badge badge-yellow';
+    badgeTrace.textContent = '草稿紙模式 (未拍臉)';
+  }
+
   // Pre-populate dashboard
   const dashName = document.getElementById('dashStudentName');
   const dashMeta = document.getElementById('dashClassAndId');
   const dashBanner = document.getElementById('dashBannerPasswordOnly');
   if (dashName) dashName.textContent = `${student.name} 同學，您好！`;
   if (dashMeta) dashMeta.textContent = `${student.classID} 班 ${student.studentID} 號`;
-  if (dashBanner) dashBanner.style.display = AppState.isPasswordOnlyLogin ? 'block' : 'none';
+  if (dashBanner) dashBanner.style.display = 'none';
 
   // Always present the navigation portal (#screen4-dashboard) upon successful login
   showScreen('screen4-dashboard');
@@ -3388,8 +3433,8 @@ function initFaceAuth() {
     });
   }
 
-  // Auto start camera on entrance
-  startFaceFirstCamera(true);
+  // Entrance is 5BC password authentication gate, no auto-start camera on entrance
+  // startFaceFirstCamera(true);
 }
 
 function populateStudentSelect() {
@@ -3414,7 +3459,8 @@ function updateUserBadge() {
   const badge = document.getElementById('headerUserBadge');
   const logoutBtn = document.getElementById('btnHeaderLogout');
   if (AppState.currentUser) {
-    badge.innerText = `${AppState.currentUser.classID} 班 ${AppState.currentUser.name}` + (AppState.isPasswordOnlyLogin ? ' (密碼/口令)' : ' (刷臉驗證)');
+    const traceStatus = AppState.faceTracePhoto ? ' (已拍臉留痕)' : ' (草稿紙模式)';
+    badge.innerText = `${AppState.currentUser.classID} 班 ${AppState.currentUser.name}` + traceStatus;
     badge.style.display = 'inline-flex';
     logoutBtn.style.display = 'inline-flex';
   } else {
@@ -3431,14 +3477,19 @@ function logout() {
     AppState.arena.isMatching = false;
     AppState.arena.peerMatched = false;
   }
+  if (entranceFaceStream) {
+    entranceFaceStream.getTracks().forEach(t => t.stop());
+    entranceFaceStream = null;
+  }
   AppState.currentUser = null;
   AppState.isPasswordOnlyLogin = false;
   AppState.draftUploaded = false;
+  AppState.faceTracePhoto = null;
+  AppState.authVerificationMode = null;
   if (AppState.activeQuiz && AppState.activeQuiz.timerInterval) clearInterval(AppState.activeQuiz.timerInterval);
   updateUserBadge();
   if (window.stopCamera) window.stopCamera();
   showScreen('screen-auth');
-  startFaceFirstCamera(true);
 }
 
 // ----------------- SCRATCH PAPER PHOTO GATE (Req 5) -----------------
@@ -4135,14 +4186,145 @@ function closeFormulaHint() {
 // js_settlement_admin_arena.js
 // 3. Quiz Submission, Settlement, Admin Dashboard & Online 1v1 Arena
 
+
+// ----------------- DUAL-CHOICE VERIFICATION (Req 4: Face Trace vs Scratch Paper) -----------------
+let entranceFaceStream = null;
+
+function startEntranceFaceTrace() {
+  const cameraWrapper = document.getElementById('dashFaceCameraWrapper');
+  const previewWrapper = document.getElementById('dashFacePreviewWrapper');
+  const btnStart = document.getElementById('btnStartFaceTrace');
+  const btnCapture = document.getElementById('btnCaptureFaceTrace');
+  const video = document.getElementById('dashFaceVideo');
+  const overlay = document.getElementById('dashFaceOverlay');
+
+  if (previewWrapper) previewWrapper.style.display = 'none';
+  if (cameraWrapper) cameraWrapper.style.display = 'block';
+  if (btnStart) btnStart.style.display = 'none';
+  if (btnCapture) btnCapture.style.display = 'inline-block';
+  if (overlay) overlay.textContent = '📷 面向鏡頭拍照留痕';
+
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }
+    }).then(stream => {
+      entranceFaceStream = stream;
+      if (video) {
+        video.srcObject = stream;
+        video.play();
+      }
+    }).catch(err => {
+      console.warn('[FaceTrace] Camera error:', err);
+      alert('無法開啟攝像頭，請允許瀏覽器使用攝像頭權限，或選擇「做題結束後拍攝帶簽名草稿紙」。');
+      if (cameraWrapper) cameraWrapper.style.display = 'none';
+      if (btnStart) btnStart.style.display = 'inline-block';
+      if (btnCapture) btnCapture.style.display = 'none';
+    });
+  } else {
+    alert('您的瀏覽器不支援攝像頭調用，請選擇「做題結束後拍攝帶簽名草稿紙」。');
+  }
+}
+
+function captureEntranceFaceTrace() {
+  const video = document.getElementById('dashFaceVideo');
+  const canvas = document.getElementById('dashFaceCanvas');
+  const cameraWrapper = document.getElementById('dashFaceCameraWrapper');
+  const previewWrapper = document.getElementById('dashFacePreviewWrapper');
+  const previewImg = document.getElementById('dashFacePreviewImg');
+  const btnStart = document.getElementById('btnStartFaceTrace');
+  const btnCapture = document.getElementById('btnCaptureFaceTrace');
+  const badge = document.getElementById('dashAuthMethodBadge');
+
+  if (!video || !canvas) return;
+
+  const w = video.videoWidth || 320;
+  const h = video.videoHeight || 240;
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, w, h);
+
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+  AppState.faceTracePhoto = dataUrl;
+  AppState.authVerificationMode = 'face_trace';
+  AppState.isPasswordOnlyLogin = false; // Bypass scratch paper requirement
+
+  // Stop stream
+  if (entranceFaceStream) {
+    entranceFaceStream.getTracks().forEach(t => t.stop());
+    entranceFaceStream = null;
+  }
+  if (video.srcObject) {
+    video.srcObject = null;
+  }
+
+  if (cameraWrapper) cameraWrapper.style.display = 'none';
+  if (btnCapture) btnCapture.style.display = 'none';
+  if (previewImg) previewImg.src = dataUrl;
+  if (previewWrapper) previewWrapper.style.display = 'block';
+  if (btnStart) {
+    btnStart.style.display = 'inline-block';
+    btnStart.innerHTML = '<span>🔄 重新拍臉留痕</span>';
+  }
+  if (badge) {
+    badge.className = 'badge badge-green';
+    badge.textContent = '已拍臉留痕 · 免草稿紙';
+  }
+
+  // Update header badge
+  updateUserBadge();
+
+  console.log('[FaceTrace] Entrance face trace captured successfully.');
+}
+
+function selectScratchModeManual() {
+  if (entranceFaceStream) {
+    entranceFaceStream.getTracks().forEach(t => t.stop());
+    entranceFaceStream = null;
+  }
+  const video = document.getElementById('dashFaceVideo');
+  if (video && video.srcObject) video.srcObject = null;
+
+  const cameraWrapper = document.getElementById('dashFaceCameraWrapper');
+  const previewWrapper = document.getElementById('dashFacePreviewWrapper');
+  const btnStart = document.getElementById('btnStartFaceTrace');
+  const btnCapture = document.getElementById('btnCaptureFaceTrace');
+  const badge = document.getElementById('dashAuthMethodBadge');
+
+  if (cameraWrapper) cameraWrapper.style.display = 'none';
+  if (previewWrapper) previewWrapper.style.display = 'none';
+  if (btnCapture) btnCapture.style.display = 'none';
+  if (btnStart) {
+    btnStart.style.display = 'inline-block';
+    btnStart.innerHTML = '<span>📷 選擇拍臉留痕 (推薦 · 免交草稿紙)</span>';
+  }
+
+  AppState.faceTracePhoto = null;
+  AppState.authVerificationMode = 'scratch_paper';
+  AppState.isPasswordOnlyLogin = true; // Requires scratch paper
+  if (badge) {
+    badge.className = 'badge badge-yellow';
+    badge.textContent = '草稿紙模式 (交卷必拍)';
+  }
+  updateUserBadge();
+  alert('您已選擇「做題結束後拍攝帶簽名草稿紙」模式。請在做題時準備草稿紙並手寫本人姓名，結算前拍照上傳！');
+}
+
+
 function promptSubmitQuiz() {
   checkAnswerAndApplyPenalties();
   if (AppState.activeQuiz.currentIndex < AppState.activeQuiz.questions.length - 1) {
     renderQuestion();
     return;
   }
-  if (AppState.isPasswordOnlyLogin && !AppState.draftUploaded) {
-    alert('⚠️ 檢測到您使用口令/密碼登入，交卷前必須拍照上傳手寫姓名的草稿紙！');
+  // Dual-choice verification: If student has face trace, bypass scratch paper requirement
+  if (AppState.faceTracePhoto) {
+    finishQuizSubmission();
+    return;
+  }
+  // Otherwise, student must submit scratch paper with signature
+  if (!AppState.draftUploaded) {
+    alert('⚠️ 檢測到您未進行拍臉留痕，交卷前必須拍攝並上傳帶有本人手寫簽名的草稿紙！');
     showScreen('screen-scratch');
     return;
   }
@@ -4150,9 +4332,10 @@ function promptSubmitQuiz() {
 }
 
 function finishQuizSubmission() {
-  if (AppState.isPasswordOnlyLogin) {
+  // Dual-choice verification: If NOT faceTracePhoto, verify scratch paper upload & signature
+  if (!AppState.faceTracePhoto) {
     if (!AppState.draftUploaded) {
-      alert('⚠️ 未上傳草稿紙照片，無法完成交卷！');
+      alert('⚠️ 未完成拍臉留痕且未上傳草稿紙照片，無法交卷！請拍攝帶有本人手寫簽名的草稿紙。');
       showScreen('screen-scratch');
       return;
     }
@@ -4160,7 +4343,7 @@ function finishQuizSubmission() {
     const entered = nameInput ? nameInput.value.trim() : '';
     const expected = AppState.currentUser ? AppState.currentUser.name.trim() : '';
     if (!entered || entered !== expected) {
-      alert(`⚠️ 手寫姓名核驗不符（輸入: ${entered}，應為: ${expected}）！請重新輸入。`);
+      alert(`⚠️ 手寫姓名核驗不符（輸入: ${entered}，應為: ${expected}）！請在草稿紙頂部手寫本人姓名並重新確認。`);
       showScreen('screen-scratch');
       return;
     }
