@@ -4763,24 +4763,25 @@ function initAdminStudentsData() {
     }
   } catch (e) {}
 
-  // 2. Aggregate attempts & scores by student key: ${cls}_${sid}
+  // 2. Aggregate attempts & scores by student key: ${cls}_${sid} (EXCLUSIVELY for 1102 bank)
   allRecords.forEach(r => {
     const cid = String(r.classID || '').trim().toUpperCase();
     const sid = parseInt(r.studentID, 10);
     const did = String(r.dateID || '');
     if ((cid === '5B' || cid === '5C') && !isNaN(sid) && sid > 0) {
+      // STRICT FILTER: Only accept 1102 question bank records (e.g. 1102_PRACTICE, 1102_5BC_QUIZ, or 5BC_MAT/5BC_W/5BC_E)
+      const is1102Record = did.startsWith('1102_') || did.includes('_5BC_') || did.includes('1102');
+      if (!is1102Record) return;
+
       const key = `${cid}_${sid}`;
       if (!statsMap[key]) {
         statsMap[key] = { attempts: 0, totalScore: 0, maxScore: 0, hasQuiz: false };
       }
-      // Count practice questions or quiz submissions
-      if (did.includes('PRACTICE') || did.includes('QUIZ') || r.Score !== undefined || r.score !== undefined) {
-        const sc = Number(r.score !== undefined ? r.score : r.Score) || 0;
-        statsMap[key].attempts++;
-        statsMap[key].totalScore += sc;
-        if (sc > statsMap[key].maxScore) statsMap[key].maxScore = sc;
-        statsMap[key].hasQuiz = true;
-      }
+      const sc = Number(r.score !== undefined ? r.score : r.Score) || 0;
+      statsMap[key].attempts++;
+      statsMap[key].totalScore += sc;
+      if (sc > statsMap[key].maxScore) statsMap[key].maxScore = sc;
+      statsMap[key].hasQuiz = true;
     }
   });
 
