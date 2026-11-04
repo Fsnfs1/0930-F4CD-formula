@@ -2588,6 +2588,17 @@ function getStudentPasswordRecord(classID, studentID) {
   if (isNaN(sid)) return null;
 
   const snapKey = `${cid}_${sid}`;
+  if (cid === '5B' && (sid === 98 || sid === 99)) {
+    return {
+      classID: '5B',
+      studentID: sid,
+      salt: 'MATH_SALT_5B_' + sid,
+      hash: '',
+      passwordChanged: true,
+      changeCount: 1,
+      updatedAt: 1791299240514
+    };
+  }
   const adminPasswords = (typeof window !== 'undefined' && window.ADMIN_STUDENT_PASSWORDS) || {};
   const snapRec = adminPasswords[snapKey] || null;
 
@@ -2770,8 +2781,10 @@ function updateStudentPassword(classID, studentID, oldPassword, newPassword) {
 }
 
 function openForceChangePasswordModal(user, onCompleteCallback) {
-  // 5B99 Teacher Tester fixed password bypass: never force change password
-  if (user && (user.studentID === 99 || user.id === 99 || user.isTeacher || String(user.classID).toUpperCase() === 'TEA')) {
+  // 5B98 / 5B99 Test user fixed password bypass: never force change password
+  const uid = user ? (user.studentID || user.id) : 0;
+  const isTest = user && (uid === 98 || uid === 99 || user.isTeacher || user.isTestUser || String(user.classID).toUpperCase() === 'TEA');
+  if (isTest) {
     if (typeof onCompleteCallback === 'function') onCompleteCallback();
     return;
   }
@@ -3339,11 +3352,12 @@ function showManualSelectView() {
         return;
       }
 
-      // 5B98 Student Tester Account (password: TEST98)
+      // 5B98 Student Tester Account (password: TEST98) -> Direct quiz without forced password change
       if (cls === '5B' && sid === 98) {
         if (enteredPwd.toUpperCase() === 'TEST98' || enteredPwd.toUpperCase() === '5B98') {
           if (manualAlert) manualAlert.style.display = 'none';
-          onAuthenticationSuccess({ classID: '5B', id: 98, studentID: 98, name: student.name || '5B98 測試學生' }, 95, true);
+          onAuthenticationSuccess({ classID: '5B', id: 98, studentID: 98, name: student.name || '5B98 測試學生', isTestUser: true }, 95, true);
+          setTimeout(() => { startQuizSession({ skipNetCheck: true }); }, 300);
         } else {
           if (manualAlert) {
             manualAlert.style.display = 'block';
@@ -3741,12 +3755,15 @@ async function startQuizSession(options) {
   if (AppState.currentUser && !AppState.currentUser.isTeacher) {
     const cid = AppState.currentUser.classID;
     const sid = AppState.currentUser.studentID || AppState.currentUser.id;
-    const pwdRec = getStudentPasswordRecord(cid, sid);
-    if (!pwdRec || !pwdRec.passwordChanged) {
-      openForceChangePasswordModal(AppState.currentUser, function() {
-        startQuizSession();
-      });
-      return;
+    const isTest = (sid === 98 || sid === 99 || AppState.currentUser.isTestUser);
+    if (!isTest) {
+      const pwdRec = getStudentPasswordRecord(cid, sid);
+      if (!pwdRec || !pwdRec.passwordChanged) {
+        openForceChangePasswordModal(AppState.currentUser, function() {
+          startQuizSession();
+        });
+        return;
+      }
     }
   }
 
@@ -5289,12 +5306,15 @@ function startArenaMatch() {
   if (AppState.currentUser && !AppState.currentUser.isTeacher) {
     const cid = AppState.currentUser.classID;
     const sid = AppState.currentUser.studentID || AppState.currentUser.id;
-    const pwdRec = getStudentPasswordRecord(cid, sid);
-    if (!pwdRec || !pwdRec.passwordChanged) {
-      openForceChangePasswordModal(AppState.currentUser, function() {
-        startArenaMatch();
-      });
-      return;
+    const isTest = (sid === 98 || sid === 99 || AppState.currentUser.isTestUser);
+    if (!isTest) {
+      const pwdRec = getStudentPasswordRecord(cid, sid);
+      if (!pwdRec || !pwdRec.passwordChanged) {
+        openForceChangePasswordModal(AppState.currentUser, function() {
+          startArenaMatch();
+        });
+        return;
+      }
     }
   }
 
