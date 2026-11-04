@@ -4872,17 +4872,47 @@ const ARENA_CONFIG = {
 };
 
 async function probeMacauNetwork(timeoutMs) {
+  // 1. Try persistence.js global probeMacauNetwork if available
   if (window.probeMacauNetwork && window.probeMacauNetwork !== probeMacauNetwork) {
-    try { return await window.probeMacauNetwork(timeoutMs); } catch (e) {}
+    try { 
+      const res = await window.probeMacauNetwork(timeoutMs);
+      if (res) return true;
+    } catch (e) {}
   }
-  const gasUrl = ARENA_CONFIG.gasEndpoint;
+
+  // 2. Immediate fail if browser is offline
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    return false;
+  }
+
+  // 3. Robust race: fast Google 204 endpoints + GAS probe
+  const endpoints = [
+    "https://connectivitycheck.gstatic.com/generate_204",
+    "https://www.google.com/generate_204",
+    ARENA_CONFIG.gasEndpoint + "?probe=1"
+  ];
+
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer = controller ? setTimeout(() => controller.abort(), timeoutMs || 3500) : null;
+
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs || 3500);
-    const resp = await fetch(gasUrl + '?probe=1', { method: 'GET', mode: 'no-cors', signal: controller.signal });
-    clearTimeout(timer);
-    return true;
+    const fetchPromises = endpoints.map(url => {
+      const buster = url.includes('?') ? `${url}&_t=${Date.now()}` : `${url}?_t=${Date.now()}`;
+      return fetch(buster, {
+        method: "GET",
+        mode: "no-cors",
+        cache: "no-store",
+        signal: controller ? controller.signal : undefined
+      }).then(() => true);
+    });
+
+    const anySuccess = (typeof Promise.any === 'function') 
+      ? await Promise.any(fetchPromises) 
+      : await Promise.race(fetchPromises);
+    if (timer) clearTimeout(timer);
+    return !!anySuccess;
   } catch (e) {
+    if (timer) clearTimeout(timer);
     return false;
   }
 }
