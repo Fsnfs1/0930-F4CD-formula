@@ -4747,22 +4747,84 @@ function restartQuiz() {
 
 // ----------------- ADMIN DASHBOARD (5BC99) -----------------
 function initAdminStudentsData() {
-  if (AppState.admin.studentsData.length > 0) return;
   const roster = window.ROSTER_5BC || { '5B': [], '5C': [] };
-  const list = [];
+  const statsMap = {};
 
+  // 1. Gather all available record sources (Snapshot + Local Cache + Active Progress)
+  const allRecords = [];
+  if (window.ADMIN_SNAPSHOT_DATA && Array.isArray(window.ADMIN_SNAPSHOT_DATA)) {
+    allRecords.push(...window.ADMIN_SNAPSHOT_DATA);
+  }
+  try {
+    const cached = localStorage.getItem("ADMIN_DASHBOARD_CACHE");
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed)) allRecords.push(...parsed);
+    }
+  } catch (e) {}
+
+  // 2. Aggregate attempts & scores by student key: ${cls}_${sid}
+  allRecords.forEach(r => {
+    const cid = String(r.classID || '').trim().toUpperCase();
+    const sid = parseInt(r.studentID, 10);
+    const did = String(r.dateID || '');
+    if ((cid === '5B' || cid === '5C') && !isNaN(sid) && sid > 0) {
+      const key = `${cid}_${sid}`;
+      if (!statsMap[key]) {
+        statsMap[key] = { attempts: 0, totalScore: 0, maxScore: 0, hasQuiz: false };
+      }
+      // Count practice questions or quiz submissions
+      if (did.includes('PRACTICE') || did.includes('QUIZ') || r.Score !== undefined || r.score !== undefined) {
+        const sc = Number(r.score !== undefined ? r.score : r.Score) || 0;
+        statsMap[key].attempts++;
+        statsMap[key].totalScore += sc;
+        if (sc > statsMap[key].maxScore) statsMap[key].maxScore = sc;
+        statsMap[key].hasQuiz = true;
+      }
+    }
+  });
+
+  // 3. Check localStorage for any local saved progress per student
   ['5B', '5C'].forEach(cls => {
     (roster[cls] || []).forEach(s => {
+      const key = `${cls}_${s.id}`;
+      try {
+        const progKey = `MATH5BC_ACTIVE_PROGRESS_${cls}_${s.id}`;
+        const pRaw = localStorage.getItem(progKey);
+        if (pRaw) {
+          const pData = JSON.parse(pRaw);
+          const ansCount = pData.answers ? Object.keys(pData.answers).length : 0;
+          if (ansCount > 0) {
+            statsMap[key] = statsMap[key] || { attempts: 0, totalScore: 0, maxScore: 0, hasQuiz: false };
+            statsMap[key].attempts = Math.max(statsMap[key].attempts, ansCount);
+            statsMap[key].hasQuiz = true;
+          }
+        }
+      } catch (e) {}
+    });
+  });
+
+  // 4. Construct student list with real stats
+  const list = [];
+  ['5B', '5C'].forEach(cls => {
+    (roster[cls] || []).forEach(s => {
+      const stat = statsMap[`${cls}_${s.id}`];
+      const attCount = stat ? stat.attempts : 0;
+      const mScore = stat ? stat.maxScore : 0;
+      const avg = (stat && stat.attempts > 0) ? (stat.totalScore / stat.attempts).toFixed(1) : '-';
+      const status = attCount > 0 ? '作答進行中' : '未作答';
+      const auth = attCount > 0 ? '密碼登錄' : '未登入';
+
       list.push({
         classID: cls,
         id: s.id,
         name: s.name,
-        attempts: 0,
-        maxScore: 0,
-        avgScore: '-',
-        scratchStatus: '未作答',
-        weakTopic: '待診斷',
-        authMethod: '未登入'
+        attempts: attCount,
+        maxScore: mScore,
+        avgScore: avg,
+        scratchStatus: status,
+        weakTopic: attCount > 0 ? '診斷完畢' : '待診斷',
+        authMethod: auth
       });
     });
   });
@@ -4770,10 +4832,30 @@ function initAdminStudentsData() {
   AppState.admin.studentsData = list;
 }
 
+// Quiet background sync with Google Apps Script to fetch live submissions
+async function syncAdminDataFromCloud() {
+  const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwNAQNxmNsNa8rWGp48qnYRrjA2WFLGIzKqSel2r8MilRp59s3ZfBJjeKXIrUfoS-Zp-g/exec";
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 6000);
+    const resp = await fetch(GAS_ENDPOINT, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!resp.ok) return;
+    const freshData = await resp.json();
+    if (Array.isArray(freshData) && freshData.length > 0) {
+      localStorage.setItem("ADMIN_DASHBOARD_CACHE", JSON.stringify(freshData));
+      initAdminStudentsData();
+      updateAdminKPIs();
+      renderAdminTable();
+    }
+  } catch (e) {}
+}
+
 function renderAdminDashboard() {
   initAdminStudentsData();
   updateAdminKPIs();
   renderAdminTable();
+  syncAdminDataFromCloud();
 }
 
 function updateAdminKPIs() {
