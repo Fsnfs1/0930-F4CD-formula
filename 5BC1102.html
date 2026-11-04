@@ -5805,15 +5805,41 @@ function resumeSavedQuizProgress(progress) {
   alert("✅ 已成功恢復存檔！請繼續答題。");
 }
 
-async function checkGoogleConnectivityQuiet(timeoutMs = 2500) {
+async function checkGoogleConnectivityQuiet(timeoutMs = 3000) {
+  // If global probeMacauNetwork from persistence.js is available, use it directly
+  if (typeof window !== 'undefined' && typeof window.probeMacauNetwork === 'function') {
+    try {
+      const ok = await window.probeMacauNetwork(timeoutMs);
+      return !!ok;
+    } catch (e) {}
+  }
+  // Robust race across standard Google connectivity endpoints
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    return false;
+  }
+  const endpoints = [
+    "https://connectivitycheck.gstatic.com/generate_204",
+    "https://www.google.com/generate_204"
+  ];
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    const gasUrl = (typeof ARENA_CONFIG !== 'undefined' && ARENA_CONFIG.gasEndpoint) ? ARENA_CONFIG.gasEndpoint : "https://script.google.com/macros/s/AKfycbwNAQNxmNsNa8rWGp48qnYRrjA2WFLGIzKqSel2r8MilRp59s3ZfBJjeKXIrUfoS-Zp-g/exec";
-    await fetch(gasUrl + '?probe=1', { method: 'GET', mode: 'no-cors', signal: controller.signal });
-    clearTimeout(timer);
-    return true;
+    const fetchPromises = endpoints.map(url => {
+      const buster = `${url}?_t=${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+      return fetch(buster, {
+        method: "HEAD",
+        mode: "no-cors",
+        cache: "no-store",
+        signal: controller ? controller.signal : undefined
+      }).then(() => true);
+    });
+    const anySuccess = (typeof Promise.any === 'function') 
+      ? await Promise.any(fetchPromises) 
+      : await Promise.race(fetchPromises);
+    if (timer) clearTimeout(timer);
+    return !!anySuccess;
   } catch (e) {
+    if (timer) clearTimeout(timer);
     return false;
   }
 }
