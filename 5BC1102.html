@@ -211,6 +211,16 @@
     <!-- SCREEN 1: 5BC Class Password Auth Gate -->
     <section id="screen-auth" class="screen active">
       <div class="card" id="cardPasswordLogin" style="max-width: 520px; margin: 30px auto; padding: 24px 20px;">
+        <!-- WeChat / System Browser Highlight Alert -->
+        <div style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(245, 158, 11, 0.2)); border: 2px solid #ef4444; border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; text-align: center; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);">
+          <div style="font-size: 14.5px; font-weight: 800; color: #fca5a5; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <span>⚠️</span> 重要提示：建議使用系統瀏覽器開啟
+          </div>
+          <div style="font-size: 13px; color: #fef08a; font-weight: 700; line-height: 1.5;">
+            本鏈接建議使用系統瀏覽器打開，以避免大家用微信打開鏈接而出現答題異常的情況。
+          </div>
+        </div>
+
         <h2 class="card-title" style="font-size: 19px; margin-bottom: 6px; justify-content: center;"><span>🔐</span> 高二 (5B / 5C) 班憑密碼登錄</h2>
         <p class="card-subtitle" style="font-size: 13px; color: #94a3b8; margin-bottom: 16px; text-align: center;">
           請選擇您的班別與學號，輸入個人密碼（首次登錄後須自行修改密碼，僅有 <strong>1 次</strong>修改機會）。
@@ -417,6 +427,7 @@
           <div style="display: flex; align-items: center; gap: 10px;">
             <div id="quizTimer" style="font-size: 18px; font-weight: 800; color: var(--accent-yellow);">15:00</div>
             <button class="btn btn-outline btn-sm" onclick="showFormulaHint()">💡 點提示</button>
+            <button id="btnSaveProgress" class="btn btn-outline btn-sm" style="border-color: #38bdf8; color: #38bdf8; font-weight: 700;" onclick="saveQuizProgressManual()">💾 存盤保存進度</button>
           </div>
         </div>
 
@@ -3396,6 +3407,9 @@ function onAuthenticationSuccess(student, percentage, isPasswordOnly) {
   if (dashMeta) dashMeta.textContent = `${student.classID} 班 ${student.studentID} 號`;
   if (dashBanner) dashBanner.style.display = 'none';
 
+  // Check if student has saved quiz progress in localStorage
+  checkAndPromptResumeProgress(student);
+
   // Always present the navigation portal (#screen4-dashboard) upon successful login
   showScreen('screen4-dashboard');
 }
@@ -3669,7 +3683,16 @@ function generateQuizQuestions() {
   });
 }
 
-function startQuizSession() {
+async function startQuizSession(options) {
+  // If not explicitly proceeding from network warning or resume, run check
+  if (!options || !options.skipNetCheck) {
+    const netOk = await checkGoogleConnectivityQuiet(2500);
+    if (!netOk) {
+      const cont = confirm("⚠️ 網絡連通性提示：\n檢測到當前可能無法直接連通 Google / GAS 服務（如在內地網絡環境）。\n\n若無法連網，答題成績及拍照存檔將自動保存在本地瀏覽器中，等回到澳門聯網後即可上傳。\n\n是否注意並繼續開始答題？");
+      if (!cont) return;
+    }
+  }
+
   if (AppState.currentUser && !AppState.currentUser.isTeacher) {
     const cid = AppState.currentUser.classID;
     const sid = AppState.currentUser.studentID || AppState.currentUser.id;
@@ -4428,6 +4451,12 @@ function finishQuizSubmission() {
   if (timeEl) timeEl.innerText = `${elMin}分${elSec}秒`;
   const countEl = document.getElementById('resTotalCount');
   if (countEl) countEl.innerText = totalCount;
+
+  // Clear in-progress snapshot since quiz is submitted
+  clearActiveQuizProgress();
+
+  // Handle Cloud Upload & Local Offline Archive for Google Form / Drive
+  handleQuizCloudSubmissionAndArchive(finalScore, correctCount, totalCount);
 
   // Save to score history (Fix 6: No synthetic score injection)
   const historyKey = 'MATH5BC_SCORE_HISTORY_' + (AppState.currentUser ? AppState.currentUser.name : 'GUEST');
@@ -5668,6 +5697,207 @@ window.addEventListener('DOMContentLoaded', () => {
     initAdminStudentsData();
   }
 });
+
+// ==========================================
+// OFFLINE SAVE & CONNECTIVITY CHECK HELPERS
+// ==========================================
+
+const QUIZ_PROGRESS_STORAGE_KEY = 'MATH5BC_ACTIVE_PROGRESS';
+const OFFLINE_RECORDS_KEY = 'MATH_OFFLINE_SAVED_RECORDS';
+
+function getStudentProgressKey(user) {
+  if (!user) return QUIZ_PROGRESS_STORAGE_KEY;
+  const cid = user.classID || '5BC';
+  const sid = user.studentID || user.id || '0';
+  return `${QUIZ_PROGRESS_STORAGE_KEY}_${cid}_${sid}`;
+}
+
+function saveQuizProgressManual() {
+  if (!AppState.activeQuiz || !AppState.activeQuiz.questions || AppState.activeQuiz.questions.length === 0) {
+    alert("目前無正在進行中的答題進度！");
+    return;
+  }
+  const user = AppState.currentUser;
+  const key = getStudentProgressKey(user);
+  const progressData = {
+    user: user,
+    savedAt: Date.now(),
+    questions: AppState.activeQuiz.questions,
+    currentIndex: AppState.activeQuiz.currentIndex,
+    answers: AppState.activeQuiz.answers,
+    timeRemaining: AppState.activeQuiz.timeRemaining,
+    startTime: AppState.activeQuiz.startTime,
+    faceTracePhoto: AppState.faceTracePhoto || null,
+    authVerificationMode: AppState.authVerificationMode || null
+  };
+  try {
+    localStorage.setItem(key, JSON.stringify(progressData));
+    alert("✅ 答題進度已成功保存至本地瀏覽器！\n\n下次登入時系統將提示您恢復進度繼續答題。");
+  } catch (e) {
+    console.error("Save progress error:", e);
+    alert("⚠️ 保存進度失敗，可能是瀏覽器本地儲存空間已滿。");
+  }
+}
+
+function clearActiveQuizProgress() {
+  const user = AppState.currentUser;
+  try {
+    localStorage.removeItem(getStudentProgressKey(user));
+  } catch (e) {}
+}
+
+function checkAndPromptResumeProgress(student) {
+  const key = getStudentProgressKey(student);
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return;
+    const progress = JSON.parse(raw);
+    if (!progress || !progress.questions || progress.questions.length === 0) return;
+    
+    const ansCount = Object.keys(progress.answers || {}).length;
+    const totalCount = progress.questions.length;
+    const curIdx = (progress.currentIndex || 0) + 1;
+    const savedDate = new Date(progress.savedAt).toLocaleTimeString();
+
+    setTimeout(() => {
+      const resume = confirm(`📋 發現本地存檔進度！\n\n學生：${student.classID} 班 ${student.name}\n存檔時間：${savedDate}\n答題進度：已答 ${ansCount} 題 / 當前第 ${curIdx} 題 (共 ${totalCount} 題)\n剩餘時間：約 ${Math.ceil((progress.timeRemaining || 900)/60)} 分鐘\n\n是否打開答題存檔繼續答題？\n(點擊「確定」恢復存檔繼續答題，「取消」稍後自行選擇)`);
+      if (resume) {
+        resumeSavedQuizProgress(progress);
+      }
+    }, 400);
+  } catch (e) {
+    console.warn("Check resume progress error:", e);
+  }
+}
+
+function resumeSavedQuizProgress(progress) {
+  AppState.activeQuiz.questions = progress.questions;
+  AppState.activeQuiz.currentIndex = progress.currentIndex || 0;
+  AppState.activeQuiz.currentRenderedIndex = -1;
+  AppState.activeQuiz.answers = progress.answers || {};
+  AppState.activeQuiz.timeRemaining = progress.timeRemaining || 900;
+  AppState.activeQuiz.targetDosage = progress.questions.length;
+  AppState.activeQuiz.consecutiveErrorsByCategory = {};
+  AppState.activeQuiz.penalizedQuestions = {};
+  AppState.activeQuiz.questionRenderTimestamp = Date.now();
+  AppState.activeQuiz.lastAnswerTimestamp = Date.now();
+  AppState.activeQuiz.isSubmitted = false;
+  AppState.activeQuiz.startTime = progress.startTime || (Date.now() - (900 - AppState.activeQuiz.timeRemaining) * 1000);
+  
+  if (progress.faceTracePhoto) {
+    AppState.faceTracePhoto = progress.faceTracePhoto;
+    AppState.authVerificationMode = progress.authVerificationMode || 'face_trace';
+  }
+
+  if (AppState.activeQuiz.timerInterval) clearInterval(AppState.activeQuiz.timerInterval);
+  AppState.activeQuiz.timerInterval = setInterval(() => {
+    AppState.activeQuiz.timeRemaining--;
+    updateQuizTimerDisplay();
+    if (AppState.activeQuiz.timeRemaining <= 0) {
+      clearInterval(AppState.activeQuiz.timerInterval);
+      freezeQuizTimeout();
+    }
+  }, 1000);
+
+  updateQuizTimerDisplay();
+  showScreen('screen-quiz');
+  renderQuestion();
+  alert("✅ 已成功恢復存檔！請繼續答題。");
+}
+
+async function checkGoogleConnectivityQuiet(timeoutMs = 2500) {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const gasUrl = (typeof ARENA_CONFIG !== 'undefined' && ARENA_CONFIG.gasEndpoint) ? ARENA_CONFIG.gasEndpoint : "https://script.google.com/macros/s/AKfycbwNAQNxmNsNa8rWGp48qnYRrjA2WFLGIzKqSel2r8MilRp59s3ZfBJjeKXIrUfoS-Zp-g/exec";
+    await fetch(gasUrl + '?probe=1', { method: 'GET', mode: 'no-cors', signal: controller.signal });
+    clearTimeout(timer);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+async function handleQuizCloudSubmissionAndArchive(finalScore, correctCount, totalCount) {
+  const user = AppState.currentUser || { classID: '5B', studentID: 1, name: '未命名' };
+  const record = {
+    classID: user.classID || '5B',
+    studentID: user.studentID || user.id || 1,
+    studentName: user.name || '',
+    score: finalScore,
+    correctCount: correctCount,
+    totalCount: totalCount,
+    dateID: `1102_5BC_QUIZ|SCORE:${finalScore}|${correctCount}_OF_${totalCount}|TS:${Date.now()}`,
+    timestamp: Date.now(),
+    faceTracePhoto: AppState.faceTracePhoto || null,
+    draftPhotoBase64: AppState.draftPhotoBase64 || null,
+    hasPhoto: !!(AppState.faceTracePhoto || AppState.draftPhotoBase64)
+  };
+
+  let submitSuccess = false;
+
+  // Try submitting Form record to Google Form / GAS
+  if (window.submitFormRecord) {
+    try {
+      submitSuccess = await window.submitFormRecord({
+        classID: record.classID,
+        studentID: record.studentID,
+        dateID: record.dateID,
+        scoreTag: `SCORE_${finalScore}_TS_${record.timestamp}`,
+        score: finalScore
+      });
+    } catch (e) {
+      submitSuccess = false;
+    }
+  } else if (typeof submitArenaFormRecord === 'function') {
+    try {
+      await submitArenaFormRecord(record);
+      submitSuccess = true;
+    } catch (e) {
+      submitSuccess = false;
+    }
+  }
+
+  // Try submitting photo to Drive if present
+  let photoUploadSuccess = true;
+  if (record.hasPhoto) {
+    if (window.uploadDrivePhoto) {
+      try {
+        const photoRes = await window.uploadDrivePhoto({
+          classID: record.classID,
+          studentID: record.studentID,
+          studentName: record.studentName,
+          imageBase64: record.faceTracePhoto || record.draftPhotoBase64,
+          tag: record.faceTracePhoto ? 'FACE_TRACE' : 'DRAFT_PHOTO',
+          timestamp: record.timestamp
+        });
+        if (!photoRes || (!photoRes.success && !photoRes.queued && !photoRes.simulated)) {
+          photoUploadSuccess = false;
+        }
+      } catch (e) {
+        photoUploadSuccess = false;
+      }
+    } else {
+      photoUploadSuccess = false;
+    }
+  }
+
+  // If cloud post or photo failed (or offline/mainland environment), save locally and alert
+  if (!submitSuccess || !photoUploadSuccess) {
+    try {
+      const offlineList = JSON.parse(localStorage.getItem(OFFLINE_RECORDS_KEY) || '[]');
+      offlineList.push(record);
+      localStorage.setItem(OFFLINE_RECORDS_KEY, JSON.stringify(offlineList));
+    } catch (e) {
+      console.warn("Offline record storage warning:", e);
+    }
+
+    setTimeout(() => {
+      alert("⚠️ 【網絡提示與本地臨時存檔】\n\n檢測到當前網絡無法直接連接 Google 服務（或在大陸未連澳門教育網絡），成績與拍照存證暫未能上傳到雲端。\n\n✅ 系統已將本次答題成績及拍照/草稿記錄完整保存在本地瀏覽器！\n請於回到澳門聯網後再次打開本系統，數據將自動或手動聯網補傳。");
+    }, 500);
+  }
+}
+
 
   </script>
 </html>
