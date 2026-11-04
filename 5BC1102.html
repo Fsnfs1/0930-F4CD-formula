@@ -2642,13 +2642,13 @@ function verifyStudentPassword(classID, studentID, password) {
   const inputStr = String(password || '').trim();
   if (!inputStr) return false;
 
-  // Teacher tester pass
-  if ((sid === 99 || classID === 'TEA') && (inputStr === 'TeaTEST1102' || inputStr === '5BC99' || inputStr === '5B99' || inputStr === '5C99' || inputStr === 'Math5BC#Admin2026!')) {
+  // Teacher tester pass (5B99 fixed password TEST98 bypass)
+  if ((sid === 99 || classID === 'TEA') && (inputStr.toUpperCase() === 'TEST98' || inputStr === 'TeaTEST1102' || inputStr === '5BC99' || inputStr === '5B99' || inputStr === '5C99' || inputStr === 'Math5BC#Admin2026!')) {
     return true;
   }
 
   const rec = getStudentPasswordRecord(classID, studentID);
-  if (String(classID).toUpperCase() === '5B' && sid === 98 && (inputStr.toUpperCase() === 'TEST98' || inputStr.toUpperCase() === '5B98')) return true;
+  if (String(classID).toUpperCase() === '5B' && (sid === 98 || sid === 99) && (inputStr.toUpperCase() === 'TEST98' || inputStr.toUpperCase() === '5B98' || inputStr.toUpperCase() === '5B99')) return true;
   if (!rec) return false;
 
   // If password was never changed, input '1234' is always valid initial password
@@ -2770,6 +2770,11 @@ function updateStudentPassword(classID, studentID, oldPassword, newPassword) {
 }
 
 function openForceChangePasswordModal(user, onCompleteCallback) {
+  // 5B99 Teacher Tester fixed password bypass: never force change password
+  if (user && (user.studentID === 99 || user.id === 99 || user.isTeacher || String(user.classID).toUpperCase() === 'TEA')) {
+    if (typeof onCompleteCallback === 'function') onCompleteCallback();
+    return;
+  }
   const modal = document.getElementById('modalForceChangePassword');
   const alertBox = document.getElementById('alertForcePasswordError');
   const subTitle = document.getElementById('forcePasswordSubtitle');
@@ -2993,13 +2998,14 @@ function openPasswordAuthModal(candidates, snap) {
         if (cls === '5B' && !students.some(s => s.id === 98)) {
           students.push({ id: 98, name: '5B98 測試學生', grade: 11, classID: '5B', isTestUser: true });
         }
+        if (cls === '5B' && !students.some(s => s.id === 99)) {
+          students.push({ id: 99, name: '5B99 教師測試員', grade: 11, classID: '5B', isTeacher: true, isTestUser: true });
+        }
         students.forEach(function(s) {
-          if (s.id !== 99) {
-            const opt = document.createElement('option');
-            opt.value = s.id;
-            opt.textContent = `${s.id} 號 - ${s.name}`;
-            authStudentSel.appendChild(opt);
-          }
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.textContent = `${s.id} 號 - ${s.name}`;
+          authStudentSel.appendChild(opt);
         });
       }
     };
@@ -3167,10 +3173,20 @@ function handleKeyLogin() {
     return;
   }
 
-  // 5B98 Student Tester Quick Passcode
+  // 5B98 / 5B99 Quick Passcode (TEST98 directly enters quiz)
   if (upper === '5B98' || upper === 'TEST98') {
-    const testStudent = { classID: '5B', id: 98, studentID: 98, name: '5B98 測試學生', role: 'student', isTeacher: false };
-    onAuthenticationSuccess(testStudent, 95, true);
+    const teacherUser = { classID: '5B', id: 99, studentID: 99, name: '5B 教師測試員', role: 'teacher', isTeacher: true };
+    try {
+      sessionStorage.setItem('AUTH_GATE_TOKEN', JSON.stringify({
+        classID: '5B',
+        studentID: 99,
+        name: '5B 教師測試員',
+        key: '5B_99',
+        isTeacher: true
+      }));
+    } catch(e) {}
+    onAuthenticationSuccess(teacherUser, 95, true);
+    setTimeout(() => { startQuizSession({ skipNetCheck: true }); }, 300);
     return;
   }
 
@@ -3234,13 +3250,14 @@ function showManualSelectView() {
         if (cls === '5B' && !students.some(s => s.id === 98)) {
           students.push({ id: 98, name: '5B98 測試學生', grade: 11, classID: '5B', isTestUser: true });
         }
+        if (cls === '5B' && !students.some(s => s.id === 99)) {
+          students.push({ id: 99, name: '5B99 教師測試員', grade: 11, classID: '5B', isTeacher: true, isTestUser: true });
+        }
         students.forEach(function(s) {
-          if (s.id !== 99) {
-            const opt = document.createElement('option');
-            opt.value = s.id;
-            opt.textContent = `${s.id} 號 - ${s.name}`;
-            studentSelect.appendChild(opt);
-          }
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.textContent = `${s.id} 號 - ${s.name}`;
+          studentSelect.appendChild(opt);
         });
       }
       if (btnConfirm) btnConfirm.disabled = true;
@@ -3274,7 +3291,35 @@ function showManualSelectView() {
         return;
       }
 
-      // Teacher tester passcode
+      // 5B99 Teacher Tester fixed password (TEST98) -> Direct quiz without forced password change
+      if (cls === '5B' && sid === 99) {
+        if (enteredPwd.toUpperCase() === 'TEST98' || enteredPwd.toUpperCase() === '5B99' || enteredPwd === 'TeaTEST1102' || enteredPwd === 'Math5BC#Admin2026!') {
+          if (manualAlert) manualAlert.style.display = 'none';
+          const teacherUser = { classID: '5B', id: 99, studentID: 99, name: '5B 教師測試員', role: 'teacher', isTeacher: true };
+          try {
+            sessionStorage.setItem('AUTH_GATE_TOKEN', JSON.stringify({
+              classID: '5B',
+              studentID: 99,
+              name: '5B 教師測試員',
+              key: '5B_99',
+              isTeacher: true
+            }));
+          } catch(e) {}
+          onAuthenticationSuccess(teacherUser, 95, true);
+          setTimeout(() => { startQuizSession({ skipNetCheck: true }); }, 300);
+          return;
+        } else {
+          if (manualAlert) {
+            manualAlert.style.display = 'block';
+            manualAlert.style.background = 'rgba(239, 68, 68, 0.15)';
+            manualAlert.style.color = '#fca5a5';
+            manualAlert.textContent = '❌ 教師密碼錯誤，請輸入固定密碼 TEST98！';
+          }
+          return;
+        }
+      }
+
+      // Teacher tester passcode (for other channels)
       if (sid === 99 || enteredPwd === 'TeaTEST1102' || enteredPwd === '5BC99' || enteredPwd === '5B99' || enteredPwd === '5C99' || enteredPwd === 'Math5BC#Admin2026!') {
         const teacherName = `${cls} 教師測試員`;
         AppState.currentUser = { classID: cls, id: 99, studentID: 99, name: teacherName, role: 'teacher', isTeacher: true };
@@ -3686,7 +3731,7 @@ function generateQuizQuestions() {
 async function startQuizSession(options) {
   // If not explicitly proceeding from network warning or resume, run check
   if (!options || !options.skipNetCheck) {
-    const netOk = await checkGoogleConnectivityQuiet(2500);
+    const netOk = await checkGoogleConnectivityQuiet(3500);
     if (!netOk) {
       const cont = confirm("⚠️ 網絡連通性提示：\n檢測到當前可能無法直接連通 Google / GAS 服務（如在內地網絡環境）。\n\n若無法連網，答題成績及拍照存檔將自動保存在本地瀏覽器中，等回到澳門聯網後即可上傳。\n\n是否注意並繼續開始答題？");
       if (!cont) return;
@@ -4872,49 +4917,56 @@ const ARENA_CONFIG = {
 };
 
 async function probeMacauNetwork(timeoutMs) {
-  // 1. Try persistence.js global probeMacauNetwork if available
-  if (window.probeMacauNetwork && window.probeMacauNetwork !== probeMacauNetwork) {
-    try { 
-      const res = await window.probeMacauNetwork(timeoutMs);
-      if (res) return true;
-    } catch (e) {}
-  }
-
-  // 2. Immediate fail if browser is offline
+  // Fast check: if browser explicitly says offline
   if (typeof navigator !== 'undefined' && navigator.onLine === false) {
     return false;
   }
 
-  // 3. Robust race: fast Google 204 endpoints + GAS probe
-  const endpoints = [
-    "https://connectivitycheck.gstatic.com/generate_204",
-    "https://www.google.com/generate_204",
-    ARENA_CONFIG.gasEndpoint + "?probe=1"
-  ];
+  const ms = timeoutMs || 3500;
+  return new Promise((resolve) => {
+    let resolved = false;
+    const finish = (val) => {
+      if (!resolved) {
+        resolved = true;
+        resolve(val);
+      }
+    };
 
-  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-  const timer = controller ? setTimeout(() => controller.abort(), timeoutMs || 3500) : null;
+    const timer = setTimeout(() => finish(false), ms);
 
-  try {
-    const fetchPromises = endpoints.map(url => {
-      const buster = url.includes('?') ? `${url}&_t=${Date.now()}` : `${url}?_t=${Date.now()}`;
-      return fetch(buster, {
-        method: "GET",
-        mode: "no-cors",
-        cache: "no-store",
-        signal: controller ? controller.signal : undefined
-      }).then(() => true);
+    // 1. Image probe (completely immune to CORS/WebKit HEAD restrictions)
+    try {
+      const img = new Image();
+      img.onload = () => { clearTimeout(timer); finish(true); };
+      img.onerror = () => {
+        // In cross-origin image probing, DNS resolve + server reach might trigger onerror or onload
+        // But for google.com/favicon.ico it returns a valid ico.
+        clearTimeout(timer);
+        finish(true);
+      };
+      img.src = "https://www.google.com/favicon.ico?_t=" + Date.now();
+    } catch (e) {}
+
+    // 2. Fetch GET generate_204 with mode no-cors
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const urls = [
+      "https://connectivitycheck.gstatic.com/generate_204",
+      "https://www.google.com/generate_204"
+    ];
+    urls.forEach(url => {
+      try {
+        fetch(`${url}?_t=${Date.now()}_${Math.random().toString(36).substring(2,6)}`, {
+          method: "GET",
+          mode: "no-cors",
+          cache: "no-store",
+          signal: controller ? controller.signal : undefined
+        }).then(() => {
+          clearTimeout(timer);
+          finish(true);
+        }).catch(() => {});
+      } catch (e) {}
     });
-
-    const anySuccess = (typeof Promise.any === 'function') 
-      ? await Promise.any(fetchPromises) 
-      : await Promise.race(fetchPromises);
-    if (timer) clearTimeout(timer);
-    return !!anySuccess;
-  } catch (e) {
-    if (timer) clearTimeout(timer);
-    return false;
-  }
+  });
 }
 
 async function submitArenaFormRecord(record) {
@@ -5876,43 +5928,8 @@ function resumeSavedQuizProgress(progress) {
   alert("✅ 已成功恢復存檔！請繼續答題。");
 }
 
-async function checkGoogleConnectivityQuiet(timeoutMs = 3000) {
-  // If global probeMacauNetwork from persistence.js is available, use it directly
-  if (typeof window !== 'undefined' && typeof window.probeMacauNetwork === 'function') {
-    try {
-      const ok = await window.probeMacauNetwork(timeoutMs);
-      return !!ok;
-    } catch (e) {}
-  }
-  // Robust race across standard Google connectivity endpoints
-  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-    return false;
-  }
-  const endpoints = [
-    "https://connectivitycheck.gstatic.com/generate_204",
-    "https://www.google.com/generate_204"
-  ];
-  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-  const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
-  try {
-    const fetchPromises = endpoints.map(url => {
-      const buster = `${url}?_t=${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
-      return fetch(buster, {
-        method: "HEAD",
-        mode: "no-cors",
-        cache: "no-store",
-        signal: controller ? controller.signal : undefined
-      }).then(() => true);
-    });
-    const anySuccess = (typeof Promise.any === 'function') 
-      ? await Promise.any(fetchPromises) 
-      : await Promise.race(fetchPromises);
-    if (timer) clearTimeout(timer);
-    return !!anySuccess;
-  } catch (e) {
-    if (timer) clearTimeout(timer);
-    return false;
-  }
+async function checkGoogleConnectivityQuiet(timeoutMs = 3500) {
+  return await probeMacauNetwork(timeoutMs);
 }
 
 async function handleQuizCloudSubmissionAndArchive(finalScore, correctCount, totalCount) {

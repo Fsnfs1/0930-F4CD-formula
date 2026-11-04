@@ -1371,7 +1371,6 @@
       timeoutMs = 3500;
     }
 
-    // 1. Check test bypass hooks for offline/test environments
     if (typeof window !== 'undefined') {
       if (window.__BYPASS_MACAU_PROBE__ === true) {
         return true;
@@ -1386,75 +1385,53 @@
       } catch (e) {}
     }
 
-    // 2. Immediate fail if browser reports offline
     if (typeof navigator !== 'undefined' && navigator.onLine === false) {
       return false;
     }
 
-    // 3. Fallback if fetch is unavailable
-    if (typeof fetch !== 'function') {
-      return false;
-    }
-
-    // 4. Candidate endpoints to race
-    const endpoints = [
-      "https://connectivitycheck.gstatic.com/generate_204",
-      "https://www.google.com/generate_204"
-    ];
-
-    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-    let timeoutId = null;
-
-    if (controller) {
-      timeoutId = setTimeout(function () {
-        controller.abort();
-      }, timeoutMs);
-    }
-
-    const testEndpoint = async function (baseUrl) {
-      const cacheBuster = `${baseUrl}?_t=${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-      const fetchOpts = {
-        method: "HEAD",
-        mode: "no-cors",
-        cache: "no-store"
-      };
-      if (controller) {
-        fetchOpts.signal = controller.signal;
+    return new Promise(function (resolve) {
+      var resolved = false;
+      function finish(val) {
+        if (!resolved) {
+          resolved = true;
+          resolve(val);
+        }
       }
-      await fetch(cacheBuster, fetchOpts);
-      return true;
-    };
 
-    const raceFirstSuccess = function (promises) {
-      if (typeof Promise.any === 'function') {
-        return Promise.any(promises);
+      var timer = setTimeout(function () { finish(false); }, timeoutMs);
+
+      // 1. Bulletproof Image ping (compatible with all mobile Safari / iOS / WebKit)
+      if (typeof Image !== 'undefined') {
+        try {
+          var img = new Image();
+          img.onload = function () { clearTimeout(timer); finish(true); };
+          img.onerror = function () { clearTimeout(timer); finish(true); };
+          img.src = "https://www.google.com/favicon.ico?_t=" + Date.now();
+        } catch (e) {}
       }
-      return new Promise(function (resolve, reject) {
-        let rejectedCount = 0;
-        const errors = [];
-        promises.forEach(function (p) {
-          Promise.resolve(p).then(resolve, function (err) {
-            rejectedCount++;
-            errors.push(err);
-            if (rejectedCount === promises.length) {
-              reject(errors);
-            }
-          });
+
+      // 2. GET fetch with mode: no-cors
+      if (typeof fetch === 'function') {
+        var endpoints = [
+          "https://connectivitycheck.gstatic.com/generate_204",
+          "https://www.google.com/generate_204"
+        ];
+        endpoints.forEach(function (url) {
+          try {
+            var buster = url + "?_t=" + Date.now() + "_" + Math.random().toString(36).substring(2, 6);
+            fetch(buster, {
+              method: "GET",
+              mode: "no-cors",
+              cache: "no-store"
+            }).then(function () {
+              clearTimeout(timer);
+              finish(true);
+            }).catch(function () {});
+          } catch (e) {}
         });
-      });
-    };
-
-    try {
-      await raceFirstSuccess(endpoints.map(testEndpoint));
-      if (timeoutId) clearTimeout(timeoutId);
-      return true;
-    } catch (err) {
-      if (timeoutId) clearTimeout(timeoutId);
-      return false;
-    }
-  }
-
-  /**
+      }
+    });
+  }/**
    * Pure JS Synchronous SHA-256 Hash
    * @param {string} ascii 
    * @returns {string} hex digest
