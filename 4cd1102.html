@@ -19817,6 +19817,13 @@ window.BANK_4CD_1102_ADAPTIVE = [
   window.handleKeyLogin = handleKeyLogin;
   window.PASSWORDS_4CD = CREDENTIALS_4CD;
 
+  // 1106 Quiz and Bonus Globals
+  window.trigger1106LoginSequence = trigger1106LoginSequence;
+  window.confirm1106ScoreModal = confirm1106ScoreModal;
+  window.startPracticeAfterRuleModal = startPracticeAfterRuleModal;
+  window.close1106BonusResultModal = close1106BonusResultModal;
+  window.handle1106QuizBonusSettlement = handle1106QuizBonusSettlement;
+
 
 
 // =========================================================================
@@ -20279,6 +20286,12 @@ async function sync1106BonusDataFromCloud() {
 
 // Run cloud sync when window loads or network recovers
 if (typeof window !== 'undefined') {
+  window.trigger1106LoginSequence = trigger1106LoginSequence;
+  window.confirm1106ScoreModal = confirm1106ScoreModal;
+  window.startPracticeAfterRuleModal = startPracticeAfterRuleModal;
+  window.close1106BonusResultModal = close1106BonusResultModal;
+  window.handle1106QuizBonusSettlement = handle1106QuizBonusSettlement;
+
   window.addEventListener('online', () => {
     flush1106PendingSubmissions();
     sync1106BonusDataFromCloud();
