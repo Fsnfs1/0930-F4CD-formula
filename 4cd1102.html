@@ -17621,6 +17621,17 @@ window.BANK_4CD_1102_ADAPTIVE = [
   }
 
   function startQuizSession(questionsSubset) {
+    // Ensure 1106 Quiz Score Modal & Bonus Rule Modal are shown before starting quiz
+    const curStud = AppState.currentUser || AppState.currentStudent;
+    if (curStud && (String(curStud.classID || '').toUpperCase() === '4C' || String(curStud.classID || '').toUpperCase() === '4D')) {
+      if (!curStud.isTeacher && curStud.studentID !== 99 && curStud.id !== 99) {
+        if (!window._1106RuleConfirmed) {
+          trigger1106LoginSequence(curStud);
+          return;
+        }
+      }
+    }
+
     // If active session was specifically restored from snapshot on load, resume it once!
     if (!questionsSubset && AppState.isRestoredFromSnapshot) {
       AppState.isRestoredFromSnapshot = false;
@@ -19422,6 +19433,9 @@ window.BANK_4CD_1102_ADAPTIVE = [
       }
 
       // Enter platform navigation portal
+      // Trigger 11/06 Quiz Score Modal sequence for 4C / 4D students
+      trigger1106LoginSequence(student);
+
       (window.showScreen || showScreen)('screen4-dashboard');
 
       // Trigger Macau probe and flush offline queue upon login success
@@ -20043,6 +20057,8 @@ function confirm1106ScoreModal() {
 }
 
 function startPracticeAfterRuleModal() {
+  window._1106RuleConfirmed = true;
+
   const modal2 = document.getElementById('modal1106BonusRule');
   if (modal2) modal2.style.display = 'none';
   if (typeof startQuizSession === 'function') {
