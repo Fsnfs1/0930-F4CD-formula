@@ -499,6 +499,29 @@
         <h2 class="card-title">🎉 答題成績結算報告</h2>
         
         <!-- Score Highlights -->
+        <div id="settlement1106QuizCard" style="display: none; background: rgba(16, 185, 129, 0.12); border: 1.5px solid #10b981; border-radius: 12px; padding: 16px; margin: 16px 0; text-align: center;">
+          <div style="font-size: 13.5px; color: #a7f3d0; font-weight: 700;">🌟 11月6日小測成績與刷題獎勵加分結算</div>
+          <div style="display: flex; justify-content: space-around; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <div style="font-size: 12px; color: #94a3b8;">小測原始分</div>
+              <div id="settle1106BaseScore" style="font-size: 24px; font-weight: 800; color: #f8fafc;">--</div>
+            </div>
+            <div style="font-size: 20px; color: #64748b;">+</div>
+            <div>
+              <div style="font-size: 12px; color: #94a3b8;">累計獎勵加分</div>
+              <div id="settle1106BonusScore" style="font-size: 24px; font-weight: 800; color: #fbbf24;">+0</div>
+            </div>
+            <div style="font-size: 20px; color: #64748b;">=</div>
+            <div>
+              <div style="font-size: 12px; color: #a7f3d0;">小測最終成績 (60封頂)</div>
+              <div id="settle1106FinalScore" style="font-size: 28px; font-weight: 900; color: #34d399;">--</div>
+            </div>
+          </div>
+          <div style="margin-top: 10px; font-size: 12px; color: #38bdf8;">
+            📅 截止 11 月 13 日前可隨時反復刷題累計加分！
+          </div>
+        </div>
+
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin: 16px 0;">
           <div style="background: rgba(30, 41, 59, 0.6); padding: 16px; border-radius: 12px; text-align: center; border: 1px solid #334155;">
             <div style="font-size: 13px; color: var(--text-muted);">最終得分</div>
@@ -882,6 +905,92 @@
       <div style="display: flex; gap: 10px; justify-content: center;">
         <button class="btn btn-primary" onclick="resolveReauth()">📷 刷臉重新核驗解鎖</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal 1: 11月6日小測成績彈窗 -->
+  <div id="modal1106QuizScore" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); z-index: 10002; align-items: center; justify-content: center; padding: 16px;">
+    <div class="modal-card" style="background: #1e293b; border: 1.5px solid #38bdf8; border-radius: 16px; padding: 24px; max-width: 460px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); text-align: center;">
+      <div style="font-size: 38px; margin-bottom: 8px;">📊</div>
+      <h3 style="font-size: 20px; font-weight: 800; color: #f8fafc; margin-bottom: 6px;">11月6日 數學小測成績通知</h3>
+      <div id="modal1106StudentMeta" style="font-size: 14px; color: #94a3b8; margin-bottom: 16px;">5B 班學生</div>
+      
+      <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; border-radius: 12px; padding: 18px; margin-bottom: 18px;">
+        <div style="font-size: 13px; color: #94a3b8; margin-bottom: 4px;">小測原始得分 / 當前小測成績</div>
+        <div id="modal1106ScoreDisplay" style="font-size: 36px; font-weight: 900; color: #38bdf8;">--</div>
+        <div id="modal1106ScoreNote" style="font-size: 12.5px; color: #34d399; margin-top: 6px; font-weight: 600;"></div>
+      </div>
+
+      <p style="font-size: 13.5px; color: #cbd5e1; line-height: 1.6; margin-bottom: 20px; text-align: left;">
+        📌 說明：上述為 11 月 6 日空間幾何與數列小測得分。點擊下方確認按鈕繼續了解加分獎勵機制。
+      </p>
+
+      <button id="btnConfirm1106Score" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 16px; font-weight: 700;" onclick="confirm1106ScoreModal()">
+        確認小測成績並繼續 ➔
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal 2: 刷題加分獎勵規則彈窗 -->
+  <div id="modal1106BonusRule" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); z-index: 10003; align-items: center; justify-content: center; padding: 16px;">
+    <div class="modal-card" style="background: #1e293b; border: 1.5px solid #f59e0b; border-radius: 16px; padding: 24px; max-width: 480px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); text-align: center;">
+      <div style="font-size: 38px; margin-bottom: 8px;">🎁</div>
+      <h3 style="font-size: 20px; font-weight: 800; color: #fbbf24; margin-bottom: 6px;">刷題加分獎勵說明</h3>
+      <div style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">專題二題庫 · 衝刺加分激勵計劃</div>
+      
+      <div style="background: rgba(245, 158, 11, 0.1); border: 1.5px solid rgba(245, 158, 11, 0.4); border-radius: 12px; padding: 16px; margin-bottom: 18px; text-align: left;">
+        <div style="font-size: 15px; font-weight: 700; color: #fde68a; margin-bottom: 8px;">
+          🎯 獎勵機制：
+        </div>
+        <ul style="margin: 0; padding-left: 20px; color: #e2e8f0; font-size: 13.5px; line-height: 1.7;">
+          <li>刷題成績<strong>超過 80 分</strong>即可獲取加分獎勵！</li>
+          <li>每超過 1 分，則 11 月 6 日小測相應<strong>加 1 分</strong>；</li>
+          <li>小測成績折算後<strong>最高 60 分封頂</strong>；</li>
+          <li>加分活動截止至<strong>下周五（11月13日前）</strong>，期間可<strong>反復刷題加分</strong>！</li>
+        </ul>
+      </div>
+
+      <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 20px;">
+        如不在澳門網絡環境，系統支持本地存檔，回到澳門聯網後將自動同步提交雲端。
+      </p>
+
+      <button id="btnStartPracticeAfterRule" class="btn btn-warning" style="width: 100%; padding: 12px; font-size: 16px; font-weight: 800; background: #f59e0b; color: #000; border: none; border-radius: 8px; cursor: pointer;" onclick="startPracticeAfterRuleModal()">
+        確認，立即開始刷題加分 🚀
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal 3: 刷題結算加分結果彈窗 -->
+  <div id="modal1106BonusResult" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); z-index: 10004; align-items: center; justify-content: center; padding: 16px;">
+    <div class="modal-card" style="background: #1e293b; border: 1.5px solid #10b981; border-radius: 16px; padding: 24px; max-width: 480px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); text-align: center;">
+      <div style="font-size: 38px; margin-bottom: 8px;">🎉</div>
+      <h3 style="font-size: 20px; font-weight: 800; color: #34d399; margin-bottom: 6px;">刷題加分結算</h3>
+      <div id="modal1106ResultStudentMeta" style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">5B 班學生</div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; border-radius: 10px; padding: 12px;">
+          <div style="font-size: 12px; color: #94a3b8;">本次刷題得分</div>
+          <div id="modal1106QuizScoreVal" style="font-size: 24px; font-weight: 800; color: #38bdf8;">0</div>
+        </div>
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; border-radius: 10px; padding: 12px;">
+          <div style="font-size: 12px; color: #94a3b8;">超 80 分獎勵</div>
+          <div id="modal1106BonusDeltaVal" style="font-size: 24px; font-weight: 800; color: #fbbf24;">+0 分</div>
+        </div>
+      </div>
+
+      <div style="background: rgba(16, 185, 129, 0.12); border: 1.5px solid rgba(16, 185, 129, 0.4); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+        <div style="font-size: 13px; color: #a7f3d0; margin-bottom: 4px;">小測最終成績 (60分封頂)</div>
+        <div id="modal1106FinalScoreDisplay" style="font-size: 38px; font-weight: 900; color: #34d399;">--</div>
+        <div id="modal1106FinalScoreDetail" style="font-size: 12px; color: #94a3b8; margin-top: 4px;">原始 -- 分 + 加分 -- 分</div>
+      </div>
+
+      <div style="background: rgba(56, 189, 248, 0.1); border-left: 3px solid #38bdf8; padding: 10px 14px; border-radius: 6px; font-size: 13px; color: #bae6fd; text-align: left; margin-bottom: 20px; line-height: 1.5;">
+        💡 <strong>溫馨提示：</strong>您可以在<strong>下周五（11月13日前）</strong>，反復刷題加分，加分記錄將自動同步更新！
+      </div>
+
+      <button class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 16px; font-weight: 700;" onclick="close1106BonusResultModal()">
+        查看詳細答題報告 ➔
+      </button>
     </div>
   </div>
 
@@ -3466,6 +3575,9 @@ function onAuthenticationSuccess(student, percentage, isPasswordOnly) {
   if (dashMeta) dashMeta.textContent = `${student.classID} 班 ${student.studentID} 號`;
   if (dashBanner) dashBanner.style.display = 'none';
 
+  // Trigger 11/06 Quiz Score Modal sequence if student belongs to 5B
+  trigger1106LoginSequence(student);
+
   // Check if student has saved quiz progress in localStorage
   checkAndPromptResumeProgress(student);
 
@@ -4557,6 +4669,9 @@ function finishQuizSubmission() {
 
   // Clear in-progress snapshot since quiz is submitted
   clearActiveQuizProgress();
+
+  // Evaluate 11/06 Quiz bonus for score > 80 (every point > 80 gives +1 bonus, capped at 60)
+  handle1106QuizBonusSettlement(finalScore, correctCount, totalCount);
 
   // Handle Cloud Upload & Local Offline Archive for Google Form / Drive
   handleQuizCloudSubmissionAndArchive(finalScore, correctCount, totalCount);
@@ -5922,6 +6037,9 @@ window.addEventListener('DOMContentLoaded', () => {
   if (typeof AppState !== 'undefined') {
     initAdminStudentsData();
   }
+  try {
+    sync1106BonusDataFromCloud();
+  } catch (e) {}
 });
 
 // ==========================================
@@ -6113,6 +6231,423 @@ async function handleQuizCloudSubmissionAndArchive(finalScore, correctCount, tot
       alert("⚠️ 【網絡提示與本地臨時存檔】\n\n檢測到當前網絡無法直接連接 Google 服務（或在大陸未連澳門教育網絡），成績與拍照存證暫未能上傳到雲端。\n\n✅ 系統已將本次答題成績及拍照/草稿記錄完整保存在本地瀏覽器！\n請於回到澳門聯網後再次打開本系統，數據將自動或手動聯網補傳。");
     }, 500);
   }
+}
+
+// =========================================================================
+// 11月6日 5B 數學小測成績與刷題超80加分系統 (11月13日前有效，60分封頂，雙端同步)
+// =========================================================================
+
+const QUIZ_1106_RAW_SCORES_5B = {
+  "高尚禮": null, // 不顯示成績
+  "陳柏琳": 43,
+  "林煜皓": 36,
+  "陳施攸": 34,
+  "梁芷韻": 34,
+  "洪泳棋": 32,
+  "黎宛旻": 32,
+  "黃卓琳": 32,
+  "林穎豪": 32,
+  "梁泳心": 32,
+  "周鈺燕": 32,
+  "姚皓然": 29,
+  "蘇子恩": 27,
+  "彭婷婷": 27,
+  "陳紫涵": 26,
+  "黃少彬": 23,
+  "陳國良": 23,
+  "黃婉瑜": 22,
+  "張啟赫": 20,
+  "葉棨釗": 19,
+  "李曉熹": 18,
+  "吳鎂澄": 12,
+  "張嘉城": 10,
+  "張嘉城A": 10,
+  "柯鈺鑫": 10,
+  "李潤歌": 10,
+  "陳鑫源": 10,
+  "潘子聰": 5,
+  "梁偉烽": 4
+};
+
+const QUIZ_1106_BONUS_PREFIX = 'MATH_1106_BONUS_5B_';
+const QUIZ_1106_PENDING_QUEUE_KEY = 'MATH_1106_PENDING_BONUS_SUBMISSIONS';
+
+function get1106StudentKey(student) {
+  if (!student) return '5B_UNKNOWN';
+  const cid = String(student.classID || '5B').trim().toUpperCase();
+  const sid = student.studentID !== undefined ? student.studentID : (student.id !== undefined ? student.id : '0');
+  return `${cid}_${sid}`;
+}
+
+function get1106RawScore(student) {
+  if (!student || !student.name) return undefined;
+  const name = student.name.trim();
+  if (Object.prototype.hasOwnProperty.call(QUIZ_1106_RAW_SCORES_5B, name)) {
+    return QUIZ_1106_RAW_SCORES_5B[name];
+  }
+  // Alternate match: handle "張嘉城A" -> "張嘉城"
+  if (name === '張嘉城' && Object.prototype.hasOwnProperty.call(QUIZ_1106_RAW_SCORES_5B, '張嘉城A')) {
+    return QUIZ_1106_RAW_SCORES_5B['張嘉城A'];
+  }
+  return undefined;
+}
+
+function get1106AccumulatedBonus(student) {
+  const studentKey = get1106StudentKey(student);
+  let localBonus = 0;
+  try {
+    const raw = localStorage.getItem(QUIZ_1106_BONUS_PREFIX + studentKey);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      localBonus = Number(parsed.accumulatedBonus) || 0;
+    }
+  } catch (e) {}
+
+  // Check Cloud Cache / Snapshot for any higher bonus
+  let cloudBonus = 0;
+  const cid = String(student.classID || '5B').trim().toUpperCase();
+  const sid = parseInt(student.studentID !== undefined ? student.studentID : student.id, 10);
+
+  const checkRecord = function (r) {
+    if (String(r.classID || '').trim().toUpperCase() === cid && parseInt(r.studentID, 10) === sid) {
+      const did = String(r.dateID || '');
+      if (did.includes('1106_QUIZ_SCORE')) {
+        const m = did.match(/BONUS:(\d+(\.\d+)?)/);
+        if (m) {
+          const b = parseFloat(m[1]);
+          if (b > cloudBonus) cloudBonus = b;
+        }
+      }
+    }
+  };
+
+  if (window.ADMIN_SNAPSHOT_DATA && Array.isArray(window.ADMIN_SNAPSHOT_DATA)) {
+    window.ADMIN_SNAPSHOT_DATA.forEach(checkRecord);
+  }
+  try {
+    const cached = localStorage.getItem('ADMIN_DASHBOARD_CACHE');
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed)) parsed.forEach(checkRecord);
+    }
+  } catch (e) {}
+
+  const finalBonus = Math.max(localBonus, cloudBonus);
+  if (finalBonus > localBonus) {
+    try {
+      let bData = { accumulatedBonus: finalBonus, history: [] };
+      const raw = localStorage.getItem(QUIZ_1106_BONUS_PREFIX + studentKey);
+      if (raw) bData = JSON.parse(raw);
+      bData.accumulatedBonus = finalBonus;
+      localStorage.setItem(QUIZ_1106_BONUS_PREFIX + studentKey, JSON.stringify(bData));
+    } catch (e) {}
+  }
+  return finalBonus;
+}
+
+function calc1106FinalScore(rawScore, accumulatedBonus) {
+  if (rawScore === null || rawScore === undefined) return null;
+  const combined = Number(rawScore) + Number(accumulatedBonus || 0);
+  return Math.min(60, combined);
+}
+
+// Trigger Login Sequence for 5B Students
+function trigger1106LoginSequence(student) {
+  if (!student || String(student.classID || '').toUpperCase() !== '5B') return;
+  // Teachers or test bypass 99 don't need popups
+  if (student.isTeacher || student.id === 99 || student.studentID === 99) return;
+
+  const rawScore = get1106RawScore(student);
+  const bonus = get1106AccumulatedBonus(student);
+  const studentKey = get1106StudentKey(student);
+
+  // Sync any pending offline submissions now that we have network or logged in
+  flush1106PendingSubmissions();
+
+  setTimeout(() => {
+    const modal1 = document.getElementById('modal1106QuizScore');
+    if (!modal1) return;
+
+    const metaEl = document.getElementById('modal1106StudentMeta');
+    const scoreValEl = document.getElementById('modal1106ScoreDisplay');
+    const noteEl = document.getElementById('modal1106ScoreNote');
+
+    if (metaEl) metaEl.textContent = `${student.classID} 班 ${student.studentID || student.id} 號 ${student.name} 同學`;
+
+    if (rawScore === null) {
+      if (scoreValEl) {
+        scoreValEl.textContent = '不顯示成績';
+        scoreValEl.style.fontSize = '26px';
+        scoreValEl.style.color = '#cbd5e1';
+      }
+      if (noteEl) noteEl.textContent = '小測成績暫不公開，您仍可正常參與刷題超80分加分活動！';
+    } else if (rawScore !== undefined) {
+      if (bonus > 0) {
+        const finalSc = calc1106FinalScore(rawScore, bonus);
+        if (scoreValEl) {
+          scoreValEl.textContent = `${finalSc} 分`;
+          scoreValEl.style.fontSize = '36px';
+          scoreValEl.style.color = '#34d399';
+        }
+        if (noteEl) {
+          noteEl.textContent = `（已含前期刷題累計加分 +${bonus} 分，小測原始分: ${rawScore} 分，60分封頂）`;
+          noteEl.style.color = '#38bdf8';
+        }
+      } else {
+        if (scoreValEl) {
+          scoreValEl.textContent = `${rawScore} 分`;
+          scoreValEl.style.fontSize = '36px';
+          scoreValEl.style.color = '#38bdf8';
+        }
+        if (noteEl) {
+          noteEl.textContent = '本次小測基準分，稍後可通過刷題超80分繼續加分（60分封頂）！';
+          noteEl.style.color = '#a7f3d0';
+        }
+      }
+    } else {
+      if (scoreValEl) scoreValEl.textContent = '-- 分';
+      if (noteEl) noteEl.textContent = '';
+    }
+
+    modal1.style.display = 'flex';
+  }, 450);
+}
+
+function confirm1106ScoreModal() {
+  const modal1 = document.getElementById('modal1106QuizScore');
+  if (modal1) modal1.style.display = 'none';
+
+  const modal2 = document.getElementById('modal1106BonusRule');
+  if (modal2) modal2.style.display = 'flex';
+}
+
+function startPracticeAfterRuleModal() {
+  const modal2 = document.getElementById('modal1106BonusRule');
+  if (modal2) modal2.style.display = 'none';
+  startQuizSession();
+}
+
+function close1106BonusResultModal() {
+  const modal3 = document.getElementById('modal1106BonusResult');
+  if (modal3) modal3.style.display = 'none';
+  showScreen('screen-settlement');
+}
+
+// Evaluate 11/06 Quiz bonus for score > 80 after quiz finishes
+function handle1106QuizBonusSettlement(quizScore, correctCount, totalCount) {
+  const student = AppState.currentUser;
+  if (!student || String(student.classID || '').toUpperCase() !== '5B') return;
+  if (student.isTeacher || student.id === 99 || student.studentID === 99) return;
+
+  const rawScore = get1106RawScore(student);
+  const studentKey = get1106StudentKey(student);
+  const previousBonus = get1106AccumulatedBonus(student);
+
+  // Bonus rule: Score > 80, every 1 point above 80 adds 1 point to quiz
+  const bonusDelta = quizScore > 80 ? (quizScore - 80) : 0;
+  const newAccumulatedBonus = previousBonus + bonusDelta;
+
+  let bonusData = { accumulatedBonus: newAccumulatedBonus, history: [] };
+  try {
+    const raw = localStorage.getItem(QUIZ_1106_BONUS_PREFIX + studentKey);
+    if (raw) bonusData = JSON.parse(raw);
+  } catch (e) {}
+
+  bonusData.accumulatedBonus = newAccumulatedBonus;
+  bonusData.history = bonusData.history || [];
+  bonusData.history.push({
+    timestamp: Date.now(),
+    quizScore: quizScore,
+    correctCount: correctCount,
+    totalCount: totalCount,
+    bonusDelta: bonusDelta,
+    accumulatedBonus: newAccumulatedBonus
+  });
+
+  try {
+    localStorage.setItem(QUIZ_1106_BONUS_PREFIX + studentKey, JSON.stringify(bonusData));
+  } catch (e) {}
+
+  const finalCombinedScore = calc1106FinalScore(rawScore, newAccumulatedBonus);
+
+  // Update Settlement Screen UI banner
+  const settleCard = document.getElementById('settlement1106QuizCard');
+  if (settleCard) {
+    settleCard.style.display = 'block';
+    const baseEl = document.getElementById('settle1106BaseScore');
+    const bonusEl = document.getElementById('settle1106BonusScore');
+    const finalEl = document.getElementById('settle1106FinalScore');
+    if (baseEl) baseEl.textContent = rawScore === null ? '不顯示' : (rawScore !== undefined ? `${rawScore}分` : '--');
+    if (bonusEl) bonusEl.textContent = `+${newAccumulatedBonus}分 (本次+${bonusDelta})`;
+    if (finalEl) finalEl.textContent = finalCombinedScore === null ? '不顯示' : `${finalCombinedScore}分`;
+  }
+
+  // Submit to Google Form / GAS cloud and enqueue for offline replay
+  post1106BonusToCloud(student, rawScore, newAccumulatedBonus, finalCombinedScore, quizScore, bonusDelta);
+
+  // Show Bonus Result Modal
+  setTimeout(() => {
+    const modal3 = document.getElementById('modal1106BonusResult');
+    if (!modal3) return;
+
+    const metaEl = document.getElementById('modal1106ResultStudentMeta');
+    const qScoreEl = document.getElementById('modal1106QuizScoreVal');
+    const bDeltaEl = document.getElementById('modal1106BonusDeltaVal');
+    const finalEl = document.getElementById('modal1106FinalScoreDisplay');
+    const detailEl = document.getElementById('modal1106FinalScoreDetail');
+
+    if (metaEl) metaEl.textContent = `${student.classID} 班 ${student.studentID || student.id} 號 ${student.name} 同學`;
+    if (qScoreEl) qScoreEl.textContent = `${quizScore} 分`;
+    if (bDeltaEl) {
+      if (bonusDelta > 0) {
+        bDeltaEl.textContent = `+${bonusDelta} 分`;
+        bDeltaEl.style.color = '#34d399';
+      } else {
+        bDeltaEl.textContent = `未達80分 (+0)`;
+        bDeltaEl.style.color = '#94a3b8';
+      }
+    }
+
+    if (rawScore === null) {
+      if (finalEl) finalEl.textContent = '不顯示成績';
+      if (detailEl) detailEl.textContent = `本次刷題獲加分 +${bonusDelta} 分，已累計加分 +${newAccumulatedBonus} 分`;
+    } else if (rawScore !== undefined) {
+      if (finalEl) finalEl.textContent = `${finalCombinedScore} 分`;
+      if (detailEl) detailEl.textContent = `小測原始 ${rawScore} 分 + 累計加分 ${newAccumulatedBonus} 分 (本次+${bonusDelta}) ➔ 最終 ${finalCombinedScore} 分 (60分封頂)`;
+    } else {
+      if (finalEl) finalEl.textContent = '-- 分';
+      if (detailEl) detailEl.textContent = `本次刷題得分 ${quizScore} 分`;
+    }
+
+    modal3.style.display = 'flex';
+  }, 400);
+}
+
+// Synchronize 1106 Bonus Record to Google Form / GAS Cloud
+async function post1106BonusToCloud(student, baseScore, accumulatedBonus, finalScore, quizScore, bonusDelta) {
+  const cid = String(student.classID || '5B').trim().toUpperCase();
+  const sid = parseInt(student.studentID !== undefined ? student.studentID : student.id, 10);
+  const ts = Date.now();
+  const baseTag = (baseScore === null || baseScore === undefined) ? 'HIDDEN' : String(baseScore);
+  const finalTag = (finalScore === null || finalScore === undefined) ? 'HIDDEN' : String(finalScore);
+
+  const payload = {
+    classID: cid,
+    studentID: sid,
+    studentName: student.name || '',
+    dateID: `1106_QUIZ_SCORE|BASE:${baseTag}|BONUS:${accumulatedBonus}|FINAL:${finalTag}|QUIZ:${quizScore}|DELTA:${bonusDelta}|TS:${ts}`,
+    scoreTag: String(finalScore !== null && finalScore !== undefined ? finalScore : (accumulatedBonus || 0)),
+    score: (finalScore !== null && finalScore !== undefined ? finalScore : (accumulatedBonus || 0)),
+    timestamp: ts
+  };
+
+  let submitSuccess = false;
+  if (window.submitFormRecord) {
+    try {
+      submitSuccess = await window.submitFormRecord({
+        classID: payload.classID,
+        studentID: payload.studentID,
+        dateID: payload.dateID,
+        scoreTag: payload.scoreTag,
+        score: payload.score
+      });
+    } catch (e) {
+      submitSuccess = false;
+    }
+  } else if (typeof submitArenaFormRecord === 'function') {
+    try {
+      await submitArenaFormRecord(payload);
+      submitSuccess = true;
+    } catch (e) {
+      submitSuccess = false;
+    }
+  }
+
+  // If failed or offline, save to pending submission queue for delayed synchronization
+  if (!submitSuccess) {
+    enqueue1106PendingSubmission(payload);
+  }
+}
+
+function enqueue1106PendingSubmission(payload) {
+  try {
+    const list = JSON.parse(localStorage.getItem(QUIZ_1106_PENDING_QUEUE_KEY) || '[]');
+    list.push(payload);
+    localStorage.setItem(QUIZ_1106_PENDING_QUEUE_KEY, JSON.stringify(list));
+    console.log('[1106Bonus] Record queued locally for offline sync:', payload);
+  } catch (e) {}
+}
+
+async function flush1106PendingSubmissions() {
+  try {
+    const raw = localStorage.getItem(QUIZ_1106_PENDING_QUEUE_KEY);
+    if (!raw) return;
+    const list = JSON.parse(raw);
+    if (!Array.isArray(list) || list.length === 0) return;
+
+    // Check connectivity quiet
+    const netOk = await checkGoogleConnectivityQuiet(2500);
+    if (!netOk) return;
+
+    const remaining = [];
+    for (const item of list) {
+      let ok = false;
+      if (window.submitFormRecord) {
+        try {
+          ok = await window.submitFormRecord({
+            classID: item.classID,
+            studentID: item.studentID,
+            dateID: item.dateID,
+            scoreTag: item.scoreTag,
+            score: item.score
+          });
+        } catch (e) {
+          ok = false;
+        }
+      } else if (typeof submitArenaFormRecord === 'function') {
+        try {
+          await submitArenaFormRecord(item);
+          ok = true;
+        } catch (e) {
+          ok = false;
+        }
+      }
+      if (!ok) {
+        remaining.push(item);
+      }
+    }
+    if (remaining.length > 0) {
+      localStorage.setItem(QUIZ_1106_PENDING_QUEUE_KEY, JSON.stringify(remaining));
+    } else {
+      localStorage.removeItem(QUIZ_1106_PENDING_QUEUE_KEY);
+      console.log('[1106Bonus] All queued bonus records synced to cloud successfully.');
+    }
+  } catch (e) {}
+}
+
+// Background auto-sync for 1106 bonus data from GAS cloud reader
+async function sync1106BonusDataFromCloud() {
+  const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwNAQNxmNsNa8rWGp48qnYRrjA2WFLGIzKqSel2r8MilRp59s3ZfBJjeKXIrUfoS-Zp-g/exec";
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 6000);
+    const resp = await fetch(GAS_ENDPOINT, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!resp.ok) return;
+    const freshData = await resp.json();
+    if (Array.isArray(freshData) && freshData.length > 0) {
+      localStorage.setItem("ADMIN_DASHBOARD_CACHE", JSON.stringify(freshData));
+      flush1106PendingSubmissions();
+    }
+  } catch (e) {}
+}
+
+// Run cloud sync when window loads or network recovers
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    flush1106PendingSubmissions();
+    sync1106BonusDataFromCloud();
+  });
 }
 
 
