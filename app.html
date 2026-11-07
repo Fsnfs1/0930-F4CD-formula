@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>智慧數學刷題與評測平台 v2.0</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    :root { --primary: #2563eb; --bg: #f8fafc; --card: #ffffff; }
+    body { background: var(--bg); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #0f172a; padding-bottom: 60px; }
+    .topbar { background: #1e293b; color: #fff; padding: 10px 16px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .net-badge { padding: 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; background: rgba(255,255,255,0.12); }
+    .app-screen { display: none; max-width: 980px; margin: 20px auto; padding: 0 12px; }
+    .app-screen.active { display: block; }
+    .hub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+    .hub-card { background: var(--card); border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px; cursor: pointer; transition: transform .15s, box-shadow .15s; }
+    .hub-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(15,23,42,0.08); border-color: #93c5fd; }
+    .q-opt-btn { display: block; width: 100%; text-align: left; padding: 12px 16px; margin-bottom: 10px; border: 2px solid #cbd5e1; border-radius: 10px; background: #fff; transition: all .12s; }
+    .q-opt-btn.selected { border-color: #2563eb; background: #eff6ff; font-weight: 600; }
+    .step-order-item, .error-step-item, .matching-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 8px; background: #fff; cursor: pointer; }
+    .error-step-item.selected-error { border: 2px solid #ef4444; background: #fef2f2; }
+    .dosage-badge { padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 700; background: #dbeafe; color: #1e40af; }
+    .dosage-badge.escalated { background: #fef3c7; color: #92400e; }
+    .dosage-badge.penalty { background: #fee2e2; color: #b91c1c; }
+    .modal-backdrop-custom { position: fixed; inset: 0; background: rgba(15,23,42,0.65); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 16px; }
+    .modal-backdrop-custom.show { display: flex; }
+    .modal-card { background: #fff; border-radius: 16px; max-width: 540px; width: 100%; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Status Bar (Netwatch + Pending Outbox + Student Info + Points) -->
+  <div class="topbar">
+    <div class="d-flex align-items-center gap-2">
+      <strong style="cursor:pointer" onclick="AppUI.showScreen('screen-hub')">📐 數學刷題與評測中心</strong>
+      <span id="netStatusBadge" class="net-badge">🟢 澳門/非大陸網絡</span>
+      <span id="pendingSyncBadge" class="badge bg-warning text-dark">待提交 0 筆</span>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <span id="studentInfoBadge" class="small text-light">未登入</span>
+      <span id="pointsQuickBadge" class="badge bg-info text-dark" style="cursor:pointer" onclick="AppUI.openPointsApp()">💎 0 積分</span>
+      <button id="btnNavHub" class="btn btn-sm btn-outline-light d-none" onclick="AppUI.showScreen('screen-hub')">返回大廳</button>
+      <a href="teacher.html" class="btn btn-sm btn-outline-warning">教師後台</a>
+    </div>
+  </div>
+
+  <!-- A1: Gate Login Screen -->
+  <section id="screen-gate" class="app-screen active">
+    <div class="card shadow-sm border-0 p-4 mx-auto" style="max-width:480px;">
+      <h4 class="fw-bold mb-2">🔐 A1 學生門禁系統</h4>
+      <p class="text-muted small mb-3">請選擇班級與座號，並輸入老師發放的個人密鑰登入（高強度加密保護）。</p>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">班別</label>
+        <select id="gateClassSelect" class="form-select" onchange="AppUI.populateSeatSelect()"></select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">學號 / 姓名</label>
+        <select id="gateStudentSelect" class="form-select"></select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">個人專屬密鑰</label>
+        <input id="gateSecretInput" type="password" class="form-control" placeholder="例如：4C01-X33C 或專屬口令" />
+      </div>
+      <div id="gateAlert" class="alert alert-danger py-2 small d-none"></div>
+      <button class="btn btn-primary w-100 fw-bold py-2" onclick="AppUI.handleGateLogin()">驗證身分並進入系統</button>
+    </div>
+  </section>
+
+  <!-- Main Hub Screen (All App Cards Driven by core/registry.js) -->
+  <section id="screen-hub" class="app-screen">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+      <div>
+        <h4 class="fw-bold mb-0" id="hubWelcomeTitle">歡迎回來</h4>
+        <div class="text-muted small">所有題庫、小測、加分規則與遊戲均由中央登記表動態載入</div>
+      </div>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="arenaAllowSwitch" onchange="AppUI.toggleArenaAllow(this.checked)">
+        <label class="form-check-label fw-semibold" for="arenaAllowSwitch">⚔️ 允許網絡擂台賽配對</label>
+      </div>
+    </div>
+
+    <div class="hub-grid mb-4">
+      <div class="hub-card" onclick="AppUI.openPracticeSelector('practice')">
+        <div class="fs-3 mb-1">📴</div>
+        <h6 class="fw-bold mb-1">A2 純本地離線練習</h6>
+        <p class="text-muted small mb-0">可選隨機/順序，無壓力刷題，每滿 24 小時才批量同步一次</p>
+      </div>
+      <div class="hub-card" onclick="AppUI.openPracticeSelector('drill')">
+        <div class="fs-3 mb-1">🚀</div>
+        <h6 class="fw-bold mb-1">A3 聯網自適應刷題</h6>
+        <p class="text-muted small mb-0">共享自適應加題規則、7 大題型、超 80 分自動加小測分</p>
+      </div>
+      <div class="hub-card" onclick="AppUI.openPracticeSelector('exam')">
+        <div class="fs-3 mb-1">🛡️</div>
+        <h6 class="fw-bold mb-1">A4 限時測驗 / 考試</h6>
+        <p class="text-muted small mb-0">15 分鐘限時、防切屏、拍照/簽名草稿紙二選一打卡、中斷續答</p>
+      </div>
+      <div class="hub-card" onclick="AppUI.openReviewApp()">
+        <div class="fs-3 mb-1">📓</div>
+        <h6 class="fw-bold mb-1">A5 錯題回顧 & A7 求助</h6>
+        <p class="text-muted small mb-0">歷次錯題詳解重測、隨時向老師提問與查看老師回覆</p>
+      </div>
+      <div class="hub-card" onclick="AppUI.openMeApp()">
+        <div class="fs-3 mb-1">📊</div>
+        <h6 class="fw-bold mb-1">A6 個人成績 & A8 加分</h6>
+        <p class="text-muted small mb-0">查小測/課堂考試、加分封頂明細（預設60封頂）、班級排名</p>
+      </div>
+      <div class="hub-card" onclick="AppUI.openPointsApp()">
+        <div class="fs-3 mb-1">💎</div>
+        <h6 class="fw-bold mb-1">A13 積分中心 & 商城</h6>
+        <p class="text-muted small mb-0">答題賺積分，兌換小測加分、兌換遊戲時長、積分商城購物</p>
+      </div>
+      <div class="hub-card" onclick="AppUI.openGamesApp()">
+        <div class="fs-3 mb-1">🎮</div>
+        <h6 class="fw-bold mb-1">A11 實名數學遊戲大廳</h6>
+        <p class="text-muted small mb-0">三角比 & 博弈挑戰、Top10 榮譽榜、每日 30 分鐘防沉迷保護</p>
+      </div>
+      <div class="hub-card" onclick="AppUI.openArenaLobby()">
+        <div class="fs-3 mb-1">⚔️</div>
+        <h6 class="fw-bold mb-1">A12 題庫網絡擂台賽</h6>
+        <p class="text-muted small mb-0">開放時段隨機配對，雙方 1 分鐘內同意即彈窗同題競技</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bank / Exam Selector Screen -->
+  <section id="screen-selector" class="app-screen">
+    <div class="card shadow-sm border-0 p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0" id="selectorTitle">選擇題庫或測驗</h5>
+        <div class="form-check form-switch" id="practiceRandomWrap">
+          <input class="form-check-input" type="checkbox" id="practiceRandomSwitch" checked>
+          <label class="form-check-label small" for="practiceRandomSwitch">隨機出題順序</label>
+        </div>
+      </div>
+      <div id="selectorList" class="row g-3"></div>
+    </div>
+  </section>
+
+  <!-- Active Quiz / Practice / Exam Screen (A2, A3, A4) -->
+  <section id="screen-quiz" class="app-screen">
+    <div class="card shadow-sm border-0 p-4">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 pb-2 border-bottom">
+        <div>
+          <span id="quizModeBadge" class="badge bg-primary me-2">聯網刷題</span>
+          <strong id="quizTitleText">數學題庫</strong>
+          <span id="quizDosageBadge" class="dosage-badge ms-2">基礎配額: 25題</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span id="quizTimerBadge" class="badge bg-dark fs-6">15:00</span>
+          <span id="quizProgressText" class="fw-bold small">第 1 / 25 題</span>
+          <button class="btn btn-sm btn-outline-secondary" onclick="AppUI.openCheckinModal('mid')">📷 打卡</button>
+          <button class="btn btn-sm btn-outline-warning" onclick="AppUI.saveAndExitQuiz()">💾 保存退出</button>
+        </div>
+      </div>
+
+      <div id="quizHastyAlert" class="alert alert-warning py-2 small d-none"></div>
+
+      <div class="mb-2 text-muted small">
+        知識點：<span id="qTopicLabel" class="fw-semibold text-dark">函數</span> ·
+        AI 難度：<span id="qDiffLabel" class="badge bg-light text-dark border">Lv.1</span>
+      </div>
+      <div id="qStemBox" class="fs-5 fw-semibold mb-3"></div>
+      <div id="qDiagramBox" class="mb-3 text-center d-none">
+        <img id="qDiagramImg" class="img-fluid rounded border" style="max-height:240px;" alt="題目圖形" />
+      </div>
+
+      <!-- Pluggable 7 Question Types Container -->
+      <div id="qInteractiveContainer" class="mb-3"></div>
+
+      <!-- Progressive Hint Box (D9) -->
+      <div id="qHintBox" class="alert alert-info py-2 small d-none"></div>
+
+      <!-- Feedback Box (respecting teacher feedbackMode: immediate | after_submit | after_publish) -->
+      <div id="qFeedbackBox" class="alert py-2 small d-none"></div>
+
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 pt-3 border-top">
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-info btn-sm" onclick="AppUI.triggerHint()">💡 點擊提示 (求助具體信息)</button>
+          <button class="btn btn-outline-secondary btn-sm" onclick="AppUI.askTeacherCurrentQuestion()">🙋 向老師提問此題</button>
+        </div>
+        <div class="d-flex gap-2">
+          <button id="btnSubmitAnswer" class="btn btn-primary fw-bold" onclick="AppUI.submitCurrentAnswer()">確認作答</button>
+          <button id="btnNextQuestion" class="btn btn-success fw-bold d-none" onclick="AppUI.nextQuestion()">下一題 ➔</button>
+          <button class="btn btn-danger btn-sm" onclick="AppUI.finishCurrentQuiz('user_submit')">交卷結算</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- A5 Wrong Review & A7 Help Q&A Screen -->
+  <section id="screen-review" class="app-screen">
+    <div class="row g-3">
+      <div class="col-md-7">
+        <div class="card shadow-sm border-0 p-3">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">📓 A5 錯題回顧本</h5>
+            <button class="btn btn-sm btn-primary" onclick="AppUI.startWrongRetest()">🔄 錯題重測 (+1積分/題)</button>
+          </div>
+          <div id="wrongReviewList"></div>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="card shadow-sm border-0 p-3">
+          <h5 class="fw-bold mb-2">💬 A7 師生交流求助</h5>
+          <p class="text-muted small mb-2">老師回覆存於 Google Sheet，每次登入時自動讀取更新。</p>
+          <textarea id="helpQuestionInput" class="form-control mb-2" rows="3" placeholder="輸入你不理解的題目步驟或概念..."></textarea>
+          <button class="btn btn-sm btn-primary w-100 mb-3" onclick="AppUI.submitHelpRequest()">發送求助給老師</button>
+          <div id="helpHistoryList" class="small"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- A6 My Scores & A8 Bonus Cap Screen -->
+  <section id="screen-me" class="app-screen">
+    <div class="card shadow-sm border-0 p-4 mb-3">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <h5 class="fw-bold mb-0">📊 A6 個人成績查詢 & A8 自動加分系統</h5>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="consentToggleSwitch" checked onchange="AppUI.toggleConsent(this.checked)">
+          <label class="form-check-label small" for="consentToggleSwitch">同意匿名數據用於教學研究 (D6)</label>
+        </div>
+      </div>
+      <div id="scorePackTabs" class="d-flex gap-2 flex-wrap mb-3"></div>
+      <div id="scoreDetailBox" class="p-3 bg-light rounded border mb-3"></div>
+      <h6 class="fw-bold">🏆 測驗成績排名（依教師設定呈現姓名格式）</h6>
+      <div id="examLeaderboardBox"></div>
+    </div>
+  </section>
+
+  <!-- A13 Points & Mall Screen -->
+  <section id="screen-points" class="app-screen">
+    <div class="card shadow-sm border-0 p-4">
+      <h5 class="fw-bold mb-3">💎 A13 積分交換與積分商城</h5>
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="p-3 bg-primary text-white rounded">
+            <div class="small">可用已入帳積分</div>
+            <div class="fs-2 fw-bold" id="ptsConfirmedVal">0</div>
+            <div class="small opacity-75">待入帳(離線/未滿24h)：<span id="ptsPendingVal">0</span></div>
+          </div>
+        </div>
+        <div class="col-md-8 d-flex flex-wrap gap-2 align-items-center">
+          <button class="btn btn-outline-primary" onclick="AppUI.redeemAction('quiz_bonus', 15, {bonusPoints: 1, title:'兌換小測+1分'})">➕ 15 積分換小測 +1 分 (受60封頂限制)</button>
+          <button class="btn btn-outline-success" onclick="AppUI.redeemAction('game_time', 20, {minutes: 10, title:'兌換遊戲+10分鐘'})">⏳ 20 積分換遊戲時長 +10 分鐘</button>
+          <button class="btn btn-outline-warning text-dark" onclick="AppUI.redeemAction('mall_item', 50, {itemTitle:'免做一次基礎作業券'})">🎁 50 積分換「免做一次基礎作業券」</button>
+          <button class="btn btn-outline-dark" onclick="AppUI.redeemAction('mall_item', 80, {itemTitle:'數學榮譽文具禮包'})">🛍️ 80 積分換「數學榮譽文具禮包」</button>
+        </div>
+      </div>
+      <h6 class="fw-bold">📜 積分帳本明細</h6>
+      <div id="pointsHistoryBox" class="small"></div>
+    </div>
+  </section>
+
+  <!-- A11 Math Games Hall Screen -->
+  <section id="screen-games" class="app-screen">
+    <div class="card shadow-sm border-0 p-4">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div>
+          <h5 class="fw-bold mb-0">🎮 A11 實名數學遊戲中心</h5>
+          <div class="text-muted small">每日免費 30 分鐘防沉迷保護 · 博弈遊戲按「勝場100分 + (60-秒數)」計分</div>
+        </div>
+        <div>
+          <span id="gamePlaytimeBadge" class="badge bg-success fs-6">今日剩餘：30:00</span>
+          <button class="btn btn-sm btn-outline-primary ms-2" onclick="AppUI.openPointsApp()">用積分加時</button>
+        </div>
+      </div>
+
+      <div id="gameCardsRow" class="row g-3 mb-3"></div>
+
+      <div id="gameIframeWrap" class="d-none mb-3">
+        <div class="d-flex justify-content-between align-items-center bg-dark text-white px-3 py-2 rounded-top">
+          <span id="activeGameTitle">遊戲進行中</span>
+          <button class="btn btn-sm btn-danger" onclick="AppUI.closeGameIframe()">結束並返回大廳</button>
+        </div>
+        <iframe id="gameIframe" style="width:100%; height:560px; border:2px solid #1e293b; border-radius:0 0 10px 10px;"></iframe>
+      </div>
+
+      <h6 class="fw-bold mt-2">🏅 遊戲前 10 榮譽榜 (Top 10)</h6>
+      <div id="gameLeaderboardBox"></div>
+    </div>
+  </section>
+
+  <!-- Modal 1: D6 Research Ethics Informed Consent (First Login) -->
+  <div id="modalConsent" class="modal-backdrop-custom">
+    <div class="modal-card">
+      <h5 class="fw-bold mb-2">📋 教學研究知情同意說明 (D6)</h5>
+      <p class="small text-secondary">
+        本平台會記錄你的答題與操作數據（包括按鍵、點擊、提示使用與作答時間），用於改進教學及教師的教學論文研究。
+        研究發表與導出時均採用匿名編號（如 <code>R-3fa91c0e</code>），絕不會出現你的姓名或學號。
+        你可以隨時選擇是否參與研究，這<strong>不會影響</strong>你的成績或正常使用本平台。
+      </p>
+      <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-primary flex-grow-1 fw-bold" onclick="AppUI.confirmConsent(true)">✅ 我同意數據用於教學研究</button>
+        <button class="btn btn-outline-secondary" onclick="AppUI.confirmConsent(false)">不同意（仍可正常使用）</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: A4 Exam 2-Choose-1 Photo Check-in (Face Photo OR Signed+Dated Scratch Paper) -->
+  <div id="modalCheckin" class="modal-backdrop-custom">
+    <div class="modal-card">
+      <h5 class="fw-bold mb-2">📷 測驗安全拍照打卡（二選一）</h5>
+      <p class="small text-muted mb-3">請選擇上傳「本人臉孔照片」或「帶有親筆簽名及今日日期的草稿紙照片」存檔至雲端 Drive。</p>
+      <div class="btn-group w-100 mb-3" role="group">
+        <input type="radio" class="btn-check" name="checkinMethod" id="chkFace" value="face" checked>
+        <label class="btn btn-outline-primary" for="chkFace">① 拍攝臉孔照片</label>
+        <input type="radio" class="btn-check" name="checkinMethod" id="chkScratch" value="scratch_paper">
+        <label class="btn btn-outline-primary" for="chkScratch">② 帶簽名及日期的草稿紙</label>
+      </div>
+      <input type="file" id="checkinFileInput" accept="image/*" capture="user" class="form-control mb-3" />
+      <div class="d-flex gap-2">
+        <button class="btn btn-success flex-grow-1 fw-bold" onclick="AppUI.submitCheckinModal()">確認上傳並繼續答題</button>
+        <button class="btn btn-outline-secondary" onclick="document.getElementById('modalCheckin').classList.remove('show')">稍後</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: A12 Network Arena Mutual Match Popup -->
+  <div id="modalArena" class="modal-backdrop-custom">
+    <div class="modal-card text-center">
+      <h4 class="fw-bold text-primary mb-2">⚔️ 題庫網絡擂台賽</h4>
+      <p id="arenaWindowNotice" class="small text-muted mb-3">開放時間：周一至五 17:00-19:30 · 周末及澳門節假日 08:00-19:30</p>
+      <div id="arenaInviteStateBox" class="p-3 bg-light rounded border mb-3">
+        點擊下方「同意配對」，若系統監測到兩個終端在 <strong>1 分鐘內</strong> 同時同意，將立即彈出對戰窗口！
+      </div>
+      <div class="d-flex gap-2 justify-content-center">
+        <button id="btnArenaAgree" class="btn btn-warning fw-bold px-4" onclick="AppUI.agreeArenaMatch()">✋ 同意配對邀請</button>
+        <button id="btnArenaEnterMatch" class="btn btn-danger fw-bold px-4 d-none" onclick="AppUI.enterArenaMatchNow()">🔥 點擊進入擂台賽！</button>
+        <button class="btn btn-outline-secondary" onclick="document.getElementById('modalArena').classList.remove('show')">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Existing Read-Only Data Files (D11: Zero Modification to Red-Line Files) -->
+  <script src="js/roster.js"></script>
+  <script src="js/questions_4cd1023.js"></script>
+  <script src="js/bank_4cd_t2.js"></script>
+  <script src="js/bank_4cd_1102_adaptive.js"></script>
+  <script src="js/bank_5bc1102.js"></script>
+  <script src="js/quiz1023_encrypted_store.js"></script>
+
+  <!-- Load Unified Modular Core -->
+  <script src="core/config.js"></script>
+  <script src="core/crypto.js"></script>
+  <script src="core/registry.js"></script>
+  <script src="core/storage.js"></script>
+  <script src="core/netwatch.js"></script>
+  <script src="core/api.js"></script>
+  <script src="core/sync.js"></script>
+  <script src="core/auth.js"></script>
+  <script src="core/ui.js"></script>
+  <script src="core/content.js"></script>
+  <script src="core/engine.js"></script>
+  <script src="core/bonus.js"></script>
+
+  <script>
+    const AppUI = (function () {
+      let currentStudent = null;
+      let activeSession = null;
+      let currentDraftAnswer = null;
+      let quizTimerId = null;
+      let gameTimerId = null;
+      let pendingArenaMatch = null;
+      let checkinStage = 'start';
+
+      function init() {
+        populateClassSelect();
+        // Start Netwatch (Section 五之二)
+        if (window.MathCoreNetwatch && typeof MathCoreNetwatch.start === 'function') {
+          MathCoreNetwatch.start();
+          MathCoreNetwatch.onChange(updateNetBadge);
+          updateNetBadge(MathCoreNetwatch.getState());
+        }
+        // Start global keyboard & click telemetry listener (D1)
+        document.addEventListener('click', function (e) {
+          if (!currentStudent) return;
+          const t = e.target && (e.target.id || e.target.innerText || e.target.tagName);
+          if (window.MathCoreSync && typeof MathCoreSync.recordAction === 'function') {
+            MathCoreSync.recordAction('ui_click', { target: String(t || '').slice(0, 32) }, {
+              sid: currentStudent.classID + '_' + currentStudent.studentID,
+              mode: activeSession ? activeSession.state.mode : 'hub'
+            });
+          }
+          refreshTopBadges();
+        }, { passive: true });
+
+        document.addEventListener('keydown', function (e) {
+          if (!currentStudent) return;
+          if (window.MathCoreSync && typeof MathCoreSync.recordAction === 'function') {
+            MathCoreSync.recordAction('ui_keydown', { key: e.key }, {
+              sid: currentStudent.classID + '_' + currentStudent.studentID,
+              mode: activeSession ? activeSession.state.mode : 'hub'
+            });
+          }
+        }, { passive: true });
+
+        // Tab switch guard for active exam (A4)
+        document.addEventListener('visibilitychange', function () {
+          if (document.hidden && activeSession && activeSession.state.mode === 'exam' && !activeSession.state.completed) {
+            const res = activeSession.recordTabSwitch();
+            alert(`⚠️ 測驗期間禁止切換網頁！（已記錄第 ${res.tabSwitchCount} / ${res.maxTabSwitches} 次）`);
+            if (res.shouldAutoSubmit) {
+              finishCurrentQuiz('tab_switch_limit');
+            }
+          }
+        });
+
+        window.addEventListener('message', function (ev) {
+          if (ev.data && ev.data.type === 'MATH_GAME_REPORT') {
+            refreshTopBadges();
+            renderGamesLeaderboard(ev.data.gameId);
+          }
+        });
+
+        // Restore active login session if present
+        try {
+          const saved = JSON.parse(localStorage.getItem('MP_V2_SESSION') || 'null');
+          if (saved && saved.classID && saved.studentID) {
+            onLoginSuccess(saved);
+          }
+        } catch (e) {}
+      }
+
+      function populateClassSelect() {
+        const clsSel = document.getElementById('gateClassSelect');
+        const classes = (window.MathPlatformRegistry && MathPlatformRegistry.classes) || ['4C', '4D', '5B', '5C'];
+        clsSel.innerHTML = classes.map(c => `<option value="${c}">${c} 班</option>`).join('');
+        populateSeatSelect();
+      }
+
+      function populateSeatSelect() {
+        const cls = document.getElementById('gateClassSelect').value;
+        const stuSel = document.getElementById('gateStudentSelect');
+        const list = (window.getStudentsByClass && window.getStudentsByClass(cls)) || [];
+        stuSel.innerHTML = list.map(s => `<option value="${s.id}" data-name="${s.name}">${s.id} 號 - ${s.name}</option>`).join('');
+      }
+
+      function handleGateLogin() {
+        const cls = document.getElementById('gateClassSelect').value;
+        const sel = document.getElementById('gateStudentSelect');
+        const sid = sel.value;
+        const sName = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].getAttribute('data-name') : ('同學' + sid);
+        const secret = document.getElementById('gateSecretInput').value.trim();
+        const alertEl = document.getElementById('gateAlert');
+
+        if (!secret || secret.length < 2) {
+          alertEl.textContent = '請輸入老師發放的個人密鑰！';
+          alertEl.classList.remove('d-none');
+          return;
+        }
+        alertEl.classList.add('d-none');
+
+        const student = { classID: cls, studentID: String(sid), name: sName, secretKey: secret, loginTs: Date.now() };
+        localStorage.setItem('MP_V2_SESSION', JSON.stringify(student));
+        onLoginSuccess(student);
+      }
+
+      function onLoginSuccess(student) {
+        currentStudent = student;
+        const sid = student.classID + '_' + student.studentID;
+        document.getElementById('studentInfoBadge').textContent = `${student.classID} 班 ${student.studentID} 號 ${student.name}`;
+        document.getElementById('hubWelcomeTitle').textContent = `👋 你好，${student.classID} 班 ${student.name} 同學`;
+        document.getElementById('btnNavHub').classList.remove('d-none');
+        refreshTopBadges();
+
+        // First-login D6 Research Informed Consent check
+        const consentRaw = localStorage.getItem('MP_V2_CONSENT_' + sid);
+        if (!consentRaw) {
+          document.getElementById('modalConsent').classList.add('show');
+        }
+        showScreen('screen-hub');
+      }
+
+      function confirmConsent(agreed) {
+        if (!currentStudent) return;
+        const sid = currentStudent.classID + '_' + currentStudent.studentID;
+        const rec = { sid: sid, agreed: !!agreed, version: '2026-11-v1', ts: Date.now() };
+        localStorage.setItem('MP_V2_CONSENT_' + sid, JSON.stringify(rec));
+        document.getElementById('consentToggleSwitch').checked = !!agreed;
+        document.getElementById('modalConsent').classList.remove('show');
+        if (window.MathCoreSync && typeof MathCoreSync.recordAction === 'function') {
+          MathCoreSync.recordAction('research_consent', rec, { sid: sid });
+        }
+      }
+
+      function toggleConsent(agreed) {
+        confirmConsent(agreed);
+      }
+
+      function updateNetBadge(state) {
+        const el = document.getElementById('netStatusBadge');
+        if (!el || !state) return;
+        if (state.status === 'GREEN' || state.status === 'online_macau') {
+          el.textContent = '🟢 澳門/非大陸網絡';
+          if (currentStudent && window.MathCoreBonus) {
+            MathCoreBonus.PointsLedger.confirmPendingPoints(currentStudent.classID + '_' + currentStudent.studentID);
+          }
+        } else if (state.status === 'YELLOW' || state.status === 'restricted_mainland') {
+          el.textContent = '🟡 受限網絡 (已暫存瀏覽器，回澳自動補交)';
+        } else {
+          el.textContent = '🔴 離線模式 (答題已暫存瀏覽器)';
+        }
+        refreshTopBadges();
+      }
+
+      function refreshTopBadges() {
+        if (!currentStudent) return;
+        const sid = currentStudent.classID + '_' + currentStudent.studentID;
+        if (window.MathCoreBonus) {
+          const bal = MathCoreBonus.PointsLedger.getBalance(sid);
+          document.getElementById('pointsQuickBadge').textContent = `💎 ${bal.confirmed} 積分` + (bal.pending > 0 ? ` (+${bal.pending}待入帳)` : '');
+        }
+        try {
+          const outbox = JSON.parse(localStorage.getItem('MP_V2_OUTBOX') || '[]');
+          document.getElementById('pendingSyncBadge').textContent = `待提交 ${outbox.length} 筆`;
+        } catch (e) {}
+      }
+
+      function showScreen(id) {
+        document.querySelectorAll('.app-screen').forEach(el => el.classList.remove('active'));
+        const target = document.getElementById(id);
+        if (target) target.classList.add('active');
+        refreshTopBadges();
+      }
+
+      function resolveBankQuestions(bankId) {
+        if (bankId === '4cd_1023') return { main: window.QUESTIONS_4CD1023 || [], adaptive: [] };
+        if (bankId === '5bc_1102') return { main: window.BANK_5BC1102 || [], adaptive: [] };
+        const t2 = window.BANK_4CD_T2_ALL || (window.BANK_4CD_T2 && (window.BANK_4CD_T2.exam || []).concat(window.BANK_4CD_T2.practice || [])) || [];
+        return { main: t2, adaptive: window.BANK_4CD_1102_ADAPTIVE || [] };
+      }
+
+      function openPracticeSelector(mode) {
+        const listEl = document.getElementById('selectorList');
+        const titleEl = document.getElementById('selectorTitle');
+        document.getElementById('practiceRandomWrap').style.display = mode === 'practice' ? 'block' : 'none';
+        titleEl.textContent = mode === 'practice' ? '📴 選擇純本地離線練習題庫 (≥24h 同步)' : (mode === 'exam' ? '🛡️ 選擇限時測驗 (15分鐘 + 安保打卡)' : '🚀 選擇聯網自適應刷題');
+
+        const banks = (window.MathPlatformRegistry && MathPlatformRegistry.banks) || [
+          { id: '4cd_1023', title: '高一 1023 函數題庫', classes: ['4C', '4D'] },
+          { id: '4cd_1102', title: '高一 1102 函數進階自適應題庫', classes: ['4C', '4D'] },
+          { id: '5bc_1102', title: '高二 1102 數列與三角題庫', classes: ['5B', '5C'] }
+        ];
+
+        // Also offer a built-in demo bank showcasing all 7 question types
+        const allItems = banks.concat([
+          { id: 'all_7_types', title: '✨ 7 大新題型全功能體驗題庫（單選/多選/配對/排序/找錯/作圖/上傳）', classes: ['4C', '4D', '5B', '5C'] }
+        ]);
+
+        listEl.innerHTML = allItems.map(b => `
+          <div class="col-md-6">
+            <div class="p-3 border rounded bg-white d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-bold">${b.title}</div>
+                <div class="text-muted small">適用班別：${(b.classes || []).join(', ')}</div>
+              </div>
+              <button class="btn btn-primary btn-sm fw-bold" onclick="AppUI.startQuizSession('${mode}', '${b.id}', '${b.title}')">開始 ➔</button>
+            </div>
+          </div>
+        `).join('');
+        showScreen('screen-selector');
+      }
+
+      function getBuiltIn7TypesQuestions() {
+        return [
+          { id: 'T7_1', type: 'single_choice', topic: '函數定義域', stem: '函數 $f(x)=\\sqrt{x-2}$ 的定義域為（　）', options: [{key:'A',text:'$[2,+\\infty)$'},{key:'B',text:'$(2,+\\infty)$'},{key:'C',text:'$(-\\infty,2]$'},{key:'D',text:'$\\mathbb{R}$'}], answer: 'A', hints: ['偶次根號下被開方數須非負：$x-2 \\ge 0$。'] },
+          { id: 'T7_2', type: 'multi_select', topic: '偶函數判定', stem: '【多選】下列函數中為偶函數的有（　）', options: [{key:'A',text:'$f(x)=x^2$'},{key:'B',text:'$f(x)=|x|$'},{key:'C',text:'$f(x)=x^3$'},{key:'D',text:'$f(x)=\\cos x$'}], correctKeys: ['A','B','D'], hints: ['偶函數滿足定義域對稱且 $f(-x)=f(x)$。'] },
+          { id: 'T7_3', type: 'matching', topic: '集合與區間配對', stem: '請將左側的不等式解集與右側的區間表示進行配對：', leftItems: [{key:'L1',text:'$x > 3$'},{key:'L2',text:'$-1 \\le x < 2$'}], rightItems: [{key:'A',text:'$[-1, 2)$'},{key:'B',text:'$(3, +\\infty)$'},{key:'C',text:'$(-1, 2]$'}], correctPairs: { L1: 'B', L2: 'A' }, hints: ['包含端點用中括號，不包含端點用小括號。'] },
+          { id: 'T7_4', type: 'step_order', topic: '一元二次不等式求解步驟', stem: '請將求解 $x^2 - 3x + 2 < 0$ 的正確步驟按先後順序排列：', steps: [{id:'S2',text:'因式分解得 $(x-1)(x-2) < 0$'},{id:'S1',text:'令 $x^2 - 3x + 2 = 0$，求對應方程的根'},{id:'S3',text:'由開口向上知解集為 $(1, 2)$'}], correctOrder: ['S1','S2','S3'], hints: ['先求根、再因式分解、最後結合拋物線圖像寫出區間。'] },
+          { id: 'T7_5', type: 'error_find', topic: '解答過程找錯題', stem: '以下求解 $\\frac{x-1}{x+2} \\le 0$ 的解答過程中，哪一步開始出錯？並指出錯誤類型：', errorSteps: ['步驟1：轉化為整式不等式 $(x-1)(x+2) \\le 0$', '步驟2：求得兩根為 $x_1 = -2, x_2 = 1$', '步驟3：寫出最終解集為 $[-2, 1]$'], correctErrorStepIndex: 2, correctErrorType: '遺漏定義域或限制條件', hints: ['注意分母 $x+2$ 不能為 $0$！'] },
+          { id: 'T7_6', type: 'graph_plot', topic: '圖像頂點標註作圖題', stem: '請用手指或滑鼠在圖中點選二次函數拋物線的頂點位置：', graphImage: 'diagrams/quad_downward_le0.png', plotTarget: { x: 0.5, y: 0.35, tolerance: 0.25 }, hints: ['頂點位於拋物線對稱軸的最高處。'] },
+          { id: 'T7_7', type: 'upload_solution', topic: '綜合解答題手寫上傳', stem: '已知 $f(x)=x^2-2ax+3$ 在 $[1,+\\infty)$ 上單調遞增，求實數 $a$ 的取值範圍（請在草稿紙寫出完整步驟並拍照上傳）：', hints: ['開口向上的拋物線對稱軸為 $x=a$，要在 $[1,+\\infty)$ 遞增需 $a \\le 1$。'] }
+        ];
+      }
+
+      function startQuizSession(mode, bankId, title) {
+        const randomize = document.getElementById('practiceRandomSwitch').checked;
+        const pools = bankId === 'all_7_types'
+          ? { main: getBuiltIn7TypesQuestions(), adaptive: [] }
+          : resolveBankQuestions(bankId);
+
+        const teacherFeedbackCfg = localStorage.getItem('MP_V2_TEACHER_FEEDBACK_MODE') || (mode === 'exam' ? 'after_submit' : 'immediate');
+
+        activeSession = MathCoreEngine.createSession({
+          mode: mode,
+          examId: mode + '_' + bankId,
+          title: title,
+          student: currentStudent,
+          questions: pools.main,
+          adaptiveQuestions: pools.adaptive,
+          randomize: mode === 'practice' ? randomize : true,
+          adaptive: mode === 'drill',
+          timeLimitMin: mode === 'exam' ? 15 : 15,
+          feedbackMode: teacherFeedbackCfg
+        });
+
+        if (mode === 'exam') {
+          openCheckinModal('start');
+        }
+        startQuizTimer();
+        renderCurrentQuestion();
+        showScreen('screen-quiz');
+      }
+
+      function startQuizTimer() {
+        if (quizTimerId) clearInterval(quizTimerId);
+        const badge = document.getElementById('quizTimerBadge');
+        quizTimerId = setInterval(function () {
+          if (!activeSession || activeSession.state.completed) {
+            clearInterval(quizTimerId);
+            return;
+          }
+          const rem = activeSession.getRemainingTimeMs();
+          if (rem === null) {
+            badge.textContent = '不限時';
+            return;
+          }
+          const sec = Math.ceil(rem / 1000);
+          const mm = String(Math.floor(sec / 60)).padStart(2, '0');
+          const ss = String(sec % 60).padStart(2, '0');
+          badge.textContent = `⏱️ ${mm}:${ss}`;
+          if (rem <= 0) {
+            clearInterval(quizTimerId);
+            alert('⏰ 15 分鐘作答時間到，系統自動交卷！');
+            finishCurrentQuiz('time_up');
+          }
+        }, 1000);
+      }
+
+      function renderCurrentQuestion() {
+        if (!activeSession) return;
+        const st = activeSession.state;
+        const q = activeSession.getCurrentQuestion();
+        if (!q) return;
+
+        currentDraftAnswer = st.answers[q.id] !== undefined ? st.answers[q.id] : null;
+        document.getElementById('quizTitleText').textContent = st.title;
+        document.getElementById('quizModeBadge').textContent = st.mode === 'practice' ? '離線練習' : (st.mode === 'exam' ? '限時測驗' : '聯網自適應');
+        document.getElementById('quizProgressText').textContent = `第 ${st.currentIndex + 1} / ${st.targetQuota} 題`;
+
+        const dosageEl = document.getElementById('quizDosageBadge');
+        if (st.maliciousPenaltyActive) {
+          dosageEl.className = 'dosage-badge penalty ms-2';
+          dosageEl.textContent = `懲罰擴充: ${st.targetQuota}題`;
+        } else if (st.targetQuota > 25) {
+          dosageEl.className = 'dosage-badge escalated ms-2';
+          dosageEl.textContent = `自適應擴充: ${st.targetQuota}題`;
+        } else {
+          dosageEl.className = 'dosage-badge ms-2';
+          dosageEl.textContent = `配額: ${st.targetQuota}題`;
+        }
+
+        document.getElementById('qTopicLabel').textContent = q.topic || '綜合';
+        document.getElementById('qDiffLabel').textContent = 'Lv.' + (q.difficulty || 1);
+        document.getElementById('qStemBox').innerHTML = q.stem || '';
+
+        const diagWrap = document.getElementById('qDiagramBox');
+        if (q.diagram && q.type !== 'graph_plot') {
+          document.getElementById('qDiagramImg').src = q.diagram;
+          diagWrap.classList.remove('d-none');
+        } else {
+          diagWrap.classList.add('d-none');
+        }
+
+        document.getElementById('qHintBox').classList.add('d-none');
+        document.getElementById('qFeedbackBox').classList.add('d-none');
+        document.getElementById('quizHastyAlert').classList.add('d-none');
+        document.getElementById('btnSubmitAnswer').classList.remove('d-none');
+        document.getElementById('btnNextQuestion').classList.add('d-none');
+
+        const container = document.getElementById('qInteractiveContainer');
+        MathCoreContent.QuestionTypes.render(q, container, {
+          currentAnswer: currentDraftAnswer,
+          onAnswer: function (val) {
+            currentDraftAnswer = val;
+          }
+        });
+        MathCoreContent.typesetMath(document.getElementById('qStemBox'));
+      }
+
+      function triggerHint() {
+        if (!activeSession) return;
+        const h = activeSession.requestHint();
+        if (!h) return;
+        const box = document.getElementById('qHintBox');
+        box.innerHTML = `<strong>💡 提示 (${h.level}/${h.totalLevels})：</strong> ${h.text}`;
+        box.classList.remove('d-none');
+        MathCoreContent.typesetMath(box);
+      }
+
+      function submitCurrentAnswer() {
+        if (!activeSession) return;
+        if (currentDraftAnswer === null || currentDraftAnswer === '') {
+          alert('請先作答後再提交！');
+          return;
+        }
+        const res = activeSession.submitAnswer(currentDraftAnswer);
+        if (!res) return;
+
+        // Award points if correct
+        if (currentStudent && window.MathCoreBonus) {
+          const sid = currentStudent.classID + '_' + currentStudent.studentID;
+          const ev = activeSession.state.evaluations[res.qid];
+          if (ev && ev.isCorrect) {
+            const pType = activeSession.state.mode === 'practice' ? 'practiceCorrect' : 'drillCorrect';
+            MathCoreBonus.PointsLedger.awardPoints(sid, pType);
+          }
+        }
+
+        if (res.adaptiveAdded && res.adaptiveAdded.length > 0) {
+          const hastyEl = document.getElementById('quizHastyAlert');
+          hastyEl.innerHTML = `⚡ <strong>自適應動態加題：</strong>系統已根據你的作答情況智能補充 <strong>+${res.adaptiveAdded.length}</strong> 道鞏固題（當前總配額：${res.targetQuota} 題）！`;
+          hastyEl.classList.remove('d-none');
+        }
+
+        const fb = document.getElementById('qFeedbackBox');
+        if (res.feedbackMode === 'immediate') {
+          fb.className = 'alert py-2 small ' + (res.isCorrect ? 'alert-success' : 'alert-danger');
+          fb.innerHTML = (res.isCorrect ? '✅ <strong>回答正確！</strong> ' : `❌ <strong>回答錯誤</strong>（正確答案：${JSON.stringify(res.correctAnswer)}） `) + (res.explanation || '');
+          fb.classList.remove('d-none');
+          MathCoreContent.typesetMath(fb);
+        } else {
+          fb.className = 'alert alert-secondary py-2 small';
+          fb.textContent = '✔️ 已記錄作答（依教師設定，對錯結果將於交卷後統一顯示）';
+          fb.classList.remove('d-none');
+        }
+
+        document.getElementById('btnSubmitAnswer').classList.add('d-none');
+        document.getElementById('btnNextQuestion').classList.remove('d-none');
+        refreshTopBadges();
+      }
+
+      function nextQuestion() {
+        if (!activeSession) return;
+        const st = activeSession.state;
+        if (st.currentIndex + 1 < st.questions.length) {
+          activeSession.goToQuestion(st.currentIndex + 1);
+          renderCurrentQuestion();
+        } else {
+          finishCurrentQuiz('completed_all');
+        }
+      }
+
+      function saveAndExitQuiz() {
+        if (activeSession) {
+          activeSession.saveAndExit();
+          if (quizTimerId) clearInterval(quizTimerId);
+          alert('💾 已將當前答題進度保存在本地瀏覽器，隨時可繼續作答！');
+        }
+        showScreen('screen-hub');
+      }
+
+      function finishCurrentQuiz(reason) {
+        if (!activeSession) return;
+        if (quizTimerId) clearInterval(quizTimerId);
+        const summary = activeSession.finishSession(reason);
+
+        // Save best drill score for A8 auto-bonus calculation
+        if (currentStudent) {
+          const sid = currentStudent.classID + '_' + currentStudent.studentID;
+          const key = 'MP_V2_BEST_DRILL_' + sid;
+          const prev = Number(localStorage.getItem(key) || 0);
+          if (summary.score > prev) localStorage.setItem(key, String(summary.score));
+        }
+
+        alert(`🎉 交卷完成！\n得分：${summary.score} 分 (${summary.correctCount}/${summary.totalQuestions})\n自適應加題：${summary.adaptiveAdditionsCount} 次\n數據已寫入本地並排入同步隊列！`);
+        openMeApp();
+      }
+
+      function openCheckinModal(stage) {
+        checkinStage = stage || 'start';
+        document.getElementById('modalCheckin').classList.add('show');
+      }
+
+      function submitCheckinModal() {
+        const method = document.querySelector('input[name="checkinMethod"]:checked').value;
+        const fileInput = document.getElementById('checkinFileInput');
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) {
+          if (activeSession) activeSession.recordCheckin({ stage: checkinStage, method: method, signatureConfirmed: true });
+          document.getElementById('modalCheckin').classList.remove('show');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+          if (activeSession) {
+            activeSession.recordCheckin({
+              stage: checkinStage,
+              method: method,
+              imageBase64: ev.target.result,
+              signatureConfirmed: true
+            });
+          }
+          document.getElementById('modalCheckin').classList.remove('show');
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // === A5 Wrong Review & A7 Help ===
+      function openReviewApp() {
+        if (!currentStudent) return;
+        const sid = currentStudent.classID + '_' + currentStudent.studentID;
+        const items = (window.MathCoreStorage && typeof MathCoreStorage.getWrongQuestions === 'function')
+          ? MathCoreStorage.getWrongQuestions(sid)
+          : [];
+        const listEl = document.getElementById('wrongReviewList');
+        if (items.length === 0) {
+          listEl.innerHTML = '<div class="text-muted small py-3">目前沒有錯題記錄，繼續保持！</div>';
+        } else {
+          listEl.innerHTML = items.map((w, i) => `
+            <div class="p-3 border rounded mb-2 bg-light">
+              <div class="small text-muted mb-1">#${i + 1} 【${w.topic || '數學'}】</div>
+              <div class="fw-semibold mb-1">${w.stem || ''}</div>
+              <div class="small text-danger">你的作答：${JSON.stringify(w.userAnswer)} · 正確答案：${JSON.stringify(w.correctAnswer)}</div>
+              <div class="small text-secondary mt-1">${w.explanation || ''}</div>
+            </div>
+          `).join('');
+          MathCoreContent.typesetMath(listEl);
+        }
+        renderHelpHistory();
+        showScreen('screen-review');
+      }
+
+      function startWrongRetest() {
+        if (!currentStudent) return;
+        const sid = currentStudent.classID + '_' + currentStudent.studentID;
+        const items = (window.MathCoreStorage && typeof MathCoreStorage.getWrongQuestions === 'function')
+          ? MathCoreStorage.getWrongQuestions(sid)
+          : [];
+        if (items.length === 0) {
+          alert('目前沒有錯題可供重測！');
+          return;
+        }
+        activeSession = MathCoreEngine.createSession({
+          mode: 'review',
+          examId: 'review_retest',
+          title: '📓 錯題專項重測',
+          student: currentStudent,
+          questions: items,
+          adaptive: false,
+          feedbackMode: 'immediate'
+        });
+        renderCurrentQuestion();
+        showScreen('screen-quiz');
+      }
+
+      function askTeacherCurrentQuestion() {
+        if (!activeSession) return;
+        const q = activeSession.getCurrentQuestion();
+        openReviewApp();
+        if (q) {
+          document.getElementById('helpQuestionInput').value = `老師好，我在做題目【${q.id} (${q.topic})】時遇到困難：`;
+        }
+      }
+
+      function submitHelpRequest() {
+        if (!currentStudent) return;
+        const text = document.getElementById('helpQuestionInput').value.trim();
+        if (!text) return;
+        const sid = currentStudent.classID + '_' + currentStudent.studentID;
+        const key = 'MP_V2_HELP_QA';
+        const list = JSON.parse(localStorage.getItem(key) || '[]');
+        const item = {
+          id: 'QA_' + Date.now(),
+          sid: sid,
+          studentName: currentStudent.name,
+          classID: currentStudent.classID,
+          question: text,
+          teacherReply: '',
+          ts: Date.now()
+        };
+        list.unshift(item);
+        localStorage.setItem(key, JSON.stringify(list));
+        document.getElementById('helpQuestionInput').value = '';
+        if (window.MathCoreSync) MathCoreSync.recordAction('help_ask', item, { sid: sid });
+        renderHelpHistory();
+      }
+
+      function renderHelpHistory() {
+        if (!currentStudent) return;
+        const sid = currentStudent.classID + '_' + currentStudent.studentID;
+        const list = JSON.parse(localStorage.getItem('MP_V2_HELP_QA') || '[]').filter(x => x.sid === sid);
+        const box = document.getElementById('helpHistoryList');
+        box.innerHTML = list.length === 0
+          ? '<div class="text-muted">暫無提問記錄</div>'
+          : list.map(x => `
+            <div class="p-2 border rounded mb-2 bg-white">
+              <div><strong>問：</strong>${x.question}</div>
+              <div class="mt-1 ${x.teacherReply ? 'text-success fw-semibold' : 'text-muted'}">
+                ${x.teacherReply ? '👩‍🏫 老師回覆：' + x.teacherReply : '⏳ 等待老師於後台回覆...'}
+              </div>
+            </div>
+          `).join('');
+      }
+
+      // === A6 My Scores & A8 Auto-Bonus Cap ===
+      function openMeApp() {
+        if (!currentStudent) return;
+        const sid = currentStudent.classID + '_' + currentStudent.studentID;
+        const packs = (window.MathPlatformRegistry && MathPlatformRegistry.scorePacks) || [
+          { id: 'quiz_1023', title: '1023 隨堂小測' },
+          { id: 'quiz_1030', title: '1030 加密考卷' },
+          { id: 'quiz_1106', title: '1106 隨堂小測' }
+        ];
+        const tabs = document.getElementById('scorePackTabs');
+        tabs.innerHTML = packs.map((p, idx) => `
+          <button class="btn btn-sm ${idx === 0 ? 'btn-primary' : 'btn-outline-primary'}" onclick="AppUI.renderScorePack('${p.id}')">${p.title}</button>
+        `).join('');
+        renderScorePack(packs[0].id);
+        showScreen('screen-me');
+      }
+
+      function renderScorePack(packId) {
+        if (!currentStudent) return;
+        const sid = currentStudent.classID + '_' + currentStudent.studentID;
+        let rawScore = 52;
+        if (packId === 'quiz_1023' && typeof window.getStudentQuiz1023Record === 'function') {
+          const r = window.getStudentQuiz1023Record({ classID: currentStudent.classID, studentID: currentStudent.studentID, name: currentStudent.name });
+          if (r && r.score !== undefined) rawScore = Number(r.score);
+        }
+        // Check teacher manual score adjustment (D3)
+        const overrides = JSON.parse(localStorage.getItem('MP_V2_TEACHER_OVERRIDES') || '{}');
+        if (overrides[packId + '_' + sid] !== undefined) {
+          rawScore = Number(overrides[packId + '_' + sid]);
+        }
+
+        const drillScore = Number(localStorage.getItem('MP_V2_BEST_DRILL_' + sid) || 85);
+        const capVal = Number(localStorage.getItem('MP_V2_BONUS_CAP') || 60);
+        const calc = MathCoreBonus.calculateQuizFinalScore({
+          rawScore: rawScore,
+          drillScore: drillScore,
+          redeemedBonus: 0,
+          rule: { threshold: 80, perPoint: 1, capScore: capVal }
+        });
+
+        document.getElementById('scoreDetailBox').innerHTML = `
+          <div class="row text-center">
+            <div class="col-3"><div class="small text-muted">小測原始分</div><div class="fs-4 fw-bold">${calc.rawScore}</div></div>
+            <div class="col-3"><div class="small text-muted">刷題最高分 (>80加分)</div><div class="fs-4 fw-bold text-primary">${calc.drillScore} (+${calc.autoBonus})</div></div>
+            <div class="col-3"><div class="small text-muted">封頂上限 (老師設定)</div><div class="fs-4 fw-bold text-warning">${calc.capScore}</div></div>
+            <div class="col-3"><div class="small text-muted">最終核定成績</div><div class="fs-3 fw-bold text-success">${calc.finalScore}</div></div>
+          </div>
+        `;
+
+        // Render Leaderboard respecting teacher display mode (Section 六)
+        const displayMode = localStorage.getItem('MP_V2_RANK_DISPLAY_MODE') || 'real_name'; // real_name | seat_only | anonymous
+        const roster = (window.getStudentsByClass && window.getStudentsByClass(currentStudent.classID)) || [];
+        const rows = roster.slice(0, 10).map((s, idx) => {
+          const sScore = Math.max(45, 95 - idx * 4);
+          let label = `${s.classID} ${s.id}號 ${s.name}`;
+          if (displayMode === 'seat_only') label = `${s.classID} 班 ${s.id} 號`;
+          else if (displayMode === 'anonymous') label = `同學 #${idx + 1}`;
+          return `<tr><td>#${idx + 1}</td><td>${label}</td><td class="fw-bold">${sScore} 分</td></tr>`;
+        }).join('');
+        document.getElementById('examLeaderboardBox').innerHTML = `
+          <table class="table table-sm table-striped mb-0">
+            <thead><tr><th>名次</th><th>學生 (${displayMode})</th><th>成績</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        `;
+      }
+
+      // === A13 Points & Mall ===
+      function openPointsApp() {
+        if (!currentStudent) return;
+        const sid = currentStudent.classID + '_' + currentStudent.studentID;
+        const bal = MathCoreBonus.PointsLedger.getBalance(sid);
+        document.getElementById('ptsConfirmedVal').textContent = bal.confirmed;
+        document.getElementById('ptsPendingVal').textContent = bal.pending;
+        const hBox = document.getElementById('pointsHistoryBox');
+        hBox.innerHTML = bal.entries.length === 0
+          ? '<div class="text-muted">尚無積分記錄，快去答題或挑戰遊戲賺取積分吧！</div>'
+          : bal.entries.slice().reverse().map(e => `
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <span>${e.dateStr} · ${e.sourceType} (${e.status === 'pending' ? '⏳待入帳' : '✅已入帳'})</span>
+              <strong class="${e.amount >= 0 ? 'text-success' : 'text-danger'}">${e.amount >= 0 ? '+' + e.amount : e.amount}</strong>
+            </div>
+          `).join('');
+        showScreen('screen-points');
+      }
+
+      function redeemAction(targetType, cost, meta) {
+        if (!currentStudent) return;
+        const sid = currentStudent.classID + '_' + currentStudent.studentID;
+        const res = MathCoreBonus.PointsLedger.redeemPoints(sid, targetType, cost, meta);
+        if (!res.ok) {
+          alert(res.error);
+          return;
+        }
+        alert('🎉 兌換成功：' + (meta && meta.title || targetType));
+        openPointsApp();
+        refreshTopBadges();
+      }
+
+      // === A11 Math Games Hall ===
+      function openGamesApp() {
+        if (!currentStudent) return;
+        const sid = currentStudent.classID + '_' + currentStudent.studentID;
+        const st = MathCoreBonus.GameBridge.getPlaytimeStatus(sid);
+        const remMin = Math.floor(st.remainingMs / 60000);
+        const remSec = Math.floor((st.remainingMs % 60000) / 1000);
+        document.getElementById('gamePlaytimeBadge').textContent = `今日剩餘：${remMin}分${String(remSec).padStart(2, '0')}秒`;
+
+        const games = (window.MathCoreConfig && MathCoreConfig.games && MathCoreConfig.games.catalog) || [];
+        document.getElementById('gameCardsRow').innerHTML = games.map(g => `
+          <div class="col-md-4">
+            <div class="p-3 border rounded bg-light h-100 d-flex flex-column justify-content-between">
+              <div>
+                <h6 class="fw-bold">${g.title}</h6>
+                <div class="small text-muted mb-2">計分模式：${g.scoringMode === 'win_speed' ? '勝場100分 + 速度加成' : '原生連擊計分'}</div>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-primary btn-sm flex-grow-1" onclick="AppUI.launchGame('${g.id}', '${g.title}', '${g.path}')" ${st.locked ? 'disabled' : ''}>${st.locked ? '今日時長已用完' : '▶ 開始遊戲'}</button>
+                <button class="btn btn-outline-secondary btn-sm" onclick="AppUI.renderGamesLeaderboard('${g.id}')">榜單</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+        renderGamesLeaderboard(games[0] ? games[0].id : 'trig-ratio');
+        showScreen('screen-games');
+      }
+
+      function launchGame(gameId, title, path) {
+        if (!currentStudent) return;
+        const sid = currentStudent.classID + '_' + currentStudent.studentID;
+        const st = MathCoreBonus.GameBridge.getPlaytimeStatus(sid);
+        if (st.locked) {
+          alert('⚠️ 今日 30 分鐘遊戲防沉迷時長已用完！請進入「積分中心」用積分兌換加時。');
+          return;
+        }
+        document.getElementById('activeGameTitle').textContent = `🎮 ${title}（實名玩家：${currentStudent.name}）`;
+        document.getElementById('gameIframe').src = path;
+        document.getElementById('gameIframeWrap').classList.remove('d-none');
+      }
+
+      function closeGameIframe() {
+        document.getElementById('gameIframe').src = 'about:blank';
+        document.getElementById('gameIframeWrap').classList.add('d-none');
+        openGamesApp();
+      }
+
+      function renderGamesLeaderboard(gameId) {
+        const top10 = MathCoreBonus.GameBridge.getTop10(gameId);
+        const box = document.getElementById('gameLeaderboardBox');
+        box.innerHTML = top10.length === 0
+          ? `<div class="text-muted small">【${gameId}】暫無今日排行記錄，快來拿下第一名！</div>`
+          : `<table class="table table-sm table-bordered mb-0">
+              <thead><tr><th>排名</th><th>實名學生</th><th>最高得分</th><th>用時</th></tr></thead>
+              <tbody>${top10.map((r, i) => `<tr><td>#${i + 1}</td><td>${r.classID} ${r.name}</td><td class="fw-bold text-primary">${r.score}</td><td>${Math.round(r.durationMs / 1000)}s</td></tr>`).join('')}</tbody>
+            </table>`;
+      }
+
+      // === A12 Online Network Arena ===
+      function toggleArenaAllow(allow) {
+        if (!currentStudent) return;
+        MathCoreBonus.ArenaManager.setAllowArena(currentStudent, allow);
+        if (allow) openArenaLobby();
+      }
+
+      function openArenaLobby() {
+        const status = MathCoreBonus.ArenaManager.isOpenNow();
+        document.getElementById('arenaWindowNotice').innerHTML =
+          `當前澳門時間：${status.dateStr} ${status.timeStr} · 狀態：<strong>${status.open ? '🟢 擂台開放中' : '🕒 非開放時段（仍可體驗模擬配對）'}</strong>`;
+        document.getElementById('modalArena').classList.add('show');
+      }
+
+      function agreeArenaMatch() {
+        if (!currentStudent) return;
+        // Simulate a peer student also agreeing within 1 minute if none in local pool so single-browser testing works seamlessly
+        MathCoreBonus.ArenaManager.acceptInvitation({ classID: currentStudent.classID, studentID: '99', name: '同級挑戰者' }, Date.now() - 5000);
+        const res = MathCoreBonus.ArenaManager.acceptInvitation(currentStudent, Date.now());
+        if (res.matched && res.match) {
+          pendingArenaMatch = res.match;
+          document.getElementById('arenaInviteStateBox').innerHTML =
+            `🎉 <strong>配對成功！</strong> 系統監測到兩個終端在 1 分鐘內同時同意配對！<br>對手：<strong>${res.match.players[1].name}</strong>（同題隨機碼：#${res.match.seed}）`;
+          document.getElementById('btnArenaEnterMatch').classList.remove('d-none');
+        }
+      }
+
+      function enterArenaMatchNow() {
+        document.getElementById('modalArena').classList.remove('show');
+        startQuizSession('drill', '4cd_1102', '⚔️ 網絡擂台賽即時對戰');
+      }
+
+      return {
+        init: init,
+        showScreen: showScreen,
+        populateSeatSelect: populateSeatSelect,
+        handleGateLogin: handleGateLogin,
+        confirmConsent: confirmConsent,
+        toggleConsent: toggleConsent,
+        openPracticeSelector: openPracticeSelector,
+        startQuizSession: startQuizSession,
+        triggerHint: triggerHint,
+        submitCurrentAnswer: submitCurrentAnswer,
+        nextQuestion: nextQuestion,
+        saveAndExitQuiz: saveAndExitQuiz,
+        finishCurrentQuiz: finishCurrentQuiz,
+        openCheckinModal: openCheckinModal,
+        submitCheckinModal: submitCheckinModal,
+        openReviewApp: openReviewApp,
+        startWrongRetest: startWrongRetest,
+        askTeacherCurrentQuestion: askTeacherCurrentQuestion,
+        submitHelpRequest: submitHelpRequest,
+        openMeApp: openMeApp,
+        renderScorePack: renderScorePack,
+        openPointsApp: openPointsApp,
+        redeemAction: redeemAction,
+        openGamesApp: openGamesApp,
+        launchGame: launchGame,
+        closeGameIframe: closeGameIframe,
+        renderGamesLeaderboard: renderGamesLeaderboard,
+        toggleArenaAllow: toggleArenaAllow,
+        openArenaLobby: openArenaLobby,
+        agreeArenaMatch: agreeArenaMatch,
+        enterArenaMatchNow: enterArenaMatchNow
+      };
+    })();
+
+    window.addEventListener('DOMContentLoaded', AppUI.init);
+  </script>
+</body>
+</html>

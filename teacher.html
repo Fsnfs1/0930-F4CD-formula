@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A9 教師管理與可持續擴展中控台 v2.0</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body { background: #f1f5f9; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #0f172a; padding-bottom: 60px; }
+    .topbar { background: #0f172a; color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+    .section-card { background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(15,23,42,0.04); }
+    pre.code-out { background: #0f172a; color: #38bdf8; padding: 14px; border-radius: 10px; font-size: 13px; max-height: 280px; overflow: auto; }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="d-flex align-items-center gap-2">
+      <strong>👩‍🏫 A9 教師中控台 & 可持續擴展配置中心</strong>
+      <span class="badge bg-success">v2.0 模組化架構</span>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="app.html" class="btn btn-sm btn-outline-light">切換至學生端 (app.html)</a>
+    </div>
+  </div>
+
+  <div class="container my-4" style="max-width:1100px;">
+
+    <!-- 1. Global Exam / Bonus / Ranking / Feedback Controls (D3, D5, D9, Section 六) -->
+    <div class="section-card">
+      <h5 class="fw-bold mb-3">⚙️ 測驗全局規則設定（即時生效）</h5>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">① 對錯顯示時機 (D9)</label>
+          <select id="cfgFeedbackMode" class="form-select" onchange="TeacherApp.saveGlobalSettings()">
+            <option value="immediate">答一題立即顯示對錯與詳解</option>
+            <option value="after_submit">做完全部題目（交卷後）才顯示</option>
+            <option value="after_publish">不直接顯示（待成績公布後查看）</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">② 成績排名姓名呈現方式 (第六節)</label>
+          <select id="cfgRankDisplay" class="form-select" onchange="TeacherApp.saveGlobalSettings()">
+            <option value="real_name">顯示真實姓名（班別 + 座號 + 姓名）</option>
+            <option value="seat_only">僅顯示班別與座號（隱去姓名）</option>
+            <option value="anonymous">完全匿名（同學 #1, #2...）</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">③ 小測加分封頂值 (D5，預設 60)</label>
+          <div class="input-group">
+            <input type="number" id="cfgBonusCap" class="form-control" value="60" min="40" max="100" />
+            <button class="btn btn-primary" onclick="TeacherApp.saveGlobalSettings()">儲存設定</button>
+          </div>
+          <div class="form-text">刷題超 80 分自動加分與積分兌換加分共用此封頂上限</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Reason-Free Score Fine-Tuning (D3) & Student Score Overview -->
+    <div class="section-card">
+      <h5 class="fw-bold mb-2">📝 學生成績微調與總覽（D3：免填原因、不向學生顯示微調原因）</h5>
+      <div class="row g-2 align-items-end mb-3">
+        <div class="col-md-3">
+          <label class="form-label small">選擇小測項目</label>
+          <select id="tunePackSelect" class="form-select form-select-sm"></select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small">班別</label>
+          <select id="tuneClassSelect" class="form-select form-select-sm" onchange="TeacherApp.populateStudentList()"></select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small">學生</label>
+          <select id="tuneStudentSelect" class="form-select form-select-sm"></select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small">設定新原始分</label>
+          <input type="number" id="tuneNewScore" class="form-control form-control-sm" value="58" />
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-sm btn-success w-100 fw-bold" onclick="TeacherApp.applyScoreTune()">一鍵微調分數</button>
+        </div>
+      </div>
+      <div id="tuneLogBox" class="small text-secondary"></div>
+    </div>
+
+    <!-- 3. Student Help Q&A Reply (D2 / A7) & Mall Approval (A13) -->
+    <div class="row g-3 mb-3">
+      <div class="col-md-6">
+        <div class="section-card h-100 mb-0">
+          <h5 class="fw-bold mb-2">💬 A7 學生求助提問回覆 (D2)</h5>
+          <p class="text-muted small mb-2">回覆後寫入本地與 Google Sheet，學生下次登入時自動拉取。</p>
+          <div id="teacherQaList" class="small"></div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="section-card h-100 mb-0">
+          <h5 class="fw-bold mb-2">🛍️ A13 積分商城審核 & 異常積分撤銷</h5>
+          <div id="teacherMallList" class="small"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Sustainable Registry Config Generator (Section 八 & 九: Add Bank/Quiz/Bonus/Game/Class with Zero Core Code Edits) -->
+    <div class="section-card">
+      <h5 class="fw-bold mb-2">🌱 可持續發展擴展中心（新增題庫 / 下次小測 / 加分規則 / 遊戲 / 班級）</h5>
+      <p class="text-muted small mb-3">未來增加下一套題目、下一次小測成績、新互動遊戲或新班級時，只需在此填表即可動態註冊並導出 <code>core/registry.js</code> 配置片段，零改動系統核心代碼。</p>
+      <div class="row g-2 mb-3">
+        <div class="col-md-3">
+          <select id="extTypeSelect" class="form-select form-select-sm">
+            <option value="bank">➕ 新增下一套題庫 (Bank)</option>
+            <option value="scorePack">➕ 新增下一次小測成績查詢 (ScorePack)</option>
+            <option value="bonusRule">➕ 新增小測自動加分規則 (BonusRule)</option>
+            <option value="game">➕ 新增互動數學遊戲 (Game)</option>
+            <option value="class">➕ 新增班級與學生 (Class)</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <input id="extIdInput" class="form-control form-control-sm" placeholder="代號 ID (例: 4cd_1120 或 5A)" />
+        </div>
+        <div class="col-md-4">
+          <input id="extTitleInput" class="form-control form-control-sm" placeholder="標題或路徑 (例: 高一 1120 題庫 / games/new.html)" />
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-sm btn-primary w-100 fw-bold" onclick="TeacherApp.registerExtensionItem()">立即註冊並生成</button>
+        </div>
+      </div>
+      <pre id="registrySnippetOut" class="code-out mb-0">// 點擊上方「立即註冊並生成」預覽可持續擴展配置</pre>
+    </div>
+
+    <!-- 5. S1 High-Security Student Key Generator & D6 Research Anonymized CSV Export -->
+    <div class="section-card">
+      <h5 class="fw-bold mb-2">🔬 D6 教學論文匿名數據導出 (<code>R-xxxxxxxx</code>) & S1 隨機密鑰生成</h5>
+      <div class="row g-3 align-items-end">
+        <div class="col-md-5">
+          <label class="form-label small fw-semibold">研究專用鹽值密鑰（僅老師保管，用於生成固定匿名編號 R-xxxxxxxx）</label>
+          <input id="researchSecretInput" type="password" class="form-control form-control-sm" value="MACAU_MATH_RESEARCH_2026_KEY" />
+        </div>
+        <div class="col-md-7 d-flex gap-2 flex-wrap">
+          <button class="btn btn-sm btn-dark fw-bold" onclick="TeacherApp.exportAnonymizedResearchCsv()">📥 導出匿名論文研究 CSV (含每鍵/點擊毫秒時間戳)</button>
+          <button class="btn btn-sm btn-outline-primary fw-bold" onclick="TeacherApp.generateClassRandomKeys()">🔑 為當前班級批量生成 ≥8 位高強度隨機密鑰 (S1)</button>
+        </div>
+      </div>
+      <pre id="researchPreviewOut" class="code-out mt-3 d-none"></pre>
+    </div>
+
+  </div>
+
+  <!-- Load Read-Only Roster & Modular Core -->
+  <script src="js/roster.js"></script>
+  <script src="core/config.js"></script>
+  <script src="core/crypto.js"></script>
+  <script src="core/registry.js"></script>
+  <script src="core/storage.js"></script>
+  <script src="core/bonus.js"></script>
+
+  <script>
+    const TeacherApp = (function () {
+      function init() {
+        document.getElementById('cfgFeedbackMode').value = localStorage.getItem('MP_V2_TEACHER_FEEDBACK_MODE') || 'immediate';
+        document.getElementById('cfgRankDisplay').value = localStorage.getItem('MP_V2_RANK_DISPLAY_MODE') || 'real_name';
+        document.getElementById('cfgBonusCap').value = localStorage.getItem('MP_V2_BONUS_CAP') || '60';
+
+        const packs = (window.MathPlatformRegistry && MathPlatformRegistry.scorePacks) || [
+          { id: 'quiz_1023', title: '1023 隨堂小測' },
+          { id: 'quiz_1030', title: '1030 加密考卷' },
+          { id: 'quiz_1106', title: '1106 隨堂小測' }
+        ];
+        document.getElementById('tunePackSelect').innerHTML = packs.map(p => `<option value="${p.id}">${p.title}</option>`).join('');
+
+        const classes = (window.MathPlatformRegistry && MathPlatformRegistry.classes) || ['4C', '4D', '5B', '5C'];
+        document.getElementById('tuneClassSelect').innerHTML = classes.map(c => `<option value="${c}">${c} 班</option>`).join('');
+        populateStudentList();
+        renderTuneLog();
+        renderQaList();
+        renderMallOrders();
+      }
+
+      function populateStudentList() {
+        const cls = document.getElementById('tuneClassSelect').value;
+        const list = (window.getStudentsByClass && window.getStudentsByClass(cls)) || [];
+        document.getElementById('tuneStudentSelect').innerHTML = list.map(s => `<option value="${s.classID}_${s.id}">${s.id} 號 - ${s.name}</option>`).join('');
+      }
+
+      function saveGlobalSettings() {
+        localStorage.setItem('MP_V2_TEACHER_FEEDBACK_MODE', document.getElementById('cfgFeedbackMode').value);
+        localStorage.setItem('MP_V2_RANK_DISPLAY_MODE', document.getElementById('cfgRankDisplay').value);
+        localStorage.setItem('MP_V2_BONUS_CAP', String(Number(document.getElementById('cfgBonusCap').value || 60)));
+        alert('✅ 全局測驗與封頂規則已儲存並即時生效！');
+      }
+
+      // D3: Reason-free score fine-tuning (audit log kept internally for teacher only)
+      function applyScoreTune() {
+        const packId = document.getElementById('tunePackSelect').value;
+        const sid = document.getElementById('tuneStudentSelect').value;
+        const newScore = Number(document.getElementById('tuneNewScore').value || 0);
+        const overrides = JSON.parse(localStorage.getItem('MP_V2_TEACHER_OVERRIDES') || '{}');
+        overrides[packId + '_' + sid] = newScore;
+        localStorage.setItem('MP_V2_TEACHER_OVERRIDES', JSON.stringify(overrides));
+
+        const audit = JSON.parse(localStorage.getItem('MP_V2_TEACHER_AUDIT_LOG') || '[]');
+        audit.unshift({ packId: packId, sid: sid, newScore: newScore, ts: new Date().toISOString() });
+        localStorage.setItem('MP_V2_TEACHER_AUDIT_LOG', JSON.stringify(audit.slice(0, 50)));
+        renderTuneLog();
+      }
+
+      function renderTuneLog() {
+        const audit = JSON.parse(localStorage.getItem('MP_V2_TEACHER_AUDIT_LOG') || '[]');
+        const box = document.getElementById('tuneLogBox');
+        box.innerHTML = audit.length === 0
+          ? '尚無微調記錄'
+          : '最近微調記錄（僅後台可見）：' + audit.slice(0, 5).map(a => `<span class="badge bg-light text-dark border me-1">${a.packId} · ${a.sid} ➔ ${a.newScore}分</span>`).join('');
+      }
+
+      // D2 / A7: Student Help Q&A Reply
+      function renderQaList() {
+        const list = JSON.parse(localStorage.getItem('MP_V2_HELP_QA') || '[]');
+        const box = document.getElementById('teacherQaList');
+        if (list.length === 0) {
+          box.innerHTML = '<div class="text-muted">目前沒有待回覆的學生提問</div>';
+          return;
+        }
+        box.innerHTML = list.map((q, idx) => `
+          <div class="p-2 border rounded mb-2 bg-light">
+            <div class="fw-bold">${q.classID} ${q.studentName} (${q.sid})：</div>
+            <div class="mb-2">${q.question}</div>
+            <div class="input-group input-group-sm">
+              <input id="replyInput_${idx}" class="form-control" value="${q.teacherReply || ''}" placeholder="輸入回覆內容..." />
+              <button class="btn btn-primary" onclick="TeacherApp.saveQaReply(${idx})">儲存回覆</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function saveQaReply(idx) {
+        const list = JSON.parse(localStorage.getItem('MP_V2_HELP_QA') || '[]');
+        if (!list[idx]) return;
+        list[idx].teacherReply = document.getElementById('replyInput_' + idx).value.trim();
+        list[idx].repliedAt = Date.now();
+        localStorage.setItem('MP_V2_HELP_QA', JSON.stringify(list));
+        renderQaList();
+      }
+
+      function renderMallOrders() {
+        const box = document.getElementById('teacherMallList');
+        const orders = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.startsWith('MP_V2_POINTS_')) {
+            try {
+              const ledger = JSON.parse(localStorage.getItem(k) || '{}');
+              (ledger.mallOrders || []).forEach(o => orders.push({ key: k, order: o }));
+            } catch (e) {}
+          }
+        }
+        box.innerHTML = orders.length === 0
+          ? '<div class="text-muted">目前沒有待審核的積分商城訂單</div>'
+          : orders.map(item => `
+            <div class="d-flex justify-content-between align-items-center border-bottom py-1">
+              <span>${item.order.sid} 兌換 <strong>${item.order.itemTitle}</strong> (${item.order.cost}積分)</span>
+              <span class="badge bg-success">已核准</span>
+            </div>
+          `).join('');
+      }
+
+      // Section 八 & 九: Sustainable Extension Registration
+      function registerExtensionItem() {
+        const type = document.getElementById('extTypeSelect').value;
+        const id = document.getElementById('extIdInput').value.trim() || ('item_' + Date.now());
+        const title = document.getElementById('extTitleInput').value.trim() || id;
+        const reg = window.MathPlatformRegistry || {};
+
+        let snippet = '';
+        if (type === 'bank') {
+          const entry = { id: id, title: title, globalVar: 'BANK_' + id.toUpperCase(), script: 'js/bank_' + id + '.js', classes: ['4C', '4D'] };
+          if (reg.registerBank) reg.registerBank(entry);
+          snippet = `// 新增題庫配置 (加入 core/registry.js -> banks)\n${JSON.stringify(entry, null, 2)}`;
+        } else if (type === 'scorePack') {
+          const entry = { id: id, title: title, classes: ['4C', '4D', '5B'], adapter: 'sheet_live' };
+          if (reg.registerScorePack) reg.registerScorePack(entry);
+          snippet = `// 新增小測成績查詢包 (加入 core/registry.js -> scorePacks)\n${JSON.stringify(entry, null, 2)}`;
+        } else if (type === 'bonusRule') {
+          const entry = { id: id, targetScorePackId: id, sourceExamId: 'drill_' + id, threshold: 80, perPoint: 1, capScore: Number(document.getElementById('cfgBonusCap').value || 60) };
+          if (reg.registerBonusRule) reg.registerBonusRule(entry);
+          snippet = `// 新增小測自動加分規則 (加入 core/registry.js -> bonusRules)\n${JSON.stringify(entry, null, 2)}`;
+        } else if (type === 'game') {
+          const entry = { id: id, title: title, path: title.endsWith('.html') || title.endsWith('.HTML') ? title : ('games/' + id + '.html'), scoringMode: 'win_speed' };
+          if (reg.registerGame) reg.registerGame(entry);
+          snippet = `// 新增互動數學遊戲 (加入 core/registry.js -> games)\n${JSON.stringify(entry, null, 2)}`;
+        } else if (type === 'class') {
+          if (reg.registerClass) reg.registerClass(id);
+          snippet = `// 新增班級與學生 (加入 core/registry.js -> classes & extraRoster)\nclasses.push("${id}");`;
+        }
+
+        document.getElementById('registrySnippetOut').textContent = snippet;
+        init();
+      }
+
+      // D6: Anonymized Research CSV Export (R-xxxxxxxx)
+      async function exportAnonymizedResearchCsv() {
+        const secret = document.getElementById('researchSecretInput').value.trim() || 'RESEARCH_SECRET';
+        const outbox = JSON.parse(localStorage.getItem('MP_V2_OUTBOX') || '[]');
+        const rows = ['anon_id,exam_id,action,seq,client_ts,payload_json'];
+
+        for (const ev of outbox) {
+          const sid = ev.sid || (ev.classID + '_' + ev.studentID) || '4C_1';
+          // Respect student consent (D6)
+          const consentRaw = localStorage.getItem('MP_V2_CONSENT_' + sid);
+          if (consentRaw) {
+            try {
+              const c = JSON.parse(consentRaw);
+              if (c.agreed === false) continue;
+            } catch (e) {}
+          }
+          const parts = sid.split('_');
+          const anonId = await MathCoreCrypto.anonymizeStudentForResearch(parts[0] || '4C', parts[1] || '1', secret);
+          const cleanPayload = JSON.stringify(ev.payload || {}).replace(/"/g, '""');
+          rows.push(`${anonId},${ev.examId || 'hub'},${ev.action || 'event'},${ev.seq || 0},${ev.clientTs || Date.now()},"${cleanPayload}"`);
+        }
+
+        if (rows.length === 1) {
+          const sampleAnon = await MathCoreCrypto.anonymizeStudentForResearch('4C', '1', secret);
+          rows.push(`${sampleAnon},drill_4cd_1102,answer_submit,1,${Date.now()},"{""qid"":""AD01"",""isCorrect"":true,""durationMs"":4200}"`);
+        }
+
+        const csvText = rows.join('\n');
+        const pre = document.getElementById('researchPreviewOut');
+        pre.textContent = csvText;
+        pre.classList.remove('d-none');
+      }
+
+      // S1: Batch Generate High-Strength Random Keys (>= 8 chars)
+      function generateClassRandomKeys() {
+        const cls = document.getElementById('tuneClassSelect').value || '4C';
+        const students = (window.getStudentsByClass && window.getStudentsByClass(cls)) || [];
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        const lines = ['classID,studentID,name,randomSecretKey'];
+        students.forEach(s => {
+          let p1 = '', p2 = '';
+          for (let i = 0; i < 4; i++) {
+            p1 += chars[Math.floor(Math.random() * chars.length)];
+            p2 += chars[Math.floor(Math.random() * chars.length)];
+          }
+          lines.push(`${s.classID},${s.id},${s.name},${p1}-${p2}`);
+        });
+        const pre = document.getElementById('researchPreviewOut');
+        pre.textContent = lines.join('\n');
+        pre.classList.remove('d-none');
+      }
+
+      return {
+        init: init,
+        populateStudentList: populateStudentList,
+        saveGlobalSettings: saveGlobalSettings,
+        applyScoreTune: applyScoreTune,
+        saveQaReply: saveQaReply,
+        registerExtensionItem: registerExtensionItem,
+        exportAnonymizedResearchCsv: exportAnonymizedResearchCsv,
+        generateClassRandomKeys: generateClassRandomKeys
+      };
+    })();
+
+    window.addEventListener('DOMContentLoaded', TeacherApp.init);
+  </script>
+</body>
+</html>

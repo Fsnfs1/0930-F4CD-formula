@@ -498,10 +498,12 @@
         if (document.fullscreenElement) exitFullScreen();
     }
 
+    let _roundStartTs = Date.now();
     function endGame(winner) {
         try { SoundManager.stopBGM(); } catch(e){} 
         gameState = "GAMEOVER";
         document.getElementById('btn-return').classList.add('hidden');
+        try { if (window.GameBridge) window.GameBridge.report({ gameId: 'bash-nim', win: winner === 'player', durationMs: Date.now() - _roundStartTs }); } catch(e){}
 
         let title, subtitle, rewardHTML = "";
 
@@ -536,6 +538,7 @@
 
     initSystem();
 </script>
-
+<script src="../core/config.js"></script>
+<script src="../core/bonus.js"></script>
 </body>
 </html>
