@@ -17,40 +17,110 @@
   <div class="topbar">
     <div class="d-flex align-items-center gap-2">
       <strong>👩‍🏫 A9 教師中控台 & 可持續擴展配置中心</strong>
-      <span class="badge bg-success">v2.0 模組化架構</span>
+      <span id="backendRoleBadge" class="badge bg-success">v2.0 模組化架構</span>
     </div>
     <div id="teacherTopbarActions" class="d-flex gap-2 d-none">
-      <button class="btn btn-sm btn-outline-info" onclick="TeacherApp.previewBankAsTeacherTest()">🔍 以教師測試身分預覽題庫</button>
+      <button id="btnPreviewAsTest" class="btn btn-sm btn-outline-info" onclick="TeacherApp.previewBankAsTeacherTest()">🔍 以教師測試身分預覽題庫</button>
       <a href="app.html" class="btn btn-sm btn-outline-light">切換至學生端 (app.html)</a>
       <button class="btn btn-sm btn-outline-danger" onclick="TeacherApp.logoutTeacher()">安全登出</button>
     </div>
   </div>
 
-  <!-- Mandatory Teacher Authentication Gate -->
-  <div id="teacherAuthOverlay" class="container my-5" style="max-width:460px;">
-    <div class="section-card p-4 shadow-sm">
-      <h4 class="fw-bold mb-2">🔐 A9 教師管理中控台認證</h4>
-      <p class="text-muted small mb-3">此區域僅限授權教師訪問。請輸入教師管理帳號與通行密鑰以解鎖後台控制權限。</p>
-      <div class="mb-3">
-        <label class="form-label fw-semibold">教師帳號</label>
-        <input id="teacherUserInput" type="text" class="form-control" value="teacher_admin" autocomplete="username" />
+  <!-- Mandatory Teacher / Class Rep Authentication Gate -->
+  <div id="teacherAuthOverlay" class="container my-5" style="max-width:760px;">
+    <div class="row g-3">
+      <!-- Teacher Full Login -->
+      <div class="col-md-6">
+        <div class="section-card p-4 shadow-sm h-100 mb-0">
+          <h5 class="fw-bold mb-2">🔐 教師管理中控台認證</h5>
+          <p class="text-muted small mb-3">授權教師輸入管理帳號與通行密鑰，解鎖完整後台與科代表設定權限。</p>
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">教師帳號</label>
+            <input id="teacherUserInput" type="text" class="form-control form-control-sm" value="teacher_admin" autocomplete="username" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">教師通行密鑰</label>
+            <input id="teacherPassInput" type="password" class="form-control form-control-sm" autocomplete="current-password" placeholder="請輸入教師管理密鑰" />
+          </div>
+          <div id="teacherAuthAlert" class="alert alert-danger py-2 small d-none"></div>
+          <button class="btn btn-primary w-100 fw-bold py-2" onclick="TeacherApp.handleTeacherLogin()">👩‍🏫 驗證教師身分並解鎖全部權限</button>
+        </div>
       </div>
-      <div class="mb-3">
-        <label class="form-label fw-semibold">教師通行密鑰</label>
-        <input id="teacherPassInput" type="password" class="form-control" autocomplete="current-password" placeholder="請輸入教師管理密鑰" />
+
+      <!-- Class Representative (科代表) Delegated Login -->
+      <div class="col-md-6">
+        <div class="section-card p-4 shadow-sm h-100 mb-0 border-primary">
+          <h5 class="fw-bold mb-2 text-primary">🎓 科代表（學生管理員）代管登入</h5>
+          <p class="text-muted small mb-3">已被老師授權的科代表可在此登入，執行老師勾選委派的部份後台權限。</p>
+          <div class="row g-2 mb-2">
+            <div class="col-5">
+              <label class="form-label fw-semibold small">班別</label>
+              <select id="repLoginClass" class="form-select form-select-sm">
+                <option value="4C">4C 班</option>
+                <option value="4D">4D 班</option>
+                <option value="5B">5B 班</option>
+                <option value="5C">5C 班</option>
+              </select>
+            </div>
+            <div class="col-7">
+              <label class="form-label fw-semibold small">學號（座號）</label>
+              <input id="repLoginSeat" type="number" class="form-control form-control-sm" placeholder="例: 1" min="1" max="60" />
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">科代表專屬口令 (PIN)</label>
+            <input id="repLoginPin" type="password" class="form-control form-control-sm" placeholder="請輸入老師設定的科代表口令" />
+          </div>
+          <div id="repAuthAlert" class="alert alert-danger py-2 small d-none"></div>
+          <button class="btn btn-outline-primary w-100 fw-bold py-2" onclick="TeacherApp.handleRepLogin()">🎓 以科代表身分登入後台</button>
+        </div>
       </div>
-      <div id="teacherAuthAlert" class="alert alert-danger py-2 small d-none"></div>
-      <button class="btn btn-primary w-100 fw-bold py-2" onclick="TeacherApp.handleTeacherLogin()">驗證教師身分並解鎖中控台</button>
-      <div class="text-center mt-3">
-        <a href="app.html" class="small text-secondary text-decoration-none">← 返回學生端登入頁面</a>
-      </div>
+    </div>
+    <div class="text-center mt-3">
+      <a href="app.html" class="small text-secondary text-decoration-none">← 返回學生端登入頁面</a>
     </div>
   </div>
 
   <div id="teacherMainContainer" class="container my-4 d-none" style="max-width:1100px;">
 
+    <!-- 0. Student Admin / Class Representative (科代表) Sub-App (Teacher Only) -->
+    <div id="secRepManager" class="section-card border-primary">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="fw-bold mb-0 text-primary">🎓 學生管理員（科代表）授權設定子應用</h5>
+        <span class="badge bg-primary">僅教師可配置</span>
+      </div>
+      <p class="text-muted small mb-3">教師可指定各班科代表並設定專屬口令與部份後台權限。科代表登入後僅會看到並操作被勾選的模組，無法觸碰密鑰生成、研究數據導出或科代表設定。</p>
+      <div class="row g-2 align-items-end mb-3">
+        <div class="col-md-2">
+          <label class="form-label small fw-semibold">班別</label>
+          <select id="repCfgClass" class="form-select form-select-sm" onchange="TeacherApp.populateRepCandidateList()"></select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-semibold">選擇學生（科代表）</label>
+          <select id="repCfgStudent" class="form-select form-select-sm"></select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small fw-semibold">設定科代表口令</label>
+          <input id="repCfgPin" type="text" class="form-control form-control-sm" value="rep2026" placeholder="例: rep2026" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-semibold d-block">勾選授權給科代表的部份權限</label>
+          <div class="d-flex flex-wrap gap-2 small">
+            <label class="form-check-label"><input type="checkbox" class="form-check-input me-1" id="permReplyQa" checked />回覆提問</label>
+            <label class="form-check-label"><input type="checkbox" class="form-check-input me-1" id="permApproveMall" checked />商城審核</label>
+            <label class="form-check-label"><input type="checkbox" class="form-check-input me-1" id="permTuneScore" />成績微調</label>
+            <label class="form-check-label"><input type="checkbox" class="form-check-input me-1" id="permSetRules" />全局規則</label>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-sm btn-primary w-100 fw-bold" onclick="TeacherApp.assignClassRep()">➕ 授權為科代表</button>
+        </div>
+      </div>
+      <div id="repListContainer" class="small"></div>
+    </div>
+
     <!-- 1. Global Exam / Bonus / Ranking / Feedback Controls (D3, D5, D9, Section 六) -->
-    <div class="section-card">
+    <div id="secGlobalRules" class="section-card">
       <h5 class="fw-bold mb-3">⚙️ 測驗全局規則設定（即時生效）</h5>
       <div class="row g-3">
         <div class="col-md-4">
@@ -83,7 +153,7 @@
     </div>
 
     <!-- 2. Reason-Free Score Fine-Tuning (D3) & Student Score Overview -->
-    <div class="section-card">
+    <div id="secScoreTune" class="section-card">
       <h5 class="fw-bold mb-2">📝 學生成績微調與總覽（D3：免填原因、不向學生顯示微調原因）</h5>
       <div class="row g-2 align-items-end mb-3">
         <div class="col-md-3">
@@ -111,14 +181,14 @@
 
     <!-- 3. Student Help Q&A Reply (D2 / A7) & Mall Approval (A13) -->
     <div class="row g-3 mb-3">
-      <div class="col-md-6">
+      <div id="secQaReply" class="col-md-6">
         <div class="section-card h-100 mb-0">
           <h5 class="fw-bold mb-2">💬 A7 學生求助提問回覆 (D2)</h5>
           <p class="text-muted small mb-2">回覆後寫入本地與 Google Sheet，學生下次登入時自動拉取。</p>
           <div id="teacherQaList" class="small"></div>
         </div>
       </div>
-      <div class="col-md-6">
+      <div id="secMallApprove" class="col-md-6">
         <div class="section-card h-100 mb-0">
           <h5 class="fw-bold mb-2">🛍️ A13 積分商城審核 & 異常積分撤銷</h5>
           <div id="teacherMallList" class="small"></div>
@@ -127,7 +197,7 @@
     </div>
 
     <!-- 4. Sustainable Registry Config Generator (Section 八 & 九: Add Bank/Quiz/Bonus/Game/Class with Zero Core Code Edits) -->
-    <div class="section-card">
+    <div id="secRegistryExt" class="section-card">
       <h5 class="fw-bold mb-2">🌱 可持續發展擴展中心（新增題庫 / 下次小測 / 加分規則 / 遊戲 / 班級）</h5>
       <p class="text-muted small mb-3">未來增加下一套題目、下一次小測成績、新互動遊戲或新班級時，只需在此填表即可動態註冊並導出 <code>core/registry.js</code> 配置片段，零改動系統核心代碼。</p>
       <div class="row g-2 mb-3">
@@ -154,7 +224,7 @@
     </div>
 
     <!-- 5. S1 High-Security Student Key Generator & D6 Research Anonymized CSV Export -->
-    <div class="section-card">
+    <div id="secResearchKeys" class="section-card">
       <h5 class="fw-bold mb-2">🔬 D6 教學論文匿名數據導出 (<code>R-xxxxxxxx</code>) & S1 隨機密鑰生成</h5>
       <div class="row g-3 align-items-end">
         <div class="col-md-5">
@@ -182,6 +252,13 @@
 
   <script>
     const TeacherApp = (function () {
+      const PERM_LABELS = {
+        reply_qa: '回覆提問',
+        approve_mall: '商城審核',
+        tune_score: '成績微調',
+        set_rules: '全局規則'
+      };
+
       function esc(str) {
         return String(str == null ? '' : str)
           .replace(/&/g, '&amp;')
@@ -191,18 +268,26 @@
           .replace(/'/g, '&#39;');
       }
 
-      function ensureTeacherAuth() {
-        if (!window.MathCoreAuth || typeof MathCoreAuth.requireAuth !== 'function') return false;
-        try {
-          const check = MathCoreAuth.requireAuth('teacher');
-          return Boolean(check && check.token);
-        } catch (e) {
-          return false;
+      function getActiveBackendSession() {
+        if (window.MathCoreAuth && typeof MathCoreAuth.getBackendSession === 'function') {
+          return MathCoreAuth.getBackendSession();
         }
+        return null;
+      }
+
+      function ensureTeacherAuth(permName) {
+        const sess = getActiveBackendSession();
+        if (!sess || !sess.token) return false;
+        if (sess.role === 'teacher') return true;
+        if (permName && permName !== 'teacher_only' && window.MathCoreAuth && typeof MathCoreAuth.hasBackendPermission === 'function') {
+          return MathCoreAuth.hasBackendPermission(sess, permName);
+        }
+        return false;
       }
 
       function checkGateOnBoot() {
-        if (ensureTeacherAuth()) {
+        const sess = getActiveBackendSession();
+        if (sess && sess.token) {
           unlockDashboard();
         } else {
           document.getElementById('teacherAuthOverlay').classList.remove('d-none');
@@ -238,10 +323,61 @@
         }
       }
 
+      async function handleRepLogin() {
+        const classID = document.getElementById('repLoginClass').value;
+        const studentID = document.getElementById('repLoginSeat').value.trim();
+        const pin = document.getElementById('repLoginPin').value.trim();
+        const alertEl = document.getElementById('repAuthAlert');
+
+        try {
+          const sess = await MathCoreAuth.loginClassRep({ classID: classID, studentID: studentID, pin: pin });
+          if (!sess || !sess.token) {
+            alertEl.textContent = '❌ 科代表驗證失敗';
+            alertEl.classList.remove('d-none');
+            return;
+          }
+          alertEl.classList.add('d-none');
+          document.getElementById('repLoginPin').value = '';
+          unlockDashboard();
+        } catch (err) {
+          alertEl.textContent = '❌ ' + ((err && err.message) || '科代表登入失敗');
+          alertEl.classList.remove('d-none');
+        }
+      }
+
+      function applyPermissionView() {
+        const sess = getActiveBackendSession();
+        const badge = document.getElementById('backendRoleBadge');
+        const isTeacher = sess && sess.role === 'teacher';
+        const hasPerm = function (p) {
+          return isTeacher || (window.MathCoreAuth && MathCoreAuth.hasBackendPermission(sess, p));
+        };
+
+        if (isTeacher) {
+          badge.className = 'badge bg-success';
+          badge.textContent = '👩‍🏫 教師完整權限 (' + (sess.username || 'teacher') + ')';
+        } else if (sess && sess.role === 'class_rep') {
+          const plist = (sess.permissions || []).map(p => PERM_LABELS[p] || p).join('、') || '無';
+          badge.className = 'badge bg-warning text-dark';
+          badge.textContent = '🎓 科代表代管：' + sess.classID + ' ' + sess.name + ' (權限：' + plist + ')';
+        }
+
+        document.getElementById('secRepManager').classList.toggle('d-none', !isTeacher);
+        document.getElementById('secRegistryExt').classList.toggle('d-none', !isTeacher);
+        document.getElementById('secResearchKeys').classList.toggle('d-none', !isTeacher);
+        document.getElementById('btnPreviewAsTest').classList.toggle('d-none', !isTeacher);
+
+        document.getElementById('secGlobalRules').classList.toggle('d-none', !hasPerm('set_rules'));
+        document.getElementById('secScoreTune').classList.toggle('d-none', !hasPerm('tune_score'));
+        document.getElementById('secQaReply').classList.toggle('d-none', !hasPerm('reply_qa'));
+        document.getElementById('secMallApprove').classList.toggle('d-none', !hasPerm('approve_mall'));
+      }
+
       function unlockDashboard() {
         document.getElementById('teacherAuthOverlay').classList.add('d-none');
         document.getElementById('teacherMainContainer').classList.remove('d-none');
         document.getElementById('teacherTopbarActions').classList.remove('d-none');
+        applyPermissionView();
         init();
       }
 
@@ -257,7 +393,7 @@
       }
 
       async function previewBankAsTeacherTest() {
-        if (!ensureTeacherAuth()) return;
+        if (!ensureTeacherAuth('teacher_only')) return;
         const cls = document.getElementById('tuneClassSelect').value || '4C';
         const teacherSession = MathCoreAuth.getTeacherSession();
         const token = teacherSession ? teacherSession.token : ('T_PREVIEW_' + Date.now());
@@ -280,7 +416,8 @@
       }
 
       function init() {
-        if (!ensureTeacherAuth()) return;
+        const sess = getActiveBackendSession();
+        if (!sess || !sess.token) return;
         document.getElementById('cfgFeedbackMode').value = localStorage.getItem('MP_V2_TEACHER_FEEDBACK_MODE') || 'immediate';
         document.getElementById('cfgRankDisplay').value = localStorage.getItem('MP_V2_RANK_DISPLAY_MODE') || 'real_name';
         document.getElementById('cfgBonusCap').value = localStorage.getItem('MP_V2_BONUS_CAP') || '60';
@@ -294,7 +431,10 @@
 
         const classes = (window.MathPlatformRegistry && MathPlatformRegistry.classes) || ['4C', '4D', '5B', '5C'];
         document.getElementById('tuneClassSelect').innerHTML = classes.map(c => `<option value="${esc(c)}">${esc(c)} 班</option>`).join('');
+        document.getElementById('repCfgClass').innerHTML = classes.map(c => `<option value="${esc(c)}">${esc(c)} 班</option>`).join('');
         populateStudentList();
+        populateRepCandidateList();
+        renderRepList();
         renderTuneLog();
         renderQaList();
         renderMallOrders();
@@ -307,8 +447,72 @@
         document.getElementById('tuneStudentSelect').innerHTML = list.map(s => `<option value="${esc(s.classID)}_${esc(s.id)}">${esc(s.id)} 號 - ${esc(s.name)}</option>`).join('');
       }
 
+      function populateRepCandidateList() {
+        const cls = document.getElementById('repCfgClass').value || '4C';
+        const list = ((window.getStudentsByClass && window.getStudentsByClass(cls)) || [])
+          .filter(s => !s.isTeacherTest && String(s.id) !== '98');
+        document.getElementById('repCfgStudent').innerHTML = list.map(s => `<option value="${esc(s.id)}" data-name="${esc(s.name)}">${esc(s.id)} 號 - ${esc(s.name)}</option>`).join('');
+      }
+
+      function assignClassRep() {
+        if (!ensureTeacherAuth('teacher_only')) return;
+        const cls = document.getElementById('repCfgClass').value;
+        const sel = document.getElementById('repCfgStudent');
+        const studentID = sel.value;
+        const name = (sel.options[sel.selectedIndex] && sel.options[sel.selectedIndex].getAttribute('data-name')) || ('#' + studentID);
+        const pin = document.getElementById('repCfgPin').value.trim() || 'rep2026';
+        const perms = [];
+        if (document.getElementById('permReplyQa').checked) perms.push('reply_qa');
+        if (document.getElementById('permApproveMall').checked) perms.push('approve_mall');
+        if (document.getElementById('permTuneScore').checked) perms.push('tune_score');
+        if (document.getElementById('permSetRules').checked) perms.push('set_rules');
+
+        if (perms.length === 0) {
+          alert('請至少勾選一項要委派給科代表的權限！');
+          return;
+        }
+        MathCoreAuth.setClassRep({
+          classID: cls,
+          studentID: studentID,
+          name: name,
+          pin: pin,
+          permissions: perms
+        });
+        renderRepList();
+      }
+
+      function removeClassRepItem(sid) {
+        if (!ensureTeacherAuth('teacher_only')) return;
+        MathCoreAuth.removeClassRep(sid);
+        renderRepList();
+      }
+
+      function renderRepList() {
+        const box = document.getElementById('repListContainer');
+        if (!box || !window.MathCoreAuth || typeof MathCoreAuth.getClassReps !== 'function') return;
+        const map = MathCoreAuth.getClassReps();
+        const entries = Object.values(map);
+        if (entries.length === 0) {
+          box.innerHTML = '<div class="text-muted">目前尚未設定任何科代表。可由上方選擇學生並勾選權限後點擊「授權為科代表」。</div>';
+          return;
+        }
+        box.innerHTML = entries.map(r => {
+          const pbadges = (r.permissions || []).map(p => `<span class="badge bg-info text-dark me-1">${esc(PERM_LABELS[p] || p)}</span>`).join('');
+          return `
+            <div class="d-flex justify-content-between align-items-center border rounded px-3 py-2 mb-1 bg-light">
+              <div>
+                <strong>${esc(r.classID)} #${esc(r.studentID)} ${esc(r.name)}</strong>
+                <span class="text-muted ms-2">口令: <code>${esc(r.repPin)}</code></span>
+                <span class="ms-2">${pbadges}</span>
+              </div>
+              <button class="btn btn-sm btn-outline-danger py-0" onclick="TeacherApp.removeClassRepItem('${esc(r.sid)}')">移除科代表</button>
+            </div>
+          `;
+        }).join('');
+      }
+
       function saveGlobalSettings() {
-        if (!ensureTeacherAuth()) return;
+        if (!ensureTeacherAuth('set_rules')) return;
         localStorage.setItem('MP_V2_TEACHER_FEEDBACK_MODE', document.getElementById('cfgFeedbackMode').value);
         localStorage.setItem('MP_V2_RANK_DISPLAY_MODE', document.getElementById('cfgRankDisplay').value);
         localStorage.setItem('MP_V2_BONUS_CAP', String(Number(document.getElementById('cfgBonusCap').value || 60)));
@@ -317,7 +521,7 @@
 
       // D3: Reason-free score fine-tuning (audit log kept internally for teacher only)
       function applyScoreTune() {
-        if (!ensureTeacherAuth()) return;
+        if (!ensureTeacherAuth('tune_score')) return;
         const packId = document.getElementById('tunePackSelect').value;
         const sid = document.getElementById('tuneStudentSelect').value;
         const newScore = Number(document.getElementById('tuneNewScore').value || 0);
@@ -365,7 +569,7 @@
       }
 
       function saveQaReply(idx) {
-        if (!ensureTeacherAuth()) return;
+        if (!ensureTeacherAuth('reply_qa')) return;
         const list = JSON.parse(localStorage.getItem('MP_V2_HELP_QA') || '[]');
         if (!list[idx]) return;
         list[idx].teacherReply = document.getElementById('replyInput_' + idx).value.trim();
@@ -398,7 +602,7 @@
 
       // Section 八 & 九: Sustainable Extension Registration
       function registerExtensionItem() {
-        if (!ensureTeacherAuth()) return;
+        if (!ensureTeacherAuth('teacher_only')) return;
         const type = document.getElementById('extTypeSelect').value;
         const id = document.getElementById('extIdInput').value.trim() || ('item_' + Date.now());
         const title = document.getElementById('extTitleInput').value.trim() || id;
@@ -432,7 +636,7 @@
 
       // D6: Anonymized Research CSV Export (R-xxxxxxxx)
       async function exportAnonymizedResearchCsv() {
-        if (!ensureTeacherAuth()) return;
+        if (!ensureTeacherAuth('teacher_only')) return;
         const secret = document.getElementById('researchSecretInput').value.trim();
         if (!secret || secret.length < 6) {
           alert('請先輸入至少 6 位的研究專用鹽值密鑰（僅老師保管），以確保匿名化不可逆！');
@@ -470,7 +674,7 @@
 
       // S1: Batch Generate High-Strength Random Keys (>= 8 chars) using CSPRNG & persist SHA-256 verifiers
       async function generateClassRandomKeys() {
-        if (!ensureTeacherAuth()) return;
+        if (!ensureTeacherAuth('teacher_only')) return;
         const cls = document.getElementById('tuneClassSelect').value || '4C';
         const students = ((window.getStudentsByClass && window.getStudentsByClass(cls)) || [])
           .filter(s => !s.isTeacherTest && String(s.id) !== '98');
@@ -507,10 +711,14 @@
       return {
         checkGateOnBoot: checkGateOnBoot,
         handleTeacherLogin: handleTeacherLogin,
+        handleRepLogin: handleRepLogin,
         logoutTeacher: logoutTeacher,
         previewBankAsTeacherTest: previewBankAsTeacherTest,
         init: init,
         populateStudentList: populateStudentList,
+        populateRepCandidateList: populateRepCandidateList,
+        assignClassRep: assignClassRep,
+        removeClassRepItem: removeClassRepItem,
         saveGlobalSettings: saveGlobalSettings,
         applyScoreTune: applyScoreTune,
         saveQaReply: saveQaReply,

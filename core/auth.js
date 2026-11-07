@@ -315,6 +315,13 @@
       return null;
     }
 
+    function getBackendSession() {
+      if (!STORAGE || typeof STORAGE.getItem !== "function") return null;
+      const sess = STORAGE.getItem(TEACHER_SESSION_KEY, null);
+      if (sess && (sess.role === "teacher" || sess.role === "class_rep") && sess.token) return sess;
+      return null;
+    }
+
     function logoutTeacher() {
       if (STORAGE && typeof STORAGE.removeItem === "function") {
         STORAGE.removeItem(TEACHER_SESSION_KEY);
@@ -450,11 +457,113 @@
       return true;
     }
 
+    // =========================================================================
+    // Student Admin / Class Representative (科代表) Sub-System
+    // =========================================================================
+    const CLASS_REPS_KEY = "MP_V2_CLASS_REPS";
+
+    function getClassReps() {
+      if (STORAGE && typeof STORAGE.getItem === "function") {
+        const map = STORAGE.getItem(CLASS_REPS_KEY, {});
+        return map && typeof map === "object" ? map : {};
+      }
+      return {};
+    }
+
+    function setClassRep(params) {
+      const p = params || {};
+      const classID = String(p.classID || "").trim().toUpperCase();
+      const studentID = String(p.studentID || "").trim();
+      if (!classID || !studentID) throw new Error("請指定科代表的班別與學號");
+      const sid = `${classID}_${studentID}`;
+      const repPin = String(p.repPin || p.pin || "rep123").trim();
+      const permissions = Array.isArray(p.permissions)
+        ? p.permissions.slice()
+        : ["reply_qa", "approve_mall"];
+      const map = getClassReps();
+      map[sid] = {
+        sid: sid,
+        classID: classID,
+        studentID: studentID,
+        name: String(p.name || sid),
+        repPin: repPin,
+        permissions: permissions,
+        updatedAt: Date.now(),
+      };
+      if (STORAGE && typeof STORAGE.setItem === "function") {
+        STORAGE.setItem(CLASS_REPS_KEY, map);
+      }
+      return map[sid];
+    }
+
+    function removeClassRep(sidOrClass, optionalStudentID) {
+      const map = getClassReps();
+      const key =
+        optionalStudentID !== undefined
+          ? `${String(sidOrClass || "").trim().toUpperCase()}_${String(optionalStudentID).trim()}`
+          : String(sidOrClass || "").trim().toUpperCase();
+      if (map[key]) {
+        delete map[key];
+        if (STORAGE && typeof STORAGE.setItem === "function") {
+          STORAGE.setItem(CLASS_REPS_KEY, map);
+        }
+        return true;
+      }
+      return false;
+    }
+
+    function loginClassRep(params) {
+      const p = params || {};
+      const classID = String(p.classID || "").trim().toUpperCase();
+      const studentID = String(p.studentID || "").trim();
+      const sid = `${classID}_${studentID}`;
+      const pin = String(p.repPin || p.pin || p.password || "").trim();
+      const map = getClassReps();
+      const rep = map[sid];
+      if (!rep) {
+        throw new Error(`該學生 (${sid}) 尚未被老師設定為科代表`);
+      }
+      if (rep.repPin !== pin) {
+        throw new Error("科代表專屬口令不正確");
+      }
+      const session = {
+        token: `REP_${sid}_${Date.now()}`,
+        sid: sid,
+        classID: rep.classID,
+        studentID: rep.studentID,
+        name: rep.name,
+        role: "class_rep",
+        permissions: rep.permissions || [],
+        loginTs: Date.now(),
+      };
+      if (STORAGE && typeof STORAGE.setItem === "function") {
+        STORAGE.setItem(TEACHER_SESSION_KEY, session);
+        STORAGE.setItem(SESSION_KEY, session);
+      }
+      return session;
+    }
+
+    function hasBackendPermission(sessionOrPerm, maybePerm) {
+      let session = sessionOrPerm;
+      let permName = maybePerm;
+      if (typeof sessionOrPerm === "string") {
+        permName = sessionOrPerm;
+        session = maybePerm || getTeacherSession() || getSession();
+      }
+      if (!session) return false;
+      if (session.role === "teacher") return true;
+      if (session.role === "class_rep" && Array.isArray(session.permissions)) {
+        return session.permissions.indexOf(permName) !== -1;
+      }
+      return false;
+    }
+
     return {
       loginStudent: loginStudent,
       loginTeacher: loginTeacher,
       getSession: getSession,
       getTeacherSession: getTeacherSession,
+      getBackendSession: getBackendSession,
       logout: logout,
       logoutTeacher: logoutTeacher,
       requireAuth: requireAuth,
@@ -464,6 +573,11 @@
       setConsentStatus: setConsentStatus,
       withdrawConsent: withdrawConsent,
       isEligibleForResearchExport: isEligibleForResearchExport,
+      getClassReps: getClassReps,
+      setClassRep: setClassRep,
+      removeClassRep: removeClassRep,
+      loginClassRep: loginClassRep,
+      hasBackendPermission: hasBackendPermission,
     };
   }
 );
