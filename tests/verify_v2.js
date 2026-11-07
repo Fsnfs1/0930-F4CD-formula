@@ -169,12 +169,17 @@ async function runAllTests() {
   assert.strictEqual(gitDiffRedLines, '', 'Red-line data files MUST remain 100% untouched');
   console.log('[PASS] 6. Red-Line Data Files 100% Untouched & Sustainable Registry Ready');
 
-  // 7. Teacher Test Account (#98 / test98) Direct-to-Bank Verification Across All Classes
+  // 7. Teacher Test Account (#98 / test98) & Gate Anti-Leakage (Zero Plaintext Passwords & Redacted Student Names)
   const merged = registry.getMergedRoster();
   const appHtml = fs.readFileSync(__dirname + '/../app.html', 'utf8');
-  assert.ok(appHtml.includes('test98'), 'app.html gate must include test98 reference');
+
+  // Anti-leakage assertions: no plaintext secret keys or test passwords in app.html
+  assert.ok(!appHtml.toLowerCase().includes('x33c'), 'app.html must not contain plaintext password x33c');
+  assert.ok(!appHtml.includes('test98'), 'app.html must not contain plaintext password test98');
+
+  // Student privacy on gate login screen: gate dropdown and candidate list must not leak student real names
+  assert.ok(!appHtml.includes('號 - ${esc(s.name)}') && !appHtml.includes('data-name="${esc(s.name)}'), 'app.html gate seat dropdown must not display student real names or data-name attributes');
   assert.ok(appHtml.includes("list.some(s => String(s.id) === '98')"), 'app.html populateSeatSelect must include seat 98');
-  assert.ok(appHtml.includes("String(sid) === '98'"), 'app.html handleGateLogin must handle seat 98');
 
   for (const cls of ['4C', '4D', '5B', '5C']) {
     const has98 = (merged[cls] || []).some(s => String(s.id) === '98' && s.directToBank);

@@ -216,7 +216,7 @@
         if (validHashes.indexOf(candidateHash) !== -1 || validHashes.indexOf(candidateCleanHash) !== -1) {
           return true;
         }
-        // Also support dashed canonical format if user omitted dash (e.g. 4C01X33C -> 4C01-X33C)
+        // Also support dashed canonical format if user omitted dash (e.g. 4C01ABCD -> 4C01-ABCD)
         if (cleanKey.length === 8 && !normalizedKey.includes("-")) {
           const dashed = cleanKey.slice(0, 4) + "-" + cleanKey.slice(4);
           const dashedHash = await computeHash(`MP_STU_V2:${sid}:${dashed}`);
@@ -273,19 +273,12 @@
       const isFaceVerified = Boolean(params.faceVerified || params.faceLoginVerified);
       const rawKey = String(params.secretKey || params.password || "").trim();
       const normKey = normalizeSecret(rawKey);
-      const studentID = params.studentID !== undefined ? parseInt(params.studentID, 10) : NaN;
       if (!isFaceVerified) {
-        if (studentID === 98) {
-          if (normKey !== "TEST98") {
-            throw new Error("98號教師測試帳戶密碼須為 test98");
-          }
-        } else {
-          if (rawKey === "1234") {
-            throw new Error("預設初始密碼 1234 不可直接登入，請輸入您設定的個人密碼或老師發放的專屬口令");
-          }
-          if (!rawKey || rawKey.length < 4) {
-            throw new Error("請輸入至少 4 位個人密碼或 6 位專屬口令");
-          }
+        if (rawKey === "1234") {
+          throw new Error("預設初始密碼 1234 不可直接登入，請輸入您設定的個人密碼或老師發放的專屬口令");
+        }
+        if (!rawKey || rawKey.length < 4) {
+          throw new Error("請輸入至少 4 位個人密碼或 6 位專屬口令");
         }
       }
 
@@ -366,7 +359,7 @@
         }
         const isValidKey = await verifyStudentRosterKey(classID, studentID, rawKey);
         if (!isValidKey) {
-          throw new Error(studentID === 98 ? "98號教師測試帳戶密碼須為 test98" : "個人密碼或老師口令不正確，請重新確認後輸入");
+          throw new Error(studentID === 98 ? "98號教師測試帳戶密碼不正確，請重新確認後輸入" : "個人密碼或老師口令不正確，請重新確認後輸入");
         }
         studentProfile = {
           classID: classID,

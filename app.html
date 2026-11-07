@@ -78,9 +78,9 @@
 
         <!-- Candidate Disambiguation Panel (Shown when multiple close faces or sub-threshold match) -->
         <div id="gateCandidatePanel" class="mt-3 pt-2 border-top border-secondary d-none">
-          <div class="small fw-bold text-warning mb-1">👥 偵測到接近臉孔或未達單一免密閾值，請點選姓名或直接輸入您的密碼/口令比對：</div>
+          <div class="small fw-bold text-warning mb-1">👥 偵測到接近臉孔或未達單一免密閾值，請點選座號或直接輸入您的密碼/口令比對：</div>
           <div id="gateCandidateList" class="d-grid gap-1 mb-2"></div>
-          <div class="small text-info mb-1" id="gateSelectedCandidateInfo">可點選上方候選人，或在下方切換任意班級/座號後輸入密碼/口令登入（仍保留本次刷臉留痕）</div>
+          <div class="small text-info mb-1" id="gateSelectedCandidateInfo">可點選上方候選座號，或在下方切換任意班級/座號後輸入密碼/口令登入（仍保留本次刷臉留痕）</div>
         </div>
       </div>
       <!-- Dual Credential Form (Student Custom Password OR Teacher Secret Key) -->
@@ -92,17 +92,17 @@
             <select id="gateClassSelect" class="form-select form-select-sm" onchange="AppUI.populateSeatSelect()"></select>
           </div>
           <div class="col-7">
-            <label class="form-label small fw-semibold mb-1">學號 / 姓名</label>
+            <label class="form-label small fw-semibold mb-1">座號</label>
             <select id="gateStudentSelect" class="form-select form-select-sm"></select>
           </div>
         </div>
         <div class="mb-2">
           <label class="form-label small fw-semibold mb-1">學生自設密碼（非1234）或 老師發放口令</label>
-          <input id="gateSecretInput" type="password" class="form-control" autocomplete="off" placeholder="例如：4C01-X33C 或教師測試密碼 test98" onkeydown="if(event.key==='Enter') AppUI.handleGateLogin()" />
+          <input id="gateSecretInput" type="password" class="form-control" autocomplete="off" placeholder="請輸入個人密碼 或 老師專屬口令" onkeydown="if(event.key==='Enter') AppUI.handleGateLogin()" />
           <div class="form-text text-muted" style="font-size:12px;">
             支援學生原設密碼（預設 1234 不可直接登入）及老師預制口令。若剛才已刷臉，系統會自動比對候選名單與所選學號並完成拍臉留痕。
           </div>
-          <div class="form-text text-primary small mt-1">💡 教師直通測試：每班均配置 <strong>98 號</strong>「教師測試帳戶」，密碼為 <code>test98</code>（驗證後直通題庫）。</div>
+          <div class="form-text text-muted small mt-1">💡 教師直通測試：每班均配置 <strong>98 號</strong>「教師測試帳戶」（持專屬密鑰驗證後直通題庫）。</div>
         </div>
         <div id="gateAlert" class="alert alert-danger py-2 small d-none mb-2"></div>
         <button class="btn btn-primary w-100 fw-bold py-2" onclick="AppUI.handleGateLogin()">驗證身分並進入系統</button>
@@ -666,22 +666,22 @@
         listEl.innerHTML = gateCloseCandidates.slice(0, 5).map(function (c, idx) {
           const prof = c.profile || c;
           const pct = c.percentage || Math.round((c.centeredSimilarity || 0.78) * 100);
-          return `<button type="button" class="btn btn-sm ${idx === 0 ? 'btn-info text-dark fw-bold' : 'btn-outline-light'} text-start d-flex justify-content-between align-items-center" onclick="AppUI.selectGateCandidate('${esc(prof.classID)}', '${esc(prof.studentID)}', '${esc(prof.name)}')">
-            <span>👤 ${esc(prof.classID)} 班 ${esc(prof.studentID)} 號 ${esc(prof.name)}</span>
+          return `<button type="button" class="btn btn-sm ${idx === 0 ? 'btn-info text-dark fw-bold' : 'btn-outline-light'} text-start d-flex justify-content-between align-items-center" onclick="AppUI.selectGateCandidate('${esc(prof.classID)}', '${esc(prof.studentID)}')">
+            <span>👤 ${esc(prof.classID)} 班 ${esc(prof.studentID)} 號</span>
             <span class="badge bg-dark">${pct}% 接近</span>
           </button>`;
         }).join('');
 
         const first = gateCloseCandidates[0].profile || gateCloseCandidates[0];
         if (first && first.classID && first.studentID) {
-          selectGateCandidate(first.classID, first.studentID, first.name, true);
+          selectGateCandidate(first.classID, first.studentID, true);
         }
         if (infoEl) {
           infoEl.textContent = '💡 請輸入您的自設密碼或老師口令完成驗證（若您不在上方候選名單，也可直接在下方下拉選單選擇您的班級與座號）';
         }
       }
 
-      function selectGateCandidate(classID, studentID, name, silentFocus) {
+      function selectGateCandidate(classID, studentID, silentFocus) {
         const clsSel = document.getElementById('gateClassSelect');
         const stuSel = document.getElementById('gateStudentSelect');
         if (clsSel && clsSel.value !== classID) {
@@ -693,7 +693,7 @@
         }
         const infoEl = document.getElementById('gateSelectedCandidateInfo');
         if (infoEl) {
-          infoEl.innerHTML = `已選取：<strong>${esc(classID)} 班 ${esc(studentID)} 號 ${esc(name || '')}</strong> · 請在下方輸入密碼或口令完成刷臉核身`;
+          infoEl.innerHTML = `已選取：<strong>${esc(classID)} 班 ${esc(studentID)} 號</strong> · 請在下方輸入密碼或口令完成刷臉核身`;
         }
         if (!silentFocus) {
           const inp = document.getElementById('gateSecretInput');
@@ -818,7 +818,11 @@
         if (!list.some(s => String(s.id) === '98')) {
           list.push({ id: 98, name: '教師測試帳戶 (直通題庫)', classID: cls, isTeacherTest: true, directToBank: true });
         }
-        stuSel.innerHTML = list.map(s => `<option value="${esc(s.id)}" data-name="${esc(s.name)}">${esc(s.id)} 號 - ${esc(s.name)}</option>`).join('');
+        stuSel.innerHTML = list.map(s => {
+          const is98 = String(s.id) === '98';
+          const label = is98 ? `${esc(s.id)} 號 (教師測試)` : `${esc(s.id)} 號`;
+          return `<option value="${esc(s.id)}">${label}</option>`;
+        }).join('');
       }
 
       async function handleGateLogin() {
@@ -828,14 +832,8 @@
         const secret = document.getElementById('gateSecretInput').value.trim();
         const alertEl = document.getElementById('gateAlert');
 
-        if (String(sid) === '98') {
-          if (secret.toLowerCase() !== 'test98') {
-            alertEl.textContent = '❌ 98 號教師測試帳戶密碼須為 test98';
-            alertEl.classList.remove('d-none');
-            return;
-          }
-        } else if (!secret || secret.length < 2) {
-          alertEl.textContent = '請輸入老師發放的個人密鑰！';
+        if (!secret || secret.length < 2) {
+          alertEl.textContent = '請輸入個人密碼或老師發放口令！';
           alertEl.classList.remove('d-none');
           return;
         }
@@ -889,7 +887,7 @@
       function onLoginSuccess(student, isFreshLogin) {
         currentStudent = student;
         const sid = student.classID + '_' + student.studentID;
-        const isTest98 = String(student.studentID) === '98' || !!student.directToBank || student.role === 'teacher_test';
+        const isSeat98Test = String(student.studentID) === '98' || !!student.directToBank || student.role === 'teacher_test';
         const faceTag = student.faceLoginVerified ? ' · 📸已刷臉留痕' : '';
         document.getElementById('studentInfoBadge').textContent = `${student.classID} 班 ${student.studentID} 號 ${student.name}${faceTag}`;
         document.getElementById('hubWelcomeTitle').textContent = `👋 你好，${student.classID} 班 ${student.name}`;
@@ -911,7 +909,7 @@
         }
 
         // Seat 98 teacher test account (when launched from teacher preview): go straight to question bank selector
-        if (isTest98) {
+        if (isSeat98Test) {
           openPracticeSelector('drill');
           return;
         }
