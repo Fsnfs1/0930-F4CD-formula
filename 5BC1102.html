@@ -913,7 +913,7 @@
     <div class="modal-card" style="background: #1e293b; border: 1.5px solid #38bdf8; border-radius: 16px; padding: 24px; max-width: 460px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); text-align: center;">
       <div style="font-size: 38px; margin-bottom: 8px;">📊</div>
       <h3 style="font-size: 20px; font-weight: 800; color: #f8fafc; margin-bottom: 6px;">11月6日 數學小測成績通知</h3>
-      <div id="modal1106StudentMeta" style="font-size: 14px; color: #94a3b8; margin-bottom: 16px;">5B 班學生</div>
+      <div id="modal1106StudentMeta" style="font-size: 14px; color: #94a3b8; margin-bottom: 16px;">5B / 5C 班學生</div>
       
       <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; border-radius: 12px; padding: 18px; margin-bottom: 18px;">
         <div style="font-size: 13px; color: #94a3b8; margin-bottom: 4px;">小測原始得分 / 當前小測成績</div>
@@ -965,7 +965,7 @@
     <div class="modal-card" style="background: #1e293b; border: 1.5px solid #10b981; border-radius: 16px; padding: 24px; max-width: 480px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); text-align: center;">
       <div style="font-size: 38px; margin-bottom: 8px;">🎉</div>
       <h3 style="font-size: 20px; font-weight: 800; color: #34d399; margin-bottom: 6px;">刷題加分結算</h3>
-      <div id="modal1106ResultStudentMeta" style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">5B 班學生</div>
+      <div id="modal1106ResultStudentMeta" style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">5B / 5C 班學生</div>
       
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
         <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; border-radius: 10px; padding: 12px;">
@@ -6234,7 +6234,7 @@ async function handleQuizCloudSubmissionAndArchive(finalScore, correctCount, tot
 }
 
 // =========================================================================
-// 11月6日 5B 數學小測成績與刷題超80加分系統 (11月13日前有效，60分封頂，雙端同步)
+// 11月6日 5B / 5C 數學小測成績與刷題超80加分系統 (11月13日前有效，60分封頂，雙端同步)
 // =========================================================================
 
 const QUIZ_1106_RAW_SCORES_5B = {
@@ -6269,8 +6269,45 @@ const QUIZ_1106_RAW_SCORES_5B = {
   "梁偉烽": 4
 };
 
+const QUIZ_1106_RAW_SCORES_5C = {
+  "王毓琳": 10,
+  "王韻婷": 15,
+  "甘凱童": 35,
+  "何健峰": 17,
+  "岑子鈞": null, // 不顯示成績
+  "周浩軒": 10,
+  "周楠": 11,
+  "周杰靈": 48,
+  "林貝莎": 16,
+  "林靜瑤": 27,
+  "姚念欣": 23,
+  "姜嘉慧": 18,
+  "柯欣榮": 19,
+  "洪鍶堉": 14,
+  "梁曉童": 18,
+  "許惠琳": 26,
+  "陳美婷": 37,
+  "陳敬恩": 42,
+  "傅銘瀚": 30,
+  "曾浚軒": 10,
+  "黃子陽": 12,
+  "黃宏迅": 14,
+  "黃澤凱": 21,
+  "楊紫晴": 39,
+  "甄浩銘": null, // 不顯示成績
+  "劉焯軒": 17,
+  "歐卓言": 24,
+  "戴詠茵": 23,
+  "謝凱盈": 29
+};
+
 const QUIZ_1106_BONUS_PREFIX = 'MATH_1106_BONUS_5B_';
 const QUIZ_1106_PENDING_QUEUE_KEY = 'MATH_1106_PENDING_BONUS_SUBMISSIONS';
+
+function is5BC1106TargetClass(classID) {
+  const c = String(classID || '').trim().toUpperCase();
+  return c === '5B' || c === '5C';
+}
 
 function get1106StudentKey(student) {
   if (!student) return '5B_UNKNOWN';
@@ -6282,8 +6319,15 @@ function get1106StudentKey(student) {
 function get1106RawScore(student) {
   if (!student || !student.name) return undefined;
   const name = student.name.trim();
+  const cid = String(student.classID || '').trim().toUpperCase();
+  if (cid === '5C' && Object.prototype.hasOwnProperty.call(QUIZ_1106_RAW_SCORES_5C, name)) {
+    return QUIZ_1106_RAW_SCORES_5C[name];
+  }
   if (Object.prototype.hasOwnProperty.call(QUIZ_1106_RAW_SCORES_5B, name)) {
     return QUIZ_1106_RAW_SCORES_5B[name];
+  }
+  if (Object.prototype.hasOwnProperty.call(QUIZ_1106_RAW_SCORES_5C, name)) {
+    return QUIZ_1106_RAW_SCORES_5C[name];
   }
   // Alternate match: handle "張嘉城A" -> "張嘉城"
   if (name === '張嘉城' && Object.prototype.hasOwnProperty.call(QUIZ_1106_RAW_SCORES_5B, '張嘉城A')) {
@@ -6351,9 +6395,9 @@ function calc1106FinalScore(rawScore, accumulatedBonus) {
   return Math.min(60, combined);
 }
 
-// Trigger Login Sequence for 5B Students
+// Trigger Login Sequence for 5B / 5C Students
 function trigger1106LoginSequence(student) {
-  if (!student || String(student.classID || '').toUpperCase() !== '5B') return;
+  if (!student || !is5BC1106TargetClass(student.classID)) return;
   // Teachers or test bypass 99 don't need popups
   if (student.isTeacher || student.id === 99 || student.studentID === 99) return;
 
@@ -6433,10 +6477,16 @@ function close1106BonusResultModal() {
   showScreen('screen-settlement');
 }
 
+if (typeof window !== 'undefined') {
+  window.confirm1106ScoreModal = confirm1106ScoreModal;
+  window.startPracticeAfterRuleModal = startPracticeAfterRuleModal;
+  window.close1106BonusResultModal = close1106BonusResultModal;
+}
+
 // Evaluate 11/06 Quiz bonus for score > 80 after quiz finishes
 function handle1106QuizBonusSettlement(quizScore, correctCount, totalCount) {
   const student = AppState.currentUser;
-  if (!student || String(student.classID || '').toUpperCase() !== '5B') return;
+  if (!student || !is5BC1106TargetClass(student.classID)) return;
   if (student.isTeacher || student.id === 99 || student.studentID === 99) return;
 
   const rawScore = get1106RawScore(student);
