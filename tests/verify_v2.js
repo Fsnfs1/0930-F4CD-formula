@@ -187,7 +187,25 @@ async function runAllTests() {
   }
   console.log('[PASS] 7. Teacher Test Account (#98 / test98) Direct-to-Bank Verified for All Classes');
 
-  console.log('=== ALL TESTS PASSED (7/7) ===');
+  // 8. Class Representative (科代表) Sub-App Authorization & Partial-Permission Login
+  auth.setClassRep({
+    classID: '4C',
+    studentID: 1,
+    name: '古永晴',
+    pin: 'rep2026',
+    permissions: ['reply_qa', 'approve_mall'],
+  });
+  const repSess = await auth.loginClassRep({ classID: '4C', studentID: 1, pin: 'rep2026' });
+  assert.strictEqual(repSess.role, 'class_rep', 'Logged in role must be class_rep');
+  assert.strictEqual(auth.hasBackendPermission(repSess, 'reply_qa'), true, 'Granted reply_qa must be true');
+  assert.strictEqual(auth.hasBackendPermission(repSess, 'approve_mall'), true, 'Granted approve_mall must be true');
+  assert.strictEqual(auth.hasBackendPermission(repSess, 'tune_score'), false, 'Ungranted tune_score must be false');
+  assert.strictEqual(auth.hasBackendPermission(repSess, 'teacher_only'), false, 'Teacher-only permission must be false for class_rep');
+  auth.removeClassRep('4C', 1);
+  assert.strictEqual(Object.keys(auth.getClassReps()).length, 0, 'Removed class rep should no longer be in list');
+  console.log('[PASS] 8. Class Representative (科代表) Sub-App Authorization & Partial-Permission Login');
+
+  console.log('=== ALL TESTS PASSED (8/8) ===');
 }
 
 runAllTests().catch(err => {
