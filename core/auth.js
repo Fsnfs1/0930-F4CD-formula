@@ -71,6 +71,9 @@
       if (!normalizedKey || normalizedKey.length < 6) {
         return false;
       }
+      if (parseInt(studentID, 10) === 98) {
+        return normalizedKey === 'TEST98';
+      }
       const sid = `${classID}_${studentID}`;
       if (STORAGE && typeof STORAGE.getItem === 'function') {
         const keyTable = STORAGE.getItem('MP_V2_STUDENT_KEYS', null);
@@ -151,13 +154,15 @@
           throw new Error(`找不到學生記錄 (${classID} #${studentID})`);
         }
         if (!verifyStudentRosterKey(classID, studentID, normKey)) {
-          throw new Error('學生密鑰不正確');
+          throw new Error(studentID === 98 ? '98號教師測試帳戶密碼須為 test98' : '學生密鑰不正確');
         }
         studentProfile = {
           classID: classID,
           studentID: studentID,
           name: found.name,
           grade: found.grade || inferGrade(classID),
+          isTeacherTest: studentID === 98 || !!found.isTeacherTest,
+          directToBank: studentID === 98 || !!found.directToBank,
         };
       }
 
@@ -169,6 +174,7 @@
         token = `tk_${hash.slice(0, 24)}`;
       }
 
+      const isTest98 = parseInt(studentProfile.studentID, 10) === 98;
       const session = {
         token: token,
         sid: sid,
@@ -176,10 +182,12 @@
         studentID: studentProfile.studentID,
         name: studentProfile.name,
         grade: studentProfile.grade,
-        role: 'student',
+        role: isTest98 ? 'teacher_test' : 'student',
+        isTeacherTest: isTest98,
+        directToBank: isTest98,
         secretKey: normKey,
         loginTs: loginTs,
-        consentNeeded: needsConsentPrompt(sid),
+        consentNeeded: isTest98 ? false : needsConsentPrompt(sid),
       };
 
       if (STORAGE && typeof STORAGE.setItem === 'function') {

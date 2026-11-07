@@ -47,6 +47,7 @@
       <span id="studentInfoBadge" class="small text-light">未登入</span>
       <span id="pointsQuickBadge" class="badge bg-info text-dark" style="cursor:pointer" onclick="AppUI.openPointsApp()">💎 0 積分</span>
       <button id="btnNavHub" class="btn btn-sm btn-outline-light d-none" onclick="AppUI.showScreen('screen-hub')">返回大廳</button>
+      <button id="btnLogout" class="btn btn-sm btn-outline-secondary text-light d-none" onclick="AppUI.logout()">切換帳號</button>
       <a href="teacher.html" class="btn btn-sm btn-outline-warning">教師後台</a>
     </div>
   </div>
@@ -66,7 +67,8 @@
       </div>
       <div class="mb-3">
         <label class="form-label fw-semibold">個人專屬密鑰</label>
-        <input id="gateSecretInput" type="password" class="form-control" placeholder="例如：4C01-X33C 或專屬口令" />
+        <input id="gateSecretInput" type="password" class="form-control" placeholder="例如：4C01-X33C 或教師測試密碼 test98" />
+        <div class="form-text text-primary">💡 教師直通測試：每班均配置 <strong>98 號</strong>「教師測試帳戶」，密碼為 <code>test98</code>（驗證後直通題庫）。</div>
       </div>
       <div id="gateAlert" class="alert alert-danger py-2 small d-none"></div>
       <button class="btn btn-primary w-100 fw-bold py-2" onclick="AppUI.handleGateLogin()">驗證身分並進入系統</button>
@@ -133,11 +135,18 @@
   <!-- Bank / Exam Selector Screen -->
   <section id="screen-selector" class="app-screen">
     <div class="card shadow-sm border-0 p-4">
-      <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
         <h5 class="fw-bold mb-0" id="selectorTitle">選擇題庫或測驗</h5>
-        <div class="form-check form-switch" id="practiceRandomWrap">
-          <input class="form-check-input" type="checkbox" id="practiceRandomSwitch" checked>
-          <label class="form-check-label small" for="practiceRandomSwitch">隨機出題順序</label>
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+          <div class="btn-group btn-group-sm" role="group">
+            <button type="button" class="btn btn-outline-primary" onclick="AppUI.openPracticeSelector('drill')">🚀 聯網自適應</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="AppUI.openPracticeSelector('practice')">📴 離線練習</button>
+            <button type="button" class="btn btn-outline-danger" onclick="AppUI.openPracticeSelector('exam')">🛡️ 限時測驗</button>
+          </div>
+          <div class="form-check form-switch mb-0" id="practiceRandomWrap">
+            <input class="form-check-input" type="checkbox" id="practiceRandomSwitch" checked>
+            <label class="form-check-label small" for="practiceRandomSwitch">隨機出題順序</label>
+          </div>
         </div>
       </div>
       <div id="selectorList" class="row g-3"></div>
@@ -440,7 +449,16 @@
       function populateSeatSelect() {
         const cls = document.getElementById('gateClassSelect').value;
         const stuSel = document.getElementById('gateStudentSelect');
-        const list = (window.getStudentsByClass && window.getStudentsByClass(cls)) || [];
+        const merged = (window.MathPlatformRegistry && typeof MathPlatformRegistry.getMergedRoster === 'function')
+          ? MathPlatformRegistry.getMergedRoster()
+          : {};
+        let list = Array.isArray(merged[cls]) && merged[cls].length > 0
+          ? merged[cls]
+          : ((window.getStudentsByClass && window.getStudentsByClass(cls)) || []);
+        // Ensure seat 98 is always present in every class dropdown
+        if (!list.some(s => String(s.id) === '98')) {
+          list = list.concat([{ id: 98, name: '教師測試帳戶 (直通題庫)', classID: cls, isTeacherTest: true, directToBank: true }]);
+        }
         stuSel.innerHTML = list.map(s => `<option value="${s.id}" data-name="${s.name}">${s.id} 號 - ${s.name}</option>`).join('');
       }
 
@@ -452,32 +470,66 @@
         const secret = document.getElementById('gateSecretInput').value.trim();
         const alertEl = document.getElementById('gateAlert');
 
-        if (!secret || secret.length < 2) {
+        if (String(sid) === '98') {
+          if (secret.toLowerCase() !== 'test98') {
+            alertEl.textContent = '❌ 98 號教師測試帳戶密碼須為 test98';
+            alertEl.classList.remove('d-none');
+            return;
+          }
+        } else if (!secret || secret.length < 2) {
           alertEl.textContent = '請輸入老師發放的個人密鑰！';
           alertEl.classList.remove('d-none');
           return;
         }
         alertEl.classList.add('d-none');
 
-        const student = { classID: cls, studentID: String(sid), name: sName, secretKey: secret, loginTs: Date.now() };
+        const isTest98 = String(sid) === '98';
+        const student = {
+          classID: cls,
+          studentID: String(sid),
+          name: sName,
+          secretKey: secret,
+          isTeacherTest: isTest98,
+          directToBank: isTest98,
+          loginTs: Date.now()
+        };
         localStorage.setItem('MP_V2_SESSION', JSON.stringify(student));
-        onLoginSuccess(student);
+        onLoginSuccess(student, true);
       }
 
-      function onLoginSuccess(student) {
+      function onLoginSuccess(student, isFreshLogin) {
         currentStudent = student;
         const sid = student.classID + '_' + student.studentID;
+        const isTest98 = String(student.studentID) === '98' || !!student.directToBank;
         document.getElementById('studentInfoBadge').textContent = `${student.classID} 班 ${student.studentID} 號 ${student.name}`;
-        document.getElementById('hubWelcomeTitle').textContent = `👋 你好，${student.classID} 班 ${student.name} 同學`;
+        document.getElementById('hubWelcomeTitle').textContent = `👋 你好，${student.classID} 班 ${student.name}`;
         document.getElementById('btnNavHub').classList.remove('d-none');
+        document.getElementById('btnLogout').classList.remove('d-none');
         refreshTopBadges();
 
-        // First-login D6 Research Informed Consent check
+        // Seat 98 teacher test account: skip consent popup and go straight to question bank selector!
+        if (isTest98) {
+          openPracticeSelector('drill');
+          return;
+        }
+
+        // First-login D6 Research Informed Consent check for regular students
         const consentRaw = localStorage.getItem('MP_V2_CONSENT_' + sid);
         if (!consentRaw) {
           document.getElementById('modalConsent').classList.add('show');
         }
         showScreen('screen-hub');
+      }
+
+      function logout() {
+        currentStudent = null;
+        activeSession = null;
+        if (quizTimerId) clearInterval(quizTimerId);
+        localStorage.removeItem('MP_V2_SESSION');
+        document.getElementById('studentInfoBadge').textContent = '未登入';
+        document.getElementById('btnNavHub').classList.add('d-none');
+        document.getElementById('btnLogout').classList.add('d-none');
+        showScreen('screen-gate');
       }
 
       function confirmConsent(agreed) {
@@ -1096,6 +1148,7 @@
         showScreen: showScreen,
         populateSeatSelect: populateSeatSelect,
         handleGateLogin: handleGateLogin,
+        logout: logout,
         confirmConsent: confirmConsent,
         toggleConsent: toggleConsent,
         openPracticeSelector: openPracticeSelector,

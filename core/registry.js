@@ -198,9 +198,20 @@
           },
         ];
 
+  const DEFAULT_EXTRA_ROSTER = DEFAULT_CLASSES.map(function (cls) {
+    return {
+      id: 98,
+      name: '教師測試帳戶 (直通題庫)',
+      grade: cls.startsWith('5') ? 11 : 10,
+      classID: cls,
+      isTeacherTest: true,
+      directToBank: true,
+    };
+  });
+
   const registry = {
     classes: deepClone(DEFAULT_CLASSES),
-    extraRoster: [],
+    extraRoster: deepClone(DEFAULT_EXTRA_ROSTER),
     banks: deepClone(DEFAULT_BANKS),
     exams: deepClone(DEFAULT_EXAMS),
     scorePacks: deepClone(DEFAULT_SCORE_PACKS),
@@ -225,6 +236,19 @@
     if (!norm) throw new Error('classCode is required');
     if (registry.classes.indexOf(norm) === -1) {
       registry.classes.push(norm);
+    }
+    const has98 = registry.extraRoster.some(function (s) {
+      return s.classID === norm && String(s.id) === '98';
+    });
+    if (!has98) {
+      registry.extraRoster.push({
+        id: 98,
+        name: '教師測試帳戶 (直通題庫)',
+        grade: inferGradeFromClass(norm),
+        classID: norm,
+        isTeacherTest: true,
+        directToBank: true,
+      });
     }
     return norm;
   }
@@ -308,6 +332,23 @@
         merged[cls].push(copy);
       }
     }
+
+    // Ensure every class has seat #98 teacher test account
+    Object.keys(merged).forEach(function (cls) {
+      const has98 = merged[cls].some(function (s) {
+        return String(s.id) === '98';
+      });
+      if (!has98) {
+        merged[cls].push({
+          id: 98,
+          name: '教師測試帳戶 (直通題庫)',
+          grade: inferGradeFromClass(cls),
+          classID: cls,
+          isTeacherTest: true,
+          directToBank: true,
+        });
+      }
+    });
 
     return merged;
   }

@@ -168,7 +168,26 @@ async function runAllTests() {
   assert.strictEqual(gitDiffRedLines, '', 'Red-line data files MUST remain 100% untouched');
   console.log('[PASS] 6. Red-Line Data Files 100% Untouched & Sustainable Registry Ready');
 
-  console.log('=== ALL TESTS PASSED (6/6) ===');
+  // 7. Teacher Test Account (#98 / test98) Direct-to-Bank Verification Across All Classes
+  const merged = registry.getMergedRoster();
+  for (const cls of ['4C', '4D', '5B', '5C']) {
+    const has98 = (merged[cls] || []).some(s => String(s.id) === '98' && s.directToBank);
+    assert.strictEqual(has98, true, `Class ${cls} must have seat #98 direct-to-bank test account`);
+    const sess98 = await auth.loginStudent({ classID: cls, studentID: 98, secretKey: 'test98' });
+    assert.strictEqual(sess98.directToBank, true);
+    assert.strictEqual(sess98.isTeacherTest, true);
+    assert.strictEqual(sess98.consentNeeded, false, 'Seat 98 skips consent prompt and goes straight to bank');
+    let rejectedWrongPwd = false;
+    try {
+      await auth.loginStudent({ classID: cls, studentID: 98, secretKey: 'wrong98' });
+    } catch (e) {
+      rejectedWrongPwd = true;
+    }
+    assert.strictEqual(rejectedWrongPwd, true, 'Seat 98 must reject password other than test98');
+  }
+  console.log('[PASS] 7. Teacher Test Account (#98 / test98) Direct-to-Bank Verified for All Classes');
+
+  console.log('=== ALL TESTS PASSED (7/7) ===');
 }
 
 runAllTests().catch(err => {
