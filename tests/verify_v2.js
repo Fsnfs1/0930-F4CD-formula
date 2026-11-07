@@ -3,6 +3,7 @@
  * Automated E2E & Integration Verification for MathPlatform v2.0
  */
 const assert = require('assert');
+const fs = require('fs');
 const { execSync } = require('child_process');
 
 const config = require('../core/config.js');
@@ -170,6 +171,11 @@ async function runAllTests() {
 
   // 7. Teacher Test Account (#98 / test98) Direct-to-Bank Verification Across All Classes
   const merged = registry.getMergedRoster();
+  const appHtml = fs.readFileSync(__dirname + '/../app.html', 'utf8');
+  assert.ok(appHtml.includes('test98'), 'app.html gate must include test98 reference');
+  assert.ok(appHtml.includes("list.some(s => String(s.id) === '98')"), 'app.html populateSeatSelect must include seat 98');
+  assert.ok(appHtml.includes("String(sid) === '98'"), 'app.html handleGateLogin must handle seat 98');
+
   for (const cls of ['4C', '4D', '5B', '5C']) {
     const has98 = (merged[cls] || []).some(s => String(s.id) === '98' && s.directToBank);
     assert.strictEqual(has98, true, `Class ${cls} must have seat #98 direct-to-bank test account`);

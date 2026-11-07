@@ -83,7 +83,6 @@
           <div class="small text-info mb-1" id="gateSelectedCandidateInfo">可點選上方候選人，或在下方切換任意班級/座號後輸入密碼/口令登入（仍保留本次刷臉留痕）</div>
         </div>
       </div>
-
       <!-- Dual Credential Form (Student Custom Password OR Teacher Secret Key) -->
       <div class="border rounded-3 p-3 bg-light">
         <div class="fw-bold small text-secondary mb-2">🔑 密碼 / 教師口令驗證（刷臉輔助核身 或 直接登入）</div>
@@ -99,10 +98,11 @@
         </div>
         <div class="mb-2">
           <label class="form-label small fw-semibold mb-1">學生自設密碼（非1234）或 老師發放口令</label>
-          <input id="gateSecretInput" type="password" class="form-control" autocomplete="off" placeholder="輸入個人自設密碼 或 老師專屬口令" onkeydown="if(event.key==='Enter') AppUI.handleGateLogin()" />
+          <input id="gateSecretInput" type="password" class="form-control" autocomplete="off" placeholder="例如：4C01-X33C 或教師測試密碼 test98" onkeydown="if(event.key==='Enter') AppUI.handleGateLogin()" />
           <div class="form-text text-muted" style="font-size:12px;">
             支援學生原設密碼（預設 1234 不可直接登入）及老師預制口令。若剛才已刷臉，系統會自動比對候選名單與所選學號並完成拍臉留痕。
           </div>
+          <div class="form-text text-primary small mt-1">💡 教師直通測試：每班均配置 <strong>98 號</strong>「教師測試帳戶」，密碼為 <code>test98</code>（驗證後直通題庫）。</div>
         </div>
         <div id="gateAlert" class="alert alert-danger py-2 small d-none mb-2"></div>
         <button class="btn btn-primary w-100 fw-bold py-2" onclick="AppUI.handleGateLogin()">驗證身分並進入系統</button>
@@ -812,10 +812,12 @@
           ? MathPlatformRegistry.getMergedRoster()
           : {};
         let list = Array.isArray(merged[cls]) && merged[cls].length > 0
-          ? merged[cls]
-          : ((window.getStudentsByClass && window.getStudentsByClass(cls)) || []);
-        // Strict role boundary: only list real students of this class in the student portal dropdown
-        list = list.filter(s => !s.isTeacherTest && String(s.id) !== '98');
+          ? merged[cls].slice()
+          : ((window.getStudentsByClass && window.getStudentsByClass(cls)) || []).slice();
+        // Ensure seat 98 teacher test account is always present in every class dropdown
+        if (!list.some(s => String(s.id) === '98')) {
+          list.push({ id: 98, name: '教師測試帳戶 (直通題庫)', classID: cls, isTeacherTest: true, directToBank: true });
+        }
         stuSel.innerHTML = list.map(s => `<option value="${esc(s.id)}" data-name="${esc(s.name)}">${esc(s.id)} 號 - ${esc(s.name)}</option>`).join('');
       }
 
@@ -825,6 +827,18 @@
         let sid = sel.value;
         const secret = document.getElementById('gateSecretInput').value.trim();
         const alertEl = document.getElementById('gateAlert');
+
+        if (String(sid) === '98') {
+          if (secret.toLowerCase() !== 'test98') {
+            alertEl.textContent = '❌ 98 號教師測試帳戶密碼須為 test98';
+            alertEl.classList.remove('d-none');
+            return;
+          }
+        } else if (!secret || secret.length < 2) {
+          alertEl.textContent = '請輸入老師發放的個人密鑰！';
+          alertEl.classList.remove('d-none');
+          return;
+        }
 
         if (!window.MathCoreAuth || typeof MathCoreAuth.loginStudent !== 'function') {
           alertEl.textContent = '系統認證模組未就緒，請重新整理頁面。';
