@@ -205,7 +205,60 @@ async function runAllTests() {
   assert.strictEqual(Object.keys(auth.getClassReps()).length, 0, 'Removed class rep should no longer be in list');
   console.log('[PASS] 8. Class Representative (科代表) Sub-App Authorization & Partial-Permission Login');
 
-  console.log('=== ALL TESTS PASSED (8/8) ===');
+  // 9. A1 Gate Upgrade: Preloaded Custom Passwords, Teacher Keys, Face Candidate Disambiguation & Face Trace Exemption
+  assert.strictEqual(Object.keys(auth.STUDENT_CUSTOM_PASSWORDS).length, 121, 'All 121 student password records hydrated');
+  const changedCount = Object.values(auth.STUDENT_CUSTOM_PASSWORDS).filter(r => r && r.passwordChanged).length;
+  assert.strictEqual(changedCount, 59, 'All 59 non-1234 student custom passwords preserved');
+
+  // Default 1234 must be rejected
+  assert.strictEqual(await auth.verifyStudentCustomPassword('4C', 1, '1234'), false, 'Default 1234 password must be rejected');
+
+  // Simulate a student setting/having a custom non-1234 password in localStorage and logging in with either custom password or teacher key
+  const customSalt = 'MATH_SALT_4C_2';
+  const customHash = await cryptoMod.sha256Hex(customSalt + ':mySecret88');
+  storage.setItem('math_student_password_4C_2', {
+    salt: customSalt,
+    passwordHash: customHash,
+    passwordChanged: true
+  });
+  const customLoginSess = await auth.loginStudent({ classID: '4C', studentID: 2, secretKey: 'mySecret88' });
+  assert.strictEqual(String(customLoginSess.studentID), '2', 'Student can log in with their own non-1234 password');
+  assert.strictEqual(customLoginSess.authMethod, 'password_or_key');
+
+  // Teacher-assigned secret key also works for the same student
+  storage.setItem('MP_V2_STUDENT_KEYS', { '4C_2': 'TKEY-4C02' });
+  const teacherKeySess = await auth.loginStudent({ classID: '4C', studentID: 2, secretKey: 'TKEY-4C02' });
+  assert.strictEqual(String(teacherKeySess.studentID), '2', 'Student can also log in with teacher-assigned secret key');
+
+  // Ambiguous / sub-threshold face candidates resolved by comparing password across within-threshold or outside-threshold list
+  const candidateMatchInList = await auth.resolveFaceCandidateWithPassword(
+    [
+      { classID: '4C', studentID: 1, name: '古永晴', distance: 0.39 },
+      { classID: '4C', studentID: 2, name: '甘浩賢', distance: 0.41 }
+    ],
+    'mySecret88',
+    null
+  );
+  assert.ok(candidateMatchInList && String(candidateMatchInList.studentID) === '2', 'Face candidate disambiguation resolves matching student #2 via password');
+
+  const candidateMatchOutsideThreshold = await auth.resolveFaceCandidateWithPassword(
+    [{ classID: '4C', studentID: 1, name: '古永晴', distance: 0.49 }],
+    'TKEY-4C02',
+    { classID: '4C', studentID: 2, name: '甘浩賢' }
+  );
+  assert.ok(candidateMatchOutsideThreshold && String(candidateMatchOutsideThreshold.studentID) === '2', 'Sub-threshold face scan resolves fallback student via teacher key');
+
+  // Unambiguous face login sets faceLoginVerified = true
+  const faceDirectSess = await auth.loginStudent({
+    classID: '4C',
+    studentID: 1,
+    faceVerified: true,
+    authMethod: 'face_1toN_direct'
+  });
+  assert.strictEqual(faceDirectSess.faceLoginVerified, true, 'Face login persists faceLoginVerified: true for automatic trace exemption');
+  console.log('[PASS] 9. A1 Gate Upgrade (1:N Face Scan + Ambiguous Candidate Password Disambiguation + Dual Credentials + Auto Face Trace)');
+
+  console.log('=== ALL TESTS PASSED (9/9) ===');
 }
 
 runAllTests().catch(err => {

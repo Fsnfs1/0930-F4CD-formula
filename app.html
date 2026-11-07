@@ -41,7 +41,7 @@
     <div class="d-flex align-items-center gap-2">
       <strong style="cursor:pointer" onclick="AppUI.showScreen('screen-hub')">📐 數學刷題與評測中心</strong>
       <span id="netStatusBadge" class="net-badge">🟢 澳門/非大陸網絡</span>
-      <span id="pendingSyncBadge" class="badge bg-warning text-dark">待提交 0 筆</span>
+      <span id="pendingSyncBadge" class="badge bg-success text-white" style="cursor:pointer" title="點擊立即同步雲端" onclick="AppUI.manualFlushSync()">已全部同步 ✓</span>
     </div>
     <div class="d-flex align-items-center gap-2">
       <span id="studentInfoBadge" class="small text-light">未登入</span>
@@ -51,26 +51,62 @@
     </div>
   </div>
 
-  <!-- A1: Gate Login Screen -->
+  <!-- A1: Gate Login Screen (1:N Face Scan + Dual Credential Disambiguation & Login) -->
   <section id="screen-gate" class="app-screen active">
-    <div class="card shadow-sm border-0 p-4 mx-auto" style="max-width:480px;">
-      <h4 class="fw-bold mb-2">🔐 A1 學生門禁系統</h4>
-      <p class="text-muted small mb-3">請選擇班級與座號，並輸入老師發放的個人密鑰登入（高強度加密保護）。</p>
-      <div class="mb-3">
-        <label class="form-label fw-semibold">班別</label>
-        <select id="gateClassSelect" class="form-select" onchange="AppUI.populateSeatSelect()"></select>
+    <div class="card shadow-sm border-0 p-4 mx-auto" style="max-width:540px;">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h4 class="fw-bold mb-0">🔐 A1 智能人臉與雙憑證門禁</h4>
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">刷臉免補拍草稿</span>
       </div>
-      <div class="mb-3">
-        <label class="form-label fw-semibold">學號 / 姓名</label>
-        <select id="gateStudentSelect" class="form-select"></select>
+      <p class="text-muted small mb-3">
+        請正面面向鏡頭眨眼或點擊拍照識別。支援 <strong>刷臉秒速登入</strong>、<strong>學生自設密碼（非1234）</strong> 及 <strong>教師發放口令</strong>。凡刷臉登入成功自動拍臉留痕，測驗免上傳草稿紙或二次自拍。
+      </p>
+
+      <!-- Face Scan Camera Viewport -->
+      <div id="gateFaceCard" class="p-3 rounded-3 mb-3 text-white" style="background:#0f172a; border:1px solid #334155;">
+        <div class="position-relative mx-auto rounded overflow-hidden" style="max-width:360px; aspect-ratio:4/3; background:#020617; border:2px solid #38bdf8;">
+          <video id="faceFirstVideo" autoplay muted playsinline style="width:100%; height:100%; object-fit:cover; transform:scaleX(-1);"></video>
+          <div id="faceFirstOverlay" class="position-absolute bottom-0 start-0 end-0 px-2 py-1 text-center small" style="background:rgba(15,23,42,0.82); color:#e2e8f0; font-size:12px;">
+            📷 點擊下方「啟動相機識別」或直接用密碼/口令登入
+          </div>
+        </div>
+        <div id="faceFirstAlert" class="alert py-2 small mt-2 mb-0 d-none"></div>
+        <div class="d-flex gap-2 justify-content-center mt-2">
+          <button id="btnFaceFirstStart" type="button" class="btn btn-info btn-sm fw-bold text-dark px-3" onclick="AppUI.startGateCamera(false)">📷 啟動相機刷臉</button>
+          <button id="btnFaceFirstCapture" type="button" class="btn btn-success btn-sm fw-bold px-3 d-none" onclick="AppUI.captureAndRecognizeGate('manual_click')">🔍 拍照識別身分</button>
+        </div>
+
+        <!-- Candidate Disambiguation Panel (Shown when multiple close faces or sub-threshold match) -->
+        <div id="gateCandidatePanel" class="mt-3 pt-2 border-top border-secondary d-none">
+          <div class="small fw-bold text-warning mb-1">👥 偵測到接近臉孔或未達單一免密閾值，請點選姓名或直接輸入您的密碼/口令比對：</div>
+          <div id="gateCandidateList" class="d-grid gap-1 mb-2"></div>
+          <div class="small text-info mb-1" id="gateSelectedCandidateInfo">可點選上方候選人，或在下方切換任意班級/座號後輸入密碼/口令登入（仍保留本次刷臉留痕）</div>
+        </div>
       </div>
-      <div class="mb-3">
-        <label class="form-label fw-semibold">個人專屬密鑰</label>
-        <input id="gateSecretInput" type="password" class="form-control" autocomplete="off" placeholder="請輸入老師發放的個人專屬密鑰" />
-        <div class="form-text text-muted">請輸入與您學號綁定的專屬通行密鑰（區分大小寫）。</div>
+
+      <!-- Dual Credential Form (Student Custom Password OR Teacher Secret Key) -->
+      <div class="border rounded-3 p-3 bg-light">
+        <div class="fw-bold small text-secondary mb-2">🔑 密碼 / 教師口令驗證（刷臉輔助核身 或 直接登入）</div>
+        <div class="row g-2 mb-2">
+          <div class="col-5">
+            <label class="form-label small fw-semibold mb-1">班別</label>
+            <select id="gateClassSelect" class="form-select form-select-sm" onchange="AppUI.populateSeatSelect()"></select>
+          </div>
+          <div class="col-7">
+            <label class="form-label small fw-semibold mb-1">學號 / 姓名</label>
+            <select id="gateStudentSelect" class="form-select form-select-sm"></select>
+          </div>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small fw-semibold mb-1">學生自設密碼（非1234）或 老師發放口令</label>
+          <input id="gateSecretInput" type="password" class="form-control" autocomplete="off" placeholder="輸入個人自設密碼 或 老師專屬口令" onkeydown="if(event.key==='Enter') AppUI.handleGateLogin()" />
+          <div class="form-text text-muted" style="font-size:12px;">
+            支援學生原設密碼（預設 1234 不可直接登入）及老師預制口令。若剛才已刷臉，系統會自動比對候選名單與所選學號並完成拍臉留痕。
+          </div>
+        </div>
+        <div id="gateAlert" class="alert alert-danger py-2 small d-none mb-2"></div>
+        <button class="btn btn-primary w-100 fw-bold py-2" onclick="AppUI.handleGateLogin()">驗證身分並進入系統</button>
       </div>
-      <div id="gateAlert" class="alert alert-danger py-2 small d-none"></div>
-      <button class="btn btn-primary w-100 fw-bold py-2" onclick="AppUI.handleGateLogin()">驗證身分並進入系統</button>
     </div>
   </section>
 
@@ -351,8 +387,12 @@
     </div>
   </div>
 
-  <!-- Load Existing Read-Only Data Files (D11: Zero Modification to Red-Line Files) -->
+  <!-- Load Existing Read-Only Data & Face Auth Files (D11: Zero Modification to Red-Line Files) -->
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
   <script src="js/roster.js"></script>
+  <script src="js/preloaded_faces.js"></script>
+  <script src="js/face_auth.js"></script>
+  <script src="js/persistence.js"></script>
   <script src="js/questions_4cd1023.js"></script>
   <script src="js/bank_4cd_t2.js"></script>
   <script src="js/bank_4cd_1102_adaptive.js"></script>
@@ -384,6 +424,10 @@
       let gameLastTickTs = 0;
       let pendingArenaMatch = null;
       let checkinStage = 'start';
+      let gateBlinkTracker = null;
+      let gateIsScanning = false;
+      let gateCapturedSnap = null;
+      let gateCloseCandidates = [];
 
       function esc(str) {
         return String(str == null ? '' : str)
@@ -402,30 +446,35 @@
           MathCoreNetwatch.onChange(updateNetBadge);
           updateNetBadge(MathCoreNetwatch.getState());
         }
-        // Start Background Sync Worker
+        // Start Background Sync Worker & listen for receipts to immediately update badge
         if (window.MathCoreSync && typeof MathCoreSync.start === 'function') {
           MathCoreSync.start();
+          if (typeof MathCoreSync.onReceipt === 'function') {
+            MathCoreSync.onReceipt(function () {
+              refreshTopBadges();
+            });
+          }
         }
 
-        // Start global keyboard & click telemetry listener (D1)
+        // Start global keyboard & click telemetry listener ONLY during active quiz/practice/exam session
         document.addEventListener('click', function (e) {
-          if (!currentStudent) return;
+          if (!currentStudent || !activeSession || activeSession.state.completed) return;
           const t = e.target && (e.target.id || e.target.innerText || e.target.tagName);
           if (window.MathCoreSync && typeof MathCoreSync.recordAction === 'function') {
             MathCoreSync.recordAction('ui_click', { target: String(t || '').slice(0, 32) }, {
               sid: currentStudent.classID + '_' + currentStudent.studentID,
-              mode: activeSession ? activeSession.state.mode : 'hub'
+              mode: activeSession.state.mode
             });
           }
           refreshTopBadges();
         }, { passive: true });
 
         document.addEventListener('keydown', function (e) {
-          if (!currentStudent) return;
+          if (!currentStudent || !activeSession || activeSession.state.completed) return;
           if (window.MathCoreSync && typeof MathCoreSync.recordAction === 'function') {
             MathCoreSync.recordAction('ui_keydown', { key: e.key }, {
               sid: currentStudent.classID + '_' + currentStudent.studentID,
-              mode: activeSession ? activeSession.state.mode : 'hub'
+              mode: activeSession.state.mode
             });
           }
         }, { passive: true });
@@ -449,14 +498,304 @@
         });
 
         // Restore active login session if present and valid student/teacher_test session
+        let restored = false;
         try {
           const saved = (window.MathCoreAuth && typeof MathCoreAuth.getSession === 'function')
             ? MathCoreAuth.getSession()
             : JSON.parse(localStorage.getItem('MP_V2_SESSION') || 'null');
           if (saved && saved.token && saved.classID && saved.studentID && (saved.role === 'student' || saved.role === 'teacher_test')) {
+            restored = true;
             onLoginSuccess(saved, false);
           }
         } catch (e) {}
+
+        if (!restored) {
+          startGateCamera(true);
+        }
+      }
+
+      async function manualFlushSync() {
+        const badge = document.getElementById('pendingSyncBadge');
+        if (badge) badge.textContent = '⏳ 正在同步...';
+        try {
+          if (window.MathCoreNetwatch && typeof MathCoreNetwatch.probeNow === 'function') {
+            await MathCoreNetwatch.probeNow();
+          }
+          if (window.MathCoreSync && typeof MathCoreSync.flushNow === 'function') {
+            await MathCoreSync.flushNow();
+          }
+        } catch (e) {}
+        refreshTopBadges();
+      }
+
+      function getAllFaceProfiles() {
+        if (window.getAllStudentProfiles && typeof window.getAllStudentProfiles === 'function') {
+          const list = window.getAllStudentProfiles();
+          if (Array.isArray(list) && list.length > 0) return list;
+        }
+        const preloaded = window.PRELOADED_STUDENT_FACES || {};
+        const map = {};
+        Object.keys(preloaded).forEach(function (k) {
+          const item = preloaded[k];
+          if (!item || !item.vector || item.vector.length !== 128) return;
+          const cid = String(item.classID || k.split('_')[0]).toUpperCase();
+          const sid = parseInt(item.studentID || k.split('_')[1], 10);
+          map[cid + '_' + sid] = {
+            classID: cid,
+            studentID: sid,
+            name: item.name || ('學生 ' + sid),
+            vector: new Float32Array(item.vector)
+          };
+        });
+        return Object.values(map);
+      }
+
+      function stopGateCamera() {
+        if (gateBlinkTracker && typeof gateBlinkTracker.stop === 'function') {
+          try { gateBlinkTracker.stop(); } catch (_) {}
+          gateBlinkTracker = null;
+        }
+        const video = document.getElementById('faceFirstVideo');
+        if (window.FaceAuthModule && typeof window.FaceAuthModule.stopCamera === 'function') {
+          try { window.FaceAuthModule.stopCamera(video); } catch (_) {}
+        }
+        if (video && video.srcObject) {
+          try {
+            video.srcObject.getTracks().forEach(function (t) { t.stop(); });
+            video.srcObject = null;
+          } catch (_) {}
+        }
+      }
+
+      async function startGateCamera(isAutoStart) {
+        const video = document.getElementById('faceFirstVideo');
+        const btnStart = document.getElementById('btnFaceFirstStart');
+        const btnCapture = document.getElementById('btnFaceFirstCapture');
+        const overlay = document.getElementById('faceFirstOverlay');
+        if (!video) return;
+
+        if (isAutoStart) {
+          try {
+            const p = new URLSearchParams(window.location.search || '');
+            if (p.get('test_disable_autocamera') === '1') return;
+          } catch (_) {}
+        }
+
+        if (overlay) overlay.textContent = '📷 正在開啟前置鏡頭，請正面面向鏡頭...';
+        try {
+          if (window.FaceAuthModule && typeof window.FaceAuthModule.startCamera === 'function') {
+            await window.FaceAuthModule.startCamera(video);
+          } else if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            const stream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+              audio: false
+            });
+            video.srcObject = stream;
+            await video.play().catch(function () {});
+          }
+          if (video.srcObject) {
+            if (overlay) overlay.textContent = '🟢 相機運作中 · 請眨眼自動識別或點擊「拍照識別身分」';
+            if (btnStart) btnStart.classList.add('d-none');
+            if (btnCapture) btnCapture.classList.remove('d-none');
+            if (window.FaceAuthModule && typeof window.FaceAuthModule.startBlinkDetection === 'function') {
+              if (gateBlinkTracker) gateBlinkTracker.stop();
+              gateBlinkTracker = window.FaceAuthModule.startBlinkDetection(video, {
+                onBlink: function () {
+                  if (!gateIsScanning) captureAndRecognizeGate('liveness_loop');
+                },
+                onStatusUpdate: function (st) {
+                  if (gateIsScanning || !overlay) return;
+                  overlay.textContent = st && st.isFaceDetected
+                    ? '🟢 偵測到臉孔 · 請眨眼或點擊「拍照識別身分」'
+                    : '🟡 請將臉孔置於鏡頭中央';
+                }
+              });
+            }
+          }
+        } catch (err) {
+          if (overlay) overlay.textContent = '⚠️ 未開啟相機權限，可點擊「啟動相機刷臉」或直接用下方密碼/口令登入';
+          if (btnStart) btnStart.classList.remove('d-none');
+          if (btnCapture) btnCapture.classList.add('d-none');
+        }
+      }
+
+      function recordFaceLoginTrace(student, snap) {
+        if (!student) return;
+        const cid = student.classID;
+        const sid = student.studentID;
+        const key = cid + '_' + sid;
+        try {
+          if (snap && snap.descriptor && window.enhanceStudentVector) {
+            window.enhanceStudentVector(cid, sid, snap.descriptor, 0.70);
+          }
+          if (snap && snap.photoBase64) {
+            sessionStorage.setItem('MP_V2_FACE_TRACE_' + key, snap.photoBase64);
+            if (window.uploadDrivePhoto) {
+              window.uploadDrivePhoto(cid, sid, student.name, snap.photoBase64, snap.descriptor || null).catch(function () {});
+            }
+          } else if (snap && snap.descriptor && window.submitFormRecord) {
+            window.submitFormRecord({
+              classID: cid,
+              studentID: sid,
+              vector: Array.from(snap.descriptor),
+              timestamp: Date.now()
+            }).catch(function () {});
+          }
+          if (window.MathCoreSync && typeof MathCoreSync.recordAction === 'function') {
+            MathCoreSync.recordAction('face_gate_checkin', {
+              method: 'face_gate',
+              hasPhoto: Boolean(snap && snap.photoBase64),
+              ts: Date.now()
+            }, { sid: key, mode: 'gate' });
+          }
+        } catch (_) {}
+      }
+
+      function renderGateCandidates(candidates) {
+        const panel = document.getElementById('gateCandidatePanel');
+        const listEl = document.getElementById('gateCandidateList');
+        const infoEl = document.getElementById('gateSelectedCandidateInfo');
+        if (!panel || !listEl) return;
+
+        gateCloseCandidates = Array.isArray(candidates) ? candidates : [];
+        if (gateCloseCandidates.length === 0) {
+          panel.classList.add('d-none');
+          return;
+        }
+        panel.classList.remove('d-none');
+        listEl.innerHTML = gateCloseCandidates.slice(0, 5).map(function (c, idx) {
+          const prof = c.profile || c;
+          const pct = c.percentage || Math.round((c.centeredSimilarity || 0.78) * 100);
+          return `<button type="button" class="btn btn-sm ${idx === 0 ? 'btn-info text-dark fw-bold' : 'btn-outline-light'} text-start d-flex justify-content-between align-items-center" onclick="AppUI.selectGateCandidate('${esc(prof.classID)}', '${esc(prof.studentID)}', '${esc(prof.name)}')">
+            <span>👤 ${esc(prof.classID)} 班 ${esc(prof.studentID)} 號 ${esc(prof.name)}</span>
+            <span class="badge bg-dark">${pct}% 接近</span>
+          </button>`;
+        }).join('');
+
+        const first = gateCloseCandidates[0].profile || gateCloseCandidates[0];
+        if (first && first.classID && first.studentID) {
+          selectGateCandidate(first.classID, first.studentID, first.name, true);
+        }
+        if (infoEl) {
+          infoEl.textContent = '💡 請輸入您的自設密碼或老師口令完成驗證（若您不在上方候選名單，也可直接在下方下拉選單選擇您的班級與座號）';
+        }
+      }
+
+      function selectGateCandidate(classID, studentID, name, silentFocus) {
+        const clsSel = document.getElementById('gateClassSelect');
+        const stuSel = document.getElementById('gateStudentSelect');
+        if (clsSel && clsSel.value !== classID) {
+          clsSel.value = classID;
+          populateSeatSelect();
+        }
+        if (stuSel) {
+          stuSel.value = String(studentID);
+        }
+        const infoEl = document.getElementById('gateSelectedCandidateInfo');
+        if (infoEl) {
+          infoEl.innerHTML = `已選取：<strong>${esc(classID)} 班 ${esc(studentID)} 號 ${esc(name || '')}</strong> · 請在下方輸入密碼或口令完成刷臉核身`;
+        }
+        if (!silentFocus) {
+          const inp = document.getElementById('gateSecretInput');
+          if (inp) inp.focus();
+        }
+      }
+
+      async function captureAndRecognizeGate(triggerSource) {
+        if (gateIsScanning && triggerSource === 'liveness_loop') return;
+        gateIsScanning = true;
+
+        const video = document.getElementById('faceFirstVideo');
+        const btnCapture = document.getElementById('btnFaceFirstCapture');
+        const alertBox = document.getElementById('faceFirstAlert');
+        const overlay = document.getElementById('faceFirstOverlay');
+
+        if (btnCapture) {
+          btnCapture.disabled = true;
+          btnCapture.textContent = '⏳ 正在提取特徵比對...';
+        }
+
+        try {
+          let snap = null;
+          if (window.FaceAuthModule && typeof window.FaceAuthModule.captureFace === 'function' && video) {
+            snap = await window.FaceAuthModule.captureFace(video);
+          }
+          if (!snap || snap.isDemo || !snap.descriptor) {
+            if (triggerSource !== 'liveness_loop' && alertBox) {
+              alertBox.className = 'alert alert-warning py-2 small mt-2 mb-0';
+              alertBox.textContent = '⚠️ 未能清晰捕捉臉孔，請面向鏡頭重試，或直接輸入下方密碼/口令登入。';
+              alertBox.classList.remove('d-none');
+            }
+            gateIsScanning = false;
+            if (btnCapture) {
+              btnCapture.disabled = false;
+              btnCapture.textContent = '🔍 拍照識別身分';
+            }
+            return;
+          }
+
+          gateCapturedSnap = snap;
+          const profiles = getAllFaceProfiles();
+          const matchResult = (window.FaceAuthModule && typeof window.FaceAuthModule.identifyFace1toN === 'function')
+            ? window.FaceAuthModule.identifyFace1toN(snap.descriptor, profiles, 0.82)
+            : { isMatch: false, candidates: [] };
+
+          const isAmbiguous = (matchResult.status === 'AMBIGUOUS_MARGIN') ||
+            (matchResult.delta !== undefined && matchResult.delta < 0.08 && matchResult.topCandidate && matchResult.secondMatch);
+
+          if (matchResult.isMatch && matchResult.bestMatch && !isAmbiguous) {
+            // Single unambiguous face match -> direct password-free login + auto face trace!
+            stopGateCamera();
+            const best = matchResult.bestMatch;
+            if (alertBox) {
+              alertBox.className = 'alert alert-success py-2 small mt-2 mb-0';
+              alertBox.innerHTML = `✅ <strong>刷臉識別成功！</strong> 歡迎 ${esc(best.classID)} 班 ${esc(best.studentID)} 號 ${esc(best.name)} 同學 (相似度 ${matchResult.percentage || 92}%)，已自動拍臉留痕！`;
+              alertBox.classList.remove('d-none');
+            }
+            if (overlay) overlay.textContent = `🟢 驗證通過 · 歡迎 ${best.name} 同學`;
+
+            const sess = await MathCoreAuth.loginStudent({
+              classID: best.classID,
+              studentID: best.studentID,
+              name: best.name,
+              faceVerified: true
+            });
+            recordFaceLoginTrace(best, snap);
+            gateIsScanning = false;
+            setTimeout(function () {
+              onLoginSuccess(sess, true);
+            }, 350);
+            return;
+          }
+
+          // Multiple close faces OR sub-threshold similarity -> show top close candidates + allow password/key disambiguation (inside or outside threshold)
+          stopGateCamera();
+          const cands = (matchResult.candidates && matchResult.candidates.length > 0)
+            ? matchResult.candidates
+            : (matchResult.topCandidate ? [{ profile: matchResult.topCandidate, percentage: matchResult.percentage || 78 }] : []);
+          renderGateCandidates(cands);
+
+          if (alertBox) {
+            alertBox.className = 'alert alert-info py-2 small mt-2 mb-0';
+            alertBox.innerHTML = '📸 <strong>已捕捉臉孔並拍臉留痕！</strong> 由於存在接近臉孔或特徵未達免密閾值，請點選姓名或直接輸入您的<strong>自設密碼 / 教師口令</strong>完成核身。';
+            alertBox.classList.remove('d-none');
+          }
+          if (overlay) overlay.textContent = '🟡 已拍臉留痕 · 請輸入密碼或口令完成最終比對';
+          const inp = document.getElementById('gateSecretInput');
+          if (inp) inp.focus();
+        } catch (err) {
+          if (alertBox) {
+            alertBox.className = 'alert alert-warning py-2 small mt-2 mb-0';
+            alertBox.textContent = '⚠️ 臉部識別暫時無法使用，請直接使用下方密碼或老師口令登入。';
+            alertBox.classList.remove('d-none');
+          }
+        } finally {
+          gateIsScanning = false;
+          if (btnCapture) {
+            btnCapture.disabled = false;
+            btnCapture.textContent = '🔍 拍照識別身分';
+          }
+        }
       }
 
       function populateClassSelect() {
@@ -481,9 +820,9 @@
       }
 
       async function handleGateLogin() {
-        const cls = document.getElementById('gateClassSelect').value;
+        let cls = document.getElementById('gateClassSelect').value;
         const sel = document.getElementById('gateStudentSelect');
-        const sid = sel.value;
+        let sid = sel.value;
         const secret = document.getElementById('gateSecretInput').value.trim();
         const alertEl = document.getElementById('gateAlert');
 
@@ -494,22 +833,41 @@
         }
 
         try {
+          const hadFaceScan = Boolean(gateCapturedSnap && gateCapturedSnap.descriptor);
+          // If face was scanned and there are close candidates, check if the entered password/key matches either the selected student OR one of the close face candidates!
+          if (hadFaceScan && typeof MathCoreAuth.resolveFaceCandidateWithPassword === 'function') {
+            const matchedProf = await MathCoreAuth.resolveFaceCandidateWithPassword(
+              gateCloseCandidates,
+              secret,
+              { classID: cls, studentID: parseInt(sid, 10) }
+            );
+            if (matchedProf && matchedProf.classID && matchedProf.studentID !== undefined) {
+              cls = matchedProf.classID;
+              sid = String(matchedProf.studentID);
+            }
+          }
+
           const res = await MathCoreAuth.loginStudent({
             classID: cls,
             studentID: sid,
-            secretKey: secret
+            secretKey: secret,
+            faceVerified: hadFaceScan
           });
           const sess = (res && res.session) || res;
           if (!sess || !sess.token) {
-            alertEl.textContent = '❌ ' + ((res && res.error) || '驗證失敗，請檢查學號與專屬密鑰。');
+            alertEl.textContent = '❌ ' + ((res && res.error) || '驗證失敗，請檢查學號、個人密碼或老師口令。');
             alertEl.classList.remove('d-none');
             return;
           }
           alertEl.classList.add('d-none');
           document.getElementById('gateSecretInput').value = '';
+          stopGateCamera();
+          if (hadFaceScan) {
+            recordFaceLoginTrace(sess, gateCapturedSnap);
+          }
           onLoginSuccess(sess, true);
         } catch (err) {
-          alertEl.textContent = '❌ ' + ((err && err.message) || '驗證失敗，請檢查學號與專屬密鑰。');
+          alertEl.textContent = '❌ ' + ((err && err.message) || '驗證失敗，請檢查學號、個人密碼或老師口令。');
           alertEl.classList.remove('d-none');
         }
       }
@@ -518,11 +876,18 @@
         currentStudent = student;
         const sid = student.classID + '_' + student.studentID;
         const isTest98 = String(student.studentID) === '98' || !!student.directToBank || student.role === 'teacher_test';
-        document.getElementById('studentInfoBadge').textContent = `${student.classID} 班 ${student.studentID} 號 ${student.name}`;
+        const faceTag = student.faceLoginVerified ? ' · 📸已刷臉留痕' : '';
+        document.getElementById('studentInfoBadge').textContent = `${student.classID} 班 ${student.studentID} 號 ${student.name}${faceTag}`;
         document.getElementById('hubWelcomeTitle').textContent = `👋 你好，${student.classID} 班 ${student.name}`;
         document.getElementById('btnNavHub').classList.remove('d-none');
         document.getElementById('btnLogout').classList.remove('d-none');
-        refreshTopBadges();
+
+        // Immediately flush any pending outbox items when online in Macau
+        if (window.MathCoreSync && typeof MathCoreSync.flushNow === 'function') {
+          MathCoreSync.flushNow().then(refreshTopBadges).catch(refreshTopBadges);
+        } else {
+          refreshTopBadges();
+        }
 
         // Sync D6 consent switch with stored status
         const consentToggle = document.getElementById('consentToggleSwitch');
@@ -547,6 +912,11 @@
 
       function logout() {
         stopGamePlaytimeTracker();
+        stopGateCamera();
+        gateCapturedSnap = null;
+        gateCloseCandidates = [];
+        const candPanel = document.getElementById('gateCandidatePanel');
+        if (candPanel) candPanel.classList.add('d-none');
         currentStudent = null;
         activeSession = null;
         if (quizTimerId) clearInterval(quizTimerId);
@@ -560,6 +930,7 @@
         document.getElementById('btnNavHub').classList.add('d-none');
         document.getElementById('btnLogout').classList.add('d-none');
         showScreen('screen-gate');
+        startGateCamera(true);
       }
 
       function confirmConsent(agreed) {
@@ -587,6 +958,9 @@
           if (currentStudent && window.MathCoreBonus) {
             MathCoreBonus.PointsLedger.confirmPendingPoints(currentStudent.classID + '_' + currentStudent.studentID);
           }
+          if (window.MathCoreSync && typeof MathCoreSync.flushNow === 'function') {
+            MathCoreSync.flushNow().then(refreshTopBadges).catch(refreshTopBadges);
+          }
         } else if (state.status === 'YELLOW' || state.status === 'restricted_mainland') {
           el.textContent = '🟡 受限網絡 (已暫存瀏覽器，回澳自動補交)';
         } else {
@@ -596,9 +970,8 @@
       }
 
       function refreshTopBadges() {
-        if (!currentStudent) return;
-        const sid = currentStudent.classID + '_' + currentStudent.studentID;
-        if (window.MathCoreBonus) {
+        if (currentStudent && window.MathCoreBonus) {
+          const sid = currentStudent.classID + '_' + currentStudent.studentID;
           const bal = MathCoreBonus.PointsLedger.getBalance(sid);
           document.getElementById('pointsQuickBadge').textContent = `💎 ${bal.confirmed} 積分` + (bal.pending > 0 ? ` (+${bal.pending}待入帳)` : '');
         }
@@ -606,7 +979,16 @@
           const pendingCount = (window.MathCoreStorage && typeof MathCoreStorage.getPendingCount === 'function')
             ? MathCoreStorage.getPendingCount()
             : JSON.parse(localStorage.getItem('MP_V2_OUTBOX') || '[]').filter(x => !x.synced).length;
-          document.getElementById('pendingSyncBadge').textContent = `待提交 ${pendingCount} 筆`;
+          const badge = document.getElementById('pendingSyncBadge');
+          if (badge) {
+            if (pendingCount === 0) {
+              badge.className = 'badge bg-success text-white';
+              badge.textContent = '已全部同步 ✓';
+            } else {
+              badge.className = 'badge bg-warning text-dark';
+              badge.textContent = `待提交 ${pendingCount} 筆`;
+            }
+          }
         } catch (e) {}
       }
 
@@ -814,7 +1196,18 @@
         });
 
         if (mode === 'exam') {
-          openCheckinModal('start');
+          if (currentStudent && currentStudent.faceLoginVerified) {
+            const traceSnap = sessionStorage.getItem('MP_V2_FACE_TRACE_' + currentStudent.classID + '_' + currentStudent.studentID) || null;
+            activeSession.recordCheckin({
+              stage: 'start',
+              method: 'face_gate_verified',
+              imageBase64: traceSnap,
+              signatureText: (currentStudent.name || '') + ' (刷臉門禁自動留痕)',
+              signatureConfirmed: true
+            });
+          } else {
+            openCheckinModal('start');
+          }
         }
         startQuizTimer();
         renderCurrentQuestion();
@@ -1068,6 +1461,22 @@
 
       function openCheckinModal(stage) {
         checkinStage = stage || 'start';
+        if (currentStudent && currentStudent.faceLoginVerified) {
+          const traceSnap = sessionStorage.getItem('MP_V2_FACE_TRACE_' + currentStudent.classID + '_' + currentStudent.studentID) || null;
+          if (activeSession) {
+            activeSession.recordCheckin({
+              stage: checkinStage,
+              method: 'face_gate_verified',
+              imageBase64: traceSnap,
+              signatureText: (currentStudent.name || '') + ' (刷臉門禁自動留痕)',
+              signatureConfirmed: true
+            });
+          }
+          if (checkinStage === 'mid') {
+            alert('✅ 你已透過刷臉門禁登入並完成拍臉留痕，無需再次拍照或上傳帶簽名草稿！');
+          }
+          return;
+        }
         const isMandatoryExamCheckin = Boolean(activeSession && activeSession.state.mode === 'exam' && (checkinStage === 'start' || checkinStage === 'submit'));
         const laterBtn = document.getElementById('btnCheckinLater');
         if (laterBtn) {
@@ -1544,6 +1953,10 @@
       return {
         init: init,
         showScreen: showScreen,
+        manualFlushSync: manualFlushSync,
+        startGateCamera: startGateCamera,
+        captureAndRecognizeGate: captureAndRecognizeGate,
+        selectGateCandidate: selectGateCandidate,
         populateSeatSelect: populateSeatSelect,
         handleGateLogin: handleGateLogin,
         logout: logout,
