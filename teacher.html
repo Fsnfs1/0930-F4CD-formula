@@ -19,12 +19,35 @@
       <strong>👩‍🏫 A9 教師中控台 & 可持續擴展配置中心</strong>
       <span class="badge bg-success">v2.0 模組化架構</span>
     </div>
-    <div class="d-flex gap-2">
+    <div id="teacherTopbarActions" class="d-flex gap-2 d-none">
+      <button class="btn btn-sm btn-outline-info" onclick="TeacherApp.previewBankAsTeacherTest()">🔍 以教師測試身分預覽題庫</button>
       <a href="app.html" class="btn btn-sm btn-outline-light">切換至學生端 (app.html)</a>
+      <button class="btn btn-sm btn-outline-danger" onclick="TeacherApp.logoutTeacher()">安全登出</button>
     </div>
   </div>
 
-  <div class="container my-4" style="max-width:1100px;">
+  <!-- Mandatory Teacher Authentication Gate -->
+  <div id="teacherAuthOverlay" class="container my-5" style="max-width:460px;">
+    <div class="section-card p-4 shadow-sm">
+      <h4 class="fw-bold mb-2">🔐 A9 教師管理中控台認證</h4>
+      <p class="text-muted small mb-3">此區域僅限授權教師訪問。請輸入教師管理帳號與通行密鑰以解鎖後台控制權限。</p>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">教師帳號</label>
+        <input id="teacherUserInput" type="text" class="form-control" value="teacher_admin" autocomplete="username" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">教師通行密鑰</label>
+        <input id="teacherPassInput" type="password" class="form-control" autocomplete="current-password" placeholder="請輸入教師管理密鑰" />
+      </div>
+      <div id="teacherAuthAlert" class="alert alert-danger py-2 small d-none"></div>
+      <button class="btn btn-primary w-100 fw-bold py-2" onclick="TeacherApp.handleTeacherLogin()">驗證教師身分並解鎖中控台</button>
+      <div class="text-center mt-3">
+        <a href="app.html" class="small text-secondary text-decoration-none">← 返回學生端登入頁面</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="teacherMainContainer" class="container my-4 d-none" style="max-width:1100px;">
 
     <!-- 1. Global Exam / Bonus / Ranking / Feedback Controls (D3, D5, D9, Section 六) -->
     <div class="section-card">
@@ -43,7 +66,9 @@
           <select id="cfgRankDisplay" class="form-select" onchange="TeacherApp.saveGlobalSettings()">
             <option value="real_name">顯示真實姓名（班別 + 座號 + 姓名）</option>
             <option value="seat_only">僅顯示班別與座號（隱去姓名）</option>
+            <option value="nickname">顯示學生自訂暱稱</option>
             <option value="anonymous">完全匿名（同學 #1, #2...）</option>
+            <option value="hidden">不公開排行榜</option>
           </select>
         </div>
         <div class="col-md-4">
@@ -134,7 +159,7 @@
       <div class="row g-3 align-items-end">
         <div class="col-md-5">
           <label class="form-label small fw-semibold">研究專用鹽值密鑰（僅老師保管，用於生成固定匿名編號 R-xxxxxxxx）</label>
-          <input id="researchSecretInput" type="password" class="form-control form-control-sm" value="MACAU_MATH_RESEARCH_2026_KEY" />
+          <input id="researchSecretInput" type="password" class="form-control form-control-sm" autocomplete="off" placeholder="請輸入研究專用鹽值密鑰（僅老師保管）" />
         </div>
         <div class="col-md-7 d-flex gap-2 flex-wrap">
           <button class="btn btn-sm btn-dark fw-bold" onclick="TeacherApp.exportAnonymizedResearchCsv()">📥 導出匿名論文研究 CSV (含每鍵/點擊毫秒時間戳)</button>
@@ -152,11 +177,110 @@
   <script src="core/crypto.js"></script>
   <script src="core/registry.js"></script>
   <script src="core/storage.js"></script>
+  <script src="core/auth.js"></script>
   <script src="core/bonus.js"></script>
 
   <script>
     const TeacherApp = (function () {
+      function esc(str) {
+        return String(str == null ? '' : str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function ensureTeacherAuth() {
+        if (!window.MathCoreAuth || typeof MathCoreAuth.requireAuth !== 'function') return false;
+        try {
+          const check = MathCoreAuth.requireAuth('teacher');
+          return Boolean(check && check.token);
+        } catch (e) {
+          return false;
+        }
+      }
+
+      function checkGateOnBoot() {
+        if (ensureTeacherAuth()) {
+          unlockDashboard();
+        } else {
+          document.getElementById('teacherAuthOverlay').classList.remove('d-none');
+          document.getElementById('teacherMainContainer').classList.add('d-none');
+          document.getElementById('teacherTopbarActions').classList.add('d-none');
+        }
+      }
+
+      async function handleTeacherLogin() {
+        const username = document.getElementById('teacherUserInput').value.trim() || 'teacher_admin';
+        const password = document.getElementById('teacherPassInput').value.trim();
+        const alertEl = document.getElementById('teacherAuthAlert');
+
+        if (!window.MathCoreAuth || typeof MathCoreAuth.loginTeacher !== 'function') {
+          alertEl.textContent = '認證模組未載入，請重新整理頁面。';
+          alertEl.classList.remove('d-none');
+          return;
+        }
+
+        try {
+          const res = await MathCoreAuth.loginTeacher({ username: username, password: password });
+          if (!res || !res.token) {
+            alertEl.textContent = '❌ ' + ((res && res.error) || '教師密鑰驗證失敗！');
+            alertEl.classList.remove('d-none');
+            return;
+          }
+          alertEl.classList.add('d-none');
+          document.getElementById('teacherPassInput').value = '';
+          unlockDashboard();
+        } catch (err) {
+          alertEl.textContent = '❌ ' + ((err && err.message) || '教師密鑰驗證失敗！');
+          alertEl.classList.remove('d-none');
+        }
+      }
+
+      function unlockDashboard() {
+        document.getElementById('teacherAuthOverlay').classList.add('d-none');
+        document.getElementById('teacherMainContainer').classList.remove('d-none');
+        document.getElementById('teacherTopbarActions').classList.remove('d-none');
+        init();
+      }
+
+      function logoutTeacher() {
+        if (window.MathCoreAuth && typeof MathCoreAuth.logoutTeacher === 'function') {
+          MathCoreAuth.logoutTeacher();
+        } else {
+          localStorage.removeItem('MP_V2_TEACHER_SESSION');
+        }
+        document.getElementById('teacherMainContainer').classList.add('d-none');
+        document.getElementById('teacherTopbarActions').classList.add('d-none');
+        document.getElementById('teacherAuthOverlay').classList.remove('d-none');
+      }
+
+      async function previewBankAsTeacherTest() {
+        if (!ensureTeacherAuth()) return;
+        const cls = document.getElementById('tuneClassSelect').value || '4C';
+        const teacherSession = MathCoreAuth.getTeacherSession();
+        const token = teacherSession ? teacherSession.token : ('T_PREVIEW_' + Date.now());
+        const previewSession = {
+          sid: cls + '_98',
+          classID: cls,
+          studentID: '98',
+          seatNo: 98,
+          name: '教師測試帳戶',
+          role: 'teacher_test',
+          isTeacherTest: true,
+          directToBank: true,
+          signingKey: token,
+          token: token,
+          loginTs: Date.now(),
+          expiresAt: Date.now() + 3600000
+        };
+        localStorage.setItem('MP_V2_SESSION', JSON.stringify(previewSession));
+        window.location.href = 'app.html';
+      }
+
       function init() {
+        if (!ensureTeacherAuth()) return;
         document.getElementById('cfgFeedbackMode').value = localStorage.getItem('MP_V2_TEACHER_FEEDBACK_MODE') || 'immediate';
         document.getElementById('cfgRankDisplay').value = localStorage.getItem('MP_V2_RANK_DISPLAY_MODE') || 'real_name';
         document.getElementById('cfgBonusCap').value = localStorage.getItem('MP_V2_BONUS_CAP') || '60';
@@ -166,10 +290,10 @@
           { id: 'quiz_1030', title: '1030 加密考卷' },
           { id: 'quiz_1106', title: '1106 隨堂小測' }
         ];
-        document.getElementById('tunePackSelect').innerHTML = packs.map(p => `<option value="${p.id}">${p.title}</option>`).join('');
+        document.getElementById('tunePackSelect').innerHTML = packs.map(p => `<option value="${esc(p.id)}">${esc(p.title)}</option>`).join('');
 
         const classes = (window.MathPlatformRegistry && MathPlatformRegistry.classes) || ['4C', '4D', '5B', '5C'];
-        document.getElementById('tuneClassSelect').innerHTML = classes.map(c => `<option value="${c}">${c} 班</option>`).join('');
+        document.getElementById('tuneClassSelect').innerHTML = classes.map(c => `<option value="${esc(c)}">${esc(c)} 班</option>`).join('');
         populateStudentList();
         renderTuneLog();
         renderQaList();
@@ -178,11 +302,13 @@
 
       function populateStudentList() {
         const cls = document.getElementById('tuneClassSelect').value;
-        const list = (window.getStudentsByClass && window.getStudentsByClass(cls)) || [];
-        document.getElementById('tuneStudentSelect').innerHTML = list.map(s => `<option value="${s.classID}_${s.id}">${s.id} 號 - ${s.name}</option>`).join('');
+        const list = ((window.getStudentsByClass && window.getStudentsByClass(cls)) || [])
+          .filter(s => !s.isTeacherTest && String(s.id) !== '98');
+        document.getElementById('tuneStudentSelect').innerHTML = list.map(s => `<option value="${esc(s.classID)}_${esc(s.id)}">${esc(s.id)} 號 - ${esc(s.name)}</option>`).join('');
       }
 
       function saveGlobalSettings() {
+        if (!ensureTeacherAuth()) return;
         localStorage.setItem('MP_V2_TEACHER_FEEDBACK_MODE', document.getElementById('cfgFeedbackMode').value);
         localStorage.setItem('MP_V2_RANK_DISPLAY_MODE', document.getElementById('cfgRankDisplay').value);
         localStorage.setItem('MP_V2_BONUS_CAP', String(Number(document.getElementById('cfgBonusCap').value || 60)));
@@ -191,12 +317,18 @@
 
       // D3: Reason-free score fine-tuning (audit log kept internally for teacher only)
       function applyScoreTune() {
+        if (!ensureTeacherAuth()) return;
         const packId = document.getElementById('tunePackSelect').value;
         const sid = document.getElementById('tuneStudentSelect').value;
         const newScore = Number(document.getElementById('tuneNewScore').value || 0);
+
         const overrides = JSON.parse(localStorage.getItem('MP_V2_TEACHER_OVERRIDES') || '{}');
         overrides[packId + '_' + sid] = newScore;
         localStorage.setItem('MP_V2_TEACHER_OVERRIDES', JSON.stringify(overrides));
+
+        const overrides2 = JSON.parse(localStorage.getItem('MP_V2_TEACHER_SCORE_OVERRIDES') || '{}');
+        overrides2[packId + ':' + sid] = { packId: packId, sid: sid, newScore: newScore, updatedAt: Date.now() };
+        localStorage.setItem('MP_V2_TEACHER_SCORE_OVERRIDES', JSON.stringify(overrides2));
 
         const audit = JSON.parse(localStorage.getItem('MP_V2_TEACHER_AUDIT_LOG') || '[]');
         audit.unshift({ packId: packId, sid: sid, newScore: newScore, ts: new Date().toISOString() });
@@ -209,7 +341,7 @@
         const box = document.getElementById('tuneLogBox');
         box.innerHTML = audit.length === 0
           ? '尚無微調記錄'
-          : '最近微調記錄（僅後台可見）：' + audit.slice(0, 5).map(a => `<span class="badge bg-light text-dark border me-1">${a.packId} · ${a.sid} ➔ ${a.newScore}分</span>`).join('');
+          : '最近微調記錄（僅後台可見）：' + audit.slice(0, 5).map(a => `<span class="badge bg-light text-dark border me-1">${esc(a.packId)} · ${esc(a.sid)} ➔ ${Number(a.newScore)}分</span>`).join('');
       }
 
       // D2 / A7: Student Help Q&A Reply
@@ -222,10 +354,10 @@
         }
         box.innerHTML = list.map((q, idx) => `
           <div class="p-2 border rounded mb-2 bg-light">
-            <div class="fw-bold">${q.classID} ${q.studentName} (${q.sid})：</div>
-            <div class="mb-2">${q.question}</div>
+            <div class="fw-bold">${esc(q.classID)} ${esc(q.studentName)} (${esc(q.sid)})：</div>
+            <div class="mb-2">${esc(q.question)}</div>
             <div class="input-group input-group-sm">
-              <input id="replyInput_${idx}" class="form-control" value="${q.teacherReply || ''}" placeholder="輸入回覆內容..." />
+              <input id="replyInput_${idx}" class="form-control" value="${esc(q.teacherReply || '')}" placeholder="輸入回覆內容..." />
               <button class="btn btn-primary" onclick="TeacherApp.saveQaReply(${idx})">儲存回覆</button>
             </div>
           </div>
@@ -233,6 +365,7 @@
       }
 
       function saveQaReply(idx) {
+        if (!ensureTeacherAuth()) return;
         const list = JSON.parse(localStorage.getItem('MP_V2_HELP_QA') || '[]');
         if (!list[idx]) return;
         list[idx].teacherReply = document.getElementById('replyInput_' + idx).value.trim();
@@ -257,7 +390,7 @@
           ? '<div class="text-muted">目前沒有待審核的積分商城訂單</div>'
           : orders.map(item => `
             <div class="d-flex justify-content-between align-items-center border-bottom py-1">
-              <span>${item.order.sid} 兌換 <strong>${item.order.itemTitle}</strong> (${item.order.cost}積分)</span>
+              <span>${esc(item.order.sid)} 兌換 <strong>${esc(item.order.itemTitle)}</strong> (${Number(item.order.cost || 0)}積分)</span>
               <span class="badge bg-success">已核准</span>
             </div>
           `).join('');
@@ -265,6 +398,7 @@
 
       // Section 八 & 九: Sustainable Extension Registration
       function registerExtensionItem() {
+        if (!ensureTeacherAuth()) return;
         const type = document.getElementById('extTypeSelect').value;
         const id = document.getElementById('extIdInput').value.trim() || ('item_' + Date.now());
         const title = document.getElementById('extTitleInput').value.trim() || id;
@@ -298,7 +432,12 @@
 
       // D6: Anonymized Research CSV Export (R-xxxxxxxx)
       async function exportAnonymizedResearchCsv() {
-        const secret = document.getElementById('researchSecretInput').value.trim() || 'RESEARCH_SECRET';
+        if (!ensureTeacherAuth()) return;
+        const secret = document.getElementById('researchSecretInput').value.trim();
+        if (!secret || secret.length < 6) {
+          alert('請先輸入至少 6 位的研究專用鹽值密鑰（僅老師保管），以確保匿名化不可逆！');
+          return;
+        }
         const outbox = JSON.parse(localStorage.getItem('MP_V2_OUTBOX') || '[]');
         const rows = ['anon_id,exam_id,action,seq,client_ts,payload_json'];
 
@@ -329,26 +468,47 @@
         pre.classList.remove('d-none');
       }
 
-      // S1: Batch Generate High-Strength Random Keys (>= 8 chars)
-      function generateClassRandomKeys() {
+      // S1: Batch Generate High-Strength Random Keys (>= 8 chars) using CSPRNG & persist SHA-256 verifiers
+      async function generateClassRandomKeys() {
+        if (!ensureTeacherAuth()) return;
         const cls = document.getElementById('tuneClassSelect').value || '4C';
-        const students = (window.getStudentsByClass && window.getStudentsByClass(cls)) || [];
+        const students = ((window.getStudentsByClass && window.getStudentsByClass(cls)) || [])
+          .filter(s => !s.isTeacherTest && String(s.id) !== '98');
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
         const lines = ['classID,studentID,name,randomSecretKey'];
-        students.forEach(s => {
+        const customKeyStore = JSON.parse(localStorage.getItem('MP_V2_STUDENT_KEYS') || '{}');
+
+        for (const s of students) {
+          const randBytes = new Uint8Array(8);
+          if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+            window.crypto.getRandomValues(randBytes);
+          } else {
+            for (let j = 0; j < 8; j++) randBytes[j] = Math.floor(Math.random() * 256);
+          }
           let p1 = '', p2 = '';
           for (let i = 0; i < 4; i++) {
-            p1 += chars[Math.floor(Math.random() * chars.length)];
-            p2 += chars[Math.floor(Math.random() * chars.length)];
+            p1 += chars[randBytes[i] % chars.length];
+            p2 += chars[randBytes[i + 4] % chars.length];
           }
-          lines.push(`${s.classID},${s.id},${s.name},${p1}-${p2}`);
-        });
+          const newKey = `${p1}-${p2}`;
+          const sid = `${s.classID}_${s.id}`;
+          if (window.MathCoreCrypto && typeof MathCoreCrypto.sha256Hex === 'function') {
+            customKeyStore[sid] = await MathCoreCrypto.sha256Hex(`MP_STU_V2:${sid}:${newKey}`);
+          }
+          lines.push(`${s.classID},${s.id},${s.name},${newKey}`);
+        }
+
+        localStorage.setItem('MP_V2_STUDENT_KEYS', JSON.stringify(customKeyStore));
         const pre = document.getElementById('researchPreviewOut');
         pre.textContent = lines.join('\n');
         pre.classList.remove('d-none');
       }
 
       return {
+        checkGateOnBoot: checkGateOnBoot,
+        handleTeacherLogin: handleTeacherLogin,
+        logoutTeacher: logoutTeacher,
+        previewBankAsTeacherTest: previewBankAsTeacherTest,
         init: init,
         populateStudentList: populateStudentList,
         saveGlobalSettings: saveGlobalSettings,
@@ -360,7 +520,7 @@
       };
     })();
 
-    window.addEventListener('DOMContentLoaded', TeacherApp.init);
+    window.addEventListener('DOMContentLoaded', TeacherApp.checkGateOnBoot);
   </script>
 </body>
 </html>

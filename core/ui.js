@@ -117,6 +117,14 @@
   /**
    * Shows a modal dialog supporting `unclosable: true` (for mandatory check-ins or alerts).
    */
+  function escapeHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
   function showModal(options) {
     const opts = options || {};
     activeModalState = {
@@ -143,13 +151,13 @@
       modalEl.style.display = 'flex';
       modalEl.innerHTML =
         `<div class="mp-modal-card" role="dialog" aria-modal="true">` +
-        `<div class="mp-modal-header"><h3 class="mp-modal-title">${activeModalState.title}</h3></div>` +
+        `<div class="mp-modal-header"><h3 class="mp-modal-title">${escapeHtml(activeModalState.title)}</h3></div>` +
         `<div class="mp-modal-body">${activeModalState.bodyHtml}</div>` +
         `<div class="mp-modal-footer">` +
         (activeModalState.unclosable
           ? ''
-          : `<button type="button" id="mp-v2-modal-cancel" class="mp-btn mp-btn-secondary">${activeModalState.cancelText}</button>`) +
-        `<button type="button" id="mp-v2-modal-confirm" class="mp-btn mp-btn-primary">${activeModalState.confirmText}</button>` +
+          : `<button type="button" id="mp-v2-modal-cancel" class="mp-btn mp-btn-secondary">${escapeHtml(activeModalState.cancelText)}</button>`) +
+        `<button type="button" id="mp-v2-modal-confirm" class="mp-btn mp-btn-primary">${escapeHtml(activeModalState.confirmText)}</button>` +
         `</div></div>`;
 
       const confirmBtn = doc.getElementById('mp-v2-modal-confirm');
@@ -247,7 +255,7 @@
    * Formats student name for leaderboards according to Teacher Console privacy mode (Section 六):
    * - `'real_name'`: `"古永晴"`
    * - `'nickname'`: `"古*晴"` (or 2-char name `"谷雨"` -> `"谷*"`)
-   * - `'seat_no'`: `"4C #01"`
+   * - `'seat_no'` / `'seat_only'`: `"4C #01"`
    * - `'anonymous'`: `"同學 #1"` (uses 1-based `rankIndex + 1` or `1`)
    * - `'hidden'`: `""` / `null` (indicates leaderboard is hidden)
    */
@@ -271,7 +279,7 @@
       return `同學 #${rankNum}`;
     }
 
-    if (mode === 'seat_no') {
+    if (mode === 'seat_no' || mode === 'seat_only') {
       return classID ? `${classID} #${padId}` : `#${padId}`;
     }
 

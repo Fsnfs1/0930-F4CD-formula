@@ -639,8 +639,20 @@
           typeof STORAGE.getItem === 'function' &&
           STORAGE.getItem('MP_V2_TEACHER_SCORE_OVERRIDES', {})) ||
         {};
+      const legacyOverridesMap =
+        (STORAGE &&
+          typeof STORAGE.getItem === 'function' &&
+          STORAGE.getItem('MP_V2_TEACHER_OVERRIDES', {})) ||
+        {};
       const overrideKey = `${packDef.id}:${sid}`;
-      const teacherOverride = overridesMap[overrideKey] || null;
+      const legacyKey = `${packDef.id}_${sid}`;
+      let teacherOverride = overridesMap[overrideKey] || null;
+      if (!teacherOverride && legacyOverridesMap[legacyKey] !== undefined) {
+        const numVal = Number(legacyOverridesMap[legacyKey]);
+        if (!isNaN(numVal)) {
+          teacherOverride = { newScore: numVal };
+        }
+      }
 
       if (packDef.adapter === 'quiz1023_store') {
         const getRec = ensureQuiz1023StoreLoaded();
@@ -685,6 +697,7 @@
           origTotal: rec.origTotal,
           details: rec.details || [],
           teacherAdjusted: Boolean(teacherOverride),
+          record: Object.assign({}, rec, { score: baseScore, newTotal: baseScore }),
           raw: rec,
         };
       }
@@ -732,6 +745,7 @@
           file: entry.file || `${classID}_${studentIDStr}.enc`,
           folder: packDef.folder || 'quiz_results',
           teacherAdjusted: Boolean(teacherOverride),
+          record: Object.assign({}, entry, { score: finalScore, newTotal: finalScore }),
           decryptedImageBytes: null,
           decryptedMimeType: 'image/jpeg',
         };
@@ -797,6 +811,7 @@
         origScore: rawScore,
         teacherAdjusted: Boolean(teacherOverride),
         source: sheetRes.source,
+        record: matchedRow || effectiveScore !== null ? Object.assign({}, matchedRow || {}, { score: effectiveScore, newTotal: effectiveScore }) : null,
         raw: matchedRow,
       };
     }
