@@ -19817,12 +19817,16 @@ window.BANK_4CD_1102_ADAPTIVE = [
   window.handleKeyLogin = handleKeyLogin;
   window.PASSWORDS_4CD = CREDENTIALS_4CD;
 
-  // 1106 Quiz and Bonus Globals
-  window.trigger1106LoginSequence = trigger1106LoginSequence;
-  window.confirm1106ScoreModal = confirm1106ScoreModal;
+  // 1109 Quiz and Bonus Globals (keep 1106 compatibility aliases)
+  window.trigger1109LoginSequence = trigger1109LoginSequence;
+  window.trigger1106LoginSequence = trigger1109LoginSequence;
+  window.confirm1109ScoreModal = confirm1109ScoreModal;
+  window.confirm1106ScoreModal = confirm1109ScoreModal;
   window.startPracticeAfterRuleModal = startPracticeAfterRuleModal;
-  window.close1106BonusResultModal = close1106BonusResultModal;
-  window.handle1106QuizBonusSettlement = handle1106QuizBonusSettlement;
+  window.close1109BonusResultModal = close1109BonusResultModal;
+  window.close1106BonusResultModal = close1109BonusResultModal;
+  window.handle1109QuizBonusSettlement = handle1109QuizBonusSettlement;
+  window.handle1106QuizBonusSettlement = handle1109QuizBonusSettlement;
 
 
 
@@ -20093,11 +20097,12 @@ function startPracticeAfterRuleModal() {
 function close1109BonusResultModal() {
   const modal3 = document.getElementById('modal1106BonusResult');
   if (modal3) modal3.style.display = 'none';
+  (window.showScreen || showScreen)('screen9-wrong-review');
 }
 
 // Evaluate 11/09 Quiz bonus for score > 80 after quiz finishes
 function handle1109QuizBonusSettlement(quizScore, correctCount, totalCount) {
-  const student = (typeof AppState !== 'undefined' && AppState.currentUser) ? AppState.currentUser : window.currentUser;
+  const student = (typeof AppState !== 'undefined' && (AppState.currentUser || AppState.currentStudent)) ? (AppState.currentUser || AppState.currentStudent) : window.currentUser;
   if (!student) return;
   const cid = String(student.classID || '').toUpperCase();
   if (cid !== '4C' && cid !== '4D') return;
@@ -20207,9 +20212,11 @@ async function post1109BonusToCloud(student, baseScore, accumulatedBonus, finalS
   };
 
   let submitSuccess = false;
-  if (window.submitFormRecord) {
+  const submitFn = (typeof submitFormRecord === 'function') ? submitFormRecord :
+                   (typeof window !== 'undefined' && typeof window.submitFormRecord === 'function') ? window.submitFormRecord : null;
+  if (submitFn) {
     try {
-      submitSuccess = await window.submitFormRecord({
+      submitSuccess = await submitFn({
         classID: payload.classID,
         studentID: payload.studentID,
         dateID: payload.dateID,
@@ -20249,12 +20256,16 @@ async function flush1109PendingSubmissions() {
     const list = JSON.parse(raw);
     if (!Array.isArray(list) || list.length === 0) return;
 
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+
     const remaining = [];
+    const submitFn = (typeof submitFormRecord === 'function') ? submitFormRecord :
+                     (typeof window !== 'undefined' && typeof window.submitFormRecord === 'function') ? window.submitFormRecord : null;
     for (const item of list) {
       let sent = false;
-      if (window.submitFormRecord) {
+      if (submitFn) {
         try {
-          sent = await window.submitFormRecord({
+          sent = await submitFn({
             classID: item.classID,
             studentID: item.studentID,
             dateID: item.dateID,
@@ -20288,15 +20299,19 @@ async function flush1109PendingSubmissions() {
 
 // Background auto-sync for 1109 bonus data from GAS cloud reader
 async function sync1109BonusDataFromCloud() {
-  if (typeof fetchDashboardData === 'function') {
-    try {
-      const records = await fetchDashboardData();
-      if (Array.isArray(records) && records.length > 0) {
-        localStorage.setItem('ADMIN_DASHBOARD_CACHE', JSON.stringify(records));
-        console.log('[1109Bonus] Cloud cache refreshed, records count:', records.length);
-      }
-    } catch (e) {}
-  }
+  const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwNAQNxmNsNa8rWGp48qnYRrjA2WFLGIzKqSel2r8MilRp59s3ZfBJjeKXIrUfoS-Zp-g/exec";
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 6000);
+    const resp = await fetch(GAS_ENDPOINT, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!resp.ok) return;
+    const freshData = await resp.json();
+    if (Array.isArray(freshData) && freshData.length > 0) {
+      localStorage.setItem("ADMIN_DASHBOARD_CACHE", JSON.stringify(freshData));
+      flush1109PendingSubmissions();
+    }
+  } catch (e) {}
 }
 
 // Expose handlers and compatibility aliases
@@ -20324,6 +20339,9 @@ setTimeout(() => {
   flush1109PendingSubmissions();
   sync1109BonusDataFromCloud();
 }, 2000);
+
+})();
+
 </script>
 </body>
 </html>
