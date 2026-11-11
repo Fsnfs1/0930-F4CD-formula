@@ -6340,12 +6340,12 @@ const QUIZ_1109_RAW_SCORES_5B = {
 
 const QUIZ_1109_RAW_SCORES_5C = {
   // 5C班備用字典（若後續上線1109小測可直接填入）
-  "王毓琳": null, "王韻婷": null, "甘凱童": null, "何健峰": null, "岑子鈞": null,
-  "周浩軒": null, "周楠": null, "周杰靈": null, "林貝莎": null, "林靜瑤": null,
-  "姚念欣": null, "姜嘉慧": null, "柯欣榮": null, "洪鍶堉": null, "梁曉童": null,
-  "許惠琳": null, "陳美婷": null, "陳敬恩": null, "傅銘瀚": null, "曾浚軒": null,
-  "黃子陽": null, "黃宏迅": null, "黃澤凱": null, "楊紫晴": null, "甄浩銘": null,
-  "劉焯軒": null, "歐卓言": null, "戴詠茵": null, "謝凱盈": null
+  "王毓琳": 0, "王韻婷": 0, "甘凱童": 0, "何健峰": 0, "岑子鈞": 0,
+  "周浩軒": 0, "周楠": 0, "周杰靈": 0, "林貝莎": 0, "林靜瑤": 0,
+  "姚念欣": 0, "姜嘉慧": 0, "柯欣榮": 0, "洪鍶堉": 0, "梁曉童": 0,
+  "許惠琳": 0, "陳美婷": 0, "陳敬恩": 0, "傅銘瀚": 0, "曾浚軒": 0,
+  "黃子陽": 0, "黃宏迅": 0, "黃澤凱": 0, "楊紫晴": 0, "甄浩銘": 0,
+  "劉焯軒": 0, "歐卓言": 0, "戴詠茵": 0, "謝凱盈": 0
 };
 
 const QUIZ_1109_BONUS_PREFIX = 'MATH_1109_BONUS_5BC_';
@@ -6381,7 +6381,8 @@ function get1109RawScore(student) {
   if (name === '張嘉城' && Object.prototype.hasOwnProperty.call(QUIZ_1109_RAW_SCORES_5B, '張嘉城A')) {
     return QUIZ_1109_RAW_SCORES_5B['張嘉城A'];
   }
-  return undefined;
+  // 待定/未登記學生一律以 0 分開始計算
+  return 0;
 }
 
 function get1109AccumulatedBonus(student) {

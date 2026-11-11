@@ -19943,7 +19943,8 @@ function get1109RawScore(student) {
       return QUIZ_1109_RAW_SCORES_4CD[c][name];
     }
   }
-  return undefined;
+  // 待定/未登記學生一律以 0 分開始計算
+  return 0;
 }
 
 function get1109AccumulatedBonus(student) {
