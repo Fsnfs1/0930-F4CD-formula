@@ -500,7 +500,7 @@
         
         <!-- Score Highlights -->
         <div id="settlement1106QuizCard" style="display: none; background: rgba(16, 185, 129, 0.12); border: 1.5px solid #10b981; border-radius: 12px; padding: 16px; margin: 16px 0; text-align: center;">
-          <div style="font-size: 13.5px; color: #a7f3d0; font-weight: 700;">🌟 11月6日小測成績與刷題獎勵加分結算</div>
+          <div style="font-size: 13.5px; color: #a7f3d0; font-weight: 700;">🌟 11月9日小測成績與刷題獎勵加分結算</div>
           <div style="display: flex; justify-content: space-around; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 10px;">
             <div>
               <div style="font-size: 12px; color: #94a3b8;">小測原始分</div>
@@ -518,7 +518,7 @@
             </div>
           </div>
           <div style="margin-top: 10px; font-size: 12px; color: #38bdf8;">
-            📅 截止 11 月 13 日前可隨時反復刷題累計加分！
+            📅 截止 11 月 20 日前可隨時反復刷題累計加分！
           </div>
         </div>
 
@@ -912,7 +912,7 @@
   <div id="modal1106QuizScore" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); z-index: 10002; align-items: center; justify-content: center; padding: 16px;">
     <div class="modal-card" style="background: #1e293b; border: 1.5px solid #38bdf8; border-radius: 16px; padding: 24px; max-width: 460px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); text-align: center;">
       <div style="font-size: 38px; margin-bottom: 8px;">📊</div>
-      <h3 style="font-size: 20px; font-weight: 800; color: #f8fafc; margin-bottom: 6px;">11月6日 數學小測成績通知</h3>
+      <h3 style="font-size: 20px; font-weight: 800; color: #f8fafc; margin-bottom: 6px;">11月9日 數學小測成績通知</h3>
       <div id="modal1106StudentMeta" style="font-size: 14px; color: #94a3b8; margin-bottom: 16px;">5B / 5C 班學生</div>
       
       <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; border-radius: 12px; padding: 18px; margin-bottom: 18px;">
@@ -922,7 +922,7 @@
       </div>
 
       <p style="font-size: 13.5px; color: #cbd5e1; line-height: 1.6; margin-bottom: 20px; text-align: left;">
-        📌 說明：上述為 11 月 6 日空間幾何與數列小測得分。點擊下方確認按鈕繼續了解加分獎勵機制。
+        📌 說明：上述為 11 月 9 日空間幾何與數列小測得分。點擊下方確認按鈕繼續了解加分獎勵機制。
       </p>
 
       <button id="btnConfirm1106Score" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 16px; font-weight: 700;" onclick="confirm1106ScoreModal()">
@@ -944,9 +944,9 @@
         </div>
         <ul style="margin: 0; padding-left: 20px; color: #e2e8f0; font-size: 13.5px; line-height: 1.7;">
           <li>刷題成績<strong>超過 80 分</strong>即可獲取加分獎勵！</li>
-          <li>每超過 1 分，則 11 月 6 日小測相應<strong>加 1 分</strong>；</li>
+          <li>每超過 1 分，則 11 月 9 日小測相應<strong>加 1 分</strong>；</li>
           <li>小測成績折算後<strong>最高 60 分封頂</strong>；</li>
-          <li>加分活動截止至<strong>下周五（11月13日前）</strong>，期間可<strong>反復刷題加分</strong>！</li>
+          <li>加分活動截止至<strong>下周五（11月20日前）</strong>，期間可<strong>反復刷題加分</strong>！</li>
         </ul>
       </div>
 
@@ -3576,7 +3576,7 @@ function onAuthenticationSuccess(student, percentage, isPasswordOnly) {
   if (dashBanner) dashBanner.style.display = 'none';
 
   // Trigger 11/06 Quiz Score Modal sequence if student belongs to 5B
-  trigger1106LoginSequence(student);
+  trigger1109LoginSequence(student);
 
   // Check if student has saved quiz progress in localStorage
   checkAndPromptResumeProgress(student);
@@ -4671,7 +4671,7 @@ function finishQuizSubmission() {
   clearActiveQuizProgress();
 
   // Evaluate 11/06 Quiz bonus for score > 80 (every point > 80 gives +1 bonus, capped at 60)
-  handle1106QuizBonusSettlement(finalScore, correctCount, totalCount);
+  handle1109QuizBonusSettlement(finalScore, correctCount, totalCount);
 
   // Handle Cloud Upload & Local Offline Archive for Google Form / Drive
   handleQuizCloudSubmissionAndArchive(finalScore, correctCount, totalCount);
@@ -6038,7 +6038,7 @@ window.addEventListener('DOMContentLoaded', () => {
     initAdminStudentsData();
   }
   try {
-    sync1106BonusDataFromCloud();
+    sync1109BonusDataFromCloud();
   } catch (e) {}
 });
 
@@ -6234,10 +6234,9 @@ async function handleQuizCloudSubmissionAndArchive(finalScore, correctCount, tot
 }
 
 // =========================================================================
-// 11月6日 5B / 5C 數學小測成績與刷題超80加分系統 (11月13日前有效，60分封頂，雙端同步)
+// 歷史封存：11月6日 5B / 5C 小測原始成績歸檔（完整加分結算已導出存檔）
 // =========================================================================
-
-const QUIZ_1106_RAW_SCORES_5B = {
+const HISTORICAL_QUIZ_1106_RAW_SCORES_5B = {
   "高尚禮": null, // 不顯示成績
   "陳柏琳": 43,
   "林煜皓": 36,
@@ -6269,7 +6268,7 @@ const QUIZ_1106_RAW_SCORES_5B = {
   "梁偉烽": 4
 };
 
-const QUIZ_1106_RAW_SCORES_5C = {
+const HISTORICAL_QUIZ_1106_RAW_SCORES_5C = {
   "王毓琳": 10,
   "王韻婷": 15,
   "甘凱童": 35,
@@ -6301,53 +6300,102 @@ const QUIZ_1106_RAW_SCORES_5C = {
   "謝凱盈": 29
 };
 
-const QUIZ_1106_BONUS_PREFIX = 'MATH_1106_BONUS_5B_';
-const QUIZ_1106_PENDING_QUEUE_KEY = 'MATH_1106_PENDING_BONUS_SUBMISSIONS';
+const QUIZ_1106_RAW_SCORES_5B = HISTORICAL_QUIZ_1106_RAW_SCORES_5B;
+const QUIZ_1106_RAW_SCORES_5C = HISTORICAL_QUIZ_1106_RAW_SCORES_5C;
 
-function is5BC1106TargetClass(classID) {
+// =========================================================================
+// 當前實行：11月9日 5B 數學小測成績與刷題超80加分系統 (11月20日前有效，60分封頂，雙端同步)
+// =========================================================================
+const QUIZ_1109_RAW_SCORES_5B = {
+  "吳鎂澄": 20,
+  "蘇子恩": 57,
+  "李潤歌": 72,
+  "李曉熹": 12,
+  "周鈺燕": 60,
+  "林煜皓": 66,
+  "林穎豪": 55,
+  "柯鈺鑫": 23,
+  "洪泳棋": 70,
+  "高尚禮": 85,
+  "張啟赫": 30,
+  "張嘉城": 12,
+  "張嘉城A": 12,
+  "梁泳心": 54,
+  "梁芷韻": 50,
+  "梁偉烽": 12,
+  "姚皓然": 33,
+  "陳施攸": 40,
+  "陳柏琳": 67,
+  "陳國良": 59,
+  "陳紫涵": 52,
+  "陳鑫源": 24,
+  "彭婷婷": 48,
+  "黃少彬": 55,
+  "黃卓琳": 60,
+  "黃婉瑜": 30,
+  "葉棨釗": 65,
+  "潘子聰": 4,
+  "黎宛旻": 62
+};
+
+const QUIZ_1109_RAW_SCORES_5C = {
+  // 5C班備用字典（若後續上線1109小測可直接填入）
+  "王毓琳": null, "王韻婷": null, "甘凱童": null, "何健峰": null, "岑子鈞": null,
+  "周浩軒": null, "周楠": null, "周杰靈": null, "林貝莎": null, "林靜瑤": null,
+  "姚念欣": null, "姜嘉慧": null, "柯欣榮": null, "洪鍶堉": null, "梁曉童": null,
+  "許惠琳": null, "陳美婷": null, "陳敬恩": null, "傅銘瀚": null, "曾浚軒": null,
+  "黃子陽": null, "黃宏迅": null, "黃澤凱": null, "楊紫晴": null, "甄浩銘": null,
+  "劉焯軒": null, "歐卓言": null, "戴詠茵": null, "謝凱盈": null
+};
+
+const QUIZ_1109_BONUS_PREFIX = 'MATH_1109_BONUS_5BC_';
+const QUIZ_1109_PENDING_QUEUE_KEY = 'MATH_1109_PENDING_BONUS_SUBMISSIONS';
+
+function is5BC1109TargetClass(classID) {
   const c = String(classID || '').trim().toUpperCase();
   return c === '5B' || c === '5C';
 }
 
-function get1106StudentKey(student) {
+function get1109StudentKey(student) {
   if (!student) return '5B_UNKNOWN';
   const cid = String(student.classID || '5B').trim().toUpperCase();
   const sid = student.studentID !== undefined ? student.studentID : (student.id !== undefined ? student.id : '0');
   return `${cid}_${sid}`;
 }
 
-function get1106RawScore(student) {
+function get1109RawScore(student) {
   if (!student || !student.name) return undefined;
-  const name = student.name.trim();
   const cid = String(student.classID || '').trim().toUpperCase();
-  if (cid === '5C' && Object.prototype.hasOwnProperty.call(QUIZ_1106_RAW_SCORES_5C, name)) {
-    return QUIZ_1106_RAW_SCORES_5C[name];
+  const name = String(student.name || '').trim();
+  
+  if (cid === '5C' && Object.prototype.hasOwnProperty.call(QUIZ_1109_RAW_SCORES_5C, name)) {
+    return QUIZ_1109_RAW_SCORES_5C[name];
   }
-  if (Object.prototype.hasOwnProperty.call(QUIZ_1106_RAW_SCORES_5B, name)) {
-    return QUIZ_1106_RAW_SCORES_5B[name];
+  if (Object.prototype.hasOwnProperty.call(QUIZ_1109_RAW_SCORES_5B, name)) {
+    return QUIZ_1109_RAW_SCORES_5B[name];
   }
-  if (Object.prototype.hasOwnProperty.call(QUIZ_1106_RAW_SCORES_5C, name)) {
-    return QUIZ_1106_RAW_SCORES_5C[name];
+  if (Object.prototype.hasOwnProperty.call(QUIZ_1109_RAW_SCORES_5C, name)) {
+    return QUIZ_1109_RAW_SCORES_5C[name];
   }
-  // Alternate match: handle "張嘉城A" -> "張嘉城"
-  if (name === '張嘉城' && Object.prototype.hasOwnProperty.call(QUIZ_1106_RAW_SCORES_5B, '張嘉城A')) {
-    return QUIZ_1106_RAW_SCORES_5B['張嘉城A'];
+  // Alternate match: "張嘉城" / "張嘉城A"
+  if (name === '張嘉城' && Object.prototype.hasOwnProperty.call(QUIZ_1109_RAW_SCORES_5B, '張嘉城A')) {
+    return QUIZ_1109_RAW_SCORES_5B['張嘉城A'];
   }
   return undefined;
 }
 
-function get1106AccumulatedBonus(student) {
-  const studentKey = get1106StudentKey(student);
+function get1109AccumulatedBonus(student) {
+  const studentKey = get1109StudentKey(student);
   let localBonus = 0;
   try {
-    const raw = localStorage.getItem(QUIZ_1106_BONUS_PREFIX + studentKey);
+    const raw = localStorage.getItem(QUIZ_1109_BONUS_PREFIX + studentKey);
     if (raw) {
       const parsed = JSON.parse(raw);
       localBonus = Number(parsed.accumulatedBonus) || 0;
     }
   } catch (e) {}
 
-  // Check Cloud Cache / Snapshot for any higher bonus
+  // Check Cloud Cache / Snapshot for any higher 1109 bonus
   let cloudBonus = 0;
   const cid = String(student.classID || '5B').trim().toUpperCase();
   const sid = parseInt(student.studentID !== undefined ? student.studentID : student.id, 10);
@@ -6355,7 +6403,7 @@ function get1106AccumulatedBonus(student) {
   const checkRecord = function (r) {
     if (String(r.classID || '').trim().toUpperCase() === cid && parseInt(r.studentID, 10) === sid) {
       const did = String(r.dateID || '');
-      if (did.includes('1106_QUIZ_SCORE')) {
+      if (did.includes('1109_QUIZ_SCORE')) {
         const m = did.match(/BONUS:(\d+(\.\d+)?)/);
         if (m) {
           const b = parseFloat(m[1]);
@@ -6380,33 +6428,34 @@ function get1106AccumulatedBonus(student) {
   if (finalBonus > localBonus) {
     try {
       let bData = { accumulatedBonus: finalBonus, history: [] };
-      const raw = localStorage.getItem(QUIZ_1106_BONUS_PREFIX + studentKey);
+      const raw = localStorage.getItem(QUIZ_1109_BONUS_PREFIX + studentKey);
       if (raw) bData = JSON.parse(raw);
       bData.accumulatedBonus = finalBonus;
-      localStorage.setItem(QUIZ_1106_BONUS_PREFIX + studentKey, JSON.stringify(bData));
+      localStorage.setItem(QUIZ_1109_BONUS_PREFIX + studentKey, JSON.stringify(bData));
     } catch (e) {}
   }
   return finalBonus;
 }
 
-function calc1106FinalScore(rawScore, accumulatedBonus) {
+function calc1109FinalScore(rawScore, accumulatedBonus) {
   if (rawScore === null || rawScore === undefined) return null;
-  const combined = Number(rawScore) + Number(accumulatedBonus || 0);
-  return Math.min(60, combined);
+  const raw = Number(rawScore);
+  const bonus = Number(accumulatedBonus || 0);
+  if (raw >= 60) return raw;
+  return Math.min(60, raw + bonus);
 }
 
-// Trigger Login Sequence for 5B / 5C Students
-function trigger1106LoginSequence(student) {
-  if (!student || !is5BC1106TargetClass(student.classID)) return;
-  // Teachers or test bypass 99 don't need popups
+// Trigger Login Sequence for 5B Students (1109 Quiz)
+function trigger1109LoginSequence(student) {
+  if (!student || !is5BC1109TargetClass(student.classID)) return;
   if (student.isTeacher || student.id === 99 || student.studentID === 99) return;
 
-  const rawScore = get1106RawScore(student);
-  const bonus = get1106AccumulatedBonus(student);
-  const studentKey = get1106StudentKey(student);
+  const rawScore = get1109RawScore(student);
+  const bonus = get1109AccumulatedBonus(student);
+  const studentKey = get1109StudentKey(student);
 
-  // Sync any pending offline submissions now that we have network or logged in
-  flush1106PendingSubmissions();
+  // Sync any pending offline submissions
+  flush1109PendingSubmissions();
 
   setTimeout(() => {
     const modal1 = document.getElementById('modal1106QuizScore');
@@ -6420,14 +6469,14 @@ function trigger1106LoginSequence(student) {
 
     if (rawScore === null) {
       if (scoreValEl) {
-        scoreValEl.textContent = '不顯示成績';
-        scoreValEl.style.fontSize = '26px';
+        scoreValEl.textContent = '小測成績待公佈';
+        scoreValEl.style.fontSize = '24px';
         scoreValEl.style.color = '#cbd5e1';
       }
-      if (noteEl) noteEl.textContent = '小測成績暫不公開，您仍可正常參與刷題超80分加分活動！';
+      if (noteEl) noteEl.textContent = '成績錄入中，您仍可正常刷題，超80分即時累計加分！';
     } else if (rawScore !== undefined) {
       if (bonus > 0) {
-        const finalSc = calc1106FinalScore(rawScore, bonus);
+        const finalSc = calc1109FinalScore(rawScore, bonus);
         if (scoreValEl) {
           scoreValEl.textContent = `${finalSc} 分`;
           scoreValEl.style.fontSize = '36px';
@@ -6457,7 +6506,7 @@ function trigger1106LoginSequence(student) {
   }, 450);
 }
 
-function confirm1106ScoreModal() {
+function confirm1109ScoreModal() {
   const modal1 = document.getElementById('modal1106QuizScore');
   if (modal1) modal1.style.display = 'none';
 
@@ -6471,27 +6520,21 @@ function startPracticeAfterRuleModal() {
   startQuizSession();
 }
 
-function close1106BonusResultModal() {
+function close1109BonusResultModal() {
   const modal3 = document.getElementById('modal1106BonusResult');
   if (modal3) modal3.style.display = 'none';
   showScreen('screen-settlement');
 }
 
-if (typeof window !== 'undefined') {
-  window.confirm1106ScoreModal = confirm1106ScoreModal;
-  window.startPracticeAfterRuleModal = startPracticeAfterRuleModal;
-  window.close1106BonusResultModal = close1106BonusResultModal;
-}
-
-// Evaluate 11/06 Quiz bonus for score > 80 after quiz finishes
-function handle1106QuizBonusSettlement(quizScore, correctCount, totalCount) {
+// Evaluate 11/09 Quiz bonus for score > 80 after quiz finishes
+function handle1109QuizBonusSettlement(quizScore, correctCount, totalCount) {
   const student = AppState.currentUser;
-  if (!student || !is5BC1106TargetClass(student.classID)) return;
+  if (!student || !is5BC1109TargetClass(student.classID)) return;
   if (student.isTeacher || student.id === 99 || student.studentID === 99) return;
 
-  const rawScore = get1106RawScore(student);
-  const studentKey = get1106StudentKey(student);
-  const previousBonus = get1106AccumulatedBonus(student);
+  const rawScore = get1109RawScore(student);
+  const studentKey = get1109StudentKey(student);
+  const previousBonus = get1109AccumulatedBonus(student);
 
   // Bonus rule: Score > 80, every 1 point above 80 adds 1 point to quiz
   const bonusDelta = quizScore > 80 ? (quizScore - 80) : 0;
@@ -6499,7 +6542,7 @@ function handle1106QuizBonusSettlement(quizScore, correctCount, totalCount) {
 
   let bonusData = { accumulatedBonus: newAccumulatedBonus, history: [] };
   try {
-    const raw = localStorage.getItem(QUIZ_1106_BONUS_PREFIX + studentKey);
+    const raw = localStorage.getItem(QUIZ_1109_BONUS_PREFIX + studentKey);
     if (raw) bonusData = JSON.parse(raw);
   } catch (e) {}
 
@@ -6515,10 +6558,10 @@ function handle1106QuizBonusSettlement(quizScore, correctCount, totalCount) {
   });
 
   try {
-    localStorage.setItem(QUIZ_1106_BONUS_PREFIX + studentKey, JSON.stringify(bonusData));
+    localStorage.setItem(QUIZ_1109_BONUS_PREFIX + studentKey, JSON.stringify(bonusData));
   } catch (e) {}
 
-  const finalCombinedScore = calc1106FinalScore(rawScore, newAccumulatedBonus);
+  const finalCombinedScore = calc1109FinalScore(rawScore, newAccumulatedBonus);
 
   // Update Settlement Screen UI banner
   const settleCard = document.getElementById('settlement1106QuizCard');
@@ -6527,13 +6570,13 @@ function handle1106QuizBonusSettlement(quizScore, correctCount, totalCount) {
     const baseEl = document.getElementById('settle1106BaseScore');
     const bonusEl = document.getElementById('settle1106BonusScore');
     const finalEl = document.getElementById('settle1106FinalScore');
-    if (baseEl) baseEl.textContent = rawScore === null ? '不顯示' : (rawScore !== undefined ? `${rawScore}分` : '--');
+    if (baseEl) baseEl.textContent = rawScore === null ? '待錄入' : (rawScore !== undefined ? `${rawScore}分` : '--');
     if (bonusEl) bonusEl.textContent = `+${newAccumulatedBonus}分 (本次+${bonusDelta})`;
-    if (finalEl) finalEl.textContent = finalCombinedScore === null ? '不顯示' : `${finalCombinedScore}分`;
+    if (finalEl) finalEl.textContent = finalCombinedScore === null ? `累計+${newAccumulatedBonus}分` : `${finalCombinedScore}分`;
   }
 
   // Submit to Google Form / GAS cloud and enqueue for offline replay
-  post1106BonusToCloud(student, rawScore, newAccumulatedBonus, finalCombinedScore, quizScore, bonusDelta);
+  post1109BonusToCloud(student, rawScore, newAccumulatedBonus, finalCombinedScore, quizScore, bonusDelta);
 
   // Show Bonus Result Modal
   setTimeout(() => {
@@ -6559,8 +6602,8 @@ function handle1106QuizBonusSettlement(quizScore, correctCount, totalCount) {
     }
 
     if (rawScore === null) {
-      if (finalEl) finalEl.textContent = '不顯示成績';
-      if (detailEl) detailEl.textContent = `本次刷題獲加分 +${bonusDelta} 分，已累計加分 +${newAccumulatedBonus} 分`;
+      if (finalEl) finalEl.textContent = `累計 +${newAccumulatedBonus} 分`;
+      if (detailEl) detailEl.textContent = `本次刷題獲加分 +${bonusDelta} 分，已累計加分 +${newAccumulatedBonus} 分，待小測分數錄入後自動折算（60分封頂）！`;
     } else if (rawScore !== undefined) {
       if (finalEl) finalEl.textContent = `${finalCombinedScore} 分`;
       if (detailEl) detailEl.textContent = `小測原始 ${rawScore} 分 + 累計加分 ${newAccumulatedBonus} 分 (本次+${bonusDelta}) ➔ 最終 ${finalCombinedScore} 分 (60分封頂)`;
@@ -6573,19 +6616,20 @@ function handle1106QuizBonusSettlement(quizScore, correctCount, totalCount) {
   }, 400);
 }
 
-// Synchronize 1106 Bonus Record to Google Form / GAS Cloud
-async function post1106BonusToCloud(student, baseScore, accumulatedBonus, finalScore, quizScore, bonusDelta) {
+// Synchronize 1109 Bonus Record to Google Form / GAS Cloud
+async function post1109BonusToCloud(student, baseScore, accumulatedBonus, finalScore, quizScore, bonusDelta) {
   const cid = String(student.classID || '5B').trim().toUpperCase();
   const sid = parseInt(student.studentID !== undefined ? student.studentID : student.id, 10);
   const ts = Date.now();
-  const baseTag = (baseScore === null || baseScore === undefined) ? 'HIDDEN' : String(baseScore);
-  const finalTag = (finalScore === null || finalScore === undefined) ? 'HIDDEN' : String(finalScore);
+
+  const baseTag = (baseScore === null || baseScore === undefined) ? 'PENDING' : String(baseScore);
+  const finalTag = (finalScore === null || finalScore === undefined) ? 'PENDING' : String(finalScore);
 
   const payload = {
     classID: cid,
     studentID: sid,
     studentName: student.name || '',
-    dateID: `1106_QUIZ_SCORE|BASE:${baseTag}|BONUS:${accumulatedBonus}|FINAL:${finalTag}|QUIZ:${quizScore}|DELTA:${bonusDelta}|TS:${ts}`,
+    dateID: `1109_QUIZ_SCORE|BASE:${baseTag}|BONUS:${accumulatedBonus}|FINAL:${finalTag}|QUIZ:${quizScore}|DELTA:${bonusDelta}|TS:${ts}`,
     scoreTag: String(finalScore !== null && finalScore !== undefined ? finalScore : (accumulatedBonus || 0)),
     score: (finalScore !== null && finalScore !== undefined ? finalScore : (accumulatedBonus || 0)),
     timestamp: ts
@@ -6613,38 +6657,33 @@ async function post1106BonusToCloud(student, baseScore, accumulatedBonus, finalS
     }
   }
 
-  // If failed or offline, save to pending submission queue for delayed synchronization
   if (!submitSuccess) {
-    enqueue1106PendingSubmission(payload);
+    enqueue1109PendingSubmission(payload);
   }
 }
 
-function enqueue1106PendingSubmission(payload) {
+function enqueue1109PendingSubmission(payload) {
   try {
-    const list = JSON.parse(localStorage.getItem(QUIZ_1106_PENDING_QUEUE_KEY) || '[]');
+    const list = JSON.parse(localStorage.getItem(QUIZ_1109_PENDING_QUEUE_KEY) || '[]');
     list.push(payload);
-    localStorage.setItem(QUIZ_1106_PENDING_QUEUE_KEY, JSON.stringify(list));
-    console.log('[1106Bonus] Record queued locally for offline sync:', payload);
+    localStorage.setItem(QUIZ_1109_PENDING_QUEUE_KEY, JSON.stringify(list));
+    console.log('[1109Bonus] Record queued locally for offline sync:', payload);
   } catch (e) {}
 }
 
-async function flush1106PendingSubmissions() {
+async function flush1109PendingSubmissions() {
   try {
-    const raw = localStorage.getItem(QUIZ_1106_PENDING_QUEUE_KEY);
+    const raw = localStorage.getItem(QUIZ_1109_PENDING_QUEUE_KEY);
     if (!raw) return;
     const list = JSON.parse(raw);
     if (!Array.isArray(list) || list.length === 0) return;
 
-    // Check connectivity quiet
-    const netOk = await checkGoogleConnectivityQuiet(2500);
-    if (!netOk) return;
-
     const remaining = [];
     for (const item of list) {
-      let ok = false;
+      let sent = false;
       if (window.submitFormRecord) {
         try {
-          ok = await window.submitFormRecord({
+          sent = await window.submitFormRecord({
             classID: item.classID,
             studentID: item.studentID,
             dateID: item.dateID,
@@ -6652,54 +6691,67 @@ async function flush1106PendingSubmissions() {
             score: item.score
           });
         } catch (e) {
-          ok = false;
+          sent = false;
         }
       } else if (typeof submitArenaFormRecord === 'function') {
         try {
           await submitArenaFormRecord(item);
-          ok = true;
+          sent = true;
         } catch (e) {
-          ok = false;
+          sent = false;
         }
       }
-      if (!ok) {
+      if (!sent) {
         remaining.push(item);
       }
     }
+
     if (remaining.length > 0) {
-      localStorage.setItem(QUIZ_1106_PENDING_QUEUE_KEY, JSON.stringify(remaining));
+      localStorage.setItem(QUIZ_1109_PENDING_QUEUE_KEY, JSON.stringify(remaining));
     } else {
-      localStorage.removeItem(QUIZ_1106_PENDING_QUEUE_KEY);
-      console.log('[1106Bonus] All queued bonus records synced to cloud successfully.');
+      localStorage.removeItem(QUIZ_1109_PENDING_QUEUE_KEY);
+      console.log('[1109Bonus] All queued bonus records synced to cloud successfully.');
     }
   } catch (e) {}
 }
 
-// Background auto-sync for 1106 bonus data from GAS cloud reader
-async function sync1106BonusDataFromCloud() {
-  const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwNAQNxmNsNa8rWGp48qnYRrjA2WFLGIzKqSel2r8MilRp59s3ZfBJjeKXIrUfoS-Zp-g/exec";
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 6000);
-    const resp = await fetch(GAS_ENDPOINT, { signal: controller.signal });
-    clearTimeout(timeout);
-    if (!resp.ok) return;
-    const freshData = await resp.json();
-    if (Array.isArray(freshData) && freshData.length > 0) {
-      localStorage.setItem("ADMIN_DASHBOARD_CACHE", JSON.stringify(freshData));
-      flush1106PendingSubmissions();
-    }
-  } catch (e) {}
+// Background auto-sync for 1109 bonus data from GAS cloud reader
+async function sync1109BonusDataFromCloud() {
+  if (typeof fetchDashboardData === 'function') {
+    try {
+      const records = await fetchDashboardData();
+      if (Array.isArray(records) && records.length > 0) {
+        localStorage.setItem('ADMIN_DASHBOARD_CACHE', JSON.stringify(records));
+        console.log('[1109Bonus] Cloud cache refreshed, records count:', records.length);
+      }
+    } catch (e) {}
+  }
 }
 
-// Run cloud sync when window loads or network recovers
+// Expose handlers and compatibility aliases
 if (typeof window !== 'undefined') {
+  window.trigger1109LoginSequence = trigger1109LoginSequence;
+  window.trigger1106LoginSequence = trigger1109LoginSequence;
+  window.confirm1109ScoreModal = confirm1109ScoreModal;
+  window.confirm1106ScoreModal = confirm1109ScoreModal;
+  window.startPracticeAfterRuleModal = startPracticeAfterRuleModal;
+  window.close1109BonusResultModal = close1109BonusResultModal;
+  window.close1106BonusResultModal = close1109BonusResultModal;
+  window.handle1109QuizBonusSettlement = handle1109QuizBonusSettlement;
+  window.handle1106QuizBonusSettlement = handle1109QuizBonusSettlement;
+  window.flush1109PendingSubmissions = flush1109PendingSubmissions;
+  window.flush1106PendingSubmissions = flush1109PendingSubmissions;
+
   window.addEventListener('online', () => {
-    flush1106PendingSubmissions();
-    sync1106BonusDataFromCloud();
+    flush1109PendingSubmissions();
+    sync1109BonusDataFromCloud();
   });
 }
 
-
-  </script>
+// Init triggers
+setTimeout(() => {
+  flush1109PendingSubmissions();
+  sync1109BonusDataFromCloud();
+}, 2000);
+</script>
 </html>

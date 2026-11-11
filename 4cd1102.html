@@ -748,7 +748,7 @@
         <!-- 1. KPI & Accuracy Card -->
         <!-- 1106 小測與加分結算展示卡片 -->
         <div id="settlement1106QuizCard" style="display: none; background: rgba(16, 185, 129, 0.12); border: 1.5px solid #10b981; border-radius: 12px; padding: 16px; margin: 16px 0; text-align: center;">
-          <div style="font-size: 13.5px; color: #a7f3d0; font-weight: 700;">🌟 11月6日小測成績與刷題獎勵加分結算</div>
+          <div style="font-size: 13.5px; color: #a7f3d0; font-weight: 700;">🌟 11月9日小測成績與刷題獎勵加分結算</div>
           <div style="display: flex; justify-content: space-around; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 10px;">
             <div>
               <div style="font-size: 12px; color: #94a3b8;">小測原始分</div>
@@ -766,7 +766,7 @@
             </div>
           </div>
           <div style="margin-top: 10px; font-size: 12px; color: #38bdf8;">
-            📅 截止 11 月 13 日前可隨時反復刷題累計加分！
+            📅 截止 11 月 20 日前可隨時反復刷題累計加分！
           </div>
         </div>
 
@@ -1081,7 +1081,7 @@
   <div id="modal1106QuizScore" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); z-index: 10002; align-items: center; justify-content: center; padding: 16px;">
     <div class="modal-card" style="background: #1e293b; border: 1.5px solid #38bdf8; border-radius: 16px; padding: 24px; max-width: 460px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); text-align: center;">
       <div style="font-size: 38px; margin-bottom: 8px;">📊</div>
-      <h3 style="font-size: 20px; font-weight: 800; color: #f8fafc; margin-bottom: 6px;">11月6日 數學小測成績通知</h3>
+      <h3 style="font-size: 20px; font-weight: 800; color: #f8fafc; margin-bottom: 6px;">11月9日 數學小測成績通知</h3>
       <div id="modal1106StudentMeta" style="font-size: 14px; color: #94a3b8; margin-bottom: 16px;">高一學生</div>
       
       <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; border-radius: 12px; padding: 18px; margin-bottom: 18px;">
@@ -1113,9 +1113,9 @@
         </div>
         <ul style="margin: 0; padding-left: 20px; color: #e2e8f0; font-size: 13.5px; line-height: 1.7;">
           <li>刷題成績<strong>超過 80 分</strong>即可獲取加分獎勵！</li>
-          <li>每超過 1 分，則 11 月 6 日小測相應<strong>加 1 分</strong>；</li>
+          <li>每超過 1 分，則 11 月 9 日小測相應<strong>加 1 分</strong>；</li>
           <li>小測成績折算後<strong>最高 60 分封頂</strong>；</li>
-          <li>加分活動截止至<strong>下周五（11月13日前）</strong>，期間可<strong>反復刷題加分</strong>！</li>
+          <li>加分活動截止至<strong>下周五（11月20日前）</strong>，期間可<strong>反復刷題加分</strong>！</li>
         </ul>
       </div>
 
@@ -17274,7 +17274,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
 
     // Always present the navigation portal (#screen4-dashboard) upon successful login
     // Trigger 11/06 Quiz Score Modal sequence for 4C / 4D students
-    trigger1106LoginSequence(student);
+    trigger1109LoginSequence(student);
 
     (window.showScreen || showScreen)('screen4-dashboard');
 
@@ -17626,7 +17626,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
     if (curStud && (String(curStud.classID || '').toUpperCase() === '4C' || String(curStud.classID || '').toUpperCase() === '4D')) {
       if (!curStud.isTeacher && curStud.studentID !== 99 && curStud.id !== 99) {
         if (!window._1106RuleConfirmed) {
-          trigger1106LoginSequence(curStud);
+          trigger1109LoginSequence(curStud);
           return;
         }
       }
@@ -18658,7 +18658,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
 
     // 2. Persist history and render trend curve
     // Evaluate 11/06 Quiz bonus for score > 80 (every point > 80 gives +1 bonus, capped at 60)
-    handle1106QuizBonusSettlement(accuracyRate, correctCount, totalAnswered);
+    handle1109QuizBonusSettlement(accuracyRate, correctCount, totalAnswered);
 
     // 2. Persist history and render trend curve
     saveAndRenderHistoryCurve(accuracyRate, totalAnswered, correctCount, wrongCount);
@@ -19434,7 +19434,7 @@ window.BANK_4CD_1102_ADAPTIVE = [
 
       // Enter platform navigation portal
       // Trigger 11/06 Quiz Score Modal sequence for 4C / 4D students
-      trigger1106LoginSequence(student);
+      trigger1109LoginSequence(student);
 
       (window.showScreen || showScreen)('screen4-dashboard');
 
@@ -19827,115 +19827,137 @@ window.BANK_4CD_1102_ADAPTIVE = [
 
 
 // =========================================================================
-// === 1106 小測成績與刷題加分獎勵系統 (4C / 4D) ===
+// 歷史封存：11月6日 4C / 4D 小測原始成績歸檔（完整加分結算已導出存檔）
 // =========================================================================
-
-const QUIZ_1106_RAW_SCORES_4CD = {
+const HISTORICAL_QUIZ_1106_RAW_SCORES_4CD = {
   "4C": {
-    "古永晴": 64,
-    "王嘉熙": 43,
-    "宋榛": 6,
-    "周子謙": 44,
-    "李藝彤": 0,
-    "谷雨": 82,
-    "冼周蔚": 42,
-    "林國榮": 2,
-    "林晨欣": 30,
-    "徐浟": 12,
-    "曹爵先": 12,
-    "梁寶娟": 34,
-    "莫芷瑤": 82,
-    "陳子豪": 82,
-    "陳心怡": 36,
-    "陳芷澄": 24,
-    "陳穎彤": 24,
-    "陸恩希": 30,
-    "麥曉楠": 30,
-    "溫愛嫦": 0,
-    "葉峰": 18,
-    "趙政熹": 6,
-    "劉卓盈": 30,
-    "蔡清琰": 12,
-    "謝嘉瑩": 56,
-    "譚梓鈞": 15,
-    "譚志坤": 18,
-    "譚欣": 54,
-    "羅清璋": 0
+    "古永晴": 64, "王嘉熙": 43, "宋榛": 6, "周子謙": 44, "李藝彤": 0, "谷雨": 82,
+    "冼周蔚": 42, "林國榮": 2, "林晨欣": 30, "徐浟": 12, "曹爵先": 12, "梁寶娟": 34,
+    "莫芷瑤": 82, "陳子豪": 82, "陳心怡": 36, "陳芷澄": 24, "陳穎彤": 24, "陸恩希": 30,
+    "麥曉楠": 30, "溫愛嫦": 0, "葉峰": 18, "趙政熹": 6, "劉卓盈": 30, "蔡清琰": 12,
+    "謝嘉瑩": 56, "譚梓鈞": 15, "譚志坤": 18, "譚欣": 54, "羅清璋": 0
   },
   "4D": {
-    "洪佳佳": 76,
-    "王偉德": 30,
-    "王煜鑫": 0,
-    "甘俊誠": 94,
-    "余浩賢": 38,
-    "李青霞": 62,
-    "李語鵑": 45,
-    "李樂瞳": 28,
-    "李穎欣": 18,
-    "李臻斌": 18,
-    "周梓霖": 6,
-    "林川雲": 29,
-    "施舒晨": 50,
-    "徐芷瑤": 24,
-    "翁淮洋": 80,
-    "馬雨彤": 0,
-    "張博聰": 12,
-    "曾浚恩": 0,
-    "黃悅軒": 88,
-    "黃梓建": 52,
-    "黃嫣然": 0,
-    "董清霞": 24,
-    "劉付穎": 58,
-    "劉泳欣": 16,
-    "鄭佩芝": 0,
-    "鄭東沅": 70,
-    "盧肇琪": 68,
-    "賴君華": 74,
-    "譚佩泳": 52,
-    "鄭梓浩": 28,
+    "洪佳佳": 76, "王偉德": 30, "王煜鑫": 0, "甘俊誠": 94, "余浩賢": 38, "李青霞": 62,
+    "李語鵑": 45, "李樂瞳": 28, "李穎欣": 18, "李臻斌": 18, "周梓霖": 6, "林川雲": 29,
+    "施舒晨": 50, "徐芷瑤": 24, "翁淮洋": 80, "馬雨彤": 0, "張博聰": 12, "曾浚恩": 0,
+    "黃悅軒": 88, "黃梓建": 52, "黃嫣然": 0, "董清霞": 24, "劉付穎": 58, "劉泳欣": 16,
+    "鄭佩芝": 0, "鄭東沅": 70, "盧肇琪": 68, "賴君華": 74, "譚佩泳": 52, "鄭梓浩": 28,
     "鄭國樺": 0
   }
 };
 
-const QUIZ_1106_BONUS_PREFIX = 'MATH_1106_BONUS_4CD_';
-const QUIZ_1106_PENDING_QUEUE_KEY = 'MATH_1106_PENDING_BONUS_SUBMISSIONS_4CD';
+const QUIZ_1106_RAW_SCORES_4CD = HISTORICAL_QUIZ_1106_RAW_SCORES_4CD;
 
-function get1106StudentKey(student) {
+// =========================================================================
+// 當前實行：11月9日 4C / 4D 數學小測成績與刷題超80加分系統 (11月20日前有效，60分封頂，雙端同步)
+// =========================================================================
+const QUIZ_1109_RAW_SCORES_4CD = {
+  "4C": {
+    "古永晴": 25,
+    "王嘉熙": 20,
+    "宋榛": 6,
+    "周子謙": 5,
+    "李藝彤": 5,
+    "谷雨": 30,
+    "冼周蔚": 42,
+    "林國榮": 0,
+    "林晨欣": 10,
+    "徐浟": 1,
+    "曹爵先": 54,
+    "梁寶娟": 6,
+    "莫芷瑤": 12,
+    "陳子豪": 95,
+    "陳心怡": 10,
+    "陳芷澄": 12,
+    "陳穎彤": 7,
+    "陸恩希": 60,
+    "麥曉楠": 0,
+    "溫愛嫦": 0,
+    "葉峰": 3,
+    "趙政熹": 48,
+    "劉卓盈": 45,
+    "蔡清琰": 0,
+    "謝嘉瑩": 5,
+    "譚梓鈞": 5,
+    "譚志坤": 6,
+    "譚欣": 16,
+    "羅清璋": null
+  },
+  "4D": {
+    "洪佳佳": 20,
+    "王偉德": null,
+    "王煜鑫": 50,
+    "甘俊誠": null,
+    "余浩賢": 45,
+    "李青霞": null,
+    "李語鵑": 30,
+    "李樂瞳": null,
+    "李穎欣": null,
+    "李臻斌": 19,
+    "周梓霖": null,
+    "林川雲": 18,
+    "施舒晨": null,
+    "徐芷瑤": null,
+    "翁淮洋": 40,
+    "馬雨彤": null,
+    "張博聰": null,
+    "曾浚恩": null,
+    "黃悅軒": 5,
+    "黃梓建": null,
+    "黃嫣然": null,
+    "董清霞": null,
+    "劉付穎": null,
+    "劉泳欣": null,
+    "鄭佩芝": null,
+    "鄭東沅": 30,
+    "盧肇琪": null,
+    "賴君華": 36,
+    "譚佩泳": 28,
+    "鄭梓浩": 42,
+    "鄭國樺": null
+  }
+};
+
+const QUIZ_1109_BONUS_PREFIX = 'MATH_1109_BONUS_4CD_';
+const QUIZ_1109_PENDING_QUEUE_KEY = 'MATH_1109_PENDING_BONUS_SUBMISSIONS_4CD';
+
+function get1109StudentKey(student) {
   if (!student) return '4CD_UNKNOWN';
   const cid = String(student.classID || '4C').trim().toUpperCase();
   const sid = student.studentID !== undefined ? student.studentID : (student.id !== undefined ? student.id : '0');
   return `${cid}_${sid}`;
 }
 
-function get1106RawScore(student) {
+function get1109RawScore(student) {
   if (!student || !student.name) return undefined;
   const cid = String(student.classID || '').trim().toUpperCase();
   const name = String(student.name || '').trim();
   
-  if (QUIZ_1106_RAW_SCORES_4CD[cid] && Object.prototype.hasOwnProperty.call(QUIZ_1106_RAW_SCORES_4CD[cid], name)) {
-    return QUIZ_1106_RAW_SCORES_4CD[cid][name];
+  if (QUIZ_1109_RAW_SCORES_4CD[cid] && Object.prototype.hasOwnProperty.call(QUIZ_1109_RAW_SCORES_4CD[cid], name)) {
+    return QUIZ_1109_RAW_SCORES_4CD[cid][name];
   }
   // Fallback search across classes if classID mismatch
   for (const c of ['4C', '4D']) {
-    if (QUIZ_1106_RAW_SCORES_4CD[c] && Object.prototype.hasOwnProperty.call(QUIZ_1106_RAW_SCORES_4CD[c], name)) {
-      return QUIZ_1106_RAW_SCORES_4CD[c][name];
+    if (QUIZ_1109_RAW_SCORES_4CD[c] && Object.prototype.hasOwnProperty.call(QUIZ_1109_RAW_SCORES_4CD[c], name)) {
+      return QUIZ_1109_RAW_SCORES_4CD[c][name];
     }
   }
   return undefined;
 }
 
-function get1106AccumulatedBonus(student) {
-  const studentKey = get1106StudentKey(student);
+function get1109AccumulatedBonus(student) {
+  const studentKey = get1109StudentKey(student);
   let localBonus = 0;
   try {
-    const raw = localStorage.getItem(QUIZ_1106_BONUS_PREFIX + studentKey);
+    const raw = localStorage.getItem(QUIZ_1109_BONUS_PREFIX + studentKey);
     if (raw) {
       const parsed = JSON.parse(raw);
       localBonus = Number(parsed.accumulatedBonus) || 0;
     }
   } catch (e) {}
 
-  // Check Cloud Cache / Snapshot for any higher bonus
+  // Check Cloud Cache / Snapshot for any higher 1109 bonus
   let cloudBonus = 0;
   const cid = String(student.classID || '4C').trim().toUpperCase();
   const sid = parseInt(student.studentID !== undefined ? student.studentID : student.id, 10);
@@ -19943,7 +19965,7 @@ function get1106AccumulatedBonus(student) {
   const checkRecord = function (r) {
     if (String(r.classID || '').trim().toUpperCase() === cid && parseInt(r.studentID, 10) === sid) {
       const did = String(r.dateID || '');
-      if (did.includes('1106_QUIZ_SCORE')) {
+      if (did.includes('1109_QUIZ_SCORE')) {
         const m = did.match(/BONUS:(\d+(\.\d+)?)/);
         if (m) {
           const b = parseFloat(m[1]);
@@ -19968,16 +19990,16 @@ function get1106AccumulatedBonus(student) {
   if (finalBonus > localBonus) {
     try {
       let bData = { accumulatedBonus: finalBonus, history: [] };
-      const raw = localStorage.getItem(QUIZ_1106_BONUS_PREFIX + studentKey);
+      const raw = localStorage.getItem(QUIZ_1109_BONUS_PREFIX + studentKey);
       if (raw) bData = JSON.parse(raw);
       bData.accumulatedBonus = finalBonus;
-      localStorage.setItem(QUIZ_1106_BONUS_PREFIX + studentKey, JSON.stringify(bData));
+      localStorage.setItem(QUIZ_1109_BONUS_PREFIX + studentKey, JSON.stringify(bData));
     } catch (e) {}
   }
   return finalBonus;
 }
 
-function calc1106FinalScore(rawScore, accumulatedBonus) {
+function calc1109FinalScore(rawScore, accumulatedBonus) {
   if (rawScore === null || rawScore === undefined) return null;
   const raw = Number(rawScore);
   const bonus = Number(accumulatedBonus || 0);
@@ -19987,19 +20009,18 @@ function calc1106FinalScore(rawScore, accumulatedBonus) {
   return Math.min(60, raw + bonus);
 }
 
-// Trigger Login Sequence for 4C / 4D Students
-function trigger1106LoginSequence(student) {
+// Trigger Login Sequence for 4C / 4D Students (1109 Quiz)
+function trigger1109LoginSequence(student) {
   if (!student) return;
   const cid = String(student.classID || '').toUpperCase();
   if (cid !== '4C' && cid !== '4D') return;
-  // Teachers or test bypass 99 don't need popups
   if (student.isTeacher || student.id === 99 || student.studentID === 99) return;
 
-  const rawScore = get1106RawScore(student);
-  const bonus = get1106AccumulatedBonus(student);
+  const rawScore = get1109RawScore(student);
+  const bonus = get1109AccumulatedBonus(student);
 
-  // Sync any pending offline submissions now that we have logged in
-  flush1106PendingSubmissions();
+  // Sync any pending offline submissions
+  flush1109PendingSubmissions();
 
   setTimeout(() => {
     const modal1 = document.getElementById('modal1106QuizScore');
@@ -20013,14 +20034,14 @@ function trigger1106LoginSequence(student) {
 
     if (rawScore === null) {
       if (scoreValEl) {
-        scoreValEl.textContent = '不顯示成績';
-        scoreValEl.style.fontSize = '26px';
+        scoreValEl.textContent = '小測成績待公佈';
+        scoreValEl.style.fontSize = '24px';
         scoreValEl.style.color = '#cbd5e1';
       }
-      if (noteEl) noteEl.textContent = '小測分數保密中，您仍可正常參與刷題超80加分活動！';
+      if (noteEl) noteEl.textContent = '小測成績錄入中，您仍可正常參與刷題超80分加分活動！';
     } else if (rawScore !== undefined) {
       if (bonus > 0) {
-        const finalSc = calc1106FinalScore(rawScore, bonus);
+        const finalSc = calc1109FinalScore(rawScore, bonus);
         if (scoreValEl) {
           scoreValEl.textContent = `${finalSc} 分`;
           scoreValEl.style.fontSize = '36px';
@@ -20037,13 +20058,8 @@ function trigger1106LoginSequence(student) {
           scoreValEl.style.color = '#38bdf8';
         }
         if (noteEl) {
-          if (rawScore >= 60) {
-            noteEl.textContent = '小測成績已及格（達到60分及以上），依然歡迎刷題鞏固知識！';
-            noteEl.style.color = '#a7f3d0';
-          } else {
-            noteEl.textContent = '小測原始得分。您可以通過刷題超80額外加分（60分封頂）！';
-            noteEl.style.color = '#a7f3d0';
-          }
+          noteEl.textContent = '本次小測基準分，稍後可通過刷題超80分繼續加分（60分封頂）！';
+          noteEl.style.color = '#a7f3d0';
         }
       }
     } else {
@@ -20055,7 +20071,7 @@ function trigger1106LoginSequence(student) {
   }, 450);
 }
 
-function confirm1106ScoreModal() {
+function confirm1109ScoreModal() {
   const modal1 = document.getElementById('modal1106QuizScore');
   if (modal1) modal1.style.display = 'none';
 
@@ -20064,8 +20080,8 @@ function confirm1106ScoreModal() {
 }
 
 function startPracticeAfterRuleModal() {
+  window._1109RuleConfirmed = true;
   window._1106RuleConfirmed = true;
-
   const modal2 = document.getElementById('modal1106BonusRule');
   if (modal2) modal2.style.display = 'none';
   if (typeof startQuizSession === 'function') {
@@ -20073,23 +20089,22 @@ function startPracticeAfterRuleModal() {
   }
 }
 
-function close1106BonusResultModal() {
+function close1109BonusResultModal() {
   const modal3 = document.getElementById('modal1106BonusResult');
   if (modal3) modal3.style.display = 'none';
-  (window.showScreen || showScreen)('screen9-wrong-review');
 }
 
-// Evaluate 11/06 Quiz bonus for score > 80 after quiz finishes
-function handle1106QuizBonusSettlement(quizScore, correctCount, totalCount) {
-  const student = AppState.currentUser || AppState.currentStudent;
+// Evaluate 11/09 Quiz bonus for score > 80 after quiz finishes
+function handle1109QuizBonusSettlement(quizScore, correctCount, totalCount) {
+  const student = (typeof AppState !== 'undefined' && AppState.currentUser) ? AppState.currentUser : window.currentUser;
   if (!student) return;
   const cid = String(student.classID || '').toUpperCase();
   if (cid !== '4C' && cid !== '4D') return;
   if (student.isTeacher || student.id === 99 || student.studentID === 99) return;
 
-  const rawScore = get1106RawScore(student);
-  const studentKey = get1106StudentKey(student);
-  const previousBonus = get1106AccumulatedBonus(student);
+  const rawScore = get1109RawScore(student);
+  const studentKey = get1109StudentKey(student);
+  const previousBonus = get1109AccumulatedBonus(student);
 
   // Bonus rule: Score > 80, every 1 point above 80 adds 1 point to quiz
   const bonusDelta = quizScore > 80 ? (quizScore - 80) : 0;
@@ -20097,7 +20112,7 @@ function handle1106QuizBonusSettlement(quizScore, correctCount, totalCount) {
 
   let bonusData = { accumulatedBonus: newAccumulatedBonus, history: [] };
   try {
-    const raw = localStorage.getItem(QUIZ_1106_BONUS_PREFIX + studentKey);
+    const raw = localStorage.getItem(QUIZ_1109_BONUS_PREFIX + studentKey);
     if (raw) bonusData = JSON.parse(raw);
   } catch (e) {}
 
@@ -20113,10 +20128,10 @@ function handle1106QuizBonusSettlement(quizScore, correctCount, totalCount) {
   });
 
   try {
-    localStorage.setItem(QUIZ_1106_BONUS_PREFIX + studentKey, JSON.stringify(bonusData));
+    localStorage.setItem(QUIZ_1109_BONUS_PREFIX + studentKey, JSON.stringify(bonusData));
   } catch (e) {}
 
-  const finalCombinedScore = calc1106FinalScore(rawScore, newAccumulatedBonus);
+  const finalCombinedScore = calc1109FinalScore(rawScore, newAccumulatedBonus);
 
   // Update Settlement Screen UI banner
   const settleCard = document.getElementById('settlement1106QuizCard');
@@ -20125,13 +20140,13 @@ function handle1106QuizBonusSettlement(quizScore, correctCount, totalCount) {
     const baseEl = document.getElementById('settle1106BaseScore');
     const bonusEl = document.getElementById('settle1106BonusScore');
     const finalEl = document.getElementById('settle1106FinalScore');
-    if (baseEl) baseEl.textContent = rawScore === null ? '保密' : (rawScore !== undefined ? `${rawScore}分` : '--');
+    if (baseEl) baseEl.textContent = rawScore === null ? '待錄入' : (rawScore !== undefined ? `${rawScore}分` : '--');
     if (bonusEl) bonusEl.textContent = `+${newAccumulatedBonus}分 (本次+${bonusDelta})`;
-    if (finalEl) finalEl.textContent = finalCombinedScore === null ? '保密' : `${finalCombinedScore}分`;
+    if (finalEl) finalEl.textContent = finalCombinedScore === null ? `累計+${newAccumulatedBonus}分` : `${finalCombinedScore}分`;
   }
 
   // Submit to Google Form / GAS cloud and enqueue for offline replay
-  post1106BonusToCloud(student, rawScore, newAccumulatedBonus, finalCombinedScore, quizScore, bonusDelta);
+  post1109BonusToCloud(student, rawScore, newAccumulatedBonus, finalCombinedScore, quizScore, bonusDelta);
 
   // Show Bonus Result Modal
   setTimeout(() => {
@@ -20151,21 +20166,17 @@ function handle1106QuizBonusSettlement(quizScore, correctCount, totalCount) {
         bDeltaEl.textContent = `+${bonusDelta} 分`;
         bDeltaEl.style.color = '#34d399';
       } else {
-        bDeltaEl.textContent = `未超80分 (+0)`;
+        bDeltaEl.textContent = `未達80分 (+0)`;
         bDeltaEl.style.color = '#94a3b8';
       }
     }
 
     if (rawScore === null) {
-      if (finalEl) finalEl.textContent = '不顯示成績';
-      if (detailEl) detailEl.textContent = `本次刷題加分 +${bonusDelta} 分，已累計加分 +${newAccumulatedBonus} 分`;
+      if (finalEl) finalEl.textContent = `累計 +${newAccumulatedBonus} 分`;
+      if (detailEl) detailEl.textContent = `本次刷題獲加分 +${bonusDelta} 分，已累計加分 +${newAccumulatedBonus} 分，待小測分數錄入後自動折算（60分封頂）！`;
     } else if (rawScore !== undefined) {
       if (finalEl) finalEl.textContent = `${finalCombinedScore} 分`;
-      if (rawScore >= 60) {
-        detailEl.textContent = `小測原始得分 ${rawScore} 分（已達60分及以上，不受封頂限制）`;
-      } else {
-        detailEl.textContent = `小測原始 ${rawScore} 分 + 累計加分 ${newAccumulatedBonus} 分 (本次+${bonusDelta}) ➔ 最終 ${finalCombinedScore} 分 (60分封頂)`;
-      }
+      if (detailEl) detailEl.textContent = `小測原始 ${rawScore} 分 + 累計加分 ${newAccumulatedBonus} 分 (本次+${bonusDelta}) ➔ 最終 ${finalCombinedScore} 分 (60分封頂)`;
     } else {
       if (finalEl) finalEl.textContent = '-- 分';
       if (detailEl) detailEl.textContent = `本次刷題得分 ${quizScore} 分`;
@@ -20175,31 +20186,29 @@ function handle1106QuizBonusSettlement(quizScore, correctCount, totalCount) {
   }, 400);
 }
 
-// Synchronize 1106 Bonus Record to Google Form / GAS Cloud
-async function post1106BonusToCloud(student, baseScore, accumulatedBonus, finalScore, quizScore, bonusDelta) {
+// Synchronize 1109 Bonus Record to Google Form / GAS Cloud
+async function post1109BonusToCloud(student, baseScore, accumulatedBonus, finalScore, quizScore, bonusDelta) {
   const cid = String(student.classID || '4C').trim().toUpperCase();
   const sid = parseInt(student.studentID !== undefined ? student.studentID : student.id, 10);
   const ts = Date.now();
-  const baseTag = (baseScore === null || baseScore === undefined) ? 'HIDDEN' : String(baseScore);
-  const finalTag = (finalScore === null || finalScore === undefined) ? 'HIDDEN' : String(finalScore);
+
+  const baseTag = (baseScore === null || baseScore === undefined) ? 'PENDING' : String(baseScore);
+  const finalTag = (finalScore === null || finalScore === undefined) ? 'PENDING' : String(finalScore);
 
   const payload = {
     classID: cid,
     studentID: sid,
     studentName: student.name || '',
-    dateID: `1106_QUIZ_SCORE|BASE:${baseTag}|BONUS:${accumulatedBonus}|FINAL:${finalTag}|QUIZ:${quizScore}|DELTA:${bonusDelta}|TS:${ts}`,
+    dateID: `1109_QUIZ_SCORE|BASE:${baseTag}|BONUS:${accumulatedBonus}|FINAL:${finalTag}|QUIZ:${quizScore}|DELTA:${bonusDelta}|TS:${ts}`,
     scoreTag: String(finalScore !== null && finalScore !== undefined ? finalScore : (accumulatedBonus || 0)),
     score: (finalScore !== null && finalScore !== undefined ? finalScore : (accumulatedBonus || 0)),
     timestamp: ts
   };
 
   let submitSuccess = false;
-  const submitFn = (typeof submitFormRecord === 'function') ? submitFormRecord : 
-                   (typeof window !== 'undefined' && typeof window.submitFormRecord === 'function') ? window.submitFormRecord : null;
-                   
-  if (submitFn) {
+  if (window.submitFormRecord) {
     try {
-      submitSuccess = await submitFn({
+      submitSuccess = await window.submitFormRecord({
         classID: payload.classID,
         studentID: payload.studentID,
         dateID: payload.dateID,
@@ -20209,41 +20218,42 @@ async function post1106BonusToCloud(student, baseScore, accumulatedBonus, finalS
     } catch (e) {
       submitSuccess = false;
     }
+  } else if (typeof submitArenaFormRecord === 'function') {
+    try {
+      await submitArenaFormRecord(payload);
+      submitSuccess = true;
+    } catch (e) {
+      submitSuccess = false;
+    }
   }
 
-  // If failed or offline, save to pending submission queue for delayed synchronization
   if (!submitSuccess) {
-    enqueue1106PendingSubmission(payload);
+    enqueue1109PendingSubmission(payload);
   }
 }
 
-function enqueue1106PendingSubmission(payload) {
+function enqueue1109PendingSubmission(payload) {
   try {
-    const list = JSON.parse(localStorage.getItem(QUIZ_1106_PENDING_QUEUE_KEY) || '[]');
+    const list = JSON.parse(localStorage.getItem(QUIZ_1109_PENDING_QUEUE_KEY) || '[]');
     list.push(payload);
-    localStorage.setItem(QUIZ_1106_PENDING_QUEUE_KEY, JSON.stringify(list));
-    console.log('[1106Bonus] Record queued locally for offline sync:', payload);
+    localStorage.setItem(QUIZ_1109_PENDING_QUEUE_KEY, JSON.stringify(list));
+    console.log('[1109Bonus] Record queued locally for offline sync:', payload);
   } catch (e) {}
 }
 
-async function flush1106PendingSubmissions() {
+async function flush1109PendingSubmissions() {
   try {
-    const raw = localStorage.getItem(QUIZ_1106_PENDING_QUEUE_KEY);
+    const raw = localStorage.getItem(QUIZ_1109_PENDING_QUEUE_KEY);
     if (!raw) return;
     const list = JSON.parse(raw);
     if (!Array.isArray(list) || list.length === 0) return;
 
-    if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
-
     const remaining = [];
-    const submitFn = (typeof submitFormRecord === 'function') ? submitFormRecord : 
-                     (typeof window !== 'undefined' && typeof window.submitFormRecord === 'function') ? window.submitFormRecord : null;
-
     for (const item of list) {
-      let ok = false;
-      if (submitFn) {
+      let sent = false;
+      if (window.submitFormRecord) {
         try {
-          ok = await submitFn({
+          sent = await window.submitFormRecord({
             classID: item.classID,
             studentID: item.studentID,
             dateID: item.dateID,
@@ -20251,56 +20261,68 @@ async function flush1106PendingSubmissions() {
             score: item.score
           });
         } catch (e) {
-          ok = false;
+          sent = false;
+        }
+      } else if (typeof submitArenaFormRecord === 'function') {
+        try {
+          await submitArenaFormRecord(item);
+          sent = true;
+        } catch (e) {
+          sent = false;
         }
       }
-      if (!ok) {
+      if (!sent) {
         remaining.push(item);
       }
     }
+
     if (remaining.length > 0) {
-      localStorage.setItem(QUIZ_1106_PENDING_QUEUE_KEY, JSON.stringify(remaining));
+      localStorage.setItem(QUIZ_1109_PENDING_QUEUE_KEY, JSON.stringify(remaining));
     } else {
-      localStorage.removeItem(QUIZ_1106_PENDING_QUEUE_KEY);
-      console.log('[1106Bonus] All queued bonus records synced to cloud successfully.');
+      localStorage.removeItem(QUIZ_1109_PENDING_QUEUE_KEY);
+      console.log('[1109Bonus] All queued bonus records synced to cloud successfully.');
     }
   } catch (e) {}
 }
 
-// Background auto-sync for 1106 bonus data from GAS cloud reader
-async function sync1106BonusDataFromCloud() {
-  const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwNAQNxmNsNa8rWGp48qnYRrjA2WFLGIzKqSel2r8MilRp59s3ZfBJjeKXIrUfoS-Zp-g/exec";
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 6000);
-    const resp = await fetch(GAS_ENDPOINT, { signal: controller.signal });
-    clearTimeout(timeout);
-    if (!resp.ok) return;
-    const freshData = await resp.json();
-    if (Array.isArray(freshData) && freshData.length > 0) {
-      localStorage.setItem("ADMIN_DASHBOARD_CACHE", JSON.stringify(freshData));
-      flush1106PendingSubmissions();
-    }
-  } catch (e) {}
+// Background auto-sync for 1109 bonus data from GAS cloud reader
+async function sync1109BonusDataFromCloud() {
+  if (typeof fetchDashboardData === 'function') {
+    try {
+      const records = await fetchDashboardData();
+      if (Array.isArray(records) && records.length > 0) {
+        localStorage.setItem('ADMIN_DASHBOARD_CACHE', JSON.stringify(records));
+        console.log('[1109Bonus] Cloud cache refreshed, records count:', records.length);
+      }
+    } catch (e) {}
+  }
 }
 
-// Run cloud sync when window loads or network recovers
+// Expose handlers and compatibility aliases
 if (typeof window !== 'undefined') {
-  window.trigger1106LoginSequence = trigger1106LoginSequence;
-  window.confirm1106ScoreModal = confirm1106ScoreModal;
+  window.trigger1109LoginSequence = trigger1109LoginSequence;
+  window.trigger1106LoginSequence = trigger1109LoginSequence;
+  window.confirm1109ScoreModal = confirm1109ScoreModal;
+  window.confirm1106ScoreModal = confirm1109ScoreModal;
   window.startPracticeAfterRuleModal = startPracticeAfterRuleModal;
-  window.close1106BonusResultModal = close1106BonusResultModal;
-  window.handle1106QuizBonusSettlement = handle1106QuizBonusSettlement;
+  window.close1109BonusResultModal = close1109BonusResultModal;
+  window.close1106BonusResultModal = close1109BonusResultModal;
+  window.handle1109QuizBonusSettlement = handle1109QuizBonusSettlement;
+  window.handle1106QuizBonusSettlement = handle1109QuizBonusSettlement;
+  window.flush1109PendingSubmissions = flush1109PendingSubmissions;
+  window.flush1106PendingSubmissions = flush1109PendingSubmissions;
 
   window.addEventListener('online', () => {
-    flush1106PendingSubmissions();
-    sync1106BonusDataFromCloud();
+    flush1109PendingSubmissions();
+    sync1109BonusDataFromCloud();
   });
 }
 
-
-})();
-
+// Init triggers
+setTimeout(() => {
+  flush1109PendingSubmissions();
+  sync1109BonusDataFromCloud();
+}, 2000);
 </script>
 </body>
 </html>
