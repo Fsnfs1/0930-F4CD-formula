@@ -404,7 +404,10 @@
   // =========================================================================
   const GameBridge = {
     _timeKey: function (sid, dateStr) {
-      return 'MP_V2_GAMETIME_' + String(sid || 'GUEST') + '_' + (dateStr || getMacauDateParts().dateStr);
+      const prefix =
+        (CONFIG && CONFIG.storageKeys && CONFIG.storageKeys.gamePlaytimePrefix) ||
+        'MP_V2_GAME_TIME_';
+      return prefix + String(sid || 'GUEST').toUpperCase() + '_' + (dateStr || getMacauDateParts().dateStr);
     },
     _boardKey: function (gameId) {
       return 'MP_V2_GAMEBOARD_' + String(gameId || 'trig-ratio');

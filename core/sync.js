@@ -116,11 +116,14 @@
       const clientTs = typeof evt.clientTs === 'number' ? evt.clientTs : Date.now();
       const seq =
         typeof evt.seq === 'number' && evt.seq > 0 ? evt.seq : STORAGE.nextSeq();
-      const secretKey =
+      const signingKey =
+        evt.signingKey ||
         evt.secretKey ||
+        defaultContext.signingKey ||
         defaultContext.secretKey ||
+        sess.signingKey ||
         sess.secretKey ||
-        `${classID}${String(studentID).padStart(2, '0')}-KEY`;
+        `MP_SIGN_${sid}`;
 
       let sig = evt.sig || '';
       if (!sig && CRYPTO && typeof CRYPTO.signSubmission === 'function') {
@@ -134,7 +137,7 @@
             clientTs: clientTs,
             seq: seq,
           },
-          secretKey
+          signingKey
         );
       }
 
@@ -152,7 +155,6 @@
         seq: seq,
         sig: sig,
         offline: evt.offline !== undefined ? Boolean(evt.offline) : isOffline,
-        secretKey: secretKey,
       });
 
       return stored;

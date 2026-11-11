@@ -318,6 +318,7 @@
         const goScreen = document.getElementById("game-over-screen"); if(goScreen) goScreen.remove();
         
         gameState = "PLAYING";
+        _roundStartTs = Date.now();
         
         // 隨機生成 5~7 條柱
         numPillars = Math.floor(Math.random() * 3) + 5; 

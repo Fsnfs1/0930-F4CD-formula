@@ -124,29 +124,85 @@
   }
 
   async function defaultGoogleProbe(timeoutMs) {
-    if (typeof fetch !== 'function') {
+    if (typeof fetch !== 'function' && typeof Image === 'undefined') {
       return true;
     }
-    const url =
-      (CONFIG && CONFIG.endpoints && CONFIG.endpoints.gasSheetReaderUrl) ||
-      'https://docs.google.com/generate_204';
-    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-    const timer = setTimeout(function () {
-      if (controller) controller.abort();
-    }, timeoutMs);
-    try {
-      await fetch(url + (url.indexOf('?') >= 0 ? '&' : '?') + '_ping=' + Date.now(), {
-        method: 'GET',
-        mode: 'no-cors',
-        cache: 'no-store',
-        signal: controller ? controller.signal : undefined,
-      });
-      clearTimeout(timer);
-      return true;
-    } catch (e) {
-      clearTimeout(timer);
-      return false;
-    }
+    const ts = Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+    const fastUrls = [
+      'https://connectivitycheck.gstatic.com/generate_204?_t=' + ts,
+      'https://www.google.com/generate_204?_t=' + ts,
+      'https://docs.google.com/generate_204?_t=' + ts,
+    ];
+
+    return new Promise(function (resolve) {
+      let settled = false;
+      let failCount = 0;
+      const controllers = [];
+      let totalProbes = 0;
+
+      const timer = setTimeout(function () {
+        if (!settled) {
+          settled = true;
+          controllers.forEach(function (c) {
+            try { c.abort(); } catch (_) {}
+          });
+          resolve(false);
+        }
+      }, timeoutMs);
+
+      function onSuccess() {
+        if (!settled) {
+          settled = true;
+          clearTimeout(timer);
+          controllers.forEach(function (c) {
+            try { c.abort(); } catch (_) {}
+          });
+          resolve(true);
+        }
+      }
+
+      function onFailure() {
+        failCount++;
+        if (!settled && failCount >= totalProbes) {
+          settled = true;
+          clearTimeout(timer);
+          resolve(false);
+        }
+      }
+
+      if (typeof Image !== 'undefined') {
+        totalProbes++;
+        try {
+          const img = new Image();
+          img.onload = onSuccess;
+          img.onerror = onFailure;
+          img.src = 'https://www.google.com/favicon.ico?_t=' + ts;
+        } catch (e) {
+          onFailure();
+        }
+      }
+
+      if (typeof fetch === 'function') {
+        fastUrls.forEach(function (url) {
+          totalProbes++;
+          const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+          if (ctrl) controllers.push(ctrl);
+          fetch(url, {
+            method: 'GET',
+            mode: 'no-cors',
+            cache: 'no-store',
+            signal: ctrl ? ctrl.signal : undefined,
+          })
+            .then(onSuccess)
+            .catch(onFailure);
+        });
+      }
+
+      if (totalProbes === 0) {
+        clearTimeout(timer);
+        resolve(true);
+      }
+    });
   }
 
   async function defaultGeoProbe(timeoutMs) {

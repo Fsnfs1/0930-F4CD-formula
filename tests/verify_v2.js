@@ -3,6 +3,7 @@
  * Automated E2E & Integration Verification for MathPlatform v2.0
  */
 const assert = require('assert');
+const fs = require('fs');
 const { execSync } = require('child_process');
 
 const config = require('../core/config.js');
@@ -168,8 +169,18 @@ async function runAllTests() {
   assert.strictEqual(gitDiffRedLines, '', 'Red-line data files MUST remain 100% untouched');
   console.log('[PASS] 6. Red-Line Data Files 100% Untouched & Sustainable Registry Ready');
 
-  // 7. Teacher Test Account (#98 / test98) Direct-to-Bank Verification Across All Classes
+  // 7. Teacher Test Account (#98 / test98) & Gate Anti-Leakage (Zero Plaintext Passwords & Redacted Student Names)
   const merged = registry.getMergedRoster();
+  const appHtml = fs.readFileSync(__dirname + '/../app.html', 'utf8');
+
+  // Anti-leakage assertions: no plaintext secret keys or test passwords in app.html
+  assert.ok(!appHtml.toLowerCase().includes('x33c'), 'app.html must not contain plaintext password x33c');
+  assert.ok(!appHtml.includes('test98'), 'app.html must not contain plaintext password test98');
+
+  // Student privacy on gate login screen: gate dropdown and candidate list must not leak student real names
+  assert.ok(!appHtml.includes('號 - ${esc(s.name)}') && !appHtml.includes('data-name="${esc(s.name)}'), 'app.html gate seat dropdown must not display student real names or data-name attributes');
+  assert.ok(appHtml.includes("list.some(s => String(s.id) === '98')"), 'app.html populateSeatSelect must include seat 98');
+
   for (const cls of ['4C', '4D', '5B', '5C']) {
     const has98 = (merged[cls] || []).some(s => String(s.id) === '98' && s.directToBank);
     assert.strictEqual(has98, true, `Class ${cls} must have seat #98 direct-to-bank test account`);
@@ -187,7 +198,78 @@ async function runAllTests() {
   }
   console.log('[PASS] 7. Teacher Test Account (#98 / test98) Direct-to-Bank Verified for All Classes');
 
-  console.log('=== ALL TESTS PASSED (7/7) ===');
+  // 8. Class Representative (科代表) Sub-App Authorization & Partial-Permission Login
+  auth.setClassRep({
+    classID: '4C',
+    studentID: 1,
+    name: '古永晴',
+    pin: 'rep2026',
+    permissions: ['reply_qa', 'approve_mall'],
+  });
+  const repSess = await auth.loginClassRep({ classID: '4C', studentID: 1, pin: 'rep2026' });
+  assert.strictEqual(repSess.role, 'class_rep', 'Logged in role must be class_rep');
+  assert.strictEqual(auth.hasBackendPermission(repSess, 'reply_qa'), true, 'Granted reply_qa must be true');
+  assert.strictEqual(auth.hasBackendPermission(repSess, 'approve_mall'), true, 'Granted approve_mall must be true');
+  assert.strictEqual(auth.hasBackendPermission(repSess, 'tune_score'), false, 'Ungranted tune_score must be false');
+  assert.strictEqual(auth.hasBackendPermission(repSess, 'teacher_only'), false, 'Teacher-only permission must be false for class_rep');
+  auth.removeClassRep('4C', 1);
+  assert.strictEqual(Object.keys(auth.getClassReps()).length, 0, 'Removed class rep should no longer be in list');
+  console.log('[PASS] 8. Class Representative (科代表) Sub-App Authorization & Partial-Permission Login');
+
+  // 9. A1 Gate Upgrade: Preloaded Custom Passwords, Teacher Keys, Face Candidate Disambiguation & Face Trace Exemption
+  assert.strictEqual(Object.keys(auth.STUDENT_CUSTOM_PASSWORDS).length, 121, 'All 121 student password records hydrated');
+  const changedCount = Object.values(auth.STUDENT_CUSTOM_PASSWORDS).filter(r => r && r.passwordChanged).length;
+  assert.strictEqual(changedCount, 59, 'All 59 non-1234 student custom passwords preserved');
+
+  // Default 1234 must be rejected
+  assert.strictEqual(await auth.verifyStudentCustomPassword('4C', 1, '1234'), false, 'Default 1234 password must be rejected');
+
+  // Simulate a student setting/having a custom non-1234 password in localStorage and logging in with either custom password or teacher key
+  const customSalt = 'MATH_SALT_4C_2';
+  const customHash = await cryptoMod.sha256Hex(customSalt + ':mySecret88');
+  storage.setItem('math_student_password_4C_2', {
+    salt: customSalt,
+    passwordHash: customHash,
+    passwordChanged: true
+  });
+  const customLoginSess = await auth.loginStudent({ classID: '4C', studentID: 2, secretKey: 'mySecret88' });
+  assert.strictEqual(String(customLoginSess.studentID), '2', 'Student can log in with their own non-1234 password');
+  assert.strictEqual(customLoginSess.authMethod, 'password_or_key');
+
+  // Teacher-assigned secret key also works for the same student
+  storage.setItem('MP_V2_STUDENT_KEYS', { '4C_2': 'TKEY-4C02' });
+  const teacherKeySess = await auth.loginStudent({ classID: '4C', studentID: 2, secretKey: 'TKEY-4C02' });
+  assert.strictEqual(String(teacherKeySess.studentID), '2', 'Student can also log in with teacher-assigned secret key');
+
+  // Ambiguous / sub-threshold face candidates resolved by comparing password across within-threshold or outside-threshold list
+  const candidateMatchInList = await auth.resolveFaceCandidateWithPassword(
+    [
+      { classID: '4C', studentID: 1, name: '古永晴', distance: 0.39 },
+      { classID: '4C', studentID: 2, name: '甘浩賢', distance: 0.41 }
+    ],
+    'mySecret88',
+    null
+  );
+  assert.ok(candidateMatchInList && String(candidateMatchInList.studentID) === '2', 'Face candidate disambiguation resolves matching student #2 via password');
+
+  const candidateMatchOutsideThreshold = await auth.resolveFaceCandidateWithPassword(
+    [{ classID: '4C', studentID: 1, name: '古永晴', distance: 0.49 }],
+    'TKEY-4C02',
+    { classID: '4C', studentID: 2, name: '甘浩賢' }
+  );
+  assert.ok(candidateMatchOutsideThreshold && String(candidateMatchOutsideThreshold.studentID) === '2', 'Sub-threshold face scan resolves fallback student via teacher key');
+
+  // Unambiguous face login sets faceLoginVerified = true
+  const faceDirectSess = await auth.loginStudent({
+    classID: '4C',
+    studentID: 1,
+    faceVerified: true,
+    authMethod: 'face_1toN_direct'
+  });
+  assert.strictEqual(faceDirectSess.faceLoginVerified, true, 'Face login persists faceLoginVerified: true for automatic trace exemption');
+  console.log('[PASS] 9. A1 Gate Upgrade (1:N Face Scan + Ambiguous Candidate Password Disambiguation + Dual Credentials + Auto Face Trace)');
+
+  console.log('=== ALL TESTS PASSED (9/9) ===');
 }
 
 runAllTests().catch(err => {

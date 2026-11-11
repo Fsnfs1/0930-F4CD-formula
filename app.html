@@ -41,37 +41,72 @@
     <div class="d-flex align-items-center gap-2">
       <strong style="cursor:pointer" onclick="AppUI.showScreen('screen-hub')">📐 數學刷題與評測中心</strong>
       <span id="netStatusBadge" class="net-badge">🟢 澳門/非大陸網絡</span>
-      <span id="pendingSyncBadge" class="badge bg-warning text-dark">待提交 0 筆</span>
+      <span id="pendingSyncBadge" class="badge bg-success text-white" style="cursor:pointer" title="點擊立即同步雲端" onclick="AppUI.manualFlushSync()">已全部同步 ✓</span>
     </div>
     <div class="d-flex align-items-center gap-2">
       <span id="studentInfoBadge" class="small text-light">未登入</span>
       <span id="pointsQuickBadge" class="badge bg-info text-dark" style="cursor:pointer" onclick="AppUI.openPointsApp()">💎 0 積分</span>
       <button id="btnNavHub" class="btn btn-sm btn-outline-light d-none" onclick="AppUI.showScreen('screen-hub')">返回大廳</button>
       <button id="btnLogout" class="btn btn-sm btn-outline-secondary text-light d-none" onclick="AppUI.logout()">切換帳號</button>
-      <a href="teacher.html" class="btn btn-sm btn-outline-warning">教師後台</a>
     </div>
   </div>
 
-  <!-- A1: Gate Login Screen -->
+  <!-- A1: Gate Login Screen (1:N Face Scan + Dual Credential Disambiguation & Login) -->
   <section id="screen-gate" class="app-screen active">
-    <div class="card shadow-sm border-0 p-4 mx-auto" style="max-width:480px;">
-      <h4 class="fw-bold mb-2">🔐 A1 學生門禁系統</h4>
-      <p class="text-muted small mb-3">請選擇班級與座號，並輸入老師發放的個人密鑰登入（高強度加密保護）。</p>
-      <div class="mb-3">
-        <label class="form-label fw-semibold">班別</label>
-        <select id="gateClassSelect" class="form-select" onchange="AppUI.populateSeatSelect()"></select>
+    <div class="card shadow-sm border-0 p-4 mx-auto" style="max-width:540px;">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h4 class="fw-bold mb-0">🔐 A1 智能人臉與雙憑證門禁</h4>
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">刷臉免補拍草稿</span>
       </div>
-      <div class="mb-3">
-        <label class="form-label fw-semibold">學號 / 姓名</label>
-        <select id="gateStudentSelect" class="form-select"></select>
+      <p class="text-muted small mb-3">
+        請正面面向鏡頭眨眼或點擊拍照識別。支援 <strong>刷臉秒速登入</strong>、<strong>學生自設密碼（非1234）</strong> 及 <strong>教師發放口令</strong>。凡刷臉登入成功自動拍臉留痕，測驗免上傳草稿紙或二次自拍。
+      </p>
+
+      <!-- Face Scan Camera Viewport -->
+      <div id="gateFaceCard" class="p-3 rounded-3 mb-3 text-white" style="background:#0f172a; border:1px solid #334155;">
+        <div class="position-relative mx-auto rounded overflow-hidden" style="max-width:360px; aspect-ratio:4/3; background:#020617; border:2px solid #38bdf8;">
+          <video id="faceFirstVideo" autoplay muted playsinline style="width:100%; height:100%; object-fit:cover; transform:scaleX(-1);"></video>
+          <div id="faceFirstOverlay" class="position-absolute bottom-0 start-0 end-0 px-2 py-1 text-center small" style="background:rgba(15,23,42,0.82); color:#e2e8f0; font-size:12px;">
+            📷 點擊下方「啟動相機識別」或直接用密碼/口令登入
+          </div>
+        </div>
+        <div id="faceFirstAlert" class="alert py-2 small mt-2 mb-0 d-none"></div>
+        <div class="d-flex gap-2 justify-content-center mt-2">
+          <button id="btnFaceFirstStart" type="button" class="btn btn-info btn-sm fw-bold text-dark px-3" onclick="AppUI.startGateCamera(false)">📷 啟動相機刷臉</button>
+          <button id="btnFaceFirstCapture" type="button" class="btn btn-success btn-sm fw-bold px-3 d-none" onclick="AppUI.captureAndRecognizeGate('manual_click')">🔍 拍照識別身分</button>
+        </div>
+
+        <!-- Candidate Disambiguation Panel (Shown when multiple close faces or sub-threshold match) -->
+        <div id="gateCandidatePanel" class="mt-3 pt-2 border-top border-secondary d-none">
+          <div class="small fw-bold text-warning mb-1">👥 偵測到接近臉孔或未達單一免密閾值，請點選座號或直接輸入您的密碼/口令比對：</div>
+          <div id="gateCandidateList" class="d-grid gap-1 mb-2"></div>
+          <div class="small text-info mb-1" id="gateSelectedCandidateInfo">可點選上方候選座號，或在下方切換任意班級/座號後輸入密碼/口令登入（仍保留本次刷臉留痕）</div>
+        </div>
       </div>
-      <div class="mb-3">
-        <label class="form-label fw-semibold">個人專屬密鑰</label>
-        <input id="gateSecretInput" type="password" class="form-control" placeholder="例如：4C01-X33C 或教師測試密碼 test98" />
-        <div class="form-text text-primary">💡 教師直通測試：每班均配置 <strong>98 號</strong>「教師測試帳戶」，密碼為 <code>test98</code>（驗證後直通題庫）。</div>
+      <!-- Dual Credential Form (Student Custom Password OR Teacher Secret Key) -->
+      <div class="border rounded-3 p-3 bg-light">
+        <div class="fw-bold small text-secondary mb-2">🔑 密碼 / 教師口令驗證（刷臉輔助核身 或 直接登入）</div>
+        <div class="row g-2 mb-2">
+          <div class="col-5">
+            <label class="form-label small fw-semibold mb-1">班別</label>
+            <select id="gateClassSelect" class="form-select form-select-sm" onchange="AppUI.populateSeatSelect()"></select>
+          </div>
+          <div class="col-7">
+            <label class="form-label small fw-semibold mb-1">座號</label>
+            <select id="gateStudentSelect" class="form-select form-select-sm"></select>
+          </div>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small fw-semibold mb-1">學生自設密碼（非1234）或 老師發放口令</label>
+          <input id="gateSecretInput" type="password" class="form-control" autocomplete="off" placeholder="請輸入個人密碼 或 老師專屬口令" onkeydown="if(event.key==='Enter') AppUI.handleGateLogin()" />
+          <div class="form-text text-muted" style="font-size:12px;">
+            支援學生原設密碼（預設 1234 不可直接登入）及老師預制口令。若剛才已刷臉，系統會自動比對候選名單與所選學號並完成拍臉留痕。
+          </div>
+          <div class="form-text text-muted small mt-1">💡 教師直通測試：每班均配置 <strong>98 號</strong>「教師測試帳戶」（持專屬密鑰驗證後直通題庫）。</div>
+        </div>
+        <div id="gateAlert" class="alert alert-danger py-2 small d-none mb-2"></div>
+        <button class="btn btn-primary w-100 fw-bold py-2" onclick="AppUI.handleGateLogin()">驗證身分並進入系統</button>
       </div>
-      <div id="gateAlert" class="alert alert-danger py-2 small d-none"></div>
-      <button class="btn btn-primary w-100 fw-bold py-2" onclick="AppUI.handleGateLogin()">驗證身分並進入系統</button>
     </div>
   </section>
 
@@ -179,6 +214,7 @@
       <div id="qStemBox" class="fs-5 fw-semibold mb-3"></div>
       <div id="qDiagramBox" class="mb-3 text-center d-none">
         <img id="qDiagramImg" class="img-fluid rounded border" style="max-height:240px;" alt="題目圖形" />
+        <div id="qDiagramFallback" class="alert alert-light border small text-start mt-2 d-none"></div>
       </div>
 
       <!-- Pluggable 7 Question Types Container -->
@@ -325,10 +361,12 @@
         <input type="radio" class="btn-check" name="checkinMethod" id="chkScratch" value="scratch_paper">
         <label class="btn btn-outline-primary" for="chkScratch">② 帶簽名及日期的草稿紙</label>
       </div>
-      <input type="file" id="checkinFileInput" accept="image/*" capture="user" class="form-control mb-3" />
+      <input type="file" id="checkinFileInput" accept="image/*" capture="user" class="form-control mb-2" />
+      <input type="text" id="checkinSignatureInput" class="form-control form-control-sm mb-2" placeholder="如設備無鏡頭，請輸入「本人姓名 + 今日日期」電子簽名存證" />
+      <div id="checkinAlert" class="alert alert-danger py-1 small d-none mb-2"></div>
       <div class="d-flex gap-2">
         <button class="btn btn-success flex-grow-1 fw-bold" onclick="AppUI.submitCheckinModal()">確認上傳並繼續答題</button>
-        <button class="btn btn-outline-secondary" onclick="document.getElementById('modalCheckin').classList.remove('show')">稍後</button>
+        <button id="btnCheckinLater" class="btn btn-outline-secondary" onclick="document.getElementById('modalCheckin').classList.remove('show')">稍後</button>
       </div>
     </div>
   </div>
@@ -349,8 +387,12 @@
     </div>
   </div>
 
-  <!-- Load Existing Read-Only Data Files (D11: Zero Modification to Red-Line Files) -->
+  <!-- Load Existing Read-Only Data & Face Auth Files (D11: Zero Modification to Red-Line Files) -->
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
   <script src="js/roster.js"></script>
+  <script src="js/preloaded_faces.js"></script>
+  <script src="js/face_auth.js"></script>
+  <script src="js/persistence.js"></script>
   <script src="js/questions_4cd1023.js"></script>
   <script src="js/bank_4cd_t2.js"></script>
   <script src="js/bank_4cd_1102_adaptive.js"></script>
@@ -378,8 +420,23 @@
       let currentDraftAnswer = null;
       let quizTimerId = null;
       let gameTimerId = null;
+      let activeGameId = null;
+      let gameLastTickTs = 0;
       let pendingArenaMatch = null;
       let checkinStage = 'start';
+      let gateBlinkTracker = null;
+      let gateIsScanning = false;
+      let gateCapturedSnap = null;
+      let gateCloseCandidates = [];
+
+      function esc(str) {
+        return String(str == null ? '' : str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
 
       function init() {
         populateClassSelect();
@@ -389,25 +446,35 @@
           MathCoreNetwatch.onChange(updateNetBadge);
           updateNetBadge(MathCoreNetwatch.getState());
         }
-        // Start global keyboard & click telemetry listener (D1)
+        // Start Background Sync Worker & listen for receipts to immediately update badge
+        if (window.MathCoreSync && typeof MathCoreSync.start === 'function') {
+          MathCoreSync.start();
+          if (typeof MathCoreSync.onReceipt === 'function') {
+            MathCoreSync.onReceipt(function () {
+              refreshTopBadges();
+            });
+          }
+        }
+
+        // Start global keyboard & click telemetry listener ONLY during active quiz/practice/exam session
         document.addEventListener('click', function (e) {
-          if (!currentStudent) return;
+          if (!currentStudent || !activeSession || activeSession.state.completed) return;
           const t = e.target && (e.target.id || e.target.innerText || e.target.tagName);
           if (window.MathCoreSync && typeof MathCoreSync.recordAction === 'function') {
             MathCoreSync.recordAction('ui_click', { target: String(t || '').slice(0, 32) }, {
               sid: currentStudent.classID + '_' + currentStudent.studentID,
-              mode: activeSession ? activeSession.state.mode : 'hub'
+              mode: activeSession.state.mode
             });
           }
           refreshTopBadges();
         }, { passive: true });
 
         document.addEventListener('keydown', function (e) {
-          if (!currentStudent) return;
+          if (!currentStudent || !activeSession || activeSession.state.completed) return;
           if (window.MathCoreSync && typeof MathCoreSync.recordAction === 'function') {
             MathCoreSync.recordAction('ui_keydown', { key: e.key }, {
               sid: currentStudent.classID + '_' + currentStudent.studentID,
-              mode: activeSession ? activeSession.state.mode : 'hub'
+              mode: activeSession.state.mode
             });
           }
         }, { passive: true });
@@ -430,19 +497,311 @@
           }
         });
 
-        // Restore active login session if present
+        // Restore active login session if present and valid student/teacher_test session
+        let restored = false;
         try {
-          const saved = JSON.parse(localStorage.getItem('MP_V2_SESSION') || 'null');
-          if (saved && saved.classID && saved.studentID) {
-            onLoginSuccess(saved);
+          const saved = (window.MathCoreAuth && typeof MathCoreAuth.getSession === 'function')
+            ? MathCoreAuth.getSession()
+            : JSON.parse(localStorage.getItem('MP_V2_SESSION') || 'null');
+          if (saved && saved.token && saved.classID && saved.studentID && (saved.role === 'student' || saved.role === 'teacher_test')) {
+            restored = true;
+            onLoginSuccess(saved, false);
           }
         } catch (e) {}
+
+        if (!restored) {
+          startGateCamera(true);
+        }
+      }
+
+      async function manualFlushSync() {
+        const badge = document.getElementById('pendingSyncBadge');
+        if (badge) badge.textContent = '⏳ 正在同步...';
+        try {
+          if (window.MathCoreNetwatch && typeof MathCoreNetwatch.probeNow === 'function') {
+            await MathCoreNetwatch.probeNow();
+          }
+          if (window.MathCoreSync && typeof MathCoreSync.flushNow === 'function') {
+            await MathCoreSync.flushNow();
+          }
+        } catch (e) {}
+        refreshTopBadges();
+      }
+
+      function getAllFaceProfiles() {
+        if (window.getAllStudentProfiles && typeof window.getAllStudentProfiles === 'function') {
+          const list = window.getAllStudentProfiles();
+          if (Array.isArray(list) && list.length > 0) return list;
+        }
+        const preloaded = window.PRELOADED_STUDENT_FACES || {};
+        const map = {};
+        Object.keys(preloaded).forEach(function (k) {
+          const item = preloaded[k];
+          if (!item || !item.vector || item.vector.length !== 128) return;
+          const cid = String(item.classID || k.split('_')[0]).toUpperCase();
+          const sid = parseInt(item.studentID || k.split('_')[1], 10);
+          map[cid + '_' + sid] = {
+            classID: cid,
+            studentID: sid,
+            name: item.name || ('學生 ' + sid),
+            vector: new Float32Array(item.vector)
+          };
+        });
+        return Object.values(map);
+      }
+
+      function stopGateCamera() {
+        if (gateBlinkTracker && typeof gateBlinkTracker.stop === 'function') {
+          try { gateBlinkTracker.stop(); } catch (_) {}
+          gateBlinkTracker = null;
+        }
+        const video = document.getElementById('faceFirstVideo');
+        if (window.FaceAuthModule && typeof window.FaceAuthModule.stopCamera === 'function') {
+          try { window.FaceAuthModule.stopCamera(video); } catch (_) {}
+        }
+        if (video && video.srcObject) {
+          try {
+            video.srcObject.getTracks().forEach(function (t) { t.stop(); });
+            video.srcObject = null;
+          } catch (_) {}
+        }
+      }
+
+      async function startGateCamera(isAutoStart) {
+        const video = document.getElementById('faceFirstVideo');
+        const btnStart = document.getElementById('btnFaceFirstStart');
+        const btnCapture = document.getElementById('btnFaceFirstCapture');
+        const overlay = document.getElementById('faceFirstOverlay');
+        if (!video) return;
+
+        if (isAutoStart) {
+          try {
+            const p = new URLSearchParams(window.location.search || '');
+            if (p.get('test_disable_autocamera') === '1') return;
+          } catch (_) {}
+        }
+
+        if (overlay) overlay.textContent = '📷 正在開啟前置鏡頭，請正面面向鏡頭...';
+        try {
+          if (window.FaceAuthModule && typeof window.FaceAuthModule.startCamera === 'function') {
+            await window.FaceAuthModule.startCamera(video);
+          } else if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            const stream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+              audio: false
+            });
+            video.srcObject = stream;
+            await video.play().catch(function () {});
+          }
+          if (video.srcObject) {
+            if (overlay) overlay.textContent = '🟢 相機運作中 · 請眨眼自動識別或點擊「拍照識別身分」';
+            if (btnStart) btnStart.classList.add('d-none');
+            if (btnCapture) btnCapture.classList.remove('d-none');
+            if (window.FaceAuthModule && typeof window.FaceAuthModule.startBlinkDetection === 'function') {
+              if (gateBlinkTracker) gateBlinkTracker.stop();
+              gateBlinkTracker = window.FaceAuthModule.startBlinkDetection(video, {
+                onBlink: function () {
+                  if (!gateIsScanning) captureAndRecognizeGate('liveness_loop');
+                },
+                onStatusUpdate: function (st) {
+                  if (gateIsScanning || !overlay) return;
+                  overlay.textContent = st && st.isFaceDetected
+                    ? '🟢 偵測到臉孔 · 請眨眼或點擊「拍照識別身分」'
+                    : '🟡 請將臉孔置於鏡頭中央';
+                }
+              });
+            }
+          }
+        } catch (err) {
+          if (overlay) overlay.textContent = '⚠️ 未開啟相機權限，可點擊「啟動相機刷臉」或直接用下方密碼/口令登入';
+          if (btnStart) btnStart.classList.remove('d-none');
+          if (btnCapture) btnCapture.classList.add('d-none');
+        }
+      }
+
+      function recordFaceLoginTrace(student, snap) {
+        if (!student) return;
+        const cid = student.classID;
+        const sid = student.studentID;
+        const key = cid + '_' + sid;
+        try {
+          if (snap && snap.descriptor && window.enhanceStudentVector) {
+            window.enhanceStudentVector(cid, sid, snap.descriptor, 0.70);
+          }
+          if (snap && snap.photoBase64) {
+            sessionStorage.setItem('MP_V2_FACE_TRACE_' + key, snap.photoBase64);
+            if (window.uploadDrivePhoto) {
+              window.uploadDrivePhoto(cid, sid, student.name, snap.photoBase64, snap.descriptor || null).catch(function () {});
+            }
+          } else if (snap && snap.descriptor && window.submitFormRecord) {
+            window.submitFormRecord({
+              classID: cid,
+              studentID: sid,
+              vector: Array.from(snap.descriptor),
+              timestamp: Date.now()
+            }).catch(function () {});
+          }
+          if (window.MathCoreSync && typeof MathCoreSync.recordAction === 'function') {
+            MathCoreSync.recordAction('face_gate_checkin', {
+              method: 'face_gate',
+              hasPhoto: Boolean(snap && snap.photoBase64),
+              ts: Date.now()
+            }, { sid: key, mode: 'gate' });
+          }
+        } catch (_) {}
+      }
+
+      function renderGateCandidates(candidates) {
+        const panel = document.getElementById('gateCandidatePanel');
+        const listEl = document.getElementById('gateCandidateList');
+        const infoEl = document.getElementById('gateSelectedCandidateInfo');
+        if (!panel || !listEl) return;
+
+        gateCloseCandidates = Array.isArray(candidates) ? candidates : [];
+        if (gateCloseCandidates.length === 0) {
+          panel.classList.add('d-none');
+          return;
+        }
+        panel.classList.remove('d-none');
+        listEl.innerHTML = gateCloseCandidates.slice(0, 5).map(function (c, idx) {
+          const prof = c.profile || c;
+          const pct = c.percentage || Math.round((c.centeredSimilarity || 0.78) * 100);
+          return `<button type="button" class="btn btn-sm ${idx === 0 ? 'btn-info text-dark fw-bold' : 'btn-outline-light'} text-start d-flex justify-content-between align-items-center" onclick="AppUI.selectGateCandidate('${esc(prof.classID)}', '${esc(prof.studentID)}')">
+            <span>👤 ${esc(prof.classID)} 班 ${esc(prof.studentID)} 號</span>
+            <span class="badge bg-dark">${pct}% 接近</span>
+          </button>`;
+        }).join('');
+
+        const first = gateCloseCandidates[0].profile || gateCloseCandidates[0];
+        if (first && first.classID && first.studentID) {
+          selectGateCandidate(first.classID, first.studentID, true);
+        }
+        if (infoEl) {
+          infoEl.textContent = '💡 請輸入您的自設密碼或老師口令完成驗證（若您不在上方候選名單，也可直接在下方下拉選單選擇您的班級與座號）';
+        }
+      }
+
+      function selectGateCandidate(classID, studentID, silentFocus) {
+        const clsSel = document.getElementById('gateClassSelect');
+        const stuSel = document.getElementById('gateStudentSelect');
+        if (clsSel && clsSel.value !== classID) {
+          clsSel.value = classID;
+          populateSeatSelect();
+        }
+        if (stuSel) {
+          stuSel.value = String(studentID);
+        }
+        const infoEl = document.getElementById('gateSelectedCandidateInfo');
+        if (infoEl) {
+          infoEl.innerHTML = `已選取：<strong>${esc(classID)} 班 ${esc(studentID)} 號</strong> · 請在下方輸入密碼或口令完成刷臉核身`;
+        }
+        if (!silentFocus) {
+          const inp = document.getElementById('gateSecretInput');
+          if (inp) inp.focus();
+        }
+      }
+
+      async function captureAndRecognizeGate(triggerSource) {
+        if (gateIsScanning && triggerSource === 'liveness_loop') return;
+        gateIsScanning = true;
+
+        const video = document.getElementById('faceFirstVideo');
+        const btnCapture = document.getElementById('btnFaceFirstCapture');
+        const alertBox = document.getElementById('faceFirstAlert');
+        const overlay = document.getElementById('faceFirstOverlay');
+
+        if (btnCapture) {
+          btnCapture.disabled = true;
+          btnCapture.textContent = '⏳ 正在提取特徵比對...';
+        }
+
+        try {
+          let snap = null;
+          if (window.FaceAuthModule && typeof window.FaceAuthModule.captureFace === 'function' && video) {
+            snap = await window.FaceAuthModule.captureFace(video);
+          }
+          if (!snap || snap.isDemo || !snap.descriptor) {
+            if (triggerSource !== 'liveness_loop' && alertBox) {
+              alertBox.className = 'alert alert-warning py-2 small mt-2 mb-0';
+              alertBox.textContent = '⚠️ 未能清晰捕捉臉孔，請面向鏡頭重試，或直接輸入下方密碼/口令登入。';
+              alertBox.classList.remove('d-none');
+            }
+            gateIsScanning = false;
+            if (btnCapture) {
+              btnCapture.disabled = false;
+              btnCapture.textContent = '🔍 拍照識別身分';
+            }
+            return;
+          }
+
+          gateCapturedSnap = snap;
+          const profiles = getAllFaceProfiles();
+          const matchResult = (window.FaceAuthModule && typeof window.FaceAuthModule.identifyFace1toN === 'function')
+            ? window.FaceAuthModule.identifyFace1toN(snap.descriptor, profiles, 0.82)
+            : { isMatch: false, candidates: [] };
+
+          const isAmbiguous = (matchResult.status === 'AMBIGUOUS_MARGIN') ||
+            (matchResult.delta !== undefined && matchResult.delta < 0.08 && matchResult.topCandidate && matchResult.secondMatch);
+
+          if (matchResult.isMatch && matchResult.bestMatch && !isAmbiguous) {
+            // Single unambiguous face match -> direct password-free login + auto face trace!
+            stopGateCamera();
+            const best = matchResult.bestMatch;
+            if (alertBox) {
+              alertBox.className = 'alert alert-success py-2 small mt-2 mb-0';
+              alertBox.innerHTML = `✅ <strong>刷臉識別成功！</strong> 歡迎 ${esc(best.classID)} 班 ${esc(best.studentID)} 號 ${esc(best.name)} 同學 (相似度 ${matchResult.percentage || 92}%)，已自動拍臉留痕！`;
+              alertBox.classList.remove('d-none');
+            }
+            if (overlay) overlay.textContent = `🟢 驗證通過 · 歡迎 ${best.name} 同學`;
+
+            const sess = await MathCoreAuth.loginStudent({
+              classID: best.classID,
+              studentID: best.studentID,
+              name: best.name,
+              faceVerified: true
+            });
+            recordFaceLoginTrace(best, snap);
+            gateIsScanning = false;
+            setTimeout(function () {
+              onLoginSuccess(sess, true);
+            }, 350);
+            return;
+          }
+
+          // Multiple close faces OR sub-threshold similarity -> show top close candidates + allow password/key disambiguation (inside or outside threshold)
+          stopGateCamera();
+          const cands = (matchResult.candidates && matchResult.candidates.length > 0)
+            ? matchResult.candidates
+            : (matchResult.topCandidate ? [{ profile: matchResult.topCandidate, percentage: matchResult.percentage || 78 }] : []);
+          renderGateCandidates(cands);
+
+          if (alertBox) {
+            alertBox.className = 'alert alert-info py-2 small mt-2 mb-0';
+            alertBox.innerHTML = '📸 <strong>已捕捉臉孔並拍臉留痕！</strong> 由於存在接近臉孔或特徵未達免密閾值，請點選姓名或直接輸入您的<strong>自設密碼 / 教師口令</strong>完成核身。';
+            alertBox.classList.remove('d-none');
+          }
+          if (overlay) overlay.textContent = '🟡 已拍臉留痕 · 請輸入密碼或口令完成最終比對';
+          const inp = document.getElementById('gateSecretInput');
+          if (inp) inp.focus();
+        } catch (err) {
+          if (alertBox) {
+            alertBox.className = 'alert alert-warning py-2 small mt-2 mb-0';
+            alertBox.textContent = '⚠️ 臉部識別暫時無法使用，請直接使用下方密碼或老師口令登入。';
+            alertBox.classList.remove('d-none');
+          }
+        } finally {
+          gateIsScanning = false;
+          if (btnCapture) {
+            btnCapture.disabled = false;
+            btnCapture.textContent = '🔍 拍照識別身分';
+          }
+        }
       }
 
       function populateClassSelect() {
         const clsSel = document.getElementById('gateClassSelect');
         const classes = (window.MathPlatformRegistry && MathPlatformRegistry.classes) || ['4C', '4D', '5B', '5C'];
-        clsSel.innerHTML = classes.map(c => `<option value="${c}">${c} 班</option>`).join('');
+        clsSel.innerHTML = classes.map(c => `<option value="${esc(c)}">${esc(c)} 班</option>`).join('');
         populateSeatSelect();
       }
 
@@ -453,62 +812,104 @@
           ? MathPlatformRegistry.getMergedRoster()
           : {};
         let list = Array.isArray(merged[cls]) && merged[cls].length > 0
-          ? merged[cls]
-          : ((window.getStudentsByClass && window.getStudentsByClass(cls)) || []);
-        // Ensure seat 98 is always present in every class dropdown
+          ? merged[cls].slice()
+          : ((window.getStudentsByClass && window.getStudentsByClass(cls)) || []).slice();
+        // Ensure seat 98 teacher test account is always present in every class dropdown
         if (!list.some(s => String(s.id) === '98')) {
-          list = list.concat([{ id: 98, name: '教師測試帳戶 (直通題庫)', classID: cls, isTeacherTest: true, directToBank: true }]);
+          list.push({ id: 98, name: '教師測試帳戶 (直通題庫)', classID: cls, isTeacherTest: true, directToBank: true });
         }
-        stuSel.innerHTML = list.map(s => `<option value="${s.id}" data-name="${s.name}">${s.id} 號 - ${s.name}</option>`).join('');
+        stuSel.innerHTML = list.map(s => {
+          const is98 = String(s.id) === '98';
+          const label = is98 ? `${esc(s.id)} 號 (教師測試)` : `${esc(s.id)} 號`;
+          return `<option value="${esc(s.id)}">${label}</option>`;
+        }).join('');
       }
 
-      function handleGateLogin() {
-        const cls = document.getElementById('gateClassSelect').value;
+      async function handleGateLogin() {
+        let cls = document.getElementById('gateClassSelect').value;
         const sel = document.getElementById('gateStudentSelect');
-        const sid = sel.value;
-        const sName = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].getAttribute('data-name') : ('同學' + sid);
+        let sid = sel.value;
         const secret = document.getElementById('gateSecretInput').value.trim();
         const alertEl = document.getElementById('gateAlert');
 
-        if (String(sid) === '98') {
-          if (secret.toLowerCase() !== 'test98') {
-            alertEl.textContent = '❌ 98 號教師測試帳戶密碼須為 test98';
-            alertEl.classList.remove('d-none');
-            return;
-          }
-        } else if (!secret || secret.length < 2) {
-          alertEl.textContent = '請輸入老師發放的個人密鑰！';
+        if (!secret || secret.length < 2) {
+          alertEl.textContent = '請輸入個人密碼或老師發放口令！';
           alertEl.classList.remove('d-none');
           return;
         }
-        alertEl.classList.add('d-none');
 
-        const isTest98 = String(sid) === '98';
-        const student = {
-          classID: cls,
-          studentID: String(sid),
-          name: sName,
-          secretKey: secret,
-          isTeacherTest: isTest98,
-          directToBank: isTest98,
-          loginTs: Date.now()
-        };
-        localStorage.setItem('MP_V2_SESSION', JSON.stringify(student));
-        onLoginSuccess(student, true);
+        if (!window.MathCoreAuth || typeof MathCoreAuth.loginStudent !== 'function') {
+          alertEl.textContent = '系統認證模組未就緒，請重新整理頁面。';
+          alertEl.classList.remove('d-none');
+          return;
+        }
+
+        try {
+          const hadFaceScan = Boolean(gateCapturedSnap && gateCapturedSnap.descriptor);
+          // If face was scanned and there are close candidates, check if the entered password/key matches either the selected student OR one of the close face candidates!
+          if (hadFaceScan && typeof MathCoreAuth.resolveFaceCandidateWithPassword === 'function') {
+            const matchedProf = await MathCoreAuth.resolveFaceCandidateWithPassword(
+              gateCloseCandidates,
+              secret,
+              { classID: cls, studentID: parseInt(sid, 10) }
+            );
+            if (matchedProf && matchedProf.classID && matchedProf.studentID !== undefined) {
+              cls = matchedProf.classID;
+              sid = String(matchedProf.studentID);
+            }
+          }
+
+          const res = await MathCoreAuth.loginStudent({
+            classID: cls,
+            studentID: sid,
+            secretKey: secret,
+            faceVerified: hadFaceScan
+          });
+          const sess = (res && res.session) || res;
+          if (!sess || !sess.token) {
+            alertEl.textContent = '❌ ' + ((res && res.error) || '驗證失敗，請檢查學號、個人密碼或老師口令。');
+            alertEl.classList.remove('d-none');
+            return;
+          }
+          alertEl.classList.add('d-none');
+          document.getElementById('gateSecretInput').value = '';
+          stopGateCamera();
+          if (hadFaceScan) {
+            recordFaceLoginTrace(sess, gateCapturedSnap);
+          }
+          onLoginSuccess(sess, true);
+        } catch (err) {
+          alertEl.textContent = '❌ ' + ((err && err.message) || '驗證失敗，請檢查學號、個人密碼或老師口令。');
+          alertEl.classList.remove('d-none');
+        }
       }
 
       function onLoginSuccess(student, isFreshLogin) {
         currentStudent = student;
         const sid = student.classID + '_' + student.studentID;
-        const isTest98 = String(student.studentID) === '98' || !!student.directToBank;
-        document.getElementById('studentInfoBadge').textContent = `${student.classID} 班 ${student.studentID} 號 ${student.name}`;
+        const isSeat98Test = String(student.studentID) === '98' || !!student.directToBank || student.role === 'teacher_test';
+        const faceTag = student.faceLoginVerified ? ' · 📸已刷臉留痕' : '';
+        document.getElementById('studentInfoBadge').textContent = `${student.classID} 班 ${student.studentID} 號 ${student.name}${faceTag}`;
         document.getElementById('hubWelcomeTitle').textContent = `👋 你好，${student.classID} 班 ${student.name}`;
         document.getElementById('btnNavHub').classList.remove('d-none');
         document.getElementById('btnLogout').classList.remove('d-none');
-        refreshTopBadges();
 
-        // Seat 98 teacher test account: skip consent popup and go straight to question bank selector!
-        if (isTest98) {
+        // Immediately flush any pending outbox items when online in Macau
+        if (window.MathCoreSync && typeof MathCoreSync.flushNow === 'function') {
+          MathCoreSync.flushNow().then(refreshTopBadges).catch(refreshTopBadges);
+        } else {
+          refreshTopBadges();
+        }
+
+        // Sync D6 consent switch with stored status
+        const consentToggle = document.getElementById('consentToggleSwitch');
+        if (consentToggle && window.MathCoreAuth && typeof MathCoreAuth.getConsentStatus === 'function') {
+          const cs = MathCoreAuth.getConsentStatus(sid);
+          if (cs && cs.decided) consentToggle.checked = !!cs.agreed;
+        }
+
+        // Seat 98 teacher test account (when launched from teacher preview): go straight to question bank selector
+        if (isSeat98Test) {
           openPracticeSelector('drill');
           return;
         }
@@ -522,26 +923,39 @@
       }
 
       function logout() {
+        stopGamePlaytimeTracker();
+        stopGateCamera();
+        gateCapturedSnap = null;
+        gateCloseCandidates = [];
+        const candPanel = document.getElementById('gateCandidatePanel');
+        if (candPanel) candPanel.classList.add('d-none');
         currentStudent = null;
         activeSession = null;
         if (quizTimerId) clearInterval(quizTimerId);
-        localStorage.removeItem('MP_V2_SESSION');
+        if (window.MathCoreAuth && typeof MathCoreAuth.logout === 'function') {
+          MathCoreAuth.logout();
+        } else {
+          localStorage.removeItem('MP_V2_SESSION');
+        }
         document.getElementById('studentInfoBadge').textContent = '未登入';
+        document.getElementById('pointsQuickBadge').textContent = '💎 0 積分';
         document.getElementById('btnNavHub').classList.add('d-none');
         document.getElementById('btnLogout').classList.add('d-none');
         showScreen('screen-gate');
+        startGateCamera(true);
       }
 
       function confirmConsent(agreed) {
         if (!currentStudent) return;
         const sid = currentStudent.classID + '_' + currentStudent.studentID;
-        const rec = { sid: sid, agreed: !!agreed, version: '2026-11-v1', ts: Date.now() };
-        localStorage.setItem('MP_V2_CONSENT_' + sid, JSON.stringify(rec));
+        if (window.MathCoreAuth && typeof MathCoreAuth.saveConsentDecision === 'function') {
+          MathCoreAuth.saveConsentDecision(sid, !!agreed);
+        } else {
+          const rec = { sid: sid, agreed: !!agreed, version: '2026-11-v1', ts: Date.now() };
+          localStorage.setItem('MP_V2_CONSENT_' + sid, JSON.stringify(rec));
+        }
         document.getElementById('consentToggleSwitch').checked = !!agreed;
         document.getElementById('modalConsent').classList.remove('show');
-        if (window.MathCoreSync && typeof MathCoreSync.recordAction === 'function') {
-          MathCoreSync.recordAction('research_consent', rec, { sid: sid });
-        }
       }
 
       function toggleConsent(agreed) {
@@ -556,6 +970,9 @@
           if (currentStudent && window.MathCoreBonus) {
             MathCoreBonus.PointsLedger.confirmPendingPoints(currentStudent.classID + '_' + currentStudent.studentID);
           }
+          if (window.MathCoreSync && typeof MathCoreSync.flushNow === 'function') {
+            MathCoreSync.flushNow().then(refreshTopBadges).catch(refreshTopBadges);
+          }
         } else if (state.status === 'YELLOW' || state.status === 'restricted_mainland') {
           el.textContent = '🟡 受限網絡 (已暫存瀏覽器，回澳自動補交)';
         } else {
@@ -565,61 +982,182 @@
       }
 
       function refreshTopBadges() {
-        if (!currentStudent) return;
-        const sid = currentStudent.classID + '_' + currentStudent.studentID;
-        if (window.MathCoreBonus) {
+        if (currentStudent && window.MathCoreBonus) {
+          const sid = currentStudent.classID + '_' + currentStudent.studentID;
           const bal = MathCoreBonus.PointsLedger.getBalance(sid);
           document.getElementById('pointsQuickBadge').textContent = `💎 ${bal.confirmed} 積分` + (bal.pending > 0 ? ` (+${bal.pending}待入帳)` : '');
         }
         try {
-          const outbox = JSON.parse(localStorage.getItem('MP_V2_OUTBOX') || '[]');
-          document.getElementById('pendingSyncBadge').textContent = `待提交 ${outbox.length} 筆`;
+          const pendingCount = (window.MathCoreStorage && typeof MathCoreStorage.getPendingCount === 'function')
+            ? MathCoreStorage.getPendingCount()
+            : JSON.parse(localStorage.getItem('MP_V2_OUTBOX') || '[]').filter(x => !x.synced).length;
+          const badge = document.getElementById('pendingSyncBadge');
+          if (badge) {
+            if (pendingCount === 0) {
+              badge.className = 'badge bg-success text-white';
+              badge.textContent = '已全部同步 ✓';
+            } else {
+              badge.className = 'badge bg-warning text-dark';
+              badge.textContent = `待提交 ${pendingCount} 筆`;
+            }
+          }
         } catch (e) {}
       }
 
       function showScreen(id) {
+        if (id !== 'screen-games') {
+          stopGamePlaytimeTracker();
+        }
         document.querySelectorAll('.app-screen').forEach(el => el.classList.remove('active'));
         const target = document.getElementById(id);
         if (target) target.classList.add('active');
         refreshTopBadges();
       }
 
-      function resolveBankQuestions(bankId) {
+      function resolveBankQuestions(bankId, subKey) {
+        const reg = window.MathPlatformRegistry;
+        const bankCfg = reg && typeof reg.getBankById === 'function' ? reg.getBankById(bankId) : null;
+        if (reg && typeof reg.resolveBankGlobalData === 'function' && bankCfg) {
+          const mainPool = reg.resolveBankGlobalData({
+            id: bankCfg.id,
+            globalVar: bankCfg.globalVar,
+            subKey: subKey || bankCfg.subKey || null
+          }, window);
+          const adaptivePool = (bankId === '4cd_1102' || bankCfg.adaptiveGlobalVar)
+            ? (window[bankCfg.adaptiveGlobalVar || 'BANK_4CD_1102_ADAPTIVE'] || [])
+            : [];
+          return { main: mainPool, adaptive: adaptivePool };
+        }
         if (bankId === '4cd_1023') return { main: window.QUESTIONS_4CD1023 || [], adaptive: [] };
         if (bankId === '5bc_1102') return { main: window.BANK_5BC1102 || [], adaptive: [] };
-        const t2 = window.BANK_4CD_T2_ALL || (window.BANK_4CD_T2 && (window.BANK_4CD_T2.exam || []).concat(window.BANK_4CD_T2.practice || [])) || [];
+        const t2 = subKey === 'exam' && window.BANK_4CD_T2 && Array.isArray(window.BANK_4CD_T2.exam)
+          ? window.BANK_4CD_T2.exam
+          : (window.BANK_4CD_T2_ALL || (window.BANK_4CD_T2 && (window.BANK_4CD_T2.exam || []).concat(window.BANK_4CD_T2.practice || [])) || []);
         return { main: t2, adaptive: window.BANK_4CD_1102_ADAPTIVE || [] };
       }
 
       function openPracticeSelector(mode) {
+        if (!currentStudent) {
+          showScreen('screen-gate');
+          return;
+        }
+        const cls = currentStudent.classID;
+        const sid = currentStudent.classID + '_' + currentStudent.studentID;
+        const isTeacherTest = String(currentStudent.studentID) === '98' || currentStudent.role === 'teacher_test';
         const listEl = document.getElementById('selectorList');
         const titleEl = document.getElementById('selectorTitle');
         document.getElementById('practiceRandomWrap').style.display = mode === 'practice' ? 'block' : 'none';
-        titleEl.textContent = mode === 'practice' ? '📴 選擇純本地離線練習題庫 (≥24h 同步)' : (mode === 'exam' ? '🛡️ 選擇限時測驗 (15分鐘 + 安保打卡)' : '🚀 選擇聯網自適應刷題');
+        titleEl.textContent = mode === 'practice'
+          ? '📴 選擇純本地離線練習題庫 (≥24h 批量同步)'
+          : (mode === 'exam' ? '🛡️ 選擇限時測驗 (15分鐘 + 安保打卡)' : '🚀 選擇聯網自適應刷題');
 
-        const banks = (window.MathPlatformRegistry && MathPlatformRegistry.banks) || [
-          { id: '4cd_1023', title: '高一 1023 函數題庫', classes: ['4C', '4D'] },
-          { id: '4cd_1102', title: '高一 1102 函數進階自適應題庫', classes: ['4C', '4D'] },
-          { id: '5bc_1102', title: '高二 1102 數列與三角題庫', classes: ['5B', '5C'] }
-        ];
+        const reg = window.MathPlatformRegistry;
+        let items = [];
 
-        // Also offer a built-in demo bank showcasing all 7 question types
-        const allItems = banks.concat([
-          { id: 'all_7_types', title: '✨ 7 大新題型全功能體驗題庫（單選/多選/配對/排序/找錯/作圖/上傳）', classes: ['4C', '4D', '5B', '5C'] }
-        ]);
+        if (mode === 'exam' && reg && typeof reg.getExamsForClass === 'function') {
+          const exams = isTeacherTest
+            ? (reg.exams || []).filter(e => e.mode === 'exam')
+            : reg.getExamsForClass(cls, 'exam');
+          items = exams.map(e => ({
+            id: e.bankId || e.id,
+            examId: e.id,
+            title: e.title,
+            classes: e.classes || [cls],
+            subKey: e.subKey || null
+          }));
+        }
 
-        listEl.innerHTML = allItems.map(b => `
-          <div class="col-md-6">
-            <div class="p-3 border rounded bg-white d-flex justify-content-between align-items-center">
-              <div>
-                <div class="fw-bold">${b.title}</div>
-                <div class="text-muted small">適用班別：${(b.classes || []).join(', ')}</div>
+        if (items.length === 0) {
+          const banks = (reg && typeof reg.getBanksForClass === 'function' && !isTeacherTest)
+            ? reg.getBanksForClass(cls)
+            : ((reg && reg.banks) || [
+                { id: '4cd_1023', title: '高一 1023 函數題庫', classes: ['4C', '4D'] },
+                { id: '4cd_1102', title: '高一 1102 函數進階自適應題庫', classes: ['4C', '4D'] },
+                { id: '5bc_1102', title: '高二 1102 數列與三角題庫', classes: ['5B', '5C'] }
+              ]);
+          items = banks.filter(b => isTeacherTest || !b.classes || b.classes.includes(cls)).map(b => ({
+            id: b.id,
+            examId: mode + '_' + b.id,
+            title: b.title,
+            classes: b.classes || [cls],
+            subKey: mode === 'exam' && b.id === '4cd_1102' ? 'exam' : null
+          }));
+        }
+
+        // Offer built-in demo bank showcasing all 7 question types for practice & drill
+        if (mode !== 'exam') {
+          items = items.concat([
+            { id: 'all_7_types', examId: mode + '_all_7_types', title: '✨ 7 大新題型全功能體驗題庫（單選/多選/配對/排序/找錯/作圖/上傳）', classes: ['4C', '4D', '5B', '5C'] }
+          ]);
+        }
+
+        // Check for unfinished saved session (Breakpoint Resume)
+        let resumeBannerHtml = '';
+        if (window.MathCoreStorage && typeof MathCoreStorage.loadActiveQuizState === 'function') {
+          const savedQuiz = MathCoreStorage.loadActiveQuizState();
+          if (savedQuiz && savedQuiz.sid === sid && !savedQuiz.completed && Array.isArray(savedQuiz.questions) && savedQuiz.questions.length > 0) {
+            const answeredCount = Object.keys(savedQuiz.answers || {}).length;
+            resumeBannerHtml = `
+              <div class="col-12">
+                <div class="p-3 border border-warning rounded bg-warning-subtle d-flex justify-content-between align-items-center flex-wrap gap-2">
+                  <div>
+                    <div class="fw-bold text-dark">📂 發現未完成的答題進度：${esc(savedQuiz.title || savedQuiz.examId)}</div>
+                    <div class="small text-secondary">已完成 ${answeredCount} / ${savedQuiz.targetQuota || savedQuiz.questions.length} 題 · 點擊右側按鈕從斷點處繼續作答</div>
+                  </div>
+                  <button class="btn btn-warning btn-sm fw-bold" onclick="AppUI.resumeSavedQuiz()">繼續上次作答 ➔</button>
+                </div>
               </div>
-              <button class="btn btn-primary btn-sm fw-bold" onclick="AppUI.startQuizSession('${mode}', '${b.id}', '${b.title}')">開始 ➔</button>
+            `;
+          }
+        }
+
+        listEl.innerHTML = resumeBannerHtml + items.map((b, idx) => `
+          <div class="col-md-6">
+            <div class="p-3 border rounded bg-white d-flex justify-content-between align-items-center h-100">
+              <div>
+                <div class="fw-bold">${esc(b.title)}</div>
+                <div class="text-muted small">適用班別：${esc((b.classes || []).join(', '))}</div>
+              </div>
+              <button class="btn btn-primary btn-sm fw-bold text-nowrap ms-2" data-mode="${esc(mode)}" data-bank="${esc(b.id)}" data-title="${esc(b.title)}" data-exam="${esc(b.examId || '')}" onclick="AppUI.startQuizFromBtn(this)">開始 ➔</button>
             </div>
           </div>
         `).join('');
         showScreen('screen-selector');
+      }
+
+      function startQuizFromBtn(btn) {
+        if (!btn) return;
+        startQuizSession(
+          btn.getAttribute('data-mode') || 'drill',
+          btn.getAttribute('data-bank') || '4cd_1102',
+          btn.getAttribute('data-title') || '數學題庫',
+          { examId: btn.getAttribute('data-exam') || undefined }
+        );
+      }
+
+      function resumeSavedQuiz() {
+        if (!currentStudent || !window.MathCoreStorage || !window.MathCoreEngine) return;
+        const sid = currentStudent.classID + '_' + currentStudent.studentID;
+        const savedQuiz = MathCoreStorage.loadActiveQuizState();
+        if (!savedQuiz || savedQuiz.sid !== sid || savedQuiz.completed) {
+          alert('找不到可恢復的未完成進度！');
+          return;
+        }
+        const bankId = String(savedQuiz.examId || '').replace(/^(practice|drill|exam)_/, '');
+        const pools = bankId === 'all_7_types'
+          ? { main: getBuiltIn7TypesQuestions(), adaptive: [] }
+          : resolveBankQuestions(bankId);
+        activeSession = MathCoreEngine.resumeSession(savedQuiz, {
+          mainPool: pools.main,
+          adaptiveQuestions: pools.adaptive
+        });
+        if (!activeSession) {
+          alert('進度恢復失敗，請重新開始。');
+          return;
+        }
+        startQuizTimer();
+        renderCurrentQuestion();
+        showScreen('screen-quiz');
       }
 
       function getBuiltIn7TypesQuestions() {
@@ -634,29 +1172,54 @@
         ];
       }
 
-      function startQuizSession(mode, bankId, title) {
+      function startQuizSession(mode, bankId, title, extraOpts) {
+        extraOpts = extraOpts || {};
         const randomize = document.getElementById('practiceRandomSwitch').checked;
+        const reg = window.MathPlatformRegistry;
+        const examCfg = (reg && Array.isArray(reg.exams))
+          ? reg.exams.find(e => e.id === extraOpts.examId || (e.bankId === bankId && e.mode === mode))
+          : null;
+
+        const subKey = (examCfg && examCfg.subKey) || (mode === 'exam' && bankId === '4cd_1102' ? 'exam' : null);
         const pools = bankId === 'all_7_types'
           ? { main: getBuiltIn7TypesQuestions(), adaptive: [] }
-          : resolveBankQuestions(bankId);
+          : resolveBankQuestions(bankId, subKey);
 
         const teacherFeedbackCfg = localStorage.getItem('MP_V2_TEACHER_FEEDBACK_MODE') || (mode === 'exam' ? 'after_submit' : 'immediate');
+        const timeLimitMin = mode === 'exam' ? ((examCfg && examCfg.timeLimitMin) || 15) : 0;
+        const baseQuota = (examCfg && examCfg.baseQuota) || (mode === 'exam' ? 20 : 25);
+        const wrongStreakScope = (examCfg && examCfg.wrongStreakScope) || 'topic';
 
         activeSession = MathCoreEngine.createSession({
           mode: mode,
-          examId: mode + '_' + bankId,
+          examId: extraOpts.examId || (mode + '_' + bankId),
           title: title,
           student: currentStudent,
           questions: pools.main,
           adaptiveQuestions: pools.adaptive,
+          baseQuota: baseQuota,
           randomize: mode === 'practice' ? randomize : true,
           adaptive: mode === 'drill',
-          timeLimitMin: mode === 'exam' ? 15 : 15,
-          feedbackMode: teacherFeedbackCfg
+          wrongStreakScope: wrongStreakScope,
+          timeLimitMin: timeLimitMin,
+          feedbackMode: teacherFeedbackCfg,
+          seed: extraOpts.seed,
+          isArena: Boolean(extraOpts.isArena)
         });
 
         if (mode === 'exam') {
-          openCheckinModal('start');
+          if (currentStudent && currentStudent.faceLoginVerified) {
+            const traceSnap = sessionStorage.getItem('MP_V2_FACE_TRACE_' + currentStudent.classID + '_' + currentStudent.studentID) || null;
+            activeSession.recordCheckin({
+              stage: 'start',
+              method: 'face_gate_verified',
+              imageBase64: traceSnap,
+              signatureText: (currentStudent.name || '') + ' (刷臉門禁自動留痕)',
+              signatureConfirmed: true
+            });
+          } else {
+            openCheckinModal('start');
+          }
         }
         startQuizTimer();
         renderCurrentQuestion();
@@ -666,7 +1229,7 @@
       function startQuizTimer() {
         if (quizTimerId) clearInterval(quizTimerId);
         const badge = document.getElementById('quizTimerBadge');
-        quizTimerId = setInterval(function () {
+        function updateTick() {
           if (!activeSession || activeSession.state.completed) {
             clearInterval(quizTimerId);
             return;
@@ -682,10 +1245,12 @@
           badge.textContent = `⏱️ ${mm}:${ss}`;
           if (rem <= 0) {
             clearInterval(quizTimerId);
-            alert('⏰ 15 分鐘作答時間到，系統自動交卷！');
+            alert('⏰ 作答時間到，系統自動交卷！');
             finishCurrentQuiz('time_up');
           }
-        }, 1000);
+        }
+        updateTick();
+        quizTimerId = setInterval(updateTick, 1000);
       }
 
       function renderCurrentQuestion() {
@@ -696,14 +1261,21 @@
 
         currentDraftAnswer = st.answers[q.id] !== undefined ? st.answers[q.id] : null;
         document.getElementById('quizTitleText').textContent = st.title;
-        document.getElementById('quizModeBadge').textContent = st.mode === 'practice' ? '離線練習' : (st.mode === 'exam' ? '限時測驗' : '聯網自適應');
+        const modeLabel = st.isArena
+          ? '⚔️ 擂台對戰'
+          : (st.mode === 'practice'
+              ? '📴 離線練習'
+              : (st.mode === 'exam'
+                  ? '🛡️ 限時測驗'
+                  : (st.mode === 'review' ? '📓 錯題重測' : '🚀 聯網自適應')));
+        document.getElementById('quizModeBadge').textContent = modeLabel;
         document.getElementById('quizProgressText').textContent = `第 ${st.currentIndex + 1} / ${st.targetQuota} 題`;
 
         const dosageEl = document.getElementById('quizDosageBadge');
         if (st.maliciousPenaltyActive) {
           dosageEl.className = 'dosage-badge penalty ms-2';
           dosageEl.textContent = `懲罰擴充: ${st.targetQuota}題`;
-        } else if (st.targetQuota > 25) {
+        } else if (st.targetQuota > (st.baseQuota || 25)) {
           dosageEl.className = 'dosage-badge escalated ms-2';
           dosageEl.textContent = `自適應擴充: ${st.targetQuota}題`;
         } else {
@@ -716,9 +1288,26 @@
         document.getElementById('qStemBox').innerHTML = q.stem || '';
 
         const diagWrap = document.getElementById('qDiagramBox');
-        if (q.diagram && q.type !== 'graph_plot') {
-          document.getElementById('qDiagramImg').src = q.diagram;
+        const diagImg = document.getElementById('qDiagramImg');
+        const diagFallback = document.getElementById('qDiagramFallback');
+        if (q.type !== 'graph_plot' && (q.diagram || q.diagram_spec)) {
           diagWrap.classList.remove('d-none');
+          if (q.diagram) {
+            diagImg.classList.remove('d-none');
+            if (diagFallback) diagFallback.classList.add('d-none');
+            diagImg.onerror = function () {
+              diagImg.classList.add('d-none');
+              if (diagFallback) {
+                diagFallback.textContent = '📐 圖形條件說明：' + (q.diagram_spec || '請依題幹條件分析作答');
+                diagFallback.classList.remove('d-none');
+              }
+            };
+            diagImg.src = q.diagram;
+          } else if (diagFallback && q.diagram_spec) {
+            diagImg.classList.add('d-none');
+            diagFallback.textContent = '📐 圖形條件說明：' + q.diagram_spec;
+            diagFallback.classList.remove('d-none');
+          }
         } else {
           diagWrap.classList.add('d-none');
         }
@@ -749,21 +1338,51 @@
         MathCoreContent.typesetMath(box);
       }
 
+      function validateAnswerBeforeSubmit(q, ans) {
+        if (ans === null || ans === undefined || ans === '') return '請先作答後再提交！';
+        const qType = (q && q.type) || 'single_choice';
+        if (qType === 'multi_select' || qType === 'plotting') {
+          if (!Array.isArray(ans) || ans.length === 0) return '請至少選擇一個選項或座標點後再提交！';
+        } else if (qType === 'matching') {
+          if (typeof ans !== 'object') return '請完成配對後再提交！';
+          const expectedCount = Array.isArray(q.leftItems) && q.leftItems.length > 0
+            ? q.leftItems.length
+            : (Array.isArray(q.pairs) ? q.pairs.length : Object.keys(q.correctPairs || {}).length);
+          const filledCount = Object.keys(ans).filter(k => ans[k] !== '' && ans[k] != null).length;
+          if (expectedCount > 0 && filledCount < expectedCount) return '請為每一項都選擇對應的配對項後再提交！';
+        } else if (qType === 'error_find') {
+          if (typeof ans !== 'object' || ans.stepIndex === null || ans.stepIndex === undefined || !ans.errorType) {
+            return '請同時點選「出錯步驟」並選擇「錯誤類型」後再提交！';
+          }
+        } else if (qType === 'upload_solution') {
+          if (typeof ans !== 'object' || !ans.imageBase64) {
+            return '請先選擇並上傳解答過程照片後再提交！';
+          }
+        }
+        return null;
+      }
+
       function submitCurrentAnswer() {
         if (!activeSession) return;
-        if (currentDraftAnswer === null || currentDraftAnswer === '') {
-          alert('請先作答後再提交！');
+        const q = activeSession.getCurrentQuestion();
+        const validationErr = validateAnswerBeforeSubmit(q, currentDraftAnswer);
+        if (validationErr) {
+          alert(validationErr);
           return;
         }
         const res = activeSession.submitAnswer(currentDraftAnswer);
         if (!res) return;
 
-        // Award points if correct
+        // Award points if correct according to mode & adaptive extra flag
         if (currentStudent && window.MathCoreBonus) {
           const sid = currentStudent.classID + '_' + currentStudent.studentID;
           const ev = activeSession.state.evaluations[res.qid];
           if (ev && ev.isCorrect) {
-            const pType = activeSession.state.mode === 'practice' ? 'practiceCorrect' : 'drillCorrect';
+            const mode = activeSession.state.mode;
+            let pType = 'drillCorrect';
+            if (mode === 'practice') pType = 'practiceCorrect';
+            else if (mode === 'review') pType = 'reviewRetestCorrect';
+            else if (q && q.isAdaptiveExtra) pType = 'adaptiveExtraCorrect';
             MathCoreBonus.PointsLedger.awardPoints(sid, pType);
           }
         }
@@ -775,9 +1394,15 @@
         }
 
         const fb = document.getElementById('qFeedbackBox');
-        if (res.feedbackMode === 'immediate') {
+        if (res.pendingTeacherGrade) {
+          fb.className = 'alert alert-info py-2 small';
+          fb.innerHTML = '📤 <strong>解答照片已上傳成功！</strong> 此題為綜合解答題，待老師於後台審閱批改後計分。';
+          fb.classList.remove('d-none');
+        } else if (res.feedbackMode === 'immediate') {
           fb.className = 'alert py-2 small ' + (res.isCorrect ? 'alert-success' : 'alert-danger');
-          fb.innerHTML = (res.isCorrect ? '✅ <strong>回答正確！</strong> ' : `❌ <strong>回答錯誤</strong>（正確答案：${JSON.stringify(res.correctAnswer)}） `) + (res.explanation || '');
+          fb.innerHTML = (res.isCorrect
+            ? '✅ <strong>回答正確！</strong> '
+            : `❌ <strong>回答錯誤</strong>（正確答案：${esc(JSON.stringify(res.correctAnswer))}） `) + (res.explanation || '');
           fb.classList.remove('d-none');
           MathCoreContent.typesetMath(fb);
         } else {
@@ -814,31 +1439,85 @@
       function finishCurrentQuiz(reason) {
         if (!activeSession) return;
         if (quizTimerId) clearInterval(quizTimerId);
+        const isArenaMatch = Boolean(activeSession.state.isArena);
         const summary = activeSession.finishSession(reason);
 
-        // Save best drill score for A8 auto-bonus calculation
-        if (currentStudent) {
+        // Save best drill score ONLY for drill mode (A8 auto-bonus calculation)
+        if (currentStudent && summary.mode === 'drill') {
           const sid = currentStudent.classID + '_' + currentStudent.studentID;
           const key = 'MP_V2_BEST_DRILL_' + sid;
           const prev = Number(localStorage.getItem(key) || 0);
           if (summary.score > prev) localStorage.setItem(key, String(summary.score));
         }
 
-        alert(`🎉 交卷完成！\n得分：${summary.score} 分 (${summary.correctCount}/${summary.totalQuestions})\n自適應加題：${summary.adaptiveAdditionsCount} 次\n數據已寫入本地並排入同步隊列！`);
+        let arenaMsg = '';
+        if (isArenaMatch && pendingArenaMatch && currentStudent && window.MathCoreBonus) {
+          const mySid = currentStudent.classID + '_' + currentStudent.studentID;
+          const opp = (pendingArenaMatch.players || []).find(p => (p.classID + '_' + p.studentID) !== mySid) || { classID: currentStudent.classID, studentID: '99', name: '同級挑戰者' };
+          const oppSid = opp.classID + '_' + opp.studentID;
+          const oppScore = 72;
+          const settled = MathCoreBonus.ArenaManager.settleMatch(pendingArenaMatch.matchId, {
+            [mySid]: { score: summary.score, durationMs: summary.durationMs || 60000 },
+            [oppSid]: { score: oppScore, durationMs: 75000 }
+          });
+          pendingArenaMatch = null;
+          if (settled && settled.ok) {
+            const won = settled.winnerSid === mySid;
+            arenaMsg = `\n⚔️ 擂台對戰結果：你 ${summary.score} 分 vs 對手 ${oppScore} 分 ➔ ${won ? '🏆 獲勝 (+10積分)' : '💪 完賽鼓勵 (+2積分)'}`;
+          }
+        }
+
+        alert(`🎉 交卷完成！\n得分：${summary.score} 分 (${summary.correctCount}/${summary.totalQuestions})\n自適應加題：${summary.adaptiveAdditionsCount} 次${arenaMsg}\n數據已寫入本地並排入同步隊列！`);
         openMeApp();
       }
 
       function openCheckinModal(stage) {
         checkinStage = stage || 'start';
+        if (currentStudent && currentStudent.faceLoginVerified) {
+          const traceSnap = sessionStorage.getItem('MP_V2_FACE_TRACE_' + currentStudent.classID + '_' + currentStudent.studentID) || null;
+          if (activeSession) {
+            activeSession.recordCheckin({
+              stage: checkinStage,
+              method: 'face_gate_verified',
+              imageBase64: traceSnap,
+              signatureText: (currentStudent.name || '') + ' (刷臉門禁自動留痕)',
+              signatureConfirmed: true
+            });
+          }
+          if (checkinStage === 'mid') {
+            alert('✅ 你已透過刷臉門禁登入並完成拍臉留痕，無需再次拍照或上傳帶簽名草稿！');
+          }
+          return;
+        }
+        const isMandatoryExamCheckin = Boolean(activeSession && activeSession.state.mode === 'exam' && (checkinStage === 'start' || checkinStage === 'submit'));
+        const laterBtn = document.getElementById('btnCheckinLater');
+        if (laterBtn) {
+          laterBtn.classList.toggle('d-none', isMandatoryExamCheckin);
+        }
+        const alertEl = document.getElementById('checkinAlert');
+        if (alertEl) alertEl.classList.add('d-none');
         document.getElementById('modalCheckin').classList.add('show');
       }
 
       function submitCheckinModal() {
         const method = document.querySelector('input[name="checkinMethod"]:checked').value;
         const fileInput = document.getElementById('checkinFileInput');
+        const sigInput = document.getElementById('checkinSignatureInput');
+        const alertEl = document.getElementById('checkinAlert');
         const file = fileInput.files && fileInput.files[0];
+        const sigText = sigInput ? sigInput.value.trim() : '';
+
+        if (!file && (!sigText || (currentStudent && !sigText.includes(currentStudent.name)))) {
+          if (alertEl) {
+            alertEl.textContent = `⚠️ 測驗安保規定：請拍攝上傳照片，或在電子簽名欄輸入包含本人姓名「${currentStudent ? currentStudent.name : ''}」的簽名確認！`;
+            alertEl.classList.remove('d-none');
+          }
+          return;
+        }
+        if (alertEl) alertEl.classList.add('d-none');
+
         if (!file) {
-          if (activeSession) activeSession.recordCheckin({ stage: checkinStage, method: method, signatureConfirmed: true });
+          if (activeSession) activeSession.recordCheckin({ stage: checkinStage, method: method, signatureText: sigText, signatureConfirmed: true });
           document.getElementById('modalCheckin').classList.remove('show');
           return;
         }
@@ -849,6 +1528,7 @@
               stage: checkinStage,
               method: method,
               imageBase64: ev.target.result,
+              signatureText: sigText,
               signatureConfirmed: true
             });
           }
@@ -870,9 +1550,9 @@
         } else {
           listEl.innerHTML = items.map((w, i) => `
             <div class="p-3 border rounded mb-2 bg-light">
-              <div class="small text-muted mb-1">#${i + 1} 【${w.topic || '數學'}】</div>
+              <div class="small text-muted mb-1">#${i + 1} 【${esc(w.topic || '數學')}】 ${w.mastered ? '<span class="badge bg-success">已重測掌握</span>' : '<span class="badge bg-warning text-dark">待重測</span>'}</div>
               <div class="fw-semibold mb-1">${w.stem || ''}</div>
-              <div class="small text-danger">你的作答：${JSON.stringify(w.userAnswer)} · 正確答案：${JSON.stringify(w.correctAnswer)}</div>
+              <div class="small text-danger">你的作答：${esc(JSON.stringify(w.userAnswer))} · 正確答案：${esc(JSON.stringify(w.correctAnswer))}</div>
               <div class="small text-secondary mt-1">${w.explanation || ''}</div>
             </div>
           `).join('');
@@ -898,9 +1578,13 @@
           title: '📓 錯題專項重測',
           student: currentStudent,
           questions: items,
+          baseQuota: items.length,
+          randomize: false,
           adaptive: false,
+          timeLimitMin: 0,
           feedbackMode: 'immediate'
         });
+        startQuizTimer();
         renderCurrentQuestion();
         showScreen('screen-quiz');
       }
@@ -946,9 +1630,9 @@
           ? '<div class="text-muted">暫無提問記錄</div>'
           : list.map(x => `
             <div class="p-2 border rounded mb-2 bg-white">
-              <div><strong>問：</strong>${x.question}</div>
+              <div><strong>問：</strong>${esc(x.question)}</div>
               <div class="mt-1 ${x.teacherReply ? 'text-success fw-semibold' : 'text-muted'}">
-                ${x.teacherReply ? '👩‍🏫 老師回覆：' + x.teacherReply : '⏳ 等待老師於後台回覆...'}
+                ${x.teacherReply ? '👩‍🏫 老師回覆：' + esc(x.teacherReply) : '⏳ 等待老師於後台回覆...'}
               </div>
             </div>
           `).join('');
@@ -957,65 +1641,143 @@
       // === A6 My Scores & A8 Auto-Bonus Cap ===
       function openMeApp() {
         if (!currentStudent) return;
-        const sid = currentStudent.classID + '_' + currentStudent.studentID;
-        const packs = (window.MathPlatformRegistry && MathPlatformRegistry.scorePacks) || [
-          { id: 'quiz_1023', title: '1023 隨堂小測' },
-          { id: 'quiz_1030', title: '1030 加密考卷' },
-          { id: 'quiz_1106', title: '1106 隨堂小測' }
-        ];
+        const reg = window.MathPlatformRegistry;
+        const packs = (reg && typeof reg.getScorePacksForClass === 'function')
+          ? reg.getScorePacksForClass(currentStudent.classID)
+          : ((reg && reg.scorePacks) || [
+              { id: 'quiz_1023', title: '1023 隨堂小測' },
+              { id: 'quiz_1030', title: '1030 加密考卷' },
+              { id: 'quiz_1106', title: '1106 隨堂小測' }
+            ]);
+        const safePacks = packs.length > 0 ? packs : [{ id: 'quiz_1023', title: '1023 隨堂小測' }];
         const tabs = document.getElementById('scorePackTabs');
-        tabs.innerHTML = packs.map((p, idx) => `
-          <button class="btn btn-sm ${idx === 0 ? 'btn-primary' : 'btn-outline-primary'}" onclick="AppUI.renderScorePack('${p.id}')">${p.title}</button>
+        tabs.innerHTML = safePacks.map((p, idx) => `
+          <button class="btn btn-sm ${idx === 0 ? 'btn-primary' : 'btn-outline-primary'}" data-pack-id="${esc(p.id)}" onclick="AppUI.renderScorePack('${esc(p.id)}')">${esc(p.title)}</button>
         `).join('');
-        renderScorePack(packs[0].id);
+        renderScorePack(safePacks[0].id);
         showScreen('screen-me');
       }
 
-      function renderScorePack(packId) {
+      async function renderScorePack(packId) {
         if (!currentStudent) return;
         const sid = currentStudent.classID + '_' + currentStudent.studentID;
-        let rawScore = 52;
-        if (packId === 'quiz_1023' && typeof window.getStudentQuiz1023Record === 'function') {
-          const r = window.getStudentQuiz1023Record({ classID: currentStudent.classID, studentID: currentStudent.studentID, name: currentStudent.name });
-          if (r && r.score !== undefined) rawScore = Number(r.score);
+        document.querySelectorAll('#scorePackTabs button').forEach(btn => {
+          const isAct = btn.getAttribute('data-pack-id') === packId;
+          btn.className = 'btn btn-sm ' + (isAct ? 'btn-primary' : 'btn-outline-primary');
+        });
+
+        let rawScore = 0;
+        let hasRecord = false;
+
+        if (window.MathCoreApi && typeof MathCoreApi.loadScorePack === 'function') {
+          try {
+            const loaded = await MathCoreApi.loadScorePack(packId, currentStudent);
+            if (loaded && loaded.ok && (loaded.found !== false)) {
+              const r = loaded.record || loaded;
+              const val = loaded.score !== undefined && loaded.score !== null
+                ? loaded.score
+                : (r.score !== undefined ? r.score : (r.newTotal !== undefined ? r.newTotal : (r.origTotal !== undefined ? r.origTotal : r.total)));
+              if (val !== undefined && val !== null) {
+                rawScore = Number(val);
+                hasRecord = true;
+              }
+            }
+          } catch (e) {}
         }
+
+        if (!hasRecord && packId === 'quiz_1023' && typeof window.getStudentQuiz1023Record === 'function') {
+          const r = window.getStudentQuiz1023Record({ classID: currentStudent.classID, studentID: currentStudent.studentID, name: currentStudent.name });
+          if (r) {
+            const val = r.score !== undefined ? r.score : (r.newTotal !== undefined ? r.newTotal : r.origTotal);
+            if (val !== undefined) {
+              rawScore = Number(val);
+              hasRecord = true;
+            }
+          }
+        }
+
         // Check teacher manual score adjustment (D3)
         const overrides = JSON.parse(localStorage.getItem('MP_V2_TEACHER_OVERRIDES') || '{}');
         if (overrides[packId + '_' + sid] !== undefined) {
           rawScore = Number(overrides[packId + '_' + sid]);
+          hasRecord = true;
+        }
+        const overrides2 = JSON.parse(localStorage.getItem('MP_V2_TEACHER_SCORE_OVERRIDES') || '{}');
+        if (overrides2[packId + ':' + sid] && overrides2[packId + ':' + sid].newScore !== undefined) {
+          rawScore = Number(overrides2[packId + ':' + sid].newScore);
+          hasRecord = true;
         }
 
-        const drillScore = Number(localStorage.getItem('MP_V2_BEST_DRILL_' + sid) || 85);
+        const drillScore = Number(localStorage.getItem('MP_V2_BEST_DRILL_' + sid) || 0);
         const capVal = Number(localStorage.getItem('MP_V2_BONUS_CAP') || 60);
+
+        // Sum redeemed quiz bonus points from student ledger (A13)
+        let redeemedBonus = 0;
+        if (window.MathCoreBonus && MathCoreBonus.PointsLedger) {
+          const bal = MathCoreBonus.PointsLedger.getBalance(sid);
+          (bal.entries || []).forEach(e => {
+            if (e.sourceType === 'redeem_quiz_bonus') {
+              redeemedBonus += Number((e.meta && e.meta.bonusPoints) || 1);
+            }
+          });
+        }
+
         const calc = MathCoreBonus.calculateQuizFinalScore({
           rawScore: rawScore,
           drillScore: drillScore,
-          redeemedBonus: 0,
+          redeemedBonus: redeemedBonus,
           rule: { threshold: 80, perPoint: 1, capScore: capVal }
         });
 
         document.getElementById('scoreDetailBox').innerHTML = `
           <div class="row text-center">
-            <div class="col-3"><div class="small text-muted">小測原始分</div><div class="fs-4 fw-bold">${calc.rawScore}</div></div>
-            <div class="col-3"><div class="small text-muted">刷題最高分 (>80加分)</div><div class="fs-4 fw-bold text-primary">${calc.drillScore} (+${calc.autoBonus})</div></div>
+            <div class="col-3"><div class="small text-muted">小測原始分</div><div class="fs-4 fw-bold">${calc.rawScore}${hasRecord ? '' : ' <span class="badge bg-secondary small">待登錄</span>'}</div></div>
+            <div class="col-3"><div class="small text-muted">刷題最高分 (>80加分)</div><div class="fs-4 fw-bold text-primary">${calc.drillScore} (+${calc.autoBonus + calc.redeemedBonus})</div></div>
             <div class="col-3"><div class="small text-muted">封頂上限 (老師設定)</div><div class="fs-4 fw-bold text-warning">${calc.capScore}</div></div>
             <div class="col-3"><div class="small text-muted">最終核定成績</div><div class="fs-3 fw-bold text-success">${calc.finalScore}</div></div>
           </div>
         `;
 
         // Render Leaderboard respecting teacher display mode (Section 六)
-        const displayMode = localStorage.getItem('MP_V2_RANK_DISPLAY_MODE') || 'real_name'; // real_name | seat_only | anonymous
-        const roster = (window.getStudentsByClass && window.getStudentsByClass(currentStudent.classID)) || [];
-        const rows = roster.slice(0, 10).map((s, idx) => {
-          const sScore = Math.max(45, 95 - idx * 4);
-          let label = `${s.classID} ${s.id}號 ${s.name}`;
-          if (displayMode === 'seat_only') label = `${s.classID} 班 ${s.id} 號`;
-          else if (displayMode === 'anonymous') label = `同學 #${idx + 1}`;
-          return `<tr><td>#${idx + 1}</td><td>${label}</td><td class="fw-bold">${sScore} 分</td></tr>`;
+        const displayMode = localStorage.getItem('MP_V2_RANK_DISPLAY_MODE') || 'real_name';
+        const lbBox = document.getElementById('examLeaderboardBox');
+        if (displayMode === 'hidden') {
+          lbBox.innerHTML = '<div class="text-muted small py-2">🔒 依教師設定，目前不公開班級成績排名。</div>';
+          return;
+        }
+
+        const roster = ((window.getStudentsByClass && window.getStudentsByClass(currentStudent.classID)) || [])
+          .filter(s => !s.isTeacherTest && String(s.id) !== '98');
+
+        const scoredRoster = roster.map(s => {
+          const sSid = s.classID + '_' + s.id;
+          let sRaw = 0;
+          if (packId === 'quiz_1023' && typeof window.getStudentQuiz1023Record === 'function') {
+            const rec = window.getStudentQuiz1023Record({ classID: s.classID, studentID: s.id, name: s.name });
+            if (rec) sRaw = Number(rec.newTotal !== undefined ? rec.newTotal : (rec.origTotal !== undefined ? rec.origTotal : (rec.score || 0)));
+          }
+          if (overrides[packId + '_' + sSid] !== undefined) sRaw = Number(overrides[packId + '_' + sSid]);
+          if (overrides2[packId + ':' + sSid] && overrides2[packId + ':' + sSid].newScore !== undefined) sRaw = Number(overrides2[packId + ':' + sSid].newScore);
+          const sDrill = Number(localStorage.getItem('MP_V2_BEST_DRILL_' + sSid) || 0);
+          const sCalc = MathCoreBonus.calculateQuizFinalScore({
+            rawScore: sRaw,
+            drillScore: sDrill,
+            redeemedBonus: 0,
+            rule: { threshold: 80, perPoint: 1, capScore: capVal }
+          });
+          return { student: s, score: sCalc.finalScore };
+        }).sort((a, b) => b.score - a.score);
+
+        const rows = scoredRoster.slice(0, 10).map((item, idx) => {
+          const s = item.student;
+          const label = (window.MathCoreUI && typeof MathCoreUI.formatLeaderboardName === 'function')
+            ? MathCoreUI.formatLeaderboardName({ classID: s.classID, studentID: s.id, name: s.name }, idx + 1, displayMode)
+            : `${s.classID} ${s.id}號 ${s.name}`;
+          return `<tr><td>#${idx + 1}</td><td>${esc(label)}</td><td class="fw-bold">${item.score} 分</td></tr>`;
         }).join('');
-        document.getElementById('examLeaderboardBox').innerHTML = `
+        lbBox.innerHTML = `
           <table class="table table-sm table-striped mb-0">
-            <thead><tr><th>名次</th><th>學生 (${displayMode})</th><th>成績</th></tr></thead>
+            <thead><tr><th>名次</th><th>學生 (${esc(displayMode)})</th><th>成績</th></tr></thead>
             <tbody>${rows}</tbody>
           </table>
         `;
@@ -1033,7 +1795,7 @@
           ? '<div class="text-muted">尚無積分記錄，快去答題或挑戰遊戲賺取積分吧！</div>'
           : bal.entries.slice().reverse().map(e => `
             <div class="d-flex justify-content-between border-bottom py-1">
-              <span>${e.dateStr} · ${e.sourceType} (${e.status === 'pending' ? '⏳待入帳' : '✅已入帳'})</span>
+              <span>${esc(e.dateStr)} · ${esc(e.sourceType)} (${e.status === 'pending' ? '⏳待入帳' : '✅已入帳'})</span>
               <strong class="${e.amount >= 0 ? 'text-success' : 'text-danger'}">${e.amount >= 0 ? '+' + e.amount : e.amount}</strong>
             </div>
           `).join('');
@@ -1048,37 +1810,70 @@
           alert(res.error);
           return;
         }
-        alert('🎉 兌換成功：' + (meta && meta.title || targetType));
+        alert('🎉 兌換成功：' + (meta && (meta.title || meta.itemTitle) || targetType));
         openPointsApp();
         refreshTopBadges();
       }
 
       // === A11 Math Games Hall ===
-      function openGamesApp() {
-        if (!currentStudent) return;
+      function updateGamePlaytimeBadge() {
+        if (!currentStudent || !window.MathCoreBonus) return null;
         const sid = currentStudent.classID + '_' + currentStudent.studentID;
         const st = MathCoreBonus.GameBridge.getPlaytimeStatus(sid);
         const remMin = Math.floor(st.remainingMs / 60000);
         const remSec = Math.floor((st.remainingMs % 60000) / 1000);
-        document.getElementById('gamePlaytimeBadge').textContent = `今日剩餘：${remMin}分${String(remSec).padStart(2, '0')}秒`;
+        const badge = document.getElementById('gamePlaytimeBadge');
+        if (badge) {
+          badge.className = 'badge fs-6 ' + (st.locked ? 'bg-danger' : (st.warning ? 'bg-warning text-dark' : 'bg-success'));
+          badge.textContent = `今日剩餘：${remMin}分${String(remSec).padStart(2, '0')}秒`;
+        }
+        return st;
+      }
 
-        const games = (window.MathCoreConfig && MathCoreConfig.games && MathCoreConfig.games.catalog) || [];
+      function stopGamePlaytimeTracker() {
+        if (gameTimerId) {
+          clearInterval(gameTimerId);
+          gameTimerId = null;
+        }
+        if (activeGameId && gameLastTickTs > 0 && currentStudent && window.MathCoreBonus) {
+          const sid = currentStudent.classID + '_' + currentStudent.studentID;
+          const elapsed = Math.max(0, Date.now() - gameLastTickTs);
+          if (elapsed > 0) {
+            MathCoreBonus.GameBridge.recordPlayDuration(sid, elapsed, activeGameId);
+          }
+        }
+        activeGameId = null;
+        gameLastTickTs = 0;
+      }
+
+      function openGamesApp() {
+        if (!currentStudent) return;
+        const st = updateGamePlaytimeBadge() || { locked: false };
+        const regGames = (window.MathPlatformRegistry && MathPlatformRegistry.games) || [];
+        const cfgGames = (window.MathCoreConfig && MathCoreConfig.games && MathCoreConfig.games.catalog) || [];
+        const games = regGames.length > 0 ? regGames : cfgGames;
+
         document.getElementById('gameCardsRow').innerHTML = games.map(g => `
           <div class="col-md-4">
             <div class="p-3 border rounded bg-light h-100 d-flex flex-column justify-content-between">
               <div>
-                <h6 class="fw-bold">${g.title}</h6>
+                <h6 class="fw-bold">${esc(g.title)}</h6>
                 <div class="small text-muted mb-2">計分模式：${g.scoringMode === 'win_speed' ? '勝場100分 + 速度加成' : '原生連擊計分'}</div>
               </div>
               <div class="d-flex gap-2">
-                <button class="btn btn-primary btn-sm flex-grow-1" onclick="AppUI.launchGame('${g.id}', '${g.title}', '${g.path}')" ${st.locked ? 'disabled' : ''}>${st.locked ? '今日時長已用完' : '▶ 開始遊戲'}</button>
-                <button class="btn btn-outline-secondary btn-sm" onclick="AppUI.renderGamesLeaderboard('${g.id}')">榜單</button>
+                <button class="btn btn-primary btn-sm flex-grow-1" data-gid="${esc(g.id)}" data-gtitle="${esc(g.title)}" data-gpath="${esc(g.path)}" onclick="AppUI.launchGameFromBtn(this)" ${st.locked ? 'disabled' : ''}>${st.locked ? '今日時長已用完' : '▶ 開始遊戲'}</button>
+                <button class="btn btn-outline-secondary btn-sm" onclick="AppUI.renderGamesLeaderboard('${esc(g.id)}')">榜單</button>
               </div>
             </div>
           </div>
         `).join('');
         renderGamesLeaderboard(games[0] ? games[0].id : 'trig-ratio');
         showScreen('screen-games');
+      }
+
+      function launchGameFromBtn(btn) {
+        if (!btn) return;
+        launchGame(btn.getAttribute('data-gid'), btn.getAttribute('data-gtitle'), btn.getAttribute('data-gpath'));
       }
 
       function launchGame(gameId, title, path) {
@@ -1089,12 +1884,29 @@
           alert('⚠️ 今日 30 分鐘遊戲防沉迷時長已用完！請進入「積分中心」用積分兌換加時。');
           return;
         }
+        stopGamePlaytimeTracker();
+        activeGameId = gameId;
+        gameLastTickTs = Date.now();
         document.getElementById('activeGameTitle').textContent = `🎮 ${title}（實名玩家：${currentStudent.name}）`;
         document.getElementById('gameIframe').src = path;
         document.getElementById('gameIframeWrap').classList.remove('d-none');
+
+        gameTimerId = setInterval(function () {
+          if (!currentStudent || !activeGameId) return;
+          const now = Date.now();
+          const delta = Math.max(0, now - gameLastTickTs);
+          gameLastTickTs = now;
+          const curSt = MathCoreBonus.GameBridge.recordPlayDuration(sid, delta, activeGameId);
+          updateGamePlaytimeBadge();
+          if (curSt.locked || curSt.remainingMs <= 0) {
+            closeGameIframe();
+            alert('⏰ 今日遊戲時長已達防沉迷上限，系統已自動關閉遊戲！');
+          }
+        }, 1000);
       }
 
       function closeGameIframe() {
+        stopGamePlaytimeTracker();
         document.getElementById('gameIframe').src = 'about:blank';
         document.getElementById('gameIframeWrap').classList.add('d-none');
         openGamesApp();
@@ -1104,10 +1916,10 @@
         const top10 = MathCoreBonus.GameBridge.getTop10(gameId);
         const box = document.getElementById('gameLeaderboardBox');
         box.innerHTML = top10.length === 0
-          ? `<div class="text-muted small">【${gameId}】暫無今日排行記錄，快來拿下第一名！</div>`
+          ? `<div class="text-muted small">【${esc(gameId)}】暫無今日排行記錄，快來拿下第一名！</div>`
           : `<table class="table table-sm table-bordered mb-0">
               <thead><tr><th>排名</th><th>實名學生</th><th>最高得分</th><th>用時</th></tr></thead>
-              <tbody>${top10.map((r, i) => `<tr><td>#${i + 1}</td><td>${r.classID} ${r.name}</td><td class="fw-bold text-primary">${r.score}</td><td>${Math.round(r.durationMs / 1000)}s</td></tr>`).join('')}</tbody>
+              <tbody>${top10.map((r, i) => `<tr><td>#${i + 1}</td><td>${esc(r.classID)} ${esc(r.name)}</td><td class="fw-bold text-primary">${Number(r.score || 0)}</td><td>${Math.round(Number(r.durationMs || 0) / 1000)}s</td></tr>`).join('')}</tbody>
             </table>`;
       }
 
@@ -1121,7 +1933,7 @@
       function openArenaLobby() {
         const status = MathCoreBonus.ArenaManager.isOpenNow();
         document.getElementById('arenaWindowNotice').innerHTML =
-          `當前澳門時間：${status.dateStr} ${status.timeStr} · 狀態：<strong>${status.open ? '🟢 擂台開放中' : '🕒 非開放時段（仍可體驗模擬配對）'}</strong>`;
+          `當前澳門時間：${esc(status.dateStr)} ${esc(status.timeStr)} · 狀態：<strong>${status.open ? '🟢 擂台開放中' : '🕒 非開放時段（可進行模擬配對體驗）'}</strong>`;
         document.getElementById('modalArena').classList.add('show');
       }
 
@@ -1133,25 +1945,38 @@
         if (res.matched && res.match) {
           pendingArenaMatch = res.match;
           document.getElementById('arenaInviteStateBox').innerHTML =
-            `🎉 <strong>配對成功！</strong> 系統監測到兩個終端在 1 分鐘內同時同意配對！<br>對手：<strong>${res.match.players[1].name}</strong>（同題隨機碼：#${res.match.seed}）`;
+            `🎉 <strong>配對成功！</strong> 系統監測到兩個終端在 1 分鐘內同時同意配對！<br>對手：<strong>${esc(res.match.players[1].name)}</strong>（同題隨機碼：#${esc(res.match.seed)}）`;
           document.getElementById('btnArenaEnterMatch').classList.remove('d-none');
         }
       }
 
       function enterArenaMatchNow() {
         document.getElementById('modalArena').classList.remove('show');
-        startQuizSession('drill', '4cd_1102', '⚔️ 網絡擂台賽即時對戰');
+        const cls = currentStudent ? String(currentStudent.classID) : '4C';
+        const arenaBankId = cls.startsWith('5') ? '5bc_1102' : '4cd_1102';
+        const seed = pendingArenaMatch ? pendingArenaMatch.seed : Date.now();
+        startQuizSession('drill', arenaBankId, '⚔️ 網絡擂台賽即時對戰', {
+          seed: seed,
+          isArena: true,
+          examId: 'arena_' + arenaBankId
+        });
       }
 
       return {
         init: init,
         showScreen: showScreen,
+        manualFlushSync: manualFlushSync,
+        startGateCamera: startGateCamera,
+        captureAndRecognizeGate: captureAndRecognizeGate,
+        selectGateCandidate: selectGateCandidate,
         populateSeatSelect: populateSeatSelect,
         handleGateLogin: handleGateLogin,
         logout: logout,
         confirmConsent: confirmConsent,
         toggleConsent: toggleConsent,
         openPracticeSelector: openPracticeSelector,
+        startQuizFromBtn: startQuizFromBtn,
+        resumeSavedQuiz: resumeSavedQuiz,
         startQuizSession: startQuizSession,
         triggerHint: triggerHint,
         submitCurrentAnswer: submitCurrentAnswer,
@@ -1169,6 +1994,7 @@
         openPointsApp: openPointsApp,
         redeemAction: redeemAction,
         openGamesApp: openGamesApp,
+        launchGameFromBtn: launchGameFromBtn,
         launchGame: launchGame,
         closeGameIframe: closeGameIframe,
         renderGamesLeaderboard: renderGamesLeaderboard,
